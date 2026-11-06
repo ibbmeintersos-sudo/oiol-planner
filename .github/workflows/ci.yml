@@ -2,7 +2,7 @@ name: OIOL CI
 
 on:
   push:
-    branches: [main, "hardening/**"]
+    branches: [main, "hardening/**", "feature/**"]
   pull_request:
     branches: [main]
   workflow_dispatch:
