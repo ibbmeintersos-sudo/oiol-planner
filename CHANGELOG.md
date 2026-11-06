@@ -5,6 +5,7 @@
 ### Added
 - OpenCode task runner with an end-to-end task deadline, cancellation propagation, failed-session cleanup, and mandatory independent verification.
 - Durable JSONL event-store schema validation and strict per-run sequence enforcement.
+- Read-only interrupted-run inspector that identifies uncertain and not-started tasks without unsafe automatic resume.
 - Node.js 22/24 CI matrix.
 - Regression coverage for task lifecycle, cancellation, retries, event-store restart, corruption, and concurrent appends.
 
