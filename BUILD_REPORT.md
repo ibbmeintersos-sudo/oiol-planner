@@ -1,4 +1,4 @@
-# OIOL Planner v0.1.2 — Hardening and integration contract report
+# OIOL Planner v0.2.0 — Engineering hardening report
 
 ## Provenance
 
@@ -23,20 +23,35 @@ This codebase began as a reconstructed implementation based on the retained v0.1
 - Improved evaluation dependency diagnostics.
 - Propagated re-verification requirements to transitive downstream tasks when upstream tasks change.
 
+## v0.2.0 — Human-gated execution orchestration
+
+- Added a deterministic task state machine and dependency-aware execution engine.
+- Requires explicit human approval bound to a SHA-256 fingerprint of the exact plan revision.
+- Requires a runner with separate execute and verify methods.
+- Requires an explicit event store; includes in-memory and append-only JSONL implementations with restrictive file permissions and sequence checks.
+- Uses bounded concurrency, but only when the runner explicitly declares concurrency safety; otherwise it serializes work.
+- Exposes only declared dependency outputs to each task.
+- Retries default to zero; optional retries reuse stable task idempotency keys.
+- Supports fail-fast, cancellation and blocked dependents after failures.
+- Added OpenCode task runner using documented server routes; it requires a separate verification callback and serializes tasks because no Git worktree isolation is implemented.
+- No automatic resume or exactly-once guarantee is claimed.
+
 ## Automated validation
 
-GitHub Actions runs Node.js 20 syntax checks over every source module and the complete node:test suite. The v0.1.2 pull request checks completed successfully:
+GitHub Actions runs Node.js 20 syntax checks over every source module and the complete node:test suite.
 
-- Push CI: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42298039133
-- Pull request CI: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42298070272
+- v0.1.2 integration CI: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42298070272
+- v0.2.0 push CI: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42299201813
 
-The tests use fake HTTP transports. They do not establish compatibility against live provider accounts or a running OpenCode server.
+The v0.2.0 push CI passed 62 tests: 62 passed, 0 failed. Provider and OpenCode tests use fake HTTP transports; no live provider credentials or OpenCode server were used.
 
 ## Remaining limitations
 
-- No autonomous execution/orchestration engine, worker lifecycle manager, worktree isolation manager, merge coordinator, or durable execution event log.
-- No exactly-once recovery guarantee.
-- Repository scanning remains heuristic; redaction cannot guarantee all secrets are removed.
+- No Git worktree isolation or safe parallel OpenCode task execution.
+- No process-crash recovery/reconciliation for uncertain tasks; no exactly-once semantics.
+- No merge coordinator or final repository acceptance gate that runs a configurable test matrix.
+- Repository scanning and secret redaction remain heuristic.
 - No live provider/OpenCode end-to-end test matrix.
-- No baseline or comparative benchmark demonstrating planning quality or speed against stock OpenCode or other coding agents.
-- Not production-ready for autonomous repository modification.
+- No benchmark against stock OpenCode or other coding agents; superiority is not established.
+- The CLI currently creates plans; the execution engine is exposed as a library and is not yet wired into an end-user execution command.
+- Not production-ready for unattended autonomous repository modification.
