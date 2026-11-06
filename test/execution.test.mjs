@@ -130,7 +130,7 @@ test('recovery inspector validates finished run ledger and rejects trailing even
     {eventId:'e5',runId:'finished',sequence:5,type:'run.finished',at,status:'completed',counts:{completed:1}}
   ];
   assert.equal(inspectExecutionRun(events).finished,true);
-  assert.throws(()=>inspectExecutionRun([...events,{eventId:'e6',runId:'finished',sequence:6,type:'task.ready',at,taskId:'t2}]),/after run.finished/);
+  assert.throws(()=>inspectExecutionRun([...events,{eventId:'e6',runId:'finished',sequence:6,type:'task.ready',at,taskId:'t2'}]),/after run.finished/);
 });
 
 test('recovery inspector rejects sequence gaps and plan fingerprint mismatch',()=>{
