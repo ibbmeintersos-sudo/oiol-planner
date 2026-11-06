@@ -49,7 +49,7 @@ Supported providers:
 | Google Gemini | `gemini` | `generateContent` API |
 | Ollama | `ollama` | Local `/api/chat` endpoint |
 
-Configuration is read from `.env` when supported by the Node runtime, or from shell environment variables. Do not commit `.env`.
+Configuration is read from `.env` when supported by the Node runtime, or from shell environment variables. `OIOL_TIMEOUT_MS` controls request timeout and `OIOL_MAX_RETRIES` controls bounded retry attempts (0–5). Do not commit `.env`.
 
 ## Output structure
 
@@ -89,8 +89,8 @@ The deterministic validator enforces the plan structure, unique IDs, requirement
 
 ## Current limitations
 
-- No real provider request is included in the automated tests; provider integrations require live credentials and network access to validate end-to-end.
-- OpenCode adapter is a minimal HTTP wrapper; no live OpenCode server test is included.
+- Provider contract tests exercise request/response shapes and retry behavior through fake HTTP transports. No live provider request with real credentials has been run.
+- OpenCode adapter is a minimal HTTP wrapper. Automated contract tests use a fake HTTP transport; no live OpenCode server test is included.
 - No AST-based import graph, persistent event store, execution engine, worker manager, merge coordinator, or exactly-once recovery.
 - No baseline benchmark against stock OpenCode has yet been run. Performance or quality superiority is not claimed.
 - Provider review can be unavailable; in that case the plan remains `needs_revision`.
