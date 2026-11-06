@@ -11,13 +11,15 @@ function validateEvent(event) {
 }
 
 export class InMemoryEventStore {
-  constructor(){this.events=[];this.lastSequence=new Map();}
+  constructor(){this.events=[];this.lastSequence=new Map();this.eventIds=new Set();}
   async append(event){
     validateEvent(event);
+    if(this.eventIds.has(event.eventId)) throw new Error(`Duplicate eventId: ${event.eventId}`);
     const previous=this.lastSequence.get(event.runId)||0;
     if(event.sequence!==previous+1) throw new Error(`Non-monotonic event sequence for run ${event.runId}: expected ${previous+1}, received ${event.sequence}`);
     this.events.push(structuredClone(event));
     this.lastSequence.set(event.runId,event.sequence);
+    this.eventIds.add(event.eventId);
     return event;
   }
   async read(runId){return this.events.filter(event=>event.runId===runId).map(event=>structuredClone(event));}
@@ -29,6 +31,7 @@ export class JsonlEventStore {
     this.filePath=path.resolve(filePath);
     this.queue=Promise.resolve();
     this.lastSequence=new Map();
+    this.eventIds=new Set();
     this.initialized=false;
   }
   async #initialize(){
@@ -41,9 +44,11 @@ export class JsonlEventStore {
       let event;
       try{event=JSON.parse(line);}catch(error){throw new Error(`Corrupt event log at line ${index+1}: ${error.message}`);}
       try{validateEvent(event);}catch(error){throw new Error(`Invalid event record at line ${index+1}: ${error.message}`);}
+      if(this.eventIds.has(event.eventId)) throw new Error(`Duplicate eventId at line ${index+1}: ${event.eventId}`);
       const previous=this.lastSequence.get(event.runId)||0;
       if(event.sequence!==previous+1) throw new Error(`Non-monotonic event sequence at line ${index+1} for run ${event.runId}`);
       this.lastSequence.set(event.runId,event.sequence);
+      this.eventIds.add(event.eventId);
     }
     this.initialized=true;
   }
@@ -51,6 +56,7 @@ export class JsonlEventStore {
     const operation=async()=>{
       validateEvent(event);
       await this.#initialize();
+      if(this.eventIds.has(event.eventId)) throw new Error(`Duplicate eventId: ${event.eventId}`);
       const previous=this.lastSequence.get(event.runId)||0;
       if(event.sequence!==previous+1) throw new Error(`Non-monotonic event sequence for run ${event.runId}: expected ${previous+1}, received ${event.sequence}`);
       await fs.mkdir(path.dirname(this.filePath),{recursive:true});
@@ -58,6 +64,7 @@ export class JsonlEventStore {
       try{await handle.chmod(0o600);await handle.writeFile(JSON.stringify(event)+'\n','utf8');await handle.sync();}
       finally{await handle.close();}
       this.lastSequence.set(event.runId,event.sequence);
+      this.eventIds.add(event.eventId);
       return event;
     };
     const pending=this.queue.then(operation,operation);
@@ -72,11 +79,14 @@ export class JsonlEventStore {
     catch(error){if(error.code==='ENOENT')return [];throw error;}
     const events=[];
     const lastSeen=new Map();
+    const seenEventIds=new Set();
     for(const [index,line] of content.split('\n').entries()){
       if(!line.trim()) continue;
       let event;
       try{event=JSON.parse(line);}catch(error){throw new Error(`Corrupt event log at line ${index+1}: ${error.message}`);}
       try{validateEvent(event);}catch(error){throw new Error(`Invalid event record at line ${index+1}: ${error.message}`);}
+      if(seenEventIds.has(event.eventId)) throw new Error(`Duplicate eventId at line ${index+1}: ${event.eventId}`);
+      seenEventIds.add(event.eventId);
       const previous=lastSeen.get(event.runId)||0;
       if(event.sequence!==previous+1) throw new Error(`Non-monotonic event sequence at line ${index+1} for run ${event.runId}`);
       lastSeen.set(event.runId,event.sequence);
