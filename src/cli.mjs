@@ -9,7 +9,7 @@ import { deriveTaskInterfaces } from './core/task-interface.mjs';
 import { buildTraceability } from './core/traceability.mjs';
 function args(argv){const o={};for(let i=0;i<argv.length;i++){const x=argv[i];if(x==='--help'||x==='-h')o.help=true;else if(x.startsWith('--'))o[x.slice(2)]=argv[++i];}return o;}
 const a=args(process.argv.slice(2));
-if(a.help){console.log(`OIOL Planner v0.1.2\n\nUsage:\n  node src/cli.mjs --mode greenfield --name "My App" --request "Build ..." --out plan.json\n  node src/cli.mjs --mode existing --repo ./repo --request "Improve ..." --out plan.json\n\nEnvironment: OIOL_PROVIDER, OIOL_MODEL, OIOL_BASE_URL, OIOL_API_KEY, OIOL_TIMEOUT_MS, OIOL_MAX_RETRIES\nProviders: openai-compatible, anthropic, gemini, ollama`);process.exit(0);}
+if(a.help){console.log(`OIOL Planner v0.2.0\n\nUsage:\n  node src/cli.mjs --mode greenfield --name "My App" --request "Build ..." --out plan.json\n  node src/cli.mjs --mode existing --repo ./repo --request "Improve ..." --out plan.json\n\nEnvironment: OIOL_PROVIDER, OIOL_MODEL, OIOL_BASE_URL, OIOL_API_KEY, OIOL_TIMEOUT_MS, OIOL_MAX_RETRIES\nProviders: openai-compatible, anthropic, gemini, ollama`);process.exit(0);}
 try{
  if(!a.mode||!['greenfield','existing'].includes(a.mode))throw new Error('--mode must be greenfield or existing');
  if(!a.request)throw new Error('--request is required');
