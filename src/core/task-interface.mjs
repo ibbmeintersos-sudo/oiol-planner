@@ -1,0 +1,1 @@
+export function deriveTaskInterfaces(plan){return (plan.tasks||[]).map(t=>({taskId:t.id,title:t.title,inputs:(t.dependencies||[]).map(id=>({fromTaskId:id,artifact:'declared task output'})),outputs:(t.outputs||[]).map(x=>x),acceptanceCriteria:t.acceptanceCriteria||[],consumers:(plan.tasks||[]).filter(x=>(x.dependencies||[]).includes(t.id)).map(x=>x.id)}));}

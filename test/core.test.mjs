@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { validatePlan } from '../src/core/validator.mjs';
+import { topologicalWaves } from '../src/core/graph.mjs';
+import { comparePlans } from '../src/core/revision.mjs';
+import { buildTraceability } from '../src/core/traceability.mjs';
+import { evaluatePlan } from '../src/core/evaluate.mjs';
+const base={requirements:[{id:'r1',statement:'Login'}],architecture:{components:[{id:'c1',name:'Auth'}]},tasks:[{id:'t1',title:'Implement login',requirementIds:['r1'],componentIds:['c1'],dependencies:[],acceptanceCriteria:['User can login'],writeScope:['src/auth']}],dependencyGraph:{nodes:['t1'],edges:[]},clarifications:[],risks:[]};
+test('valid plan passes deterministic validation',()=>assert.equal(validatePlan(base).valid,true));
+test('unknown requirement reference fails',()=>{const p=structuredClone(base);p.tasks[0].requirementIds=['missing'];assert.equal(validatePlan(p).valid,false);});
+test('unsafe path fails',()=>{const p=structuredClone(base);p.tasks[0].writeScope=['../secrets'];assert.equal(validatePlan(p).valid,false);});
+test('dependency cycle is detected',()=>{const p=structuredClone(base);p.tasks.push({...p.tasks[0],id:'t2',dependencies:['t1']});p.dependencyGraph.edges=[{from:'t1',to:'t2'},{from:'t2',to:'t1'}];assert.equal(validatePlan(p).valid,false);});
+test('topological waves respect dependencies',()=>{const r=topologicalWaves([{id:'a'},{id:'b'},{id:'c'}],[{from:'a',to:'c'}]);assert.deepEqual(r.waves[0],['a','b']);assert.deepEqual(r.waves[1],['c']);});
+test('write scopes serialize overlapping work',()=>{const r=topologicalWaves([{id:'a',writeScope:['src']},{id:'b',writeScope:['src/auth']}]);assert.equal(r.waves.length,2);});
+test('revision detects added and changed tasks',()=>{const n=structuredClone(base);n.tasks[0].title='Improve login';n.tasks.push({id:'t2'});const r=comparePlans(base,n);assert.deepEqual(r.modified,['t1']);assert.deepEqual(r.new,['t2']);});
+test('traceability distinguishes mapped from verified',()=>{const t=buildTraceability(base);assert.equal(t.mappingCoverage,1);assert.equal(t.verificationComplete,false);});
+test('evaluation exposes conflict pairs',()=>{const p=structuredClone(base);p.tasks.push({id:'t2',title:'other',acceptanceCriteria:['ok'],writeScope:['src/auth']});assert.deepEqual(evaluatePlan(p).metrics.concurrentWriteConflictPairs,[['t1','t2']]);});
