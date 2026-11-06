@@ -139,3 +139,16 @@ test('recovery inspector rejects sequence gaps and plan fingerprint mismatch',()
   assert.throws(()=>inspectExecutionRun(events,{expectedPlanFingerprint:'different'}),/fingerprint/);
   assert.throws(()=>inspectExecutionRun([...events,{eventId:'e2',runId:'r',sequence:3,type:'run.finished',at,status:'completed',counts:{}}]),/sequence/);
 });
+
+test('execution engine exposes read-only run inspection',async()=>{
+  const store=new InMemoryEventStore();
+  const engine=makeEngine({runner:successRunner,eventStore:store});
+  const at=new Date().toISOString();
+  await store.append({eventId:'e1',runId:'inspect',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:1});
+  await store.append({eventId:'e2',runId:'inspect',sequence:2,type:'task.ready',at,taskId:'t1'});
+  await store.append({eventId:'e3',runId:'inspect',sequence:3,type:'task.attempt.started',at,taskId:'t1',attempt:1});
+  const result=await engine.inspectRun('inspect',{expectedPlanId:'p1'});
+  assert.deepEqual(result.uncertainTaskIds,['t1']);
+  assert.equal(result.recoveryAllowed,false);
+  await assert.rejects(()=>engine.inspectRun('missing'),/No execution events found/);
+});
