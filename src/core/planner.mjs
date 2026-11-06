@@ -1,35 +1,54 @@
 import { emptyPlan } from '../contracts/types.mjs';
 import { PLANNER_SYSTEM_PROMPT, plannerUserPrompt, REVIEW_SYSTEM_PROMPT } from './prompts.mjs';
 import { validatePlan } from './validator.mjs';
-import { id } from './utils.mjs';
+import { dependencyEdgesFromTasks } from './graph.mjs';
+import { isObject } from './utils.mjs';
 export class HybridPlanner {
- constructor({provider,reviewer=provider,maxRepairRounds=2}={}){if(!provider)throw new Error('A planning provider is required');Object.assign(this,{provider,reviewer,maxRepairRounds});}
- async createPlan(project){
-  const first=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT,user:plannerUserPrompt(project),temperature:0});
-  let plan=normalize(first.data,project), validation=validatePlan(plan,project);
-  for(let i=0;i<this.maxRepairRounds&&!validation.valid;i++){
-   const repaired=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT+'\nRepair the supplied plan. Fix every validation error. Return the complete JSON plan.',user:JSON.stringify({project,plan,validation},null,2),temperature:0});
-   plan=normalize(repaired.data,project);validation=validatePlan(plan,project);
+  constructor({provider,reviewer=provider,maxRepairRounds=2}={}) {
+    if(!provider) throw new Error('A planning provider is required');
+    if(!Number.isInteger(maxRepairRounds)||maxRepairRounds<0||maxRepairRounds>5) throw new Error('maxRepairRounds must be an integer from 0 to 5');
+    Object.assign(this,{provider,reviewer,maxRepairRounds});
   }
-  let review=null;
-  try{
-   const result=await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0});
-   review=result.data;
-   const critical=(review.findings||[]).some(x=>['high','critical'].includes(x.severity));
-   if(critical&&this.provider!==this.reviewer){
-    const fixed=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT+'\nRevise the plan to resolve the review findings. Return the full plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
-    plan=normalize(fixed.data,project);validation=validatePlan(plan,project);
-    const again=await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0});review=again.data;
-   }
-  }catch(e){review={status:'needs_revision',summary:`Review unavailable: ${e.message}`,findings:[]};}
-  plan.review=review;plan.validation=validation;
-  plan.status=!validation.valid?'blocked':review?.status==='approved'?'ready_for_review':'needs_revision';
+  async createPlan(project) {
+    const first=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT,user:plannerUserPrompt(project),temperature:0});
+    let plan=normalize(first.data,project),validation=validatePlan(plan,project);
+    for(let round=0;round<this.maxRepairRounds&&!validation.valid;round++) {
+      const repaired=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT+'\nRepair the supplied plan. Fix every validation error. Return the complete JSON plan.',user:JSON.stringify({project,plan,validation},null,2),temperature:0});
+      plan=normalize(repaired.data,project); validation=validatePlan(plan,project);
+    }
+    let review=null,reviewError=null;
+    if(validation.valid&&this.reviewer) {
+      try { review=validateReview((await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
+      catch(error) { reviewError=error; }
+      for(let round=0;round<this.maxRepairRounds&&review&&hasHighFindings(review);round++) {
+        const fixed=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
+        plan=normalize(fixed.data,project); validation=validatePlan(plan,project);
+        if(!validation.valid) break;
+        try { review=validateReview((await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
+        catch(error) { review=null; reviewError=error; break; }
+      }
+    }
+    plan.review=review||{status:'needs_revision',summary:reviewError?`Review unavailable: ${reviewError.message}`:'No reviewer configured',findings:[]};
+    plan.validation=validation;
+    const critical=review?.findings?.some(x=>x.severity==='critical')||false;
+    const high=review?.findings?.some(x=>x.severity==='high')||false;
+    plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high?'needs_revision':'ready_for_review';
+    return plan;
+  }
+}
+function normalize(raw,project) {
+  if(!isObject(raw)) throw new Error('Planner response must be a JSON object');
+  const plan={...emptyPlan(project),...raw,project};
+  if(!Array.isArray(plan.requirements)||!isObject(plan.architecture)||!Array.isArray(plan.architecture.components)||!Array.isArray(plan.tasks)) throw new Error('Planner response does not match the required plan structure');
+  if(!Array.isArray(plan.architecture.decisions)) plan.architecture.decisions=[];
+  if(!isObject(plan.dependencyGraph)) plan.dependencyGraph={nodes:plan.tasks.map(t=>t?.id).filter(Boolean),edges:dependencyEdgesFromTasks(plan.tasks)};
+  if(!Array.isArray(plan.risks)) plan.risks=[];
+  if(!Array.isArray(plan.clarifications)) plan.clarifications=[];
   return plan;
- }
 }
-function normalize(raw,project){
- const p={...emptyPlan(project),...raw};p.project=project;p.requirements=Array.isArray(p.requirements)?p.requirements:[];p.architecture=p.architecture||{components:[],decisions:[]};p.architecture.components=p.architecture.components||[];p.tasks=p.tasks||[];p.dependencyGraph=p.dependencyGraph||{nodes:p.tasks.map(t=>t.id),edges:[]};p.dependencyGraph.nodes=p.dependencyGraph.nodes||p.tasks.map(t=>t.id);p.dependencyGraph.edges=p.dependencyGraph.edges||[];p.risks=p.risks||[];p.clarifications=p.clarifications||[];
- for(const r of p.requirements)r.id ||=id('req');for(const c of p.architecture.components)c.id ||=id('cmp');for(const t of p.tasks){t.id ||=id('task');t.requirementIds||=[];t.componentIds||=[];t.dependencies||=[];t.acceptanceCriteria||=[];t.writeScope||=[];}
- if(!p.dependencyGraph.edges.length)p.dependencyGraph.edges=p.tasks.flatMap(t=>(t.dependencies||[]).map(from=>({from,to:t.id,type:'finish_to_start'})));
- return p;
+function validateReview(review) {
+  if(!isObject(review)||!['approved','needs_revision','blocked'].includes(review.status)||!Array.isArray(review.findings)) throw new Error('Reviewer returned an invalid review contract');
+  for(const finding of review.findings) if(!isObject(finding)||!['low','medium','high','critical'].includes(finding.severity)||typeof finding.message!=='string') throw new Error('Reviewer returned an invalid finding');
+  return {...review,summary:typeof review.summary==='string'?review.summary:''};
 }
+function hasHighFindings(review){return review.findings.some(x=>x.severity==='high'||x.severity==='critical');}
