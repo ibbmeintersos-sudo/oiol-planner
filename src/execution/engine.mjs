@@ -92,7 +92,9 @@ export class ExecutionEngine {
           const updated=transitionTask(states,task.id,'skipped',{error:reason,completedAt:this.clock()});
           await emit('task.skipped',{taskId:task.id,attempt,reason,status:updated.status,outcome:'uncertain'});return;
         }
-        if(attempt<=this.maxRetries&&this.retryOn(error,task,{attempt,runId})){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
+        let retryAllowed=false;
+        if(attempt<=this.maxRetries){try{retryAllowed=this.retryOn(error,task,{attempt,runId})===true;}catch{retryAllowed=false;}}
+        if(retryAllowed){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
         const safeError=redact(error.message).slice(0,2000);
         const updated=transitionTask(states,task.id,'failed',{error:safeError,completedAt:this.clock()});
         await emit('task.failed',{taskId:task.id,attempt,error:safeError,status:updated.status});return;
