@@ -152,3 +152,10 @@ test('execution engine exposes read-only run inspection',async()=>{
   assert.equal(result.recoveryAllowed,false);
   await assert.rejects(()=>engine.inspectRun('missing'),/No execution events found/);
 });
+
+test('event stores reject duplicate event identifiers',async()=>{
+  const at=new Date().toISOString();
+  const store=new InMemoryEventStore();
+  await store.append({eventId:'same',runId:'r1',sequence:1,type:'run.started',at});
+  await assert.rejects(()=>store.append({eventId:'same',runId:'r2',sequence:1,type:'run.started',at}),/Duplicate eventId/);
+});
