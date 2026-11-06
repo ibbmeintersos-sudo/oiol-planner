@@ -1,10 +1,16 @@
 {
   "name": "oiol-planner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Hybrid planning and validation layer for OpenCode workflows",
-  "engines": {"node": ">=20"},
-  "scripts": {"test": "node --test", "check": "node --check src/cli.mjs", "plan": "node src/cli.mjs"},
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "find src -type f -name '*.mjs' -print0 | xargs -0 -n1 node --check",
+    "plan": "node src/cli.mjs"
+  },
   "license": "MIT"
 }

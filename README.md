@@ -1,6 +1,6 @@
 # OIOL Planner
 
-**OpenCode Intelligence & Optimization Layer — Planner preview v0.1.0**
+**OpenCode Intelligence & Optimization Layer — Planner hardening release v0.1.1**
 
 OIOL Planner is a hybrid planning layer intended to sit above OpenCode. It turns a software request into a structured, reviewable execution plan. The LLM proposes requirements, architecture, tasks and risks; deterministic code validates references, requirement coverage, paths and dependency graphs.
 
@@ -67,7 +67,7 @@ The JSON plan contains:
 
 ## Existing repository scanner
 
-The scanner collects Git branch/commit/dirty state, tracked working-tree file candidates, manifests, scripts, test/config paths and a bounded source context. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies basic secret redaction. File/import mapping is intentionally heuristic in this preview; it is not a full AST or semantic index.
+The scanner collects Git branch/commit/dirty state, bounded working-tree file candidates, manifests, scripts, test/config paths and a bounded source context. Discovery stops at the configured file/depth limits rather than enumerating the entire tree first. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies basic secret redaction. File/import mapping is intentionally heuristic in this preview; it is not a full AST or semantic index.
 
 The scanner does **not** run package scripts, tests, build commands, hooks, or arbitrary code from the target repository.
 
@@ -77,7 +77,7 @@ The scanner does **not** run package scripts, tests, build commands, hooks, or a
 
 ## Validation and scheduling
 
-The deterministic validator checks duplicate/missing IDs, task references, requirement coverage, acceptance criteria, unsafe write paths, unknown graph edges and cycles. The scheduler builds topological waves and conservatively serializes tasks whose write scopes overlap. It does not prove semantic independence of tasks.
+The deterministic validator enforces the plan structure, unique IDs, requirement coverage, valid task/component references, safe relative write scopes, exact agreement between task dependencies and graph edges/nodes, supported edge types, and cycle-free scheduling. Missing requirement coverage is a blocking error. The scheduler builds deterministic topological waves and conservatively serializes tasks whose write scopes overlap. It does not prove semantic independence of tasks.
 
 ## Security notes
 
@@ -99,9 +99,11 @@ The deterministic validator checks duplicate/missing IDs, task references, requi
 ## Development
 
 ```bash
-npm test
 npm run check
+npm test
 ```
+
+CI workflow: `.github/workflows/ci.yml`.
 
 ## License
 
