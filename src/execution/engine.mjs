@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { id, isObject, redact } from '../core/utils.mjs';
 import { validatePlan } from '../core/validator.mjs';
-import { InMemoryEventStore } from './event-store.mjs';
 import { initialTaskStates, transitionTask, summarizeRun } from './state-machine.mjs';
 export function fingerprintPlan(plan){return crypto.createHash('sha256').update(JSON.stringify(plan)).digest('hex');}
 export function createExecutionApproval(plan,{approvedBy,approvedAt=new Date().toISOString()}={}){
