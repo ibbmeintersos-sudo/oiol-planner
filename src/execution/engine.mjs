@@ -28,6 +28,7 @@ export class ExecutionEngine {
     const emit=async(type,payload={})=>this.eventStore.append({eventId:id('evt'),runId,sequence:++sequence,type,at:this.clock(),...payload});
     await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,approvedAt:approval.approvedAt,taskCount:plan.tasks.length});
     let stopped=false;
+    const concurrency=this.runner.concurrentSafe===true?this.maxConcurrency:1;
     for(const wave of validation.graph.waves){
       if(stopped)break;
       if(signal?.aborted){stopped=true;break;}
@@ -42,9 +43,9 @@ export class ExecutionEngine {
           const updated=transitionTask(states,taskId,'ready');await emit('task.ready',{taskId,status:updated.status});runnable.push(task);
         }
       }
-      for(let offset=0;offset<runnable.length;offset+=this.maxConcurrency){
+      for(let offset=0;offset<runnable.length;offset+=concurrency){
         if(signal?.aborted){stopped=true;break;}
-        const batch=runnable.slice(offset,offset+this.maxConcurrency);
+        const batch=runnable.slice(offset,offset+concurrency);
         await Promise.all(batch.map(task=>this.#runTask({task,plan,runId,states,results,emit,signal})));
         if(this.failFast&&batch.some(task=>states.get(task.id).status==='failed')){stopped=true;break;}
       }
