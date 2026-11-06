@@ -9,7 +9,7 @@ export function createExecutionApproval(plan,{approvedBy,approvedAt=new Date().t
   return {approved:true,approvedBy:approvedBy.trim(),approvedAt,planId:plan.id,planFingerprint:fingerprintPlan(plan)};
 }
 export class ExecutionEngine {
-  constructor({runner,eventStore=new InMemoryEventStore(),maxConcurrency=2,maxRetries=1,failFast=false,clock=()=>new Date().toISOString()}={}){
+  constructor({runner,eventStore,maxConcurrency=2,maxRetries=0,failFast=false,clock=()=>new Date().toISOString()}={}){
     if(!runner||typeof runner.execute!=='function'||typeof runner.verify!=='function')throw new Error('Runner must implement execute(task, context) and verify(task, result, context)');
     if(!Number.isInteger(maxConcurrency)||maxConcurrency<1||maxConcurrency>32)throw new Error('maxConcurrency must be an integer from 1 to 32');
     if(!Number.isInteger(maxRetries)||maxRetries<0||maxRetries>5)throw new Error('maxRetries must be an integer from 0 to 5');
