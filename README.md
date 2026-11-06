@@ -94,6 +94,11 @@ Execution uses validated dependency waves, bounded concurrency, dependency-scope
 Recovery is deliberately not automatic. Reusing a run ID is rejected, and a process interruption after a side effect but before its completion event can leave the task outcome uncertain. The event log is not an exactly-once guarantee. A future recovery manager must reconcile uncertain tasks with the runner before retrying.
 
 Example integration is intentionally left to a concrete, tested runner. The current OpenCode HTTP client is not yet a task runner and no live OpenCode execution is claimed.
+### OpenCode runner
+
+`OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
+
+The OpenCode server operates against the project directory in which `opencode serve` is started. The runner currently does not isolate tasks in Git worktrees, so it declares itself non-concurrency-safe and the engine serializes its tasks. Do not enable parallel writes until a tested worktree adapter exists.
 ## Security notes
 
 - Never put credentials in project prompts or repository files.
