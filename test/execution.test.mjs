@@ -15,7 +15,7 @@ function makePlan(){
   return {id:'plan_test',status:'ready_for_review',project:{kind:'greenfield'},requirements:[{id:'r1',statement:'Build feature'}],architecture:{components:[{id:'c1',name:'Core'}],decisions:[]},tasks,dependencyGraph:{nodes:['t1','t2','t3'],edges:[{from:'t1',to:'t2',type:'finish_to_start'}]},risks:[],clarifications:[]};
 }
 const approved=plan=>createExecutionApproval(plan,{approvedBy:'test-operator'});
-const makeEngine=options=>makeEngine({eventStore:new InMemoryEventStore(),...options});
+const makeEngine=options=>new ExecutionEngine({eventStore:new InMemoryEventStore(),...options});
 const successRunner={async execute(task){return {summary:`Executed ${task.id}`,outputs:{artifact:`${task.id}.txt`}};},async verify(){return {passed:true,method:'unit-test'};}};
 test('execution requires explicit approval',async()=>{const plan=makePlan();const engine=makeEngine({runner:successRunner});await assert.rejects(()=>engine.run(plan),/Explicit human approval/);});
 test('approval is bound to exact plan revision',async()=>{const plan=makePlan(),approval=approved(plan);plan.tasks[0].title='tampered';const engine=makeEngine({runner:successRunner});await assert.rejects(()=>engine.run(plan,{approval}),/does not match/);});
