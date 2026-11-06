@@ -1,10 +1,11 @@
 import { isObject, redact } from '../core/utils.mjs';
 export class OpenCodeTaskRunner {
-  constructor({client,verifyTask,agent,model,maxDependencyContextChars=12000}={}){
+  constructor({client,verifyTask,agent,model,taskTimeoutMs=600000,maxDependencyContextChars=12000}={}){
     if(!client||typeof client.createSession!=='function'||typeof client.prompt!=='function'||typeof client.getSessionDiff!=='function')throw new Error('OpenCode client must support createSession, prompt and getSessionDiff');
     if(typeof verifyTask!=='function')throw new Error('A separate verifyTask callback is required; assistant self-report is not proof of completion');
+    if(!Number.isFinite(taskTimeoutMs)||taskTimeoutMs<1000)throw new Error('taskTimeoutMs must be at least 1000ms');
     if(!Number.isInteger(maxDependencyContextChars)||maxDependencyContextChars<1000)throw new Error('maxDependencyContextChars must be at least 1000');
-    Object.assign(this,{client,verifyTask,agent,model,maxDependencyContextChars});
+    Object.assign(this,{client,verifyTask,agent,model,taskTimeoutMs,maxDependencyContextChars});
     this.concurrentSafe=false;
   }
   async execute(task,context){
@@ -12,12 +13,13 @@ export class OpenCodeTaskRunner {
     if(!isObject(session)||typeof session.id!=='string'||!session.id)throw new Error('OpenCode did not return a valid session ID');
     let message;
     try{
-      message=await this.client.prompt(session.id,[{type:'text',text:buildTaskPrompt(task,context.results,this.maxDependencyContextChars)}],{agent:this.agent,model:this.model,signal:context.signal});
+      message=await this.client.prompt(session.id,[{type:'text',text:buildTaskPrompt(task,context.results,this.maxDependencyContextChars)}],{agent:this.agent,model:this.model,signal:context.signal,timeoutMs:this.taskTimeoutMs});
     }catch(error){
-      if(context.signal?.aborted) await this.client.abortSession?.(session.id).catch(()=>{});
+      await this.client.abortSession?.(session.id).catch(()=>{});
       throw error;
     }
-    if(!isObject(message)||!Array.isArray(message.parts))throw new Error('OpenCode returned an invalid message response');
+    if(!isObject(message)||!isObject(message.info)||message.info.role!=='assistant'||!Array.isArray(message.parts))throw new Error('OpenCode returned an invalid assistant message response');
+    if(message.info.error)throw new Error('OpenCode assistant response reported an execution error');
     const assistantText=message.parts.filter(part=>part?.type==='text'&&typeof part.text==='string').map(part=>part.text).join('\n');
     const diff=await this.client.getSessionDiff(session.id);
     if(!Array.isArray(diff))throw new Error('OpenCode returned an invalid session diff');
