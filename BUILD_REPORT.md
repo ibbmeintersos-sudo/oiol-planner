@@ -1,4 +1,4 @@
-# OIOL Planner v0.2.0 — Engineering hardening report
+# OIOL Planner v0.2.1 — Engineering hardening report
 
 ## Provenance
 
@@ -33,7 +33,7 @@ This codebase began as a reconstructed implementation based on the retained v0.1
 - Exposes only declared dependency outputs to each task.
 - Retries default to zero; optional retries reuse stable task idempotency keys.
 - Supports fail-fast, cancellation and blocked dependents after failures.
-- Added OpenCode task runner using documented server routes; it requires a separate verification callback and serializes tasks because no Git worktree isolation is implemented.
+- Added OpenCode task runner using documented server routes; it requires a separate verification callback, uses a configurable 10-minute task timeout by default, attempts to abort sessions on prompt failures, and serializes tasks because no Git worktree isolation is implemented.
 - No automatic resume or exactly-once guarantee is claimed.
 
 ## Automated validation
