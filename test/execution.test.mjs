@@ -61,3 +61,12 @@ test('event stores reject malformed and non-monotonic events',async()=>{
   await store.append({eventId:'e1',runId:'r',sequence:1,type:'run.started',at:new Date().toISOString()});
   await assert.rejects(()=>store.append({eventId:'e2',runId:'r',sequence:3,type:'run.finished',at:new Date().toISOString()}),/Non-monotonic event sequence/);
 });
+
+test('retry policy exceptions fail closed without retrying',async()=>{
+  const plan=makePlan();let calls=0;
+  const runner={idempotent:true,async execute(){calls++;throw Object.assign(new Error('temporary'),{retryable:true});},async verify(){return true;}};
+  const result=await makeEngine({runner,maxRetries:2,retryOn(){throw new Error('policy failure');}}).run(plan,{approval:approved(plan)});
+  assert.equal(result.tasks.t1.status,'failed');
+  assert.equal(result.tasks.t1.attempts,1);
+  assert.equal(calls,3);
+});
