@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { ExecutionEngine, createExecutionApproval } from '../src/execution/engine.mjs';
@@ -69,4 +69,35 @@ test('retry policy exceptions fail closed without retrying',async()=>{
   assert.equal(result.tasks.t1.status,'failed');
   assert.equal(result.tasks.t1.attempts,1);
   assert.equal(calls,2);
+});
+
+test('JSONL event store resumes sequence validation after reopening',async()=>{
+  const directory=await mkdtemp(path.join(os.tmpdir(),'oiol-events-reopen-'));
+  try{
+    const file=path.join(directory,'events.jsonl');
+    const first=new JsonlEventStore(file);
+    await first.append({eventId:'e1',runId:'restart',sequence:1,type:'run.started',at:new Date().toISOString()});
+    const reopened=new JsonlEventStore(file);
+    await reopened.append({eventId:'e2',runId:'restart',sequence:2,type:'run.finished',at:new Date().toISOString()});
+    assert.deepEqual((await reopened.read('restart')).map(event=>event.sequence),[1,2]);
+  }finally{await rm(directory,{recursive:true,force:true});}
+});
+
+test('JSONL event store rejects corrupt durable logs',async()=>{
+  const directory=await mkdtemp(path.join(os.tmpdir(),'oiol-events-corrupt-'));
+  try{
+    const file=path.join(directory,'events.jsonl');
+    await writeFile(file,'{"eventId":"e1","runId":"r","sequence":1,"type":"run.started","at":"bad-date"}\\n','utf8');
+    const store=new JsonlEventStore(file);
+    await assert.rejects(()=>store.read('r'),/Event timestamp must be valid/);
+  }finally{await rm(directory,{recursive:true,force:true});}
+});
+
+test('JSONL event store serializes concurrent appends in call order',async()=>{
+  const directory=await mkdtemp(path.join(os.tmpdir(),'oiol-events-concurrent-'));
+  try{
+    const store=new JsonlEventStore(path.join(directory,'events.jsonl'));
+    await Promise.all([1,2,3].map(sequence=>store.append({eventId:`e${sequence}`,runId:'concurrent',sequence,type:`event.${sequence}`,at:new Date().toISOString()})));
+    assert.deepEqual((await store.read('concurrent')).map(event=>event.sequence),[1,2,3]);
+  }finally{await rm(directory,{recursive:true,force:true});}
 });
