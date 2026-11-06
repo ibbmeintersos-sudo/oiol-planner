@@ -26,7 +26,7 @@ export class ExecutionEngine {
     const states=initialTaskStates(plan.tasks),results=new Map(),tasks=new Map(plan.tasks.map(task=>[task.id,task]));
     let sequence=0;
     const emit=async(type,payload={})=>this.eventStore.append({eventId:id('evt'),runId,sequence:++sequence,type,at:this.clock(),...payload});
-    await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,taskCount:plan.tasks.length});
+    await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,approvedAt:approval.approvedAt,taskCount:plan.tasks.length});
     let stopped=false;
     for(const wave of validation.graph.waves){
       if(stopped)break;
@@ -58,7 +58,7 @@ export class ExecutionEngine {
       }
     }
     const summary=summarizeRun(states);
-    if(signal?.aborted)summary.status='cancelled';
+    if(signal?.aborted)summary.status=summary.counts.failed?'cancelled_with_errors':'cancelled';
     await emit('run.finished',{status:summary.status,counts:summary.counts,total:summary.total});
     return {runId,planId:plan.id,...summary,tasks:Object.fromEntries(states),results:Object.fromEntries(results)};
   }
