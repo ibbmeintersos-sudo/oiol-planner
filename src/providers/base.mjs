@@ -1,10 +1,11 @@
 import { ProviderError } from '../core/errors.mjs';
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 export class BaseProvider {
-  constructor({apiKey='',baseUrl='',model='',timeoutMs=60000,maxRetries=2}={}) {
+  constructor({apiKey='',baseUrl='',model='',timeoutMs=60000,maxRetries=2,fetchImpl=globalThis.fetch}={}) {
     if(!Number.isFinite(timeoutMs)||timeoutMs<=0) throw new Error('timeoutMs must be positive');
     if(!Number.isInteger(maxRetries)||maxRetries<0||maxRetries>5) throw new Error('maxRetries must be an integer from 0 to 5');
-    Object.assign(this,{apiKey,baseUrl,model,timeoutMs,maxRetries});
+    if(typeof fetchImpl!=='function') throw new Error('fetchImpl must be a function');
+    Object.assign(this,{apiKey,baseUrl,model,timeoutMs,maxRetries,fetchImpl});
   }
   async requestJson({system,user,temperature=0}) {
     let lastError;
@@ -19,7 +20,7 @@ export class BaseProvider {
         const retryable=error?.retryable===true||error?.name==='AbortError'||/fetch failed|network|timed out/i.test(error?.message||'');
         if(!retryable||attempt===this.maxRetries) break;
         await sleep(Math.min(250*2**attempt,2000));
-      } finally { clearTimeout(timer); }
+      } finally {clearTimeout(timer);}
     }
     throw lastError instanceof Error?lastError:new ProviderError(String(lastError));
   }
@@ -31,8 +32,7 @@ export function parseJson(text) {
   const fence=String.fromCharCode(96).repeat(3);
   const fenced=source.match(new RegExp('^'+fence+'(?:json)?\\s*([\\s\\S]*?)\\s*'+fence+'$','i'));
   const candidate=fenced?fenced[1]:source;
-  let value;
-  try { value=JSON.parse(candidate); } catch(error) { throw new ProviderError(`Provider response is not strict JSON: ${error.message}`); }
+  let value;try{value=JSON.parse(candidate);}catch(error){throw new ProviderError(`Provider response is not strict JSON: ${error.message}`);}
   if(value===null||Array.isArray(value)||typeof value!=='object') throw new ProviderError('Provider response must be a JSON object');
   return value;
 }
