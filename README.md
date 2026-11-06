@@ -1,10 +1,10 @@
 # OIOL Planner
 
-**OpenCode Intelligence & Optimization Layer — Planner hardening release v0.1.2**
+**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.2.0**
 
-OIOL Planner is a hybrid planning layer intended to sit above OpenCode. It turns a software request into a structured, reviewable execution plan. The LLM proposes requirements, architecture, tasks and risks; deterministic code validates references, requirement coverage, paths and dependency graphs.
+OIOL is a hybrid planning and human-gated execution layer intended to sit above OpenCode. It turns a software request into a structured plan, validates it deterministically, then can coordinate approved tasks through an injected runner.
 
-> This is a planning component, not an autonomous coding agent. It does not execute project commands, modify repositories, create OpenCode workers, or claim that planned work has been implemented.
+ > OIOL does not perform unreviewed autonomous changes. Execution requires an explicit approval bound to the exact plan revision and a separate task-verification callback. The OpenCode runner can delegate implementation to an OpenCode server.
 
 ## Design principles
 
@@ -73,7 +73,7 @@ The scanner does **not** run package scripts, tests, build commands, hooks, or a
 
 ## OpenCode adapter
 
-`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval and prompting. It validates the base URL, bounds request duration, encodes session IDs, and rejects malformed responses. The adapter has contract tests with a fake transport. It does not yet orchestrate OpenCode subagents or worktrees.
+`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval, prompting, aborting and reading diffs. It validates the base URL, supports configurable Basic Auth, propagates cancellation, bounds request duration, encodes session IDs, and rejects malformed responses. `OpenCodeTaskRunner` uses this client to create one session per task and collect its response and diff.
 
 ## Validation and scheduling
 
@@ -93,7 +93,7 @@ Execution uses validated dependency waves, bounded concurrency, dependency-scope
 
 Recovery is deliberately not automatic. Reusing a run ID is rejected, and a process interruption after a side effect but before its completion event can leave the task outcome uncertain. The event log is not an exactly-once guarantee. A future recovery manager must reconcile uncertain tasks with the runner before retrying.
 
-Example integration is intentionally left to a concrete, tested runner. The current OpenCode HTTP client is not yet a task runner and no live OpenCode execution is claimed.
+The OpenCode runner is covered by fake-transport contract tests, but it has not yet been tested against a live OpenCode server.
 ### OpenCode runner
 
 `OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
@@ -110,8 +110,8 @@ The OpenCode server operates against the project directory in which `opencode se
 ## Current limitations
 
 - Provider contract tests exercise request/response shapes and retry behavior through fake HTTP transports. No live provider request with real credentials has been run.
-- OpenCode adapter is a minimal HTTP wrapper. Automated contract tests use a fake HTTP transport; no live OpenCode server test is included.
-- No AST-based import graph, persistent event store, execution engine, worker manager, merge coordinator, or exactly-once recovery.
+- OpenCode adapter and task runner have fake-transport contract tests; no live OpenCode server end-to-end test is included.
+- No AST-based import graph, Git worktree isolation, worker recovery manager, merge coordinator, or exactly-once recovery.
 - No baseline benchmark against stock OpenCode has yet been run. Performance or quality superiority is not claimed.
 - Provider review can be unavailable; in that case the plan remains `needs_revision`.
 - Provider and OpenCode tests use fake HTTP transports; live API/server compatibility still needs environment-backed integration tests.
