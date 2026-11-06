@@ -1,6 +1,6 @@
 # OIOL Planner
 
-**OpenCode Intelligence & Optimization Layer — Planner hardening release v0.1.1**
+**OpenCode Intelligence & Optimization Layer — Planner hardening release v0.1.2**
 
 OIOL Planner is a hybrid planning layer intended to sit above OpenCode. It turns a software request into a structured, reviewable execution plan. The LLM proposes requirements, architecture, tasks and risks; deterministic code validates references, requirement coverage, paths and dependency graphs.
 
@@ -73,7 +73,7 @@ The scanner does **not** run package scripts, tests, build commands, hooks, or a
 
 ## OpenCode adapter
 
-`src/adapters/opencode/client.mjs` exposes small HTTP methods for health, session creation, session retrieval and prompting. It is deliberately thin and does not assume that experimental endpoints are stable. This preview does not yet orchestrate OpenCode subagents or worktrees.
+`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval and prompting. It validates the base URL, bounds request duration, encodes session IDs, and rejects malformed responses. The adapter has contract tests with a fake transport. It does not yet orchestrate OpenCode subagents or worktrees.
 
 ## Validation and scheduling
 
@@ -94,6 +94,7 @@ The deterministic validator enforces the plan structure, unique IDs, requirement
 - No AST-based import graph, persistent event store, execution engine, worker manager, merge coordinator, or exactly-once recovery.
 - No baseline benchmark against stock OpenCode has yet been run. Performance or quality superiority is not claimed.
 - Provider review can be unavailable; in that case the plan remains `needs_revision`.
+- Provider and OpenCode tests use fake HTTP transports; live API/server compatibility still needs environment-backed integration tests.
 - This is an engineering preview, not a production-ready autonomous development platform.
 
 ## Development
