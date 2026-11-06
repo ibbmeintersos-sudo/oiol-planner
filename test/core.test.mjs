@@ -15,3 +15,23 @@ test('write scopes serialize overlapping work',()=>{const r=topologicalWaves([{i
 test('revision detects added and changed tasks',()=>{const n=structuredClone(base);n.tasks[0].title='Improve login';n.tasks.push({id:'t2'});const r=comparePlans(base,n);assert.deepEqual(r.modified,['t1']);assert.deepEqual(r.new,['t2']);});
 test('traceability distinguishes mapped from verified',()=>{const t=buildTraceability(base);assert.equal(t.mappingCoverage,1);assert.equal(t.verificationComplete,false);});
 test('evaluation exposes conflict pairs',()=>{const p=structuredClone(base);p.tasks.push({id:'t2',title:'other',acceptanceCriteria:['ok'],writeScope:['src/auth']});assert.deepEqual(evaluatePlan(p).metrics.concurrentWriteConflictPairs,[['t1','t2']]);});
+
+import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { HybridPlanner } from '../src/core/planner.mjs';
+import { parseJson } from '../src/providers/base.mjs';
+import { scanRepository } from '../src/scanner/repository.mjs';
+const makePlan=()=>structuredClone(base);
+test('uncovered requirements are blocking errors',()=>{const p=makePlan();p.requirements.push({id:'r2',statement:'Audit'});assert.equal(validatePlan(p).valid,false);});
+test('duplicate task IDs fail',()=>{const p=makePlan();p.tasks.push({...p.tasks[0]});assert.equal(validatePlan(p).valid,false);});
+test('unknown dependency fails',()=>{const p=makePlan();p.tasks[0].dependencies=['missing'];assert.equal(validatePlan(p).valid,false);});
+test('dependency edge mismatch fails closed',()=>{const p=makePlan();p.tasks.push({...p.tasks[0],id:'t2',dependencies:['t1']});p.dependencyGraph.nodes.push('t2');assert.equal(validatePlan(p).valid,false);});
+test('malformed and absolute write scopes fail',()=>{for(const scope of ['/etc/passwd','C:\\\\temp','a//b','.','']){const p=makePlan();p.tasks[0].writeScope=[scope];assert.equal(validatePlan(p).valid,false,scope);}});
+test('topological scheduler rejects unknown graph references',()=>assert.equal(topologicalWaves([{id:'a'}],[{from:'x',to:'a'}]).error,'unknown_task_reference'));
+test('provider parser rejects prose-wrapped JSON',()=>assert.throws(()=>parseJson('Here is the JSON: {"ok":true}'),/strict JSON/));
+test('provider parser accepts strict JSON fenced response',()=>assert.deepEqual(parseJson('```json\n{"ok":true}\n```'),{ok:true}));
+test('review cannot approve a plan with critical findings',async()=>{let calls=0;const provider={async requestJson(){calls++;return {data:calls===1?makePlan():{status:'approved',summary:'Looks good',findings:[{severity:'critical',message:'Unsafe design'}]}};}};const plan=await new HybridPlanner({provider,maxRepairRounds:0}).createPlan({kind:'greenfield'});assert.equal(plan.status,'blocked');});
+test('same-provider high finding is not silently approved',async()=>{let calls=0;const provider={async requestJson(){calls++;return {data:calls===1?makePlan():{status:'approved',summary:'ok',findings:[{severity:'high',message:'Missing rollback'}]}};}};const plan=await new HybridPlanner({provider,maxRepairRounds:0}).createPlan({});assert.equal(plan.status,'needs_revision');});
+test('review failure never yields ready_for_review',async()=>{const provider={async requestJson(){return {data:makePlan()};}},reviewer={async requestJson(){throw new Error('offline');}};const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:0}).createPlan({});assert.equal(plan.status,'needs_revision');});
+test('scanner stops discovery at configured file limit',async()=>{const root=await mkdtemp(path.join(os.tmpdir(),'oiol-scan-'));try{await mkdir(path.join(root,'src'));await writeFile(path.join(root,'a.txt'),'safe');await writeFile(path.join(root,'b.txt'),'safe');await writeFile(path.join(root,'src','c.js'),'const x=1');const result=await scanRepository(root,{maxFiles:1,maxDepth:4});assert.equal(result.files.length,1);assert.equal(result.truncated,true);assert.equal(result.fileCount,2);}finally{await rm(root,{recursive:true,force:true});}});
