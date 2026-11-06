@@ -68,5 +68,5 @@ test('retry policy exceptions fail closed without retrying',async()=>{
   const result=await makeEngine({runner,maxRetries:2,retryOn(){throw new Error('policy failure');}}).run(plan,{approval:approved(plan)});
   assert.equal(result.tasks.t1.status,'failed');
   assert.equal(result.tasks.t1.attempts,1);
-  assert.equal(calls,3);
+  assert.equal(calls,2);
 });
