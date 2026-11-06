@@ -10,8 +10,8 @@ export class JsonlEventStore {
   async append(event){
     const operation=async()=>{
       await fs.mkdir(path.dirname(this.filePath),{recursive:true});
-      const handle=await fs.open(this.filePath,'a');
-      try{await handle.writeFile(JSON.stringify(event)+'\n','utf8');await handle.sync();}finally{await handle.close();}
+      const handle=await fs.open(this.filePath,'a',0o600);
+      try{await handle.chmod(0o600);await handle.writeFile(JSON.stringify(event)+'\n','utf8');await handle.sync();}finally{await handle.close();}
       return event;
     };
     const pending=this.queue.then(operation,operation);this.queue=pending.catch(()=>{});return pending;
@@ -26,6 +26,8 @@ export class JsonlEventStore {
       if(!event||typeof event!=='object'||typeof event.runId!=='string'||typeof event.type!=='string'||!Number.isInteger(event.sequence))throw new Error(`Invalid event record at line ${index+1}`);
       if(event.runId===runId)events.push(event);
     }
-    return events.sort((a,b)=>a.sequence-b.sequence);
+    events.sort((a,b)=>a.sequence-b.sequence);
+    for(let index=1;index<events.length;index++) if(events[index].sequence===events[index-1].sequence) throw new Error(`Duplicate event sequence ${events[index].sequence} for run ${runId}`);
+    return events;
   }
 }
