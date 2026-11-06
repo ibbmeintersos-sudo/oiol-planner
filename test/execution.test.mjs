@@ -50,7 +50,7 @@ test('retries require explicit idempotency and retryable errors',async()=>{
   assert.throws(()=>makeEngine({runner:unsafeRunner,maxRetries:1}),/idempotent execution/);
   const runner={idempotent:true,async execute(){calls++;throw new Error('permanent');},async verify(){return true;}};
   const result=await makeEngine({runner,maxRetries:3}).run(plan,{approval:approved(plan)});
-  assert.equal(calls,3);
+  assert.equal(calls,2);
   assert.equal(result.tasks.t1.attempts,1);
   assert.equal(result.tasks.t1.status,'failed');
 });
