@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { id, isObject, redact } from '../core/utils.mjs';
 import { validatePlan } from '../core/validator.mjs';
 import { initialTaskStates, transitionTask, summarizeRun } from './state-machine.mjs';
+import { inspectExecutionRun } from './recovery-inspector.mjs';
 export function fingerprintPlan(plan){return crypto.createHash('sha256').update(JSON.stringify(plan)).digest('hex');}
 export function createExecutionApproval(plan,{approvedBy,approvedAt=new Date().toISOString()}={}){
   if(typeof approvedBy!=='string'||!approvedBy.trim())throw new Error('approvedBy is required');
@@ -64,6 +65,12 @@ export class ExecutionEngine {
     if(signal?.aborted)summary.status=summary.counts.failed?'cancelled_with_errors':'cancelled';
     await emit('run.finished',{status:summary.status,counts:summary.counts,total:summary.total});
     return {runId,planId:plan.id,...summary,tasks:Object.fromEntries(states),results:Object.fromEntries(results)};
+  }
+  async inspectRun(runId,options={}) {
+    if(typeof runId!=='string'||!runId.trim()) throw new Error('runId is required');
+    const events=await this.eventStore.read(runId);
+    if(!events.length) throw new Error(`No execution events found for run ${runId}`);
+    return inspectExecutionRun(events,options);
   }
   #assertApproval(plan,approval){
     if(!isObject(approval)||approval.approved!==true)throw new Error('Explicit human approval is required before execution');
