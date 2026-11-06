@@ -10,8 +10,9 @@ export class OpenCodeClient {
   async request(route,options={}) {
     if(typeof route!=='string'||!route.startsWith('/')||route.startsWith('//')) throw new Error('OpenCode route must be an absolute path on the configured server');
     const headers={accept:'application/json',...(options.body!==undefined?{'content-type':'application/json'}:{}),...(this.password?{authorization:`Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`}:{})};
-    const {signal:externalSignal,...requestOptions}=options;
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),this.timeoutMs);
+    const {signal:externalSignal,timeoutMs=this.timeoutMs,...requestOptions}=options;
+    if(!Number.isFinite(timeoutMs)||timeoutMs<=0) throw new Error('timeoutMs must be positive');
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
     const abort=()=>controller.abort();
     if(externalSignal?.aborted) controller.abort(); else externalSignal?.addEventListener('abort',abort,{once:true});
     try {
@@ -21,7 +22,7 @@ export class OpenCodeClient {
       if(response.status===204||!body.trim()) return null;
       try{return JSON.parse(body);}catch(error){throw new Error(`OpenCode returned invalid JSON (${response.status}): ${error.message}`);}
     } catch(error) {
-      if(error?.name==='AbortError') throw new Error(externalSignal?.aborted?'OpenCode request cancelled':`OpenCode request timed out after ${this.timeoutMs}ms`);
+      if(error?.name==='AbortError') throw new Error(externalSignal?.aborted?'OpenCode request cancelled':`OpenCode request timed out after ${timeoutMs}ms`);
       throw error;
     } finally {clearTimeout(timer);externalSignal?.removeEventListener('abort',abort);}
   }
@@ -32,8 +33,8 @@ export class OpenCodeClient {
   getSessionMessages(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/message`);}
   abortSession(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/abort`,{method:'POST',body:JSON.stringify({})});}
   getSessionDiff(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/diff`);}
-  prompt(sessionId,parts,{agent,model,signal}={}){
+  prompt(sessionId,parts,{agent,model,signal,timeoutMs}={}){
     if(!Array.isArray(parts)||parts.length===0||parts.some(part=>!part||typeof part!=='object'||typeof part.type!=='string'))throw new Error('OpenCode prompt parts must be a non-empty array of typed parts');
-    return this.request(`/session/${encodeURIComponent(sessionId)}/message`,{method:'POST',body:JSON.stringify({parts,...(agent?{agent}:{}),...(model?{model}:{})}),signal});
+    return this.request(`/session/${encodeURIComponent(sessionId)}/message`,{method:'POST',body:JSON.stringify({parts,...(agent?{agent}:{}),...(model?{model}:{})}),signal,timeoutMs});
   }
 }
