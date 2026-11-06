@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { id, isObject } from '../core/utils.mjs';
+import { id, isObject, redact } from '../core/utils.mjs';
 import { validatePlan } from '../core/validator.mjs';
 import { InMemoryEventStore } from './event-store.mjs';
 import { initialTaskStates, transitionTask, summarizeRun } from './state-machine.mjs';
@@ -78,7 +78,8 @@ export class ExecutionEngine {
       let executionResult,verification;
       try{
         if(signal?.aborted)throw Object.assign(new Error('Execution aborted'),{name:'AbortError'});
-        const context={runId,plan,signal,attempt,idempotencyKey,results};
+        const dependencyResults=new Map((task.dependencies||[]).map(dependency=>[dependency,results.get(dependency)]));
+        const context={runId,plan,signal,attempt,idempotencyKey,results:dependencyResults};
         executionResult=await this.runner.execute(task,context);
         if(!isObject(executionResult))throw new Error('Runner execute() must return an object');
         verification=await this.runner.verify(task,executionResult,context);
@@ -89,12 +90,14 @@ export class ExecutionEngine {
           const updated=transitionTask(states,task.id,'skipped',{error:reason,completedAt:this.clock()});
           await emit('task.skipped',{taskId:task.id,attempt,reason,status:updated.status,outcome:'uncertain'});return;
         }
-        if(attempt<=this.maxRetries){await emit('task.attempt.failed',{taskId:task.id,attempt,error:error.message,retrying:true});continue;}
-        const updated=transitionTask(states,task.id,'failed',{error:error.message,completedAt:this.clock()});
-        await emit('task.failed',{taskId:task.id,attempt,error:error.message,status:updated.status});return;
+        if(attempt<=this.maxRetries){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
+        const safeError=redact(error.message).slice(0,2000);
+        const updated=transitionTask(states,task.id,'failed',{error:safeError,completedAt:this.clock()});
+        await emit('task.failed',{taskId:task.id,attempt,error:safeError,status:updated.status});return;
       }
-      await emit('task.completed',{taskId:task.id,attempt,status:'completed',verification:isObject(verification)?verification:{passed:true},summary:typeof executionResult.summary==='string'?executionResult.summary:''});
-      transitionTask(states,task.id,'completed',{completedAt:this.clock(),verification:isObject(verification)?verification:{passed:true},error:null});
+      const safeVerification=verification===true?{passed:true}:{passed:true,...(typeof verification.method==='string'?{method:verification.method.slice(0,100)}:{}),...(typeof verification.summary==='string'?{summary:redact(verification.summary).slice(0,500)}:{})};
+      await emit('task.completed',{taskId:task.id,attempt,status:'completed',verification:safeVerification});
+      transitionTask(states,task.id,'completed',{completedAt:this.clock(),verification:safeVerification,error:null});
       results.set(task.id,{result:executionResult,verification});return;
     }
   }
