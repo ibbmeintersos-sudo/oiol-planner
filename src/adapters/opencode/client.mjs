@@ -31,8 +31,8 @@ export class OpenCodeClient {
   createSession(title,{signal}={}){if(typeof title!=='string'||!title.trim())throw new Error('Session title is required');return this.request('/session',{method:'POST',body:JSON.stringify({title:title.trim()}),signal});}
   getSession(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}`);}
   getSessionMessages(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/message`);}
-  abortSession(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/abort`,{method:'POST',body:JSON.stringify({})});}
-  getSessionDiff(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/diff`);}
+  abortSession(sessionId,{signal,timeoutMs}={}){return this.request(`/session/${encodeURIComponent(sessionId)}/abort`,{method:'POST',body:JSON.stringify({}),signal,timeoutMs});}
+  getSessionDiff(sessionId,{signal,timeoutMs}={}){return this.request(`/session/${encodeURIComponent(sessionId)}/diff`,{signal,timeoutMs});}
   prompt(sessionId,parts,{agent,model,signal,timeoutMs}={}){
     if(!Array.isArray(parts)||parts.length===0||parts.some(part=>!part||typeof part!=='object'||typeof part.type!=='string'))throw new Error('OpenCode prompt parts must be a non-empty array of typed parts');
     return this.request(`/session/${encodeURIComponent(sessionId)}/message`,{method:'POST',body:JSON.stringify({parts,...(agent?{agent}:{}),...(model?{model}:{})}),signal,timeoutMs});
