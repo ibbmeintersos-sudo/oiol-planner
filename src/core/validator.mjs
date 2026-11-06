@@ -1,26 +1,44 @@
-import { safePath } from './utils.mjs';
-import { topologicalWaves } from './graph.mjs';
+import { safePath, isObject } from './utils.mjs';
+import { dependencyEdgesFromTasks, canonicalEdgeKey, topologicalWaves } from './graph.mjs';
 export function validatePlan(plan, project={}) {
-  const errors=[],warnings=[]; const reqs=plan.requirements||[], tasks=plan.tasks||[], comps=plan.architecture?.components||[];
-  const unique=(items,label)=>{const seen=new Set();for(const x of items){if(!x.id)errors.push(`${label} is missing id`);else if(seen.has(x.id))errors.push(`Duplicate ${label} id: ${x.id}`);else seen.add(x.id);}};
+  const errors=[], warnings=[];
+  if(!isObject(plan)) return result(['Plan must be a JSON object'],warnings,0,0,null);
+  if(!Array.isArray(plan.requirements)) errors.push('Plan requirements must be an array');
+  if(!isObject(plan.architecture)||!Array.isArray(plan.architecture.components)) errors.push('Plan architecture.components must be an array');
+  if(!Array.isArray(plan.tasks)) errors.push('Plan tasks must be an array');
+  if(!isObject(plan.dependencyGraph)||!Array.isArray(plan.dependencyGraph.nodes)||!Array.isArray(plan.dependencyGraph.edges)) errors.push('Plan dependencyGraph.nodes and edges must be arrays');
+  if(errors.length) return result(errors,warnings,0,Array.isArray(plan.tasks)?plan.tasks.length:0,null);
+  const reqs=plan.requirements,tasks=plan.tasks,comps=plan.architecture.components;
+  const unique=(items,label)=>{const seen=new Set();for(const item of items){if(!isObject(item)||typeof item.id!=='string'||!item.id.trim())errors.push(`${label} is missing a valid id`);else if(seen.has(item.id))errors.push(`Duplicate ${label} id: ${item.id}`);else seen.add(item.id);}};
   unique(reqs,'requirement'); unique(tasks,'task'); unique(comps,'component');
-  const reqIds=new Set(reqs.map(x=>x.id)),taskIds=new Set(tasks.map(x=>x.id)),compIds=new Set(comps.map(x=>x.id));
-  const covered=new Set();
-  for(const t of tasks){
-    if(!t.title)errors.push(`Task ${t.id} has no title`);
-    if(!Array.isArray(t.acceptanceCriteria)||!t.acceptanceCriteria.length)errors.push(`Task ${t.id} has no acceptance criteria`);
-    for(const r of t.requirementIds||[]){if(!reqIds.has(r))errors.push(`Task ${t.id} references unknown requirement ${r}`);else covered.add(r);}
-    for(const c of t.componentIds||[])if(!compIds.has(c))errors.push(`Task ${t.id} references unknown component ${c}`);
-    for(const p of t.writeScope||[])if(!safePath(p))errors.push(`Unsafe write scope in ${t.id}: ${p}`);
-    if(t.verification?.command && /\b(rm\s+-rf|format\s+c:|del\s+\/s|DROP\s+DATABASE)\b/i.test(t.verification.command)) warnings.push(`Potentially destructive verification command in ${t.id}`);
+  const reqIds=new Set(reqs.map(x=>x?.id)),taskIds=new Set(tasks.map(x=>x?.id)),compIds=new Set(comps.map(x=>x?.id)),covered=new Set();
+  for(const task of tasks) {
+    if(!isObject(task)){errors.push('Task entry must be an object');continue;}
+    if(typeof task.title!=='string'||!task.title.trim()) errors.push(`Task ${task.id} has no title`);
+    for(const field of ['requirementIds','componentIds','dependencies','acceptanceCriteria','writeScope']) if(!Array.isArray(task[field])) errors.push(`Task ${task.id}.${field} must be an array`);
+    if(!Array.isArray(task.acceptanceCriteria)||!task.acceptanceCriteria.length||task.acceptanceCriteria.some(x=>typeof x!=='string'||!x.trim())) errors.push(`Task ${task.id} must have non-empty string acceptance criteria`);
+    for(const req of Array.isArray(task.requirementIds)?task.requirementIds:[]) {if(!reqIds.has(req))errors.push(`Task ${task.id} references unknown requirement ${req}`);else covered.add(req);}
+    for(const comp of Array.isArray(task.componentIds)?task.componentIds:[]) if(!compIds.has(comp)) errors.push(`Task ${task.id} references unknown component ${comp}`);
+    for(const dep of Array.isArray(task.dependencies)?task.dependencies:[]) if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
+    for(const scope of Array.isArray(task.writeScope)?task.writeScope:[]) if(!safePath(scope)) errors.push(`Unsafe or invalid write scope in ${task.id}: ${scope}`);
+    if(task.verification?.command&&/\b(rm\s+-rf|format\s+c:|del\s+\/s|DROP\s+DATABASE)\b/i.test(task.verification.command)) errors.push(`Destructive verification command in ${task.id}`);
   }
-  for(const r of reqs)if(!covered.has(r.id))warnings.push(`Requirement ${r.id} is not covered by any task`);
-  const edges=plan.dependencyGraph?.edges||[];
-  for(const e of edges)if(!taskIds.has(e.from)||!taskIds.has(e.to))errors.push(`Dependency edge references unknown task: ${e.from} -> ${e.to}`);
-  const graph=topologicalWaves(tasks,edges); if(graph.cycle)errors.push(`Dependency graph contains a cycle: ${graph.remaining.join(', ')}`);
-  for(const t of tasks)if(!(t.dependencies||[]).every(d=>taskIds.has(d)))errors.push(`Task ${t.id} has unknown dependency`);
-  if((plan.clarifications||[]).some(x=>x.blocking && !x.resolved)) warnings.push('Unresolved blocking clarifications remain');
+  for(const req of reqs) if(req?.id&&!covered.has(req.id)) errors.push(`Requirement ${req.id} is not covered by any task`);
+  const graph=plan.dependencyGraph,expected=dependencyEdgesFromTasks(tasks),edgeKeys=graph.edges.map(e=>canonicalEdgeKey(e||{})),expectedKeys=expected.map(canonicalEdgeKey);
+  if(new Set(edgeKeys).size!==edgeKeys.length) errors.push('Dependency graph contains duplicate edges');
+  if(edgeKeys.slice().sort().join('|')!==expectedKeys.slice().sort().join('|')) errors.push('Dependency graph edges do not exactly match task.dependencies');
+  const expectedNodes=[...taskIds].sort(),actualNodes=graph.nodes.slice().sort();
+  if(actualNodes.length!==expectedNodes.length||actualNodes.some((x,i)=>x!==expectedNodes[i])) errors.push('Dependency graph nodes do not exactly match task IDs');
+  for(const edge of graph.edges) {
+    if(!isObject(edge)||!taskIds.has(edge.from)||!taskIds.has(edge.to)) errors.push(`Dependency edge references unknown task: ${edge?.from} -> ${edge?.to}`);
+    else if(edge.type&&edge.type!=='finish_to_start') errors.push(`Unsupported dependency edge type: ${edge.type}`);
+  }
+  const schedule=topologicalWaves(tasks,expected);
+  if(schedule.cycle) errors.push(`Dependency graph contains a cycle: ${schedule.remaining.join(', ')}`);
+  if(schedule.error) errors.push(`Dependency scheduler error: ${schedule.error}`);
+  if((plan.clarifications||[]).some(x=>x?.blocking&&!x?.resolved)) warnings.push('Unresolved blocking clarifications remain');
   if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; execution must preserve them');
-  if(!tasks.length)warnings.push('Plan contains no tasks');
-  return {valid:errors.length===0,errors,warnings,requirementCoverage:reqs.length?covered.size/reqs.length:1,taskCount:tasks.length,graph};
+  if(!tasks.length) errors.push('Plan contains no tasks');
+  return result(errors,warnings,reqs.length?covered.size/reqs.length:1,tasks.length,schedule);
 }
+function result(errors,warnings,requirementCoverage,taskCount,graph){return {valid:errors.length===0,errors,warnings,requirementCoverage,taskCount,graph};}
