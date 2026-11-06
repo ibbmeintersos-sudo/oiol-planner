@@ -1,6 +1,6 @@
 # OIOL Planner
 
-**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.2.0**
+**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.2.1**
 
 OIOL is a hybrid planning and human-gated execution layer intended to sit above OpenCode. It turns a software request into a structured plan, validates it deterministically, then can coordinate approved tasks through an injected runner.
 
@@ -96,9 +96,9 @@ Recovery is deliberately not automatic. Reusing a run ID is rejected, and a proc
 The OpenCode runner is covered by fake-transport contract tests, but it has not yet been tested against a live OpenCode server.
 ### OpenCode runner
 
-`OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
+`OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, applies a configurable task timeout (10 minutes by default), aborts failed sessions when possible, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
 
-The OpenCode server operates against the project directory in which `opencode serve` is started. The runner currently does not isolate tasks in Git worktrees, so it declares itself non-concurrency-safe and the engine serializes its tasks. Do not enable parallel writes until a tested worktree adapter exists.
+The OpenCode server operates against the project directory in which `opencode serve` is started. The server adapter follows the documented `/session` and `/session/:id/message` API shape; session creation sends a title, and prompts use typed `parts`. The runner currently does not isolate tasks in Git worktrees, so it declares itself non-concurrency-safe and the engine serializes its tasks. Do not enable parallel writes until a tested worktree adapter exists.
 ## Security notes
 
 - Never put credentials in project prompts or repository files.
