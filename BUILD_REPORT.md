@@ -1,22 +1,29 @@
-# OIOL Planner v0.1.0 — Reconstruction build report
+# OIOL Planner v0.1.1 — Core hardening report
 
-## Provenance
+## Scope
 
-This package is a **reconstructed implementation** based on the retained v0.1.0 design specification and test/architecture notes. It is not asserted to be byte-for-byte identical to the earlier session's ZIP archive, which was no longer available in the active workspace.
+This release hardens the reconstructed v0.1.0 planning core. It does not add an execution engine and does not claim production readiness.
 
-## Included
+## Changes
 
-- Greenfield and existing-project analysis.
-- Conservative repository scanner with bounded context and basic redaction.
-- Provider abstraction for OpenAI-compatible, Anthropic, Gemini and Ollama APIs.
-- Hybrid planner with deterministic validation and optional independent review.
-- Dependency graph validation and conservative topological scheduling.
-- Task interface derivation, plan revision comparison, traceability and evaluation metrics.
-- Minimal OpenCode HTTP adapter.
-- CLI, tests and documentation.
+- Enforced strict plan structure and blocking requirement coverage.
+- Required dependency graph nodes and edges to exactly match task IDs and task dependency declarations.
+- Added deterministic scheduling checks for unknown references, duplicate IDs, cycles and overlapping write scopes.
+- Prevented review approval when critical/high findings remain; review failures cannot produce a ready-for-review plan.
+- Tightened provider JSON parsing to reject prose-wrapped or non-object responses.
+- Bounded repository discovery by file count and depth; retained symlink avoidance and heuristic redaction.
+- Expanded regression tests and added GitHub Actions CI for syntax and test checks.
 
-## Validation performed in this build
+## Validation
 
-The automated test suite covers deterministic plan validation, invalid references, unsafe paths, dependency cycles, dependency ordering, overlapping write scopes, revision classification, traceability, and evaluation conflict reporting.
+GitHub Actions run: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42297398671
 
-Live LLM, live OpenCode, and end-to-end GitHub-hosted package tests are not represented as completed unless separately reported after execution.
+The run completed successfully on Node.js 20. Both static syntax checks and the automated test suite passed. This is a successful CI run for commit `75de3051ffa2c17ed3b05d23bbd73d8a37dbe05f`.
+
+## Limitations
+
+- No live LLM provider integration test was run.
+- No live OpenCode server integration test was run.
+- No benchmark establishes planning quality against other agents.
+- The scanner's redaction remains heuristic; it is not a guarantee that all secrets are removed.
+- The product remains a planner, not an autonomous execution/orchestration system.
