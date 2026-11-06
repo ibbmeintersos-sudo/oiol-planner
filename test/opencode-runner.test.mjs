@@ -18,9 +18,12 @@ function fakeClient(overrides={}) {
 }
 
 test('OpenCode runner returns assistant response and diff',async()=>{
-  const {client,calls}=fakeClient();
+  let promptText='';
+  const {client,calls}=fakeClient({async prompt(_id,parts){calls.prompted++;promptText=parts[0].text;return structuredClone(message);}});
   const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});
   const result=await runner.execute(task,{runId:'run-1',results:new Map()});
+  assert.match(promptText,/Acceptance criteria:\\n- Feature works/);
+  assert.doesNotMatch(promptText,/Acceptance criteria:\\\\n/);
   assert.equal(result.sessionId,'session-1');
   assert.equal(result.assistantText,'Implemented');
   assert.deepEqual(result.diff,[]);
