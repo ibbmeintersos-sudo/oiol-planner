@@ -34,7 +34,7 @@ export class OpenCodeTaskRunner {
         throw new Error('OpenCode returned an invalid assistant message response');
       }
       if(message.info.error) throw new Error('OpenCode assistant response reported an execution error');
-      const assistantText=message.parts.filter(part=>part?.type==='text'&&typeof part.text==='string').map(part=>part.text).join('\\n');
+      const assistantText=message.parts.filter(part=>part?.type==='text'&&typeof part.text==='string').map(part=>part.text).join('\n');
       const diff=await this.client.getSessionDiff(sessionId,{signal:controller.signal,timeoutMs:remaining()});
       if(!Array.isArray(diff)) throw new Error('OpenCode returned an invalid session diff');
       return {sessionId,messageId:message.info.id||null,assistantText,diff,parts:message.parts};
@@ -73,11 +73,11 @@ function buildTaskPrompt(task,dependencyResults,maxChars) {
     `Task ID: ${task.id}`,
     `Title: ${task.title}`,
     `Description: ${task.description||''}`,
-    `Acceptance criteria:\\n${(task.acceptanceCriteria||[]).map(x=>'- '+x).join('\\n')}`,
-    `Allowed write scope:\\n${(task.writeScope||[]).map(x=>'- '+x).join('\\n')||'- No file writes are authorized'}`,
+    `Acceptance criteria:\n${(task.acceptanceCriteria||[]).map(x=>'- '+x).join('\n')}`,
+    `Allowed write scope:\n${(task.writeScope||[]).map(x=>'- '+x).join('\n')||'- No file writes are authorized'}`,
     `Declared dependencies: ${(task.dependencies||[]).join(', ')||'none'}`,
-    `Dependency outputs (JSON, redacted and truncated):\\n${serialized}`,
+    `Dependency outputs (JSON, redacted and truncated):\n${serialized}`,
     '',
     'At completion, report the implementation summary, files changed, checks actually performed, unresolved risks, and any acceptance criteria that remain unverified.'
-  ].join('\\n');
+  ].join('\n');
 }
