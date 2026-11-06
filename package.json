@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Hybrid planning and validation layer for OpenCode workflows",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "test": "node --test",
