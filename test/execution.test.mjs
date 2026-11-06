@@ -87,7 +87,7 @@ test('JSONL event store rejects corrupt durable logs',async()=>{
   const directory=await mkdtemp(path.join(os.tmpdir(),'oiol-events-corrupt-'));
   try{
     const file=path.join(directory,'events.jsonl');
-    await writeFile(file,'{"eventId":"e1","runId":"r","sequence":1,"type":"run.started","at":"bad-date"}\\n','utf8');
+    await writeFile(file,'{"eventId":"e1","runId":"r","sequence":1,"type":"run.started","at":"bad-date"}\n','utf8');
     const store=new JsonlEventStore(file);
     await assert.rejects(()=>store.read('r'),/Event timestamp must be valid/);
   }finally{await rm(directory,{recursive:true,force:true});}
