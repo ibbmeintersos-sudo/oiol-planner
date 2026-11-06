@@ -21,7 +21,7 @@ export class OpenCodeClient {
       if(response.status===204||!body.trim()) return null;
       try{return JSON.parse(body);}catch(error){throw new Error(`OpenCode returned invalid JSON (${response.status}): ${error.message}`);}
     } catch(error) {
-      if(error?.name==='AbortError') throw new Error(`OpenCode request timed out after ${this.timeoutMs}ms`);
+      if(error?.name==='AbortError') throw new Error(externalSignal?.aborted?'OpenCode request cancelled':`OpenCode request timed out after ${this.timeoutMs}ms`);
       throw error;
     } finally {clearTimeout(timer);externalSignal?.removeEventListener('abort',abort);}
   }
