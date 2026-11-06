@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "node --check src/cli.mjs && node --check src/core/planner.mjs && node --check src/core/validator.mjs && node --check src/core/graph.mjs && node --check src/scanner/repository.mjs && node --check src/providers/base.mjs",
+    "check": "find src -type f -name '*.mjs' -print0 | xargs -0 -n1 node --check",
     "plan": "node src/cli.mjs"
   },
   "license": "MIT"
