@@ -1,6 +1,6 @@
 # OIOL Planner
 
-**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.2.1**
+**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.3.0**
 
 OIOL is a hybrid planning and human-gated execution layer intended to sit above OpenCode. It turns a software request into a structured plan, validates it deterministically, then can coordinate approved tasks through an injected runner.
 
