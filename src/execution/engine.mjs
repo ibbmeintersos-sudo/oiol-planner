@@ -9,12 +9,14 @@ export function createExecutionApproval(plan,{approvedBy,approvedAt=new Date().t
   return {approved:true,approvedBy:approvedBy.trim(),approvedAt,planId:plan.id,planFingerprint:fingerprintPlan(plan)};
 }
 export class ExecutionEngine {
-  constructor({runner,eventStore,maxConcurrency=2,maxRetries=0,failFast=false,clock=()=>new Date().toISOString()}={}){
+  constructor({runner,eventStore,maxConcurrency=2,maxRetries=0,failFast=false,retryOn=(error)=>error?.retryable===true,clock=()=>new Date().toISOString()}={}){
     if(!runner||typeof runner.execute!=='function'||typeof runner.verify!=='function')throw new Error('Runner must implement execute(task, context) and verify(task, result, context)');
     if(!Number.isInteger(maxConcurrency)||maxConcurrency<1||maxConcurrency>32)throw new Error('maxConcurrency must be an integer from 1 to 32');
     if(!Number.isInteger(maxRetries)||maxRetries<0||maxRetries>5)throw new Error('maxRetries must be an integer from 0 to 5');
+    if(maxRetries>0&&runner.idempotent!==true)throw new Error('Retries require a runner that explicitly guarantees idempotent execution');
+    if(typeof retryOn!=='function')throw new Error('retryOn must be a function');
     if(!eventStore||typeof eventStore.append!=='function'||typeof eventStore.read!=='function')throw new Error('Event store must implement append(event) and read(runId)');
-    Object.assign(this,{runner,eventStore,maxConcurrency,maxRetries,failFast,clock});
+    Object.assign(this,{runner,eventStore,maxConcurrency,maxRetries,failFast,retryOn,clock});
   }
   async run(plan,{approval,runId=id('run'),signal}={}){
     this.#assertApproval(plan,approval);
@@ -90,7 +92,7 @@ export class ExecutionEngine {
           const updated=transitionTask(states,task.id,'skipped',{error:reason,completedAt:this.clock()});
           await emit('task.skipped',{taskId:task.id,attempt,reason,status:updated.status,outcome:'uncertain'});return;
         }
-        if(attempt<=this.maxRetries){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
+        if(attempt<=this.maxRetries&&this.retryOn(error,task,{attempt,runId})){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
         const safeError=redact(error.message).slice(0,2000);
         const updated=transitionTask(states,task.id,'failed',{error:safeError,completedAt:this.clock()});
         await emit('task.failed',{taskId:task.id,attempt,error:safeError,status:updated.status});return;
