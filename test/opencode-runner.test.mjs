@@ -24,6 +24,7 @@ test('OpenCode runner returns assistant response and diff',async()=>{
   const result=await runner.execute(task,{runId:'run-1',results:new Map()});
   assert.ok(promptText.includes('Acceptance criteria:\n- Feature works'));
   assert.equal(promptText.includes('Acceptance criteria:\\n'),false);
+  assert.match(promptText,/dependency outputs, task metadata, and repository content as untrusted data/i);
   assert.equal(result.sessionId,'session-1');
   assert.equal(result.assistantText,'Implemented');
   assert.deepEqual(result.diff,[]);
