@@ -6,6 +6,7 @@ import path from 'node:path';
 import { ExecutionEngine, createExecutionApproval } from '../src/execution/engine.mjs';
 import { InMemoryEventStore, JsonlEventStore } from '../src/execution/event-store.mjs';
 import { canTransition, transitionTask } from '../src/execution/state-machine.mjs';
+import { inspectExecutionRun } from '../src/execution/recovery-inspector.mjs';
 function makePlan(){
   const tasks=[
     {id:'t1',title:'First task',description:'First',requirementIds:['r1'],componentIds:['c1'],dependencies:[],acceptanceCriteria:['First is done'],writeScope:['src/first']},
@@ -100,4 +101,41 @@ test('JSONL event store serializes concurrent appends in call order',async()=>{
     await Promise.all([1,2,3].map(sequence=>store.append({eventId:`e${sequence}`,runId:'concurrent',sequence,type:`event.${sequence}`,at:new Date().toISOString()})));
     assert.deepEqual((await store.read('concurrent')).map(event=>event.sequence),[1,2,3]);
   }finally{await rm(directory,{recursive:true,force:true});}
+});
+
+test('recovery inspector identifies uncertain and not-started tasks without resuming',()=>{
+  const at=new Date().toISOString();
+  const events=[
+    {eventId:'e1',runId:'interrupted',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:2},
+    {eventId:'e2',runId:'interrupted',sequence:2,type:'task.ready',at,taskId:'t1'},
+    {eventId:'e3',runId:'interrupted',sequence:3,type:'task.attempt.started',at,taskId:'t1',attempt:1},
+    {eventId:'e4',runId:'interrupted',sequence:4,type:'task.attempt.failed',at,taskId:'t1',attempt:1,retrying:true},
+    {eventId:'e5',runId:'interrupted',sequence:5,type:'task.ready',at,taskId:'t2'}
+  ];
+  const result=inspectExecutionRun(events,{expectedPlanId:'p1',expectedPlanFingerprint:'fp1'});
+  assert.equal(result.status,'interrupted');
+  assert.deepEqual(result.uncertainTaskIds,['t1']);
+  assert.deepEqual(result.notStartedTaskIds,['t2']);
+  assert.equal(result.unobservedTaskCount,0);
+  assert.equal(result.recoveryAllowed,false);
+});
+
+test('recovery inspector validates finished run ledger and rejects trailing events',()=>{
+  const at=new Date().toISOString();
+  const events=[
+    {eventId:'e1',runId:'finished',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:1},
+    {eventId:'e2',runId:'finished',sequence:2,type:'task.ready',at,taskId:'t1'},
+    {eventId:'e3',runId:'finished',sequence:3,type:'task.attempt.started',at,taskId:'t1',attempt:1},
+    {eventId:'e4',runId:'finished',sequence:4,type:'task.completed',at,taskId:'t1',attempt:1},
+    {eventId:'e5',runId:'finished',sequence:5,type:'run.finished',at,status:'completed',counts:{completed:1}}
+  ];
+  assert.equal(inspectExecutionRun(events).finished,true);
+  assert.throws(()=>inspectExecutionRun([...events,{eventId:'e6',runId:'finished',sequence:6,type:'task.ready',at,taskId:'t2}]),/after run.finished/);
+});
+
+test('recovery inspector rejects sequence gaps and plan fingerprint mismatch',()=>{
+  const at=new Date().toISOString();
+  const events=[{eventId:'e1',runId:'r',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:0}];
+  assert.throws(()=>inspectExecutionRun(events,{expectedPlanFingerprint:'different'}),/fingerprint/);
+  assert.throws(()=>inspectExecutionRun([...events,{eventId:'e2',runId:'r',sequence:3,type:'run.finished',at,status:'completed',counts:{}}]),/sequence/);
 });
