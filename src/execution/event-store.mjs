@@ -36,7 +36,7 @@ export class JsonlEventStore {
     let content;
     try{content=await fs.readFile(this.filePath,'utf8');}
     catch(error){if(error.code==='ENOENT'){this.initialized=true;return;}throw error;}
-    for(const [index,line] of content.split('\\n').entries()){
+    for(const [index,line] of content.split('\n').entries()){
       if(!line.trim()) continue;
       let event;
       try{event=JSON.parse(line);}catch(error){throw new Error(`Corrupt event log at line ${index+1}: ${error.message}`);}
@@ -55,7 +55,7 @@ export class JsonlEventStore {
       if(event.sequence!==previous+1) throw new Error(`Non-monotonic event sequence for run ${event.runId}: expected ${previous+1}, received ${event.sequence}`);
       await fs.mkdir(path.dirname(this.filePath),{recursive:true});
       const handle=await fs.open(this.filePath,'a',0o600);
-      try{await handle.chmod(0o600);await handle.writeFile(JSON.stringify(event)+'\\n','utf8');await handle.sync();}
+      try{await handle.chmod(0o600);await handle.writeFile(JSON.stringify(event)+'\n','utf8');await handle.sync();}
       finally{await handle.close();}
       this.lastSequence.set(event.runId,event.sequence);
       return event;
@@ -72,7 +72,7 @@ export class JsonlEventStore {
     catch(error){if(error.code==='ENOENT')return [];throw error;}
     const events=[];
     const lastSeen=new Map();
-    for(const [index,line] of content.split('\\n').entries()){
+    for(const [index,line] of content.split('\n').entries()){
       if(!line.trim()) continue;
       let event;
       try{event=JSON.parse(line);}catch(error){throw new Error(`Corrupt event log at line ${index+1}: ${error.message}`);}
