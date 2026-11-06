@@ -12,7 +12,7 @@ export function inspectExecutionRun(events,{expectedPlanId,expectedPlanFingerpri
     const event=events[index];
     if(!event||typeof event!=='object'||event.runId!==runId) throw new Error(`Invalid run event at position ${index+1}: runId mismatch`);
     if(event.sequence!==index+1) throw new Error(`Invalid run event sequence at position ${index+1}: expected ${index+1}`);
-    if(typeof event.type!=='string'||typeof event.at!=='string'||!Number.isFinite(Date.parse(event.at))) throw new Error(`Invalid run event metadata at sequence ${event.sequence}`);
+    if(typeof event.eventId!=='string'||!event.eventId||typeof event.type!=='string'||typeof event.at!=='string'||!Number.isFinite(Date.parse(event.at))) throw new Error(`Invalid run event metadata at sequence ${event.sequence}`);
     if(finished) throw new Error('Run event stream contains events after run.finished');
 
     if(index===0) {
