@@ -13,7 +13,7 @@ export class OpenCodeTaskRunner {
     if(!isObject(session)||typeof session.id!=='string'||!session.id)throw new Error('OpenCode did not return a valid session ID');
     let message;
     try{
-      message=await this.client.prompt(session.id,[{type:'text',text:buildTaskPrompt(task,context.results,this.maxDependencyContextChars)}],{agent:this.agent,model:this.model,signal:context.signal});
+      message=await this.client.prompt(session.id,[{type:'text',text:buildTaskPrompt(task,context.results,this.maxDependencyContextChars)}],{agent:this.agent,model:this.model,signal:context.signal,timeoutMs:this.taskTimeoutMs});
     }catch(error){
       await this.client.abortSession?.(session.id).catch(()=>{});
       throw error;
