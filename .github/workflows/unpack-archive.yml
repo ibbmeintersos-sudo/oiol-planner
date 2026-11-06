@@ -8,7 +8,6 @@ permissions:
 
 jobs:
   unpack:
-    if: hashFiles('oiol-planner-v0.1.0-reconstructed.tar.gz') != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +18,7 @@ jobs:
         run: |
           set -euo pipefail
           archive="oiol-planner-v0.1.0-reconstructed.tar.gz"
+          if [ ! -f "$archive" ]; then echo "No archive to unpack."; exit 0; fi
           mkdir -p /tmp/oiol-source
           tar -tzf "$archive" | grep -q '^oiol-planner/'
           tar -xzf "$archive" -C /tmp/oiol-source --strip-components=1
