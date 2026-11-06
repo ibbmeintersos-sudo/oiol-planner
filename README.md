@@ -17,7 +17,7 @@ OIOL is a hybrid planning and human-gated execution layer intended to sit above 
 
 ## Requirements
 
-- Node.js 20 or newer.
+- Node.js 22 or newer (the package engine requirement is `>=22`).
 - An LLM provider endpoint for plan generation. Ollama can be used locally.
 - No runtime npm dependencies in this preview.
 
@@ -87,9 +87,9 @@ Before execution, the engine requires:
 
 - A plan with status `ready_for_review` that passes deterministic validation.
 - An explicit approval object bound to the exact plan fingerprint, approver and timestamp.
-- An explicit event store. `JsonlEventStore` persists append-only events with restrictive file permissions; `InMemoryEventStore` is for tests and ephemeral use.
+- An explicit event store. `JsonlEventStore` persists append-only events with restrictive file permissions and validates the event schema plus strictly increasing per-run sequence numbers; `InMemoryEventStore` is for tests and ephemeral use. The JSONL implementation is a single-process, single-writer store, not a distributed lock or multi-process transaction coordinator.
 
-Execution uses validated dependency waves, bounded concurrency, dependency-scoped task outputs, verification gates, fail-fast as an option, cancellation signaling and stable per-task idempotency keys. Automatic retries default to **zero** because repeating a task can duplicate side effects; callers may enable retries only when their runner safely honors the idempotency key.
+Execution uses validated dependency waves, bounded concurrency, dependency-scoped task outputs, verification gates, fail-fast as an option, cancellation signaling and stable per-task idempotency keys. Automatic retries default to **zero** because repeating a task can duplicate side effects. Enabling execution retries requires `runner.idempotent === true`, and an error is retried only when the configured `retryOn(error, task, context)` policy returns `true` (default: `error.retryable === true`). A stable idempotency key is supplied, but the engine cannot prove that an external runner actually honors it.
 
 Recovery is deliberately not automatic. Reusing a run ID is rejected, and a process interruption after a side effect but before its completion event can leave the task outcome uncertain. The event log is not an exactly-once guarantee. A future recovery manager must reconcile uncertain tasks with the runner before retrying.
 
