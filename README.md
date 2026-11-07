@@ -137,7 +137,7 @@ CI workflow: `.github/workflows/ci.yml`.
 
 ## Planner quality benchmark
 
-A six-scenario starter benchmark covers Greenfield, Existing Project, multi-component design, and ambiguous requirements. Read the [benchmark protocol](benchmarks/README.md), configure planning/reviewer providers, then explicitly opt in to live provider calls:
+A ten-scenario starter benchmark covers Greenfield, Existing Project, multi-component design, and ambiguous requirements. Read the [benchmark protocol](benchmarks/README.md), configure planning/reviewer providers, then explicitly opt in to live provider calls:
 
 ```bash
 OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
