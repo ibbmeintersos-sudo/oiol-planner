@@ -14,7 +14,7 @@ const plan={
 };
 test('benchmark rubric rewards correct blocking clarification and scenario coverage',()=>{
  const result=scoreScenario(scenario,{plan,elapsedMs:12});
- assert.equal(result.validation.valid,false);
+ assert.equal(result.validation.valid,false);\n assert.equal(result.validation.structurallyValid,true);\n assert.equal(result.blockers.length,0);
  assert.equal(result.clarificationPass,true);
  assert.equal(result.dimensions.requirementSignalCoverage,1);
  assert.equal(result.dimensions.clarificationDiscipline,1);
