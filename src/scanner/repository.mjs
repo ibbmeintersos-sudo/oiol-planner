@@ -77,7 +77,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     ...manifests,
     ...tests.slice(0, 20),
     ...configs.slice(0, 20),
-    ...files.filter(file => /\.(mjs|cjs|js|ts|tsx|py|go|rs|java|md)$/i.test(file)).slice(0, 50)
+    ...files.filter(file => /\.(mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|md)$/i.test(file)).slice(0, 50)
   ])];
   let context = '', contextTruncated = false;
   const snippets = [];
@@ -111,12 +111,14 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     } catch {}
   }
 
-  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests });
+  const structure = await analyzeRepositoryStructure({ files, contents: sourceContents, manifests });
   const structureSummary = [
-    'Repository structure analysis (bounded static heuristics; evidence, not certainty):',
+    'Repository structure analysis (Tree-sitter AST where available; bounded lexical fallback; evidence, not certainty):',
     'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
     'Frameworks: ' + (structure.frameworks.join(', ') || 'not detected'),
     'Entry points: ' + (structure.entryPoints.join(', ') || 'not detected'),
+    'AST-parsed source files: ' + structure.astAnalyzedSourceFileCount + '/' + structure.sourceFileCount,
+    'AST files with syntax errors: ' + structure.astParseErrorFileCount,
     'Local import edges: ' + structure.dependencyGraph.edgeCount,
     'Unresolved relative imports: ' + structure.unresolvedLocalImportCount,
     'Route-like files: ' + structure.routeFiles.length,

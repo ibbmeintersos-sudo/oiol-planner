@@ -4,7 +4,9 @@
   "private": false,
   "type": "module",
   "description": "Planning-only intelligent engineering system with deterministic plan validation and portable handoff",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "node --test",
     "check": "node scripts/check.mjs",
@@ -16,5 +18,9 @@
     "benchmark:compare": "node scripts/compare-benchmark-modes.mjs",
     "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "tree-sitter-wasm": "2.0.4",
+    "web-tree-sitter": "0.27.1"
+  }
 }
