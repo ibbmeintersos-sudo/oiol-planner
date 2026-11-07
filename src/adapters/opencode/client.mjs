@@ -33,6 +33,7 @@ export class OpenCodeClient {
   listSessions(){return this.request('/session');}
   createSession(title,{signal}={}){if(typeof title!=='string'||!title.trim())throw new Error('Session title is required');return this.request('/session',{method:'POST',body:JSON.stringify({title:title.trim()}),signal});}
   getSession(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}`);}
+  deleteSession(sessionId,{signal,timeoutMs}={}){return this.request(`/session/${encodeURIComponent(sessionId)}`,{method:'DELETE',signal,timeoutMs});}
   getSessionMessages(sessionId){return this.request(`/session/${encodeURIComponent(sessionId)}/message`);}
   abortSession(sessionId,{signal,timeoutMs}={}){return this.request(`/session/${encodeURIComponent(sessionId)}/abort`,{method:'POST',body:JSON.stringify({}),signal,timeoutMs});}
   getSessionDiff(sessionId,{signal,timeoutMs}={}){return this.request(`/session/${encodeURIComponent(sessionId)}/diff`,{signal,timeoutMs});}
