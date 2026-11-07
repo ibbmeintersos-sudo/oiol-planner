@@ -14,6 +14,21 @@ import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
 import { selectScenarios, resolveScenarioProject, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
 
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
+
+export async function createBaselineWorkspace(scenario) {
+ const tempRoot=await fs.mkdtemp(path.join(os.tmpdir(),'oiol-opencode-baseline-'));
+ const projectDirectory=path.join(tempRoot,'project');
+ try {
+  if(scenario?.project?.fixturePath) {
+   const fixtureSource=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',scenario.project.fixturePath);
+   await fs.cp(fixtureSource,projectDirectory,{recursive:true});
+  } else await fs.mkdir(projectDirectory,{recursive:true});
+  return {tempRoot,projectDirectory,cleanup:()=>fs.rm(tempRoot,{recursive:true,force:true})};
+ } catch(error) {
+  await fs.rm(tempRoot,{recursive:true,force:true}).catch(()=>{});
+  throw error;
+ }
+}
 function parseModelRef(value){
  if(!value)return null;
  const index=value.indexOf('/');
@@ -58,16 +73,11 @@ export async function main(){
  const records=[];
  for(const scenario of chosen){
   const started=Date.now();
-  let project=null,workspaceRoot=null,record=null,workspaceCleanupWarning=null;
+  let project=null,workspace=null,record=null,workspaceCleanupWarning=null;
   try{
    project=await resolveScenarioProject(scenario);
-   workspaceRoot=await fs.mkdtemp(path.join(os.tmpdir(),'oiol-opencode-baseline-'));
-   const projectDirectory=path.join(workspaceRoot,'project');
-   if(scenario.project.fixturePath){
-    const fixtureSource=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',scenario.project.fixturePath);
-    await fs.cp(fixtureSource,projectDirectory,{recursive:true});
-   }else await fs.mkdir(projectDirectory,{recursive:true});
-   const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:projectDirectory,timeoutMs:baseConfig.timeoutMs});
+   workspace=await createBaselineWorkspace(scenario);
+   const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:workspace.projectDirectory,timeoutMs:baseConfig.timeoutMs});
    const baseline=await runOpenCodeBaselineScenario({client,scenario,project,agent:baseConfig.agent,model:baseConfig.modelRef});
    const plan=baseline.plan;
    const usage={planner:{requests:0,calls:[]},reviewer:{requests:0,calls:[]}};
@@ -79,7 +89,7 @@ export async function main(){
   }catch(error){
    record={scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message,cleanupWarning:error.cleanupWarning||null}};
   }finally{
-   if(workspaceRoot){try{await fs.rm(workspaceRoot,{recursive:true,force:true});}catch(error){workspaceCleanupWarning=error.message;}}
+   if(workspace){try{await workspace.cleanup();}catch(error){workspaceCleanupWarning=error.message;}}
   }
   if(workspaceCleanupWarning)record.workspaceCleanupWarning=workspaceCleanupWarning;
   records.push(record);
