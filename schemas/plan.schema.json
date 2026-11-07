@@ -112,7 +112,7 @@
     "evidence": {
       "type": "array",
       "items": {
-        "type": "object"
+        "$ref": "#/$defs/evidence"
       }
     },
     "clarifications": {
@@ -452,6 +452,63 @@
           "type": "boolean"
         },
         "resolved": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "description",
+        "source",
+        "trustLevel"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trustLevel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "sourceSha256": {
+          "type": "string"
+        },
+        "excerptSha256": {
+          "type": "string"
+        },
+        "sourceBytes": {
+          "type": "integer"
+        },
+        "excerptBytes": {
+          "type": "integer"
+        },
+        "excerptTruncated": {
+          "type": "boolean"
+        },
+        "redactionPassApplied": {
+          "type": "boolean"
+        },
+        "redactionChangedContent": {
           "type": "boolean"
         }
       },

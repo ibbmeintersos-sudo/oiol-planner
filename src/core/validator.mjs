@@ -15,6 +15,39 @@ export function validatePlan(plan, project={}) {
   if(!Array.isArray(plan.tasks)) errors.push('Plan tasks must be an array');
   if(!isObject(plan.dependencyGraph)||!Array.isArray(plan.dependencyGraph.nodes)||!Array.isArray(plan.dependencyGraph.edges)) errors.push('Plan dependencyGraph.nodes and edges must be arrays');
   if(errors.length) return result(errors,warnings,0,Array.isArray(plan.tasks)?plan.tasks.length:0,null);
+
+  if(plan.evidence!==undefined) {
+    if(!Array.isArray(plan.evidence)) errors.push('Plan evidence must be an array');
+    else {
+      const knownEvidence=new Map((Array.isArray(project.evidence)?project.evidence:[])
+        .filter(item=>isObject(item)&&typeof item.id==='string')
+        .map(item=>[item.id,item]));
+      const seenEvidence=new Set();
+      for(const item of plan.evidence) {
+        if(!isObject(item)) { errors.push('Evidence entry must be an object'); continue; }
+        if(typeof item.id!=='string'||!item.id.trim()) errors.push('Evidence entry is missing a valid id');
+        else if(seenEvidence.has(item.id)) errors.push('Duplicate evidence id: '+item.id);
+        else seenEvidence.add(item.id);
+        if(typeof item.source!=='string'||!item.source.trim()) errors.push('Evidence '+(item.id||'unspecified')+' is missing a source');
+        if(knownEvidence.size&&typeof item.id==='string') {
+          const known=knownEvidence.get(item.id);
+          if(!known) errors.push('Evidence '+item.id+' is not present in the supplied project evidence');
+          else {
+            if(item.source!==known.source) errors.push('Evidence '+item.id+' source does not match the supplied project evidence');
+            const citedSourceHash=item.sourceSha256||item.sha256;
+            const knownSourceHash=known.sourceSha256||known.sha256;
+            if(known.type==='repository_file_excerpt') {
+              if(!item.sourceSha256||item.sourceSha256!==knownSourceHash) errors.push('Evidence '+item.id+' must preserve the exact source fingerprint');
+              if(!item.excerptSha256||item.excerptSha256!==known.excerptSha256) errors.push('Evidence '+item.id+' must preserve the exact excerpt fingerprint');
+            } else if(citedSourceHash&&knownSourceHash&&citedSourceHash!==knownSourceHash) errors.push('Evidence '+item.id+' source fingerprint does not match the supplied project evidence');
+            if(item.excerptSha256&&known.excerptSha256&&item.excerptSha256!==known.excerptSha256) errors.push('Evidence '+item.id+' excerpt fingerprint does not match the supplied project evidence');
+          }
+        }
+      }
+    }
+  } else if(project.kind==='existing'&&Array.isArray(project.evidence)&&project.evidence.some(item=>item?.type==='repository_file_excerpt')) {
+    warnings.push('Existing-repository plan has no explicit evidence citations; repository-derived claims should cite supplied evidence IDs');
+  }
   const reqs=plan.requirements,tasks=plan.tasks,comps=plan.architecture.components;
   const unique=(items,label)=>{const seen=new Set();for(const item of items){if(!isObject(item)||typeof item.id!=='string'||!item.id.trim())errors.push(`${label} is missing a valid id`);else if(seen.has(item.id))errors.push(`Duplicate ${label} id: ${item.id}`);else seen.add(item.id);}};
   unique(reqs,'requirement'); unique(tasks,'task'); unique(comps,'component');

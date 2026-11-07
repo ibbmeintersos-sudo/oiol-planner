@@ -175,3 +175,48 @@ test('null plan input is reported safely by evaluation, traceability, interfaces
   assert.doesNotThrow(() => renderPlanMarkdown(null));
   assert.equal(evaluatePlan(null).validation.valid, false);
 });
+
+test('evidence citations must resolve to supplied project evidence and preserve fingerprints', () => {
+  const plan = validPlan();
+  const evidence = {
+    id: 'REPO-0123456789ab',
+    type: 'repository_file_excerpt',
+    description: 'Redacted source excerpt',
+    source: 'src/service.mjs',
+    trustLevel: 'untrusted_repository_content',
+    sourceSha256: 'a'.repeat(64),
+    excerptSha256: 'b'.repeat(64)
+  };
+  const project = { kind: 'existing', evidence: [evidence] };
+  plan.evidence = [{ ...evidence }];
+  assert.equal(validatePlan(plan, project).valid, true);
+  plan.evidence[0].excerptSha256 = 'c'.repeat(64);
+  assert.ok(validatePlan(plan, project).errors.some(error => error.includes('excerpt fingerprint')));
+  plan.evidence[0] = { ...evidence, id: 'REPO-UNKNOWN' };
+  assert.ok(validatePlan(plan, project).errors.some(error => error.includes('not present')));
+});
+
+test('existing repository plans without citations receive an explicit review warning', () => {
+  const plan = validPlan();
+  const project = { kind: 'existing', evidence: [{ id: 'REPO-1', type: 'repository_file_excerpt', source: 'src/a.mjs' }] };
+  const result = validatePlan(plan, project);
+  assert.ok(result.warnings.some(warning => warning.includes('no explicit evidence citations')));
+});
+
+test('repository evidence citations require both exact source and excerpt fingerprints', () => {
+  const plan = validPlan();
+  const evidence = {
+    id: 'REPO-0123456789ab',
+    type: 'repository_file_excerpt',
+    description: 'Redacted source excerpt',
+    source: 'src/service.mjs',
+    trustLevel: 'untrusted_repository_content',
+    sourceSha256: 'a'.repeat(64),
+    excerptSha256: 'b'.repeat(64)
+  };
+  const project = { kind: 'existing', evidence: [evidence] };
+  plan.evidence = [{ id: evidence.id, type: evidence.type, description: evidence.description, source: evidence.source, trustLevel: evidence.trustLevel }];
+  const result = validatePlan(plan, project);
+  assert.ok(result.errors.some(error => error.includes('exact source fingerprint')));
+  assert.ok(result.errors.some(error => error.includes('exact excerpt fingerprint')));
+});
