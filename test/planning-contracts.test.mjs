@@ -6,7 +6,7 @@ import { comparePlans } from '../src/core/revision.mjs';
 test('task interfaces resolve consumer inputs only from explicit producer outputs', () => {
   const plan = { tasks: [
     { id: 'design', title: 'Design API', dependencies: [], outputs: [{ name: 'api-contract', type: 'openapi', description: 'Versioned API contract' }] },
-    { id: 'implement', title: 'Implement API', dependencies: ['design'], outputs: ['api-source'], acceptanceCriteria: ['API matches contract'] }
+    { id: 'implement', title: 'Implement API', dependencies: ['design'], inputs: [{ fromTaskId: 'design', outputName: 'api-contract' }], outputs: ['api-source'], acceptanceCriteria: ['API matches contract'] }
   ] };
   const interfaces = deriveTaskInterfaces(plan);
   assert.equal(interfaces[1].inputs[0].resolved, true);
@@ -17,9 +17,10 @@ test('task interfaces resolve consumer inputs only from explicit producer output
 test('task interfaces expose missing producer outputs instead of inventing placeholder artifacts', () => {
   const interfaces = deriveTaskInterfaces({ tasks: [
     { id: 'a', title: 'A', dependencies: [] },
-    { id: 'b', title: 'B', dependencies: ['a'] }
+    { id: 'b', title: 'B', dependencies: ['a'], inputs: [{ fromTaskId: 'a', outputName: 'missing-artifact' }] }
   ] });
   assert.equal(interfaces[1].inputs[0].resolved, false);
+  assert.equal(interfaces[1].inputs[0].error, 'unknown_producer_output');
   assert.deepEqual(interfaces[1].inputs[0].outputs, []);
 });
 

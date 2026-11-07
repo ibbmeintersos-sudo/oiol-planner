@@ -15,14 +15,16 @@ export function deriveTaskInterfaces(plan = {}) {
     (Array.isArray(task.outputs) ? task.outputs : []).map(normalizeOutput).filter(Boolean)
   ]));
   return tasks.map(task => {
-    const inputs = (Array.isArray(task.dependencies) ? task.dependencies : []).map(dependencyId => {
-      const producer = byId.get(dependencyId);
-      const outputs = normalizedOutputs.get(dependencyId) || [];
+    const inputs = (Array.isArray(task.inputs) ? task.inputs : []).map(input => {
+      const producer = byId.get(input?.fromTaskId);
+      const outputs = normalizedOutputs.get(input?.fromTaskId) || [];
+      const matched = outputs.find(output => output.name === input?.outputName) || null;
       return {
-        fromTaskId: dependencyId,
-        outputs,
-        resolved: outputs.length > 0,
-        ...(producer ? {} : { error: 'unknown_dependency' })
+        fromTaskId: input?.fromTaskId || null,
+        outputName: input?.outputName || null,
+        outputs: matched ? [matched] : [],
+        resolved: Boolean(producer && matched),
+        ...(!producer ? { error: 'unknown_producer_task' } : !matched ? { error: 'unknown_producer_output' } : {})
       };
     });
     return {
@@ -32,6 +34,9 @@ export function deriveTaskInterfaces(plan = {}) {
       outputs: normalizedOutputs.get(task.id) || [],
       acceptanceCriteria: Array.isArray(task.acceptanceCriteria) ? task.acceptanceCriteria : [],
       consumers: tasks.filter(candidate =>
+        Array.isArray(candidate.inputs) && candidate.inputs.some(input => input?.fromTaskId === task.id)
+      ).map(candidate => candidate.id),
+      dependents: tasks.filter(candidate =>
         Array.isArray(candidate.dependencies) && candidate.dependencies.includes(task.id)
       ).map(candidate => candidate.id)
     };

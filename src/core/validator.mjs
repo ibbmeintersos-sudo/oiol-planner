@@ -26,7 +26,7 @@ export function validatePlan(plan, project={}) {
     for(const dep of Array.isArray(task.dependencies)?task.dependencies:[]) {
       const producer=tasks.find(candidate=>candidate?.id===dep);
       if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
-      else if(!Array.isArray(producer?.outputs)||!producer.outputs.length) warnings.push(`Task ${task.id} depends on ${dep}, but that task declares no explicit outputs`);
+
     }
     if(task.outputs!==undefined&&(!Array.isArray(task.outputs)||task.outputs.some(output=>!(typeof output==='string'&&output.trim())&&!(isObject(output)&&typeof output.name==='string'&&output.name.trim())))) errors.push(`Task ${task.id}.outputs must contain named strings or objects`);
     for(const scope of Array.isArray(task.writeScope)?task.writeScope:[]) if(!safePath(scope)) errors.push(`Unsafe or invalid write scope in ${task.id}: ${scope}`);
