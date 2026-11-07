@@ -39,5 +39,5 @@ test('adjudication resolves a large disagreement with explicit rationale',()=>{
 test('duplicate reviewer entries and missing evidence are rejected',()=>{
   assert.throws(()=>aggregateHumanReviews(parseCsv(header+'\n'+row('R1',4)+'\n'+row('R1',5)),['T-1']),/Duplicate review/);
   const missing=row('R2',4).replace('Plan evidence: task boundaries and acceptance criteria are clear','');
-  assert.throws(()=>aggregateHumanReviews(parseCsv(header+'\n'+row('R1',4)+'\n'+missing)),/Evidence notes are required/);
+  assert.throws(()=>aggregateHumanReviews(parseCsv(header+'\n'+row('R1',4)+'\n'+missing),['T-1']),/Evidence notes are required/);
 });
