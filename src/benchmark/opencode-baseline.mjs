@@ -33,7 +33,7 @@ export function parseBaselinePlan(text) {
 }
 
 export async function runOpenCodeBaselineScenario({client,scenario,project=scenario?.project,agent='plan',model,signal}={}) {
-  if(!client||typeof client.createSession!=='function'||typeof client.prompt!=='function'||typeof client.deleteSession!=='function')throw new Error('A compatible OpenCode client is required');
+  if(!client||typeof client.createSession!=='function'||typeof client.prompt!=='function'||typeof client.deleteSession!=='function'||typeof client.getSessionDiff!=='function')throw new Error('A compatible OpenCode client with session diff inspection is required');
   if(!scenario?.id||!isObject(project))throw new Error('A benchmark scenario and project object are required');
   let sessionId=null,result=null,runError=null,cleanupWarning=null;
   const startedAt=Date.now();
@@ -45,8 +45,11 @@ export async function runOpenCodeBaselineScenario({client,scenario,project=scena
     if(!isObject(message)||!isObject(message.info)||message.info.role!=='assistant'||!Array.isArray(message.parts))throw new Error('OpenCode returned an invalid baseline assistant message');
     if(message.info.error)throw new Error('OpenCode baseline assistant reported an error');
     const assistantText=message.parts.filter(part=>part?.type==='text'&&typeof part.text==='string').map(part=>part.text).join('\n');
+    const diff=await client.getSessionDiff(sessionId,{signal});
+    if(!Array.isArray(diff))throw new Error('OpenCode baseline returned an invalid session diff');
+    if(diff.length)throw new Error('OpenCode baseline violated its read-only contract; files changed: '+diff.slice(0,20).map(x=>x?.file||'[unknown]').join(', '));
     const plan=parseBaselinePlan(assistantText);
-    result={scenarioId:scenario.id,plan,assistantText,sessionId,messageId:message.info.id||null,messageInfo:{model:message.info.model||null},usage:message.info.tokens||message.info.usage||null,elapsedMs:Date.now()-startedAt};
+    result={scenarioId:scenario.id,plan,assistantText,sessionId,messageId:message.info.id||null,messageInfo:{model:message.info.model||null},usage:message.info.tokens||message.info.usage||null,diffCount:diff.length,elapsedMs:Date.now()-startedAt};
   }catch(error){runError=error;}
   finally{
     if(sessionId){try{await client.deleteSession(sessionId,{signal,timeoutMs:5000});}catch(error){cleanupWarning=error.message;}}
