@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { OpenCodeClient } from '../src/adapters/opencode/client.mjs';
@@ -57,10 +58,16 @@ export async function main(){
  const records=[];
  for(const scenario of chosen){
   const started=Date.now();
-  let project=null;
+  let project=null,workspaceRoot=null,record=null,workspaceCleanupWarning=null;
   try{
    project=await resolveScenarioProject(scenario);
-   const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:project.repository?.root,timeoutMs:baseConfig.timeoutMs});
+   workspaceRoot=await fs.mkdtemp(path.join(os.tmpdir(),'oiol-opencode-baseline-'));
+   const projectDirectory=path.join(workspaceRoot,'project');
+   if(scenario.project.fixturePath){
+    const fixtureSource=path.resolve(path.dirname(new URL(import.meta.url).pathname),'..',scenario.project.fixturePath);
+    await fs.cp(fixtureSource,projectDirectory,{recursive:true});
+   }else await fs.mkdir(projectDirectory,{recursive:true});
+   const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:projectDirectory,timeoutMs:baseConfig.timeoutMs});
    const baseline=await runOpenCodeBaselineScenario({client,scenario,project,agent:baseConfig.agent,model:baseConfig.modelRef});
    const plan=baseline.plan;
    const usage={planner:{requests:0,calls:[]},reviewer:{requests:0,calls:[]}};
@@ -68,12 +75,16 @@ export async function main(){
    usage.planner.calls.push({model:baseline.messageInfo?.model||baseConfig.modelRef?.modelID||null,usage:baseline.usage||null});
    await attachReviewer(plan,project,reviewer,reviewConfig,baseConfig.modelRef,usage);
    plan.providerUsage=usage;
-   records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git}:null,plan,cleanupWarning:baseline.cleanupWarning});
-   console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
+   record={scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git}:null,plan,cleanupWarning:baseline.cleanupWarning,diffCount:baseline.diffCount};
   }catch(error){
-   records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message,cleanupWarning:error.cleanupWarning||null}});
-   console.error('['+scenario.id+'] ERROR: '+error.message);
+   record={scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message,cleanupWarning:error.cleanupWarning||null}};
+  }finally{
+   if(workspaceRoot){try{await fs.rm(workspaceRoot,{recursive:true,force:true});}catch(error){workspaceCleanupWarning=error.message;}}
   }
+  if(workspaceCleanupWarning)record.workspaceCleanupWarning=workspaceCleanupWarning;
+  records.push(record);
+  if(record.error)console.error('['+scenario.id+'] ERROR: '+record.error.message);
+  else console.log('['+scenario.id+'] '+record.plan.status+' in '+record.elapsedMs+'ms');
  }
  const scores=records.map(record=>{const scenario=chosen.find(x=>x.id===record.scenarioId);return record.error?{scenarioId:record.scenarioId,category:scenario.category,difficulty:scenario.difficulty,score:0,blockers:[record.error.message]}:scoreScenario(scenario,record);});
  const summary=summarizeBenchmark(scores);
