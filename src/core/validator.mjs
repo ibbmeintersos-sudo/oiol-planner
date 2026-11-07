@@ -29,6 +29,17 @@ export function validatePlan(plan, project={}) {
 
     }
     if(task.outputs!==undefined&&(!Array.isArray(task.outputs)||task.outputs.some(output=>!(typeof output==='string'&&output.trim())&&!(isObject(output)&&typeof output.name==='string'&&output.name.trim())))) errors.push(`Task ${task.id}.outputs must contain named strings or objects`);
+    if(task.inputs!==undefined&&!Array.isArray(task.inputs)) errors.push(`Task ${task.id}.inputs must be an array`);
+    for(const input of Array.isArray(task.inputs)?task.inputs:[]) {
+      if(!isObject(input)||typeof input.fromTaskId!=='string'||!input.fromTaskId.trim()||typeof input.outputName!=='string'||!input.outputName.trim()) {
+        errors.push(`Task ${task.id} has an invalid input contract; fromTaskId and outputName are required`);
+        continue;
+      }
+      if(!Array.isArray(task.dependencies)||!task.dependencies.includes(input.fromTaskId)) errors.push(`Task ${task.id} input ${input.outputName} references ${input.fromTaskId}, which is not a declared dependency`);
+      const producer=tasks.find(candidate=>candidate?.id===input.fromTaskId);
+      const outputs=(Array.isArray(producer?.outputs)?producer.outputs:[]).map(output=>typeof output==='string'?output:output?.name).filter(Boolean);
+      if(!producer||!outputs.includes(input.outputName)) errors.push(`Task ${task.id} input ${input.outputName} references an output not declared by ${input.fromTaskId}`);
+    }
     for(const scope of Array.isArray(task.writeScope)?task.writeScope:[]) if(!safePath(scope)) errors.push(`Unsafe or invalid write scope in ${task.id}: ${scope}`);
     if(task.verification?.command&&/\b(rm\s+-rf|format\s+c:|del\s+\/s|DROP\s+DATABASE)\b/i.test(task.verification.command)) errors.push(`Destructive verification command in ${task.id}`);
   }
