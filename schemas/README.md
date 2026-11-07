@@ -2,49 +2,51 @@
 
 ## Current contract
 
-- Schema file: `plan.schema.json`
-- JSON Schema dialect identifier: Draft 2020-12
-- `schemaVersion`: `1.0.0`
-- `contractVersion`: `1.0`
-- Schema identifier: `urn:oiol:schemas:plan:1.0.0`
+- Current schema: \`plan.schema.json\`
+- Current \`schemaVersion\`: \`1.1.0\`
+- Current \`contractVersion\`: \`1.1\`
+- Schema dialect: JSON Schema Draft 2020-12
+- Immutable snapshots: \`plan-1.0.0.schema.json\`, \`plan-1.1.0.schema.json\`
 
-Every generated plan must carry both version fields. The published schema pins them with `const`; consumers must not silently interpret an unknown schema version as the current contract.
+The plan schema is a planning-artifact contract, not an execution-state contract. The 1.1.0 additions are optional, so 1.0.0 plans remain valid when validated against their own frozen schema.
 
-## Built-in validator support
+## Built-in validator keyword support
 
-OIOL's built-in validator is deliberately a documented subset, not a general-purpose Draft 2020-12 implementation. The supported keywords are:
+The built-in validator is a deliberately bounded subset, not a complete Draft 2020-12 implementation.
 
 | Keyword | Implemented behavior | Limitations |
 |---|---|---|
-| `$schema`, `$id`, `title`, `description` | Schema metadata accepted | Metadata is not used to select a dialect or fetch remote schemas |
-| `$defs` | Named nested schema definitions | Local schema nodes only |
-| `$ref` | Resolves local JSON Pointer references beginning with `#/` | No remote references, anchors, or dynamic references |
-| `type` | Checks null, object, array, string, boolean, integer, and finite number; arrays of types mean any listed type | No custom types |
-| `required` | Checks required object property names | No dependent-required semantics |
-| `properties` | Validates declared object properties | No pattern properties or property-name schemas |
-| `items` | Applies one schema object to every array item | Tuple-style array schemas are unsupported |
-| `additionalProperties` | Accepts true/false or validates remaining properties against a schema object | No unevaluated-properties semantics |
-| `const`, `enum` | Deep JSON-value equality | No coercion |
-| `minLength` | Minimum Unicode code-point count for strings | No max length or regular-expression pattern |
-| `minItems` | Minimum array length | No max items |
-| `uniqueItems` | Deep JSON-value uniqueness | No custom equality |
-| `oneOf`, `anyOf`, `not` | Exactly one, at least one, or zero matching child schemas | Only the listed subset is evaluated recursively |
+| \`$schema\`, \`$id\`, \`title\`, \`description\` | Metadata accepted | No remote schema loading or dialect negotiation |
+| \`$defs\`, \`$ref\` | Local definitions and JSON Pointer references | No remote refs, anchors, or dynamic refs |
+| \`type\`, \`required\`, \`properties\` | Type and required-property validation | No dependent-required or pattern properties |
+| \`items\`, \`additionalProperties\` | Item and extra-property validation | No tuple arrays or unevaluated-properties semantics |
+| \`const\`, \`enum\` | Deep JSON equality | No coercion |
+| \`minLength\`, \`minItems\`, \`uniqueItems\` | Basic string/array constraints | No max constraints or regex patterns |
+| \`oneOf\`, \`anyOf\`, \`not\` | Boolean schema composition | Evaluates only the listed keyword subset |
 
-Any other keyword is rejected during schema inspection. In particular, keywords such as `format`, `pattern`, `minimum`, `maximum`, `contains`, `propertyNames`, `if/then/else`, and `unevaluatedProperties` are not supported by the built-in validator. External consumers should validate against the published schema with a standards-compliant Draft 2020-12 implementation.
+Unknown keywords are rejected. Keywords such as \`format\`, \`pattern\`, \`minimum\`, \`maximum\`, \`contains\`, \`if/then/else\`, and \`unevaluatedProperties\` are not supported by the built-in validator.
 
-## Versioning and migration policy
+## 1.1.0 quality fields
 
-1. **Patch version** (`1.0.x`): documentation corrections or validator bug fixes that do not intentionally change the contract's accepted data model or field meaning. Publish the change log and regression fixtures.
-2. **Minor version** (`1.x.0`): backward-compatible additions such as optional fields or new optional metadata. Existing 1.0 consumers must be able to ignore the new fields. Update `schemaVersion`, `$id`, `SCHEMA_VERSION`, examples, and contract tests together.
-3. **Major version** (`2.0.0`): a breaking shape or semantic change, removal/renaming of a field, a newly required field, or a changed interpretation. Bump `schemaVersion` and `contractVersion`; publish a version-specific schema and a documented migration guide. Do not silently reinterpret older plan files.
-4. Keep released versioned schemas immutable. `plan.schema.json` is the current convenience pointer; the `plan-1.0.0.schema.json` file is the frozen copy of the currently published contract. For future schema versions, add `plan-<schemaVersion>.schema.json` and never overwrite older snapshots.
-5. A validator must fail closed on an unsupported `schemaVersion`. A migration must be an explicit, separately tested conversion that states which source versions it accepts and which information may be lost.
-6. A software release version (for example OIOL `0.5.0`) is independent of the plan `schemaVersion`. Do not bump the schema version for implementation-only releases.
+- \`qualityAttribute\` identifies a non-functional quality dimension; \`measurement\` records metric, target, unit, and method.
+- \`testStrategy\` records the planned verification approach, levels, coverage, entry/exit criteria, and test-data approach.
+- \`rollbackPlan\` records applicability or a reasoned non-applicability statement; applicable changes describe strategy, triggers, steps, verification, and data compatibility.
+- \`unknownsReviewed\` distinguishes an explicitly reviewed empty unknowns list from an unreviewed omission.
+- \`unknowns\` records impact, resolution approach, and whether each unknown blocks a decision.
+- \`assumptions\` records confidence and how each assumption should be checked.
+- Risks may carry integer \`likelihood\` and \`impact\` estimates from 1 to 5. OIOL derives exposure as likelihood × impact; the model must not invent an exposure score.
 
-## Contract change checklist
+These sections are optional in the schema to preserve backward compatibility. Quality evaluation reports missing or incomplete evidence; it does not claim that an absent section proves the corresponding concern is irrelevant.
 
-- Update `schemaVersion`, `contractVersion`, and `$id` consistently.
-- Update `src/contracts/types.mjs`, the published schema, examples, and schema keyword documentation.
-- Add valid and invalid contract fixtures, including older-version rejection tests.
-- Verify generated plans, CLI validation, Markdown rendering, and benchmark scoring.
-- Record migration behavior and compatibility notes in the release notes.
+## Version and migration policy
+
+1. Patch version: validator or documentation corrections that do not intentionally alter the data contract.
+2. Minor version: backward-compatible optional fields or metadata. Publish a new immutable snapshot and retain all older snapshots.
+3. Major version: breaking structure or meaning changes. Publish a migration guide and explicit conversion procedure; do not silently reinterpret older plans.
+4. Validate a plan using the snapshot matching its declared \`schemaVersion\`. Unsupported versions fail closed.
+5. The current \`plan.schema.json\` is a convenience copy of the current immutable snapshot.
+6. \`schemaVersion\` and package version are independent; implementation releases do not automatically require a schema bump.
+
+## Change checklist
+
+Update \`src/contracts/types.mjs\`, \`plan.schema.json\`, a new immutable snapshot, examples, prompt instructions, contract tests, and this document in one change. Never edit a released versioned snapshot.

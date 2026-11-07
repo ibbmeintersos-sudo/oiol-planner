@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "1.0.0",
-  "contractVersion": "1.0",
+  "schemaVersion": "1.1.0",
+  "contractVersion": "1.1",
   "id": "sample_api_plan_v1",
   "status": "needs_revision",
   "summary": "A small example plan demonstrating requirement traceability, explicit task outputs, and a dependency graph.",
@@ -29,13 +29,40 @@
         "Each adjustment records item, delta, reason, actor reference, and timestamp.",
         "Invalid adjustments are rejected according to the documented quantity rules."
       ]
+    },
+    {
+      "id": "REQ-NFR-1",
+      "statement": "The API must meet a defined latency target under the agreed reference load.",
+      "category": "non_functional",
+      "priority": "high",
+      "qualityAttribute": "performance",
+      "measurement": {
+        "metric": "p95 response latency",
+        "target": "250",
+        "unit": "ms at 100 requests/second",
+        "measurementMethod": "Run the agreed load-test profile and capture p95 latency."
+      },
+      "acceptanceCriteria": [
+        "p95 response latency remains at or below 250 ms at the reference load."
+      ]
     }
   ],
   "assumptions": [
-    "The API is consumed by authenticated internal applications."
+    {
+      "id": "ASM-1",
+      "statement": "The existing database supports additive schema changes.",
+      "confidence": "medium",
+      "validationApproach": "Inspect the deployed database version and migration policy before finalizing the migration task."
+    }
   ],
   "unknowns": [
-    "The identity provider and authorization claims have not yet been selected."
+    {
+      "id": "UNK-1",
+      "description": "The production p95 latency baseline is not yet supplied.",
+      "impact": "The target may be too strict or too lenient for the actual workload.",
+      "resolutionApproach": "Measure the current p95 under a representative load before setting the release threshold.",
+      "blocking": false
+    }
   ],
   "constraints": [
     "Raw credentials must not be included in the plan or repository."
@@ -199,7 +226,10 @@
       "id": "RISK-001",
       "severity": "medium",
       "description": "Unspecified identity provider may affect authentication integration design.",
-      "mitigation": "Resolve the identity provider and claims contract before provider-specific planning."
+      "mitigation": "Resolve the identity provider and claims contract before provider-specific planning.",
+      "likelihood": 3,
+      "impact": 4,
+      "confidence": "medium"
     }
   ],
   "evidence": [
@@ -223,5 +253,47 @@
   "metadata": {
     "createdAt": "2026-11-07T00:00:00.000Z",
     "example": true
-  }
+  },
+  "testStrategy": {
+    "approach": "Risk-based layered verification planned before implementation.",
+    "levels": [
+      "unit",
+      "integration",
+      "contract",
+      "end_to_end",
+      "security",
+      "performance"
+    ],
+    "coverage": [
+      "REQ-1",
+      "REQ-NFR-1"
+    ],
+    "entryCriteria": [
+      "API contract and threat assumptions are reviewed."
+    ],
+    "exitCriteria": [
+      "Planned checks have passed in the implementation environment and their evidence has been reviewed."
+    ],
+    "testData": "Synthetic records with tenant-boundary and pagination edge cases."
+  },
+  "rollbackPlan": {
+    "applicability": "applicable",
+    "rationale": "The proposed change alters a deployed API and persisted data path.",
+    "strategy": "Use an additive deployment and preserve the prior API contract until the new path is accepted.",
+    "triggerConditions": [
+      "Error rate or p95 latency exceeds the agreed release guardrail.",
+      "Data compatibility checks fail."
+    ],
+    "steps": [
+      "Stop further rollout.",
+      "Route traffic back to the previous compatible path.",
+      "Reconcile writes using the documented idempotent procedure."
+    ],
+    "verification": [
+      "Confirm health indicators return to the agreed baseline.",
+      "Confirm no accepted writes are lost or duplicated."
+    ],
+    "dataCompatibility": "New writes must remain readable by the previous version for the rollback window; validate this assumption before release."
+  },
+  "unknownsReviewed": true
 }

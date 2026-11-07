@@ -132,3 +132,12 @@ CI tests Node.js 22 and 24.
 ## License
 
 MIT
+
+
+## Plan quality evidence (schema 1.1.0)
+
+OIOL reports measurable quality evidence for non-functional requirements, test-strategy completeness, rollback-plan completeness, explicit unknown review, assumption validation, and risk estimation. These deterministic completeness metrics are not proof that future implementation will pass tests or meet production targets. A plan can mark rollback as not applicable only with a rationale.
+
+## Optional delivery adapters
+
+The GitHub Issues and Linear adapters sit outside the planning core. They can produce a local JSON preview without network access. Publishing is a separate explicit CLI action using a user-supplied token; neither adapter runs code, changes repository files, or marks a planned task as complete.
