@@ -17,14 +17,15 @@ OIOL does not implement code, run project commands or tests, modify target repos
 - Planning-only requirement traceability.
 - Non-blocking plan-quality diagnostics surfaced in JSON and Markdown reports.
 - Markdown engineering-plan report.
-- Repository evidence identifiers aligned between scanner context and analyzer evidence records, with separate SHA-256 fingerprints for original source files and redacted excerpts.
+- Repository evidence identifiers aligned between scanner context and analyzer evidence records, with separate SHA-256 fingerprints for original source files and redacted excerpts; plan citations are checked against the supplied IDs and fingerprints.
+- Benchmark scoring validates against the actual scanner evidence captured by each run, not stale fixture summaries; schema-invalid plans are structural blockers.
 - Ten-scenario planning benchmark harness, repeated-run aggregation, paired OpenCode planning baseline, and human-review aggregation protocol.
 
 ## Validation evidence
 
-The latest CI run is [42347034663](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42347034663). Both Node.js 22 and 24 jobs passed syntax checks and all 117 tests (117 passed, 0 failed).
+The latest CI run is [42347639742](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42347639742). Both Node.js 22 and 24 jobs passed syntax checks and all 125 tests (125 passed, 0 failed).
 
-The passing suite covers published-schema validation, planner gating before reviewer evaluation, malformed plan structures, planning-only contract boundaries, evidence ID alignment, source/excerpt fingerprints, structured secret redaction, quality diagnostics, CLI validation, Markdown reporting, and benchmark tooling.
+The passing suite covers published-schema validation, planner gating before reviewer evaluation, malformed plan structures, planning-only contract boundaries, evidence ID alignment, exact source/excerpt fingerprint matching, structured secret redaction, quality diagnostics, schema validation, Markdown reporting, and benchmark evidence matching.
 
 ## Known limitations
 

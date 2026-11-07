@@ -17,7 +17,9 @@
 - Added these diagnostics to generated plans, validation output, and Markdown reports.
 - Added a schema-aware validator for the published contract's supported JSON Schema keywords. HybridPlanner now rejects schema-invalid plans before reviewer evaluation; the offline CLI validates the same contract without provider calls.
 - Kept the validator explicit about its supported keyword subset; external consumers should use a standards-compliant Draft 2020-12 implementation.
-- CI run 42347034663 passed on Node.js 22 and 24: 117 tests passed, 0 failed.
+- Added plan-evidence contract validation: cited IDs and sources must match supplied project evidence, and repository excerpt citations must preserve exact source and excerpt fingerprints.
+- Aligned OIOL and OpenCode benchmark scoring with the actual scanner evidence captured for each run; schema-invalid plans are now structural blockers in benchmark scoring, and the OpenCode baseline is schema-validated before reviewer evaluation.
+- CI run 42347639742 passed on Node.js 22 and 24: 125 tests passed, 0 failed.
 
 ## 0.4.0 — planning-only contract and quality foundations
 
