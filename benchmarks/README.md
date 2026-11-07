@@ -77,6 +77,14 @@ npm run benchmark:compare -- --oiol benchmarks/results/oiol.json --baseline benc
 
 The report includes per-scenario score deltas and explicitly flags whether reviewer configuration matches. A positive automated score delta is not a quality claim. Repeat paired comparisons at least three times and complete blinded human review before drawing conclusions.
 
+Aggregate three or more paired comparison reports:
+
+```sh
+npm run benchmark:compare:aggregate -- --inputs benchmarks/results/pair-1.json,benchmarks/results/pair-2.json,benchmarks/results/pair-3.json
+```
+
+The paired aggregator reports median/min/max/spread for each scenario and blocks human-adjudication readiness unless at least three paired runs exist and reviewer configurations match.
+
 Do not commit API keys or private benchmark results containing sensitive repository details.
 
 ## Automated rubric (100 points)
