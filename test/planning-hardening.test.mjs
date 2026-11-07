@@ -256,3 +256,12 @@ test('published schema requires contract version, unique dependencies and typed 
   missingEdgeType.dependencyGraph.edges.push({ from: missingEdgeType.tasks[0].id, to: missingEdgeType.tasks[1].id });
   assert.equal((await validatePlanSchema(missingEdgeType)).valid, false);
 });
+
+
+test('semantic planning contract rejects execution runtime fields consistently with the schema', () => {
+  for (const field of ['executionStatus', 'runStatus', 'runState', 'attempts', 'finishedAt', 'actualDuration', 'logs', 'workerId', 'agentId', 'leaseId', 'retryCount', 'lastError', 'runId', 'executionId']) {
+    const plan = validPlan();
+    plan.tasks[0][field] = 'runtime-value';
+    assert.equal(validatePlan(plan).valid, false, 'runtime field was accepted: ' + field);
+  }
+});

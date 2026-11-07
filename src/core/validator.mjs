@@ -56,7 +56,7 @@ export function validatePlan(plan, project={}) {
   for(const task of tasks) {
     if(!isObject(task)){errors.push('Task entry must be an object');continue;}
     if(typeof task.title!=='string'||!task.title.trim()) errors.push(`Task ${task.id} has no title`);
-    for (const field of ['status', 'execution', 'executionState', 'startedAt', 'completedAt', 'attempt', 'result', 'verified', 'verificationStatus']) {
+    for (const field of ['status', 'execution', 'executionState', 'executionRun', 'executionId', 'runId', 'runStatus', 'runState', 'executionStatus', 'startedAt', 'finishedAt', 'completedAt', 'attempt', 'attempts', 'retryCount', 'result', 'lastError', 'logs', 'workerId', 'agentId', 'leaseId', 'actualDuration', 'verified', 'verificationStatus']) {
       if (Object.hasOwn(task, field)) errors.push(`Task ${task.id} contains execution-state field: ${field}`);
     }
     for(const field of ['requirementIds','componentIds','dependencies','acceptanceCriteria','writeScope']) if(!Array.isArray(task[field])) errors.push(`Task ${task.id}.${field} must be an array`);
