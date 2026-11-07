@@ -21,7 +21,7 @@ function parserFor(language, { maxSourceBytes, parseTimeoutMs }) {
   if (typeof TreeSitter.getParser !== 'function') throw new Error('Tree-sitter WASM getParser API is unavailable');
   const parser = TreeSitter.getParser(language);
   parser.setMaxSourceBytes?.(maxSourceBytes);
-  parser.setParseTimeoutMs?.(parseTimeoutMs);
+  parser.setParseTimeoutMs?.(BigInt(parseTimeoutMs));
   parserCache.set(language, parser);
   return parser;
 }
