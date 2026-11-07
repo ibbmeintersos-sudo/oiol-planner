@@ -27,6 +27,7 @@ test('planner preserves per-role usage metadata for planning and distinct review
  assert.equal(result.providerUsage.planner.calls[0].usage.total_tokens,140);
  assert.equal(result.providerUsage.reviewer.calls[0].usage.input_tokens,60);
  assert.equal(result.review.configurationDistinct,true);
+ assert.equal(result.validation.schemaValidation.valid,true);
 });
 
 test('planner usage records absent provider usage without fabricating token counts',async()=>{
@@ -35,4 +36,18 @@ test('planner usage records absent provider usage without fabricating token coun
  const result=await new HybridPlanner({provider,reviewer,maxRepairRounds:0}).createPlan(project);
  assert.equal(result.providerUsage.planner.calls[0].usage,null);
  assert.equal(result.providerUsage.reviewer.calls[0].usage,null);
+});
+
+test('planner blocks review when a plan violates the published JSON Schema', async () => {
+ const invalidPlan = { ...plan, risks: [{}] };
+ const provider = { model: 'planner', baseUrl: 'https://planner.invalid', requestJson: async () => ({ data: invalidPlan }) };
+ let reviewerCalls = 0;
+ const reviewer = { model: 'reviewer', baseUrl: 'https://reviewer.invalid', requestJson: async () => {
+   reviewerCalls++;
+   return { data: { status: 'approved', findings: [] } };
+ } };
+ const result = await new HybridPlanner({ provider, reviewer, maxRepairRounds: 0 }).createPlan(project);
+ assert.equal(result.status, 'blocked');
+ assert.equal(result.validation.schemaValidation.valid, false);
+ assert.equal(reviewerCalls, 0);
 });
