@@ -45,7 +45,8 @@ test('OpenCode baseline deletes a session even when the model returns invalid JS
  assert.equal(deleted,true);
 });
 
-import { main as baselineMain } from '../scripts/run-opencode-baseline.mjs';
+import { main as baselineMain, createBaselineWorkspace } from '../scripts/run-opencode-baseline.mjs';
+import fs from 'node:fs/promises';
 
 test('OpenCode baseline runner dry-run validates config without contacting OpenCode',async()=>{
  const previousArgv=process.argv,previousOptIn=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
@@ -77,4 +78,22 @@ test('OpenCode baseline rejects any file changes despite read-only prompt',async
  };
  await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/violated its read-only contract/);
  assert.equal(deleted,true);
+});
+
+test('baseline workspace copies fixtures into a disposable directory and cleans it up',async()=>{
+ const fixtureScenario={id:'EX-API-003',project:{fixturePath:'benchmarks/fixtures/customer-api'}};
+ const workspace=await createBaselineWorkspace(fixtureScenario);
+ try {
+  assert.notEqual(workspace.projectDirectory,fixtureScenario.project.fixturePath);
+  await fs.access(workspace.projectDirectory+'/package.json');
+  await fs.access(workspace.projectDirectory+'/src/routes/customers.mjs');
+ } finally { await workspace.cleanup(); }
+ await assert.rejects(()=>fs.access(workspace.projectDirectory));
+});
+
+test('greenfield baseline receives an isolated empty workspace',async()=>{
+ const workspace=await createBaselineWorkspace({id:'GF-API-001',project:{kind:'greenfield'}});
+ try {
+  assert.deepEqual(await fs.readdir(workspace.projectDirectory),[]);
+ } finally { await workspace.cleanup(); }
 });
