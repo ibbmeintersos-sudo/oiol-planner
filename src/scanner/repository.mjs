@@ -56,7 +56,7 @@ export async function scanRepository(repoPath,{maxFiles=250,maxFileBytes=16000,m
         path:file,
         sha256:createHash('sha256').update(buffer).digest('hex'),
         trustLevel:'untrusted_repository_content',
-        redactionApplied:true,
+        redactionPassApplied:true,
         content
       });
     }catch{}

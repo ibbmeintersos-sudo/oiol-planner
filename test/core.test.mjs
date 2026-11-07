@@ -73,7 +73,7 @@ test('scanner marks excerpts as untrusted and records content provenance',async(
     const snippet=result.snippets.find(item=>item.path==='src/app.mjs');
     assert.ok(snippet);
     assert.equal(snippet.trustLevel,'untrusted_repository_content');
-    assert.equal(snippet.redactionApplied,true);
+    assert.equal(snippet.redactionPassApplied,true);
     assert.match(snippet.sha256,/^[a-f0-9]{64}$/);
   } finally { await rm(root,{recursive:true,force:true}); }
 });

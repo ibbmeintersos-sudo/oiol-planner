@@ -10,8 +10,8 @@ function indexScores(run){
  return map;
 }
 export function compareBenchmarkModes(oiol,baseline){
- if(oiol?.executionMode!=='oiol')throw new Error('First input must be an OIOL planner run');
- if(baseline?.executionMode!=='opencode-baseline')throw new Error('Second input must be an OpenCode baseline run');
+ if(oiol?.benchmarkMode!=='oiol')throw new Error('First input must be an OIOL planner run');
+ if(baseline?.benchmarkMode!=='opencode-baseline')throw new Error('Second input must be an OpenCode baseline run');
  if(!oiol.comparisonKey||oiol.comparisonKey!==baseline.comparisonKey)throw new Error('Runs must have the same non-empty OIOL_BENCHMARK_COMPARISON_KEY');
  if(!oiol.budgetKey||oiol.budgetKey!==baseline.budgetKey)throw new Error('Runs must have the same non-empty OIOL_BENCHMARK_BUDGET_KEY');
  const a=indexScores(oiol),b=indexScores(baseline);
