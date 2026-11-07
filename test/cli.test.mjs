@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 const cli = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
 const validPlan = {
   schemaVersion: '1.0.0',
+  contractVersion: '1.0',
   id: 'plan_cli_test',
   status: 'needs_revision',
   project: { kind: 'greenfield', name: 'CLI fixture', request: 'Plan a sample endpoint' },

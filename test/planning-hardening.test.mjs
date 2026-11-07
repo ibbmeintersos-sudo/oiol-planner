@@ -17,6 +17,7 @@ import { buildTraceability } from '../src/core/traceability.mjs';
 
 const validPlan = () => ({
   schemaVersion: '1.0.0',
+  contractVersion: '1.0',
   id: 'plan_hardening',
   status: 'needs_revision',
   project: { kind: 'greenfield', name: 'Hardening fixture' },
