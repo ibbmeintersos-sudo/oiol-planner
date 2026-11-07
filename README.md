@@ -103,7 +103,7 @@ Live planning benchmark calls can incur provider charges and require explicit op
 
     OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
 
-The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. No live provider quality score or superiority claim is made until those experiments have actually been completed.
+The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. Filled review sheets can be combined with npm run benchmark:human-review; the gate requires two reviewers per scenario, documented evidence, adjudication of large disagreements, and no critical findings. No live provider quality score or superiority claim is made until those experiments have actually been completed.
 
 An OpenCode planning-only baseline adapter and paired comparison scripts are available for evaluation. They are benchmark tooling, not OIOL execution features. Configure the receiving OpenCode plan agent with read-only permissions; the adapter's diff check is not a sandbox.
 

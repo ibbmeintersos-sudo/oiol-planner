@@ -122,7 +122,7 @@ Score each dimension from 1 to 5:
 
 Anchors: 1 = materially unsafe or unusable; 2 = major omissions or rework required; 3 = usable only with meaningful revision; 4 = strong with minor corrections; 5 = precise, complete, and implementation-ready.
 
-Resolve reviewer disagreements by recording both original scores and an adjudicated score with a written rationale. Do not average away a critical safety or correctness objection. After collecting the filled CSVs, aggregate them with:\n\n```sh\nnpm run benchmark:human-review -- --inputs reviewer-a.csv,reviewer-b.csv --out benchmarks/results/human-review-aggregate.json\n```\n\nThe aggregator requires two distinct reviewers per scenario, evidence notes, and a documented adjudication when overall scores differ by 2 or more points. Any critical finding blocks the human-review gate regardless of averages.
+Resolve reviewer disagreements by recording both original scores and an adjudicated score with a written rationale. Do not average away a critical safety or correctness objection. After collecting the filled CSVs, aggregate them with:\n\n    npm run benchmark:human-review -- --inputs reviewer-a.csv,reviewer-b.csv --out benchmarks/results/human-review-aggregate.json\n\nThe aggregator requires two distinct reviewers per scenario, evidence notes, and a documented adjudication when overall scores differ by 2 or more points. Any critical finding blocks the human-review gate regardless of averages.
 
 ## Certification decision
 
