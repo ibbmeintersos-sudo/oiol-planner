@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { scenarios } from '../benchmarks/scenarios.mjs';
-import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,6);
@@ -93,4 +93,23 @@ test('Existing Project benchmark scenarios are analyzed from real fixture reposi
     assert.ok(project.repository.context.length>0,scenario.id);
     assert.equal(Object.hasOwn(project,'fixturePath'),false);
   }
+});
+
+test('provider defaults use the selected provider endpoint rather than OpenAI for every backend',()=>{
+ const previousProvider=process.env.OIOL_PROVIDER,previousBase=process.env.OIOL_BASE_URL,previousModel=process.env.OIOL_MODEL;
+ try {
+  process.env.OIOL_PROVIDER='ollama';
+  delete process.env.OIOL_BASE_URL;
+  delete process.env.OIOL_MODEL;
+  const config=providerConfig();
+  assert.equal(config.baseUrl,'http://127.0.0.1:11434');
+  assert.equal(config.model,'qwen2.5:7b');
+  process.env.OIOL_PROVIDER='anthropic';
+  const anthropic=providerConfig();
+  assert.equal(anthropic.baseUrl,'https://api.anthropic.com');
+ } finally {
+  if(previousProvider===undefined) delete process.env.OIOL_PROVIDER; else process.env.OIOL_PROVIDER=previousProvider;
+  if(previousBase===undefined) delete process.env.OIOL_BASE_URL; else process.env.OIOL_BASE_URL=previousBase;
+  if(previousModel===undefined) delete process.env.OIOL_MODEL; else process.env.OIOL_MODEL=previousModel;
+ }
 });
