@@ -1,20 +1,55 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 import { createProvider } from '../src/providers/index.mjs';
 import { HybridPlanner } from '../src/core/planner.mjs';
 import { scenarios } from '../benchmarks/scenarios.mjs';
 import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
 
+export function selectScenarios(selection='all', catalog=scenarios) {
+  if (selection === 'all') return [...catalog];
+  const ids = selection.split(',').map(x => x.trim()).filter(Boolean);
+  if (!ids.length) throw new Error('--scenarios must contain at least one scenario ID or all');
+  if (new Set(ids).size !== ids.length) throw new Error('--scenarios contains duplicate IDs');
+  const known = new Set(catalog.map(x => x.id));
+  const unknown = ids.filter(id => !known.has(id));
+  if (unknown.length) throw new Error('Unknown benchmark scenario ID(s): ' + unknown.join(', '));
+  return ids.map(id => catalog.find(x => x.id === id));
+}
+
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
-try {
-  if(process.env.OIOL_BENCHMARK_ALLOW_LIVE!=='1') throw new Error('Set OIOL_BENCHMARK_ALLOW_LIVE=1 to confirm that this run may call configured LLM providers.');
-  if(!process.env.OIOL_API_KEY && (process.env.OIOL_PROVIDER||'openai-compatible')!=='ollama') throw new Error('OIOL_API_KEY is required for the configured remote planning provider.');
-  const provider=createProvider({provider:process.env.OIOL_PROVIDER||'openai-compatible',model:process.env.OIOL_MODEL||'gpt-4o-mini',baseUrl:process.env.OIOL_BASE_URL||'https://api.openai.com/v1',apiKey:process.env.OIOL_API_KEY,timeoutMs:Number(process.env.OIOL_TIMEOUT_MS||60000),maxRetries:Number(process.env.OIOL_MAX_RETRIES||2)});
-  const reviewer=process.env.OIOL_REVIEW_PROVIDER?createProvider({provider:process.env.OIOL_REVIEW_PROVIDER,model:process.env.OIOL_REVIEW_MODEL||'gpt-4o-mini',baseUrl:process.env.OIOL_REVIEW_BASE_URL||process.env.OIOL_BASE_URL||'https://api.openai.com/v1',apiKey:process.env.OIOL_REVIEW_API_KEY||process.env.OIOL_API_KEY,timeoutMs:Number(process.env.OIOL_REVIEW_TIMEOUT_MS||60000),maxRetries:Number(process.env.OIOL_MAX_RETRIES||2)}):provider;
+function providerConfig(prefix='OIOL_') {
+  const provider=process.env[prefix+'PROVIDER']||(prefix==='OIOL_'?'openai-compatible':undefined);
+  return {provider,model:process.env[prefix+'MODEL']||(prefix==='OIOL_'?'gpt-4o-mini':undefined),baseUrl:process.env[prefix+'BASE_URL']||(prefix==='OIOL_'?'https://api.openai.com/v1':undefined),apiKey:process.env[prefix+'API_KEY'],timeoutMs:Number(process.env[prefix+'TIMEOUT_MS']||60000),maxRetries:Number(process.env.OIOL_MAX_RETRIES||2)};
+}
+function publicConfig(config) {
+  return {provider:config.provider,model:config.model,baseUrl:config.baseUrl,timeoutMs:config.timeoutMs,maxRetries:config.maxRetries,credentialConfigured:Boolean(config.apiKey)};
+}
+export function benchmarkConfigFingerprint(config) {
+  return createHash('sha256').update(JSON.stringify(config)).digest('hex');
+}
+
+export async function main() {
   const selected=arg('scenarios','all');
-  const chosen=selected==='all'?scenarios:scenarios.filter(x=>selected.split(',').includes(x.id));
-  if(!chosen.length) throw new Error('No benchmark scenarios matched --scenarios');
+  const chosen=selectScenarios(selected);
+  if(process.argv.includes('--list')) {
+    for(const s of scenarios) console.log(s.id+' ['+s.category+'/'+s.difficulty+']'+(s.mustClarify?' blocking clarification required':''));
+    return 0;
+  }
+  const planningConfig=providerConfig('OIOL_');
+  const reviewConfig=process.env.OIOL_REVIEW_PROVIDER?providerConfig('OIOL_REVIEW_'):null;
+  const configSummary={planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'}};
+  if(process.argv.includes('--dry-run')) {
+    console.log(JSON.stringify({dryRun:true,selected:chosen.map(x=>x.id),config:configSummary,liveCalls:false},null,2));
+    return 0;
+  }
+  if(process.env.OIOL_BENCHMARK_ALLOW_LIVE!=='1') throw new Error('Set OIOL_BENCHMARK_ALLOW_LIVE=1 to confirm that this run may call configured LLM providers.');
+  if(!planningConfig.apiKey && planningConfig.provider!=='ollama') throw new Error('OIOL_API_KEY is required for the configured remote planning provider.');
+  if(reviewConfig&&!reviewConfig.apiKey&&reviewConfig.provider!=='ollama') throw new Error('OIOL_REVIEW_API_KEY is required when a separate remote reviewer is configured.');
+  const provider=createProvider(planningConfig);
+  const reviewer=reviewConfig?createProvider(reviewConfig):provider;
   const records=[];
   for(const scenario of chosen){
     const started=Date.now();
@@ -29,7 +64,7 @@ try {
   }
   const scores=records.map(record=>{const scenario=chosen.find(x=>x.id===record.scenarioId);return record.error?{scenarioId:record.scenarioId,category:scenario.category,difficulty:scenario.difficulty,score:0,blockers:[record.error.message]}:scoreScenario(scenario,record);});
   const summary=summarizeBenchmark(scores);
-  const output={protocolVersion:'1.0',createdAt:new Date().toISOString(),provider:{name:process.env.OIOL_PROVIDER||'openai-compatible',model:process.env.OIOL_MODEL||'gpt-4o-mini'},reviewer:{name:process.env.OIOL_REVIEW_PROVIDER||process.env.OIOL_PROVIDER||'same-as-planner',model:process.env.OIOL_REVIEW_MODEL||process.env.OIOL_MODEL||'gpt-4o-mini'},summary,scores,records};
+  const output={protocolVersion:'1.1',runnerVersion:'1.1.0',runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider'}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},summary,scores,records,limitations:['Token and cost accounting are unavailable at the planner orchestration boundary.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
@@ -38,5 +73,10 @@ try {
   const humanPath=out.replace(/\.json$/,'-human-review.csv');
   await fs.writeFile(humanPath,csv.join('\n')+'\n');
   console.log(JSON.stringify({summary,resultFile:out,humanReviewFile:humanPath},null,2));
-  if(summary.passCount!==summary.scenarioCount) process.exitCode=2;
-}catch(error){console.error('Benchmark error: '+error.message);process.exitCode=1;}
+  return summary.passCount===summary.scenarioCount?0:2;
+}
+
+if (process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) {
+  try { process.exitCode=await main(); }
+  catch(error){console.error('Benchmark error: '+error.message);process.exitCode=1;}
+}
