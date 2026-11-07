@@ -199,7 +199,7 @@
     {
       "id": "Q-001",
       "question": "Which identity provider and authorization claims should the API use?",
-      "blocking": true,
+      "blocking": false,
       "resolved": false
     }
   ],
