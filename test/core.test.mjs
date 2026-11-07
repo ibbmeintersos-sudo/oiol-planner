@@ -77,3 +77,6 @@ test('scanner marks excerpts as untrusted and records content provenance',async(
     assert.match(snippet.sha256,/^[a-f0-9]{64}$/);
   } finally { await rm(root,{recursive:true,force:true}); }
 });
+
+test('validator rejects unsupported plan schema versions',()=>{const p=structuredClone(base);p.schemaVersion='9.9.9';assert.equal(validatePlan(p).valid,false);});
+test('validator warns when dependent tasks have no declared output contract',()=>{const p=structuredClone(base);p.tasks.push({...p.tasks[0],id:'t2',dependencies:['t1']});p.dependencyGraph.nodes.push('t2');p.dependencyGraph.edges=[{from:'t1',to:'t2',type:'finish_to_start'}];const r=validatePlan(p);assert.equal(r.valid,true);assert.ok(r.warnings.some(x=>x.includes('no explicit outputs')));});

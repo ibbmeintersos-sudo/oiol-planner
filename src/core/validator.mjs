@@ -1,8 +1,12 @@
 import { safePath, isObject } from './utils.mjs';
+import { SCHEMA_VERSION, PLAN_STATUSES } from '../contracts/types.mjs';
 import { dependencyEdgesFromTasks, canonicalEdgeKey, topologicalWaves } from './graph.mjs';
 export function validatePlan(plan, project={}) {
   const errors=[], warnings=[];
   if(!isObject(plan)) return result(['Plan must be a JSON object'],warnings,0,0,null);
+  if(plan.schemaVersion && plan.schemaVersion!==SCHEMA_VERSION) errors.push('Unsupported plan schemaVersion: '+plan.schemaVersion);
+  if(!plan.schemaVersion) warnings.push('Legacy plan has no schemaVersion; validate it against the published schema before external handoff');
+  if(plan.status && !PLAN_STATUSES.includes(plan.status)) errors.push('Unsupported plan status: '+plan.status);
   if(!Array.isArray(plan.requirements)) errors.push('Plan requirements must be an array');
   if(!isObject(plan.architecture)||!Array.isArray(plan.architecture.components)) errors.push('Plan architecture.components must be an array');
   if(!Array.isArray(plan.tasks)) errors.push('Plan tasks must be an array');
@@ -19,7 +23,12 @@ export function validatePlan(plan, project={}) {
     if(!Array.isArray(task.acceptanceCriteria)||!task.acceptanceCriteria.length||task.acceptanceCriteria.some(x=>typeof x!=='string'||!x.trim())) errors.push(`Task ${task.id} must have non-empty string acceptance criteria`);
     for(const req of Array.isArray(task.requirementIds)?task.requirementIds:[]) {if(!reqIds.has(req))errors.push(`Task ${task.id} references unknown requirement ${req}`);else covered.add(req);}
     for(const comp of Array.isArray(task.componentIds)?task.componentIds:[]) if(!compIds.has(comp)) errors.push(`Task ${task.id} references unknown component ${comp}`);
-    for(const dep of Array.isArray(task.dependencies)?task.dependencies:[]) if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
+    for(const dep of Array.isArray(task.dependencies)?task.dependencies:[]) {
+      const producer=tasks.find(candidate=>candidate?.id===dep);
+      if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
+      else if(!Array.isArray(producer?.outputs)||!producer.outputs.length) warnings.push(`Task ${task.id} depends on ${dep}, but that task declares no explicit outputs`);
+    }
+    if(task.outputs!==undefined&&(!Array.isArray(task.outputs)||task.outputs.some(output=>!(typeof output==='string'&&output.trim())&&!(isObject(output)&&typeof output.name==='string'&&output.name.trim())))) errors.push(`Task ${task.id}.outputs must contain named strings or objects`);
     for(const scope of Array.isArray(task.writeScope)?task.writeScope:[]) if(!safePath(scope)) errors.push(`Unsafe or invalid write scope in ${task.id}: ${scope}`);
     if(task.verification?.command&&/\b(rm\s+-rf|format\s+c:|del\s+\/s|DROP\s+DATABASE)\b/i.test(task.verification.command)) errors.push(`Destructive verification command in ${task.id}`);
   }

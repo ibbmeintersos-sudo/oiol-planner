@@ -2,7 +2,7 @@ function normalizeOutput(output) {
   if (typeof output === 'string' && output.trim()) return { name: output.trim() };
   if (output && typeof output === 'object' && !Array.isArray(output)) {
     const name = typeof output.name === 'string' ? output.name.trim() : '';
-    return { ...output, name };
+    return name ? { ...output, name } : null;
   }
   return null;
 }
