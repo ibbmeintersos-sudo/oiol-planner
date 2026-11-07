@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { scenarios } from '../benchmarks/scenarios.mjs';
-import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,6);
@@ -57,4 +57,27 @@ test('usage aggregation normalizes common provider token field names and never i
   assert.equal(result.reportedCalls,2);
   assert.equal(result.unreportedCalls,1);
   assert.equal(result.cost,null);
+});
+
+test('benchmark dry-run works without credentials and makes no provider calls',async()=>{
+  const previousArgv=process.argv,previousKey=process.env.OIOL_API_KEY,previousOptIn=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+  const lines=[];
+  const previousLog=console.log;
+  try {
+    process.argv=['node','run-planner-benchmark.mjs','--scenarios','GF-API-001','--dry-run'];
+    delete process.env.OIOL_API_KEY;
+    delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+    console.log=(value)=>lines.push(String(value));
+    assert.equal(await main(),0);
+    const report=JSON.parse(lines.at(-1));
+    assert.equal(report.dryRun,true);
+    assert.deepEqual(report.selected,['GF-API-001']);
+    assert.equal(report.liveCalls,false);
+    assert.equal(report.config.planner.credentialConfigured,false);
+  } finally {
+    process.argv=previousArgv;
+    if(previousKey===undefined) delete process.env.OIOL_API_KEY; else process.env.OIOL_API_KEY=previousKey;
+    if(previousOptIn===undefined) delete process.env.OIOL_BENCHMARK_ALLOW_LIVE; else process.env.OIOL_BENCHMARK_ALLOW_LIVE=previousOptIn;
+    console.log=previousLog;
+  }
 });
