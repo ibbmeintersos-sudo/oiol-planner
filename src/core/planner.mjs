@@ -10,18 +10,26 @@ export class HybridPlanner {
     Object.assign(this,{provider,reviewer,maxRepairRounds});
   }
   async createPlan(project) {
-    const first=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT,user:plannerUserPrompt(project),temperature:0});
+    const usage={planner:{requests:0,calls:[]},reviewer:{requests:0,calls:[]}};
+    const request=async(role,provider,payload)=>{
+      const result=await provider.requestJson(payload);
+      const bucket=usage[role];
+      bucket.requests++;
+      bucket.calls.push({model:result?.model||provider.model||null,usage:result?.usage||null});
+      return result;
+    };
+    const first=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT,user:plannerUserPrompt(project),temperature:0});
     let plan=normalize(first.data,project),validation=validatePlan(plan,project);
     for(let round=0;round<this.maxRepairRounds&&!validation.valid;round++) {
-      const repaired=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT+'\nRepair the supplied plan. Fix every validation error. Return the complete JSON plan.',user:JSON.stringify({project,plan,validation},null,2),temperature:0});
+      const repaired=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nRepair the supplied plan. Fix every validation error. Return the complete JSON plan.',user:JSON.stringify({project,plan,validation},null,2),temperature:0});
       plan=normalize(repaired.data,project); validation=validatePlan(plan,project);
     }
     let review=null,reviewError=null;
     if(validation.valid&&this.reviewer) {
-      try { review=validateReview((await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
+      try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
       catch(error) { reviewError=error; }
       for(let round=0;round<this.maxRepairRounds&&review&&hasHighFindings(review);round++) {
-        const fixed=await this.provider.requestJson({system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
+        const fixed=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
         plan=normalize(fixed.data,project); validation=validatePlan(plan,project);
         if(!validation.valid) break;
         try { review=validateReview((await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
@@ -31,6 +39,7 @@ export class HybridPlanner {
     const independentReview=Boolean(this.reviewer&&this.reviewer!==this.provider&&(this.reviewer.constructor!==this.provider.constructor||this.reviewer.model!==this.provider.model||this.reviewer.baseUrl!==this.provider.baseUrl));
     plan.review={...(review||{status:'needs_revision',summary:reviewError?`Review unavailable: ${reviewError.message}`:'No reviewer configured',findings:[]}),independent:independentReview};
     plan.validation=validation;
+    plan.providerUsage=usage;
     const critical=review?.findings?.some(x=>x.severity==='critical')||false;
     const high=review?.findings?.some(x=>x.severity==='high')||false;
     plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high||!independentReview?'needs_revision':'ready_for_review';
