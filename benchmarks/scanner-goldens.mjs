@@ -60,5 +60,19 @@ export const scannerGoldens = [
     imports: [
       ['src/main.mjs', './helper.mjs']
     ]
+  },
+  {
+    id: 'workspace-platform',
+    fixturePath: 'benchmarks/fixtures/workspace-platform',
+    symbols: [
+      ['apps/api/src/handler.ts', 'function', 'createHandler'],
+      ['packages/shared/src/logger.ts', 'function', 'log']
+    ],
+    imports: [
+      ['apps/api/src/handler.ts', '@oiol/shared/logger']
+    ],
+    workspaceDependencies: [
+      ['apps/api', '@oiol/shared', 'packages/shared']
+    ]
   }
 ];

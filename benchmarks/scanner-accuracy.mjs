@@ -11,6 +11,9 @@ function keyOfSymbol(item) {
 function keyOfImport(item) {
   return [item.from, item.specifier].join('::');
 }
+function keyOfWorkspaceDependency(item) {
+  return [item.from, item.packageName, item.to].join('::');
+}
 function countMetrics(expectedValues, actualValues) {
   const expected = new Set(expectedValues);
   const actual = new Set(actualValues);
@@ -53,7 +56,8 @@ export async function runScannerAccuracyBenchmark() {
   for (const mode of modes) {
     const totals = {
       symbols: { truePositive: 0, falsePositive: 0, falseNegative: 0 },
-      imports: { truePositive: 0, falsePositive: 0, falseNegative: 0 }
+      imports: { truePositive: 0, falsePositive: 0, falseNegative: 0 },
+      workspaceDependencies: { truePositive: 0, falsePositive: 0, falseNegative: 0 }
     };
     const fixtures = [];
     let astFileCount = 0;
@@ -70,10 +74,14 @@ export async function runScannerAccuracyBenchmark() {
       const expectedSymbols = golden.symbols.map(item => item.join('::'));
       const actualImports = (structure.imports || []).map(keyOfImport);
       const expectedImports = golden.imports.map(item => item.join('::'));
+      const actualWorkspaceDependencies = (structure.workspaceGraph?.dependencies || []).map(keyOfWorkspaceDependency);
+      const expectedWorkspaceDependencies = (golden.workspaceDependencies || []).map(item => item.join('::'));
       const symbolMetrics = countMetrics(expectedSymbols, actualSymbols);
       const importMetrics = countMetrics(expectedImports, actualImports);
+      const workspaceMetrics = countMetrics(expectedWorkspaceDependencies, actualWorkspaceDependencies);
       addCounts(totals.symbols, symbolMetrics);
       addCounts(totals.imports, importMetrics);
+      addCounts(totals.workspaceDependencies, workspaceMetrics);
       astFileCount += structure.astFileCount || 0;
       lexicalFallbackFileCount += structure.lexicalFallbackFileCount || 0;
       astRuntimeAvailable ||= Boolean(structure.astRuntimeAvailable);
@@ -83,7 +91,8 @@ export async function runScannerAccuracyBenchmark() {
         astFileCount: structure.astFileCount,
         lexicalFallbackFileCount: structure.lexicalFallbackFileCount,
         symbols: symbolMetrics,
-        imports: importMetrics
+        imports: importMetrics,
+        workspaceDependencies: workspaceMetrics
       });
     }
 
@@ -93,25 +102,31 @@ export async function runScannerAccuracyBenchmark() {
       lexicalFallbackFileCount,
       symbols: finishCounts(totals.symbols),
       imports: finishCounts(totals.imports),
+      workspaceDependencies: finishCounts(totals.workspaceDependencies),
       fixtures
     };
   }
 
   return {
-    protocolVersion: '1.0.0',
+    protocolVersion: '1.1.0',
     generatedAt: new Date().toISOString(),
     fixtureCount: scannerGoldens.length,
     groundTruthSource: 'benchmarks/scanner-goldens.mjs; manually reviewed expectations',
-    measuredSignals: ['named function declarations', 'import specifiers'],
+    measuredSignals: [
+      'named function declarations',
+      'import specifiers',
+      'manifest-declared workspace package dependencies'
+    ],
     modes: modeResults,
     interpretation: {
       precision: 'true positives / (true positives + false positives)',
       recall: 'true positives / (true positives + false negatives)',
       f1: 'harmonic mean of precision and recall',
       limits: [
-        'The goldens cover only named function declarations and import specifiers.',
+        'The goldens cover selected named function declarations, import specifiers, and declared workspace package dependencies.',
         'These compact fixtures are not representative of production repositories or every supported language.',
         'Auto mode uses Tree-sitter when the optional runtime and grammar are available, otherwise bounded lexical fallback.',
+        'Workspace edges represent manifest declarations; they do not prove runtime package use.',
         'Scores do not measure type resolution, runtime behavior, dynamic imports, or architectural reasoning.'
       ]
     }

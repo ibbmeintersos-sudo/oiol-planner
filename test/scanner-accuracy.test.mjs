@@ -7,11 +7,11 @@ import { scanRepository } from '../src/scanner/repository.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-test('scanner fixture benchmark reports precision, recall, and F1 for AST and lexical modes', async () => {
+test('scanner fixture benchmark reports precision, recall, and F1 for AST, lexical, and workspace analysis', async () => {
   const report = await runScannerAccuracyBenchmark();
-  assert.equal(report.fixtureCount, 4);
+  assert.equal(report.fixtureCount, 5);
   for (const mode of ['auto', 'lexical']) {
-    for (const signal of ['symbols', 'imports']) {
+    for (const signal of ['symbols', 'imports', 'workspaceDependencies']) {
       const result = report.modes[mode][signal];
       for (const metric of ['precision', 'recall', 'f1']) {
         assert.ok(Number.isFinite(result[metric]), mode + ' ' + signal + ' ' + metric);
@@ -25,6 +25,10 @@ test('scanner fixture benchmark reports precision, recall, and F1 for AST and le
   const lexicalAdversarial = report.modes.lexical.fixtures.find(item => item.id === 'scanner-adversarial');
   assert.ok(lexicalAdversarial.symbols.falsePositive >= 1);
   assert.ok(lexicalAdversarial.imports.falsePositive >= 1);
+  const workspace = report.modes.lexical.fixtures.find(item => item.id === 'workspace-platform');
+  assert.equal(workspace.workspaceDependencies.truePositive, 1);
+  assert.equal(workspace.workspaceDependencies.falsePositive, 0);
+  assert.equal(workspace.workspaceDependencies.falseNegative, 0);
   if (report.modes.auto.astRuntimeAvailable) {
     const astAdversarial = report.modes.auto.fixtures.find(item => item.id === 'scanner-adversarial');
     assert.ok(astAdversarial.symbols.falsePositive < lexicalAdversarial.symbols.falsePositive);

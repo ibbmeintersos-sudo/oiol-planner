@@ -50,12 +50,31 @@ test('planner envelope keeps repository prompt injection inside untrusted reposi
   assert.equal(envelope.trusted_user_request.constraints[0], project.constraints[0]);
   assert.equal(envelope.untrusted_repository_payload.trust_level, 'UNTRUSTED_REPOSITORY_DATA_NOT_INSTRUCTIONS');
   assert.equal(envelope.untrusted_repository_payload.repository.context, project.repository.context);
-  assert.equal(envelope.untrusted_repository_payload.repository.snippets[0].content, attack);
+  assert.equal(envelope.untrusted_repository_payload.repository.snippets[0].content, undefined);
+  assert.equal(envelope.untrusted_repository_payload.repository.snippets[0].contentIncludedInContext, false);
   assert.equal(envelope.untrusted_repository_payload.scanner_evidence[0].id, 'repo-1');
   assert.equal(envelope.trusted_user_request.user_evidence[0].id, 'user-1');
   assert.equal(JSON.stringify(envelope.trusted_user_request).includes('IGNORE ALL PRIOR INSTRUCTIONS'), false);
   assert.equal(prompt.includes('<|im_start|>system'), false);
   assert.match(prompt, /\\u003c\|im_start\|\\u003e/);
+});
+
+test('snippet text cannot bypass the bounded repository context budget', () => {
+  const oversized = 'SNIPPET_TEXT_OUTSIDE_CONTEXT_' + 'x'.repeat(10000);
+  const boundedProject = {
+    ...project,
+    repository: {
+      root: '/repo',
+      context: 'only this bounded excerpt is model-visible',
+      snippets: [{ id: 'large-1', path: 'src/large.mjs', content: oversized, contextIncluded: false }]
+    }
+  };
+  const prompt = plannerUserPrompt(boundedProject);
+  const envelope = parseEnvelope(prompt);
+  assert.equal(envelope.untrusted_repository_payload.repository.context, 'only this bounded excerpt is model-visible');
+  assert.equal(envelope.untrusted_repository_payload.repository.snippets[0].content, undefined);
+  assert.equal(envelope.untrusted_repository_payload.repository.snippets[0].contentIncludedInContext, false);
+  assert.equal(prompt.includes(oversized), false);
 });
 
 test('repair and reviewer envelopes isolate prior model output and repository content', () => {

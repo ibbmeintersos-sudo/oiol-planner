@@ -187,7 +187,7 @@ Run the fixture accuracy benchmark without provider calls:
 npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
 ```
 
-The report evaluates named function symbols and static import specifiers against manually reviewed goldens for the checked-in customer, invoice, order, and adversarial scanner fixtures. It reports TP/FP/FN, precision, recall, and F1 for AST-auto and lexical-only analysis. The goldens are compact regression fixtures; these metrics do not establish accuracy across production repositories or full semantic dependency resolution.
+The report evaluates named function symbols, import specifiers, and manifest-declared workspace package dependencies against manually reviewed goldens for the customer, invoice, order, adversarial, and synthetic workspace-platform fixtures. It reports TP/FP/FN, precision, recall, and F1 for Tree-sitter-auto and lexical-only modes. The workspace fixture also checks a `tsconfig.json` path mapping. These metrics are compact regression signals; they do not establish accuracy across production repositories, complete type resolution, or runtime dependency use.
 
 
 ### P2 human review gate

@@ -1,0 +1,7 @@
+{
+  "name": "@oiol/api",
+  "private": true,
+  "dependencies": {
+    "@oiol/shared": "workspace:*"
+  }
+}

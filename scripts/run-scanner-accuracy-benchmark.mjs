@@ -19,8 +19,10 @@ export async function main() {
     autoAstRuntimeAvailable: report.modes.auto.astRuntimeAvailable,
     autoSymbols: report.modes.auto.symbols,
     autoImports: report.modes.auto.imports,
+    autoWorkspaceDependencies: report.modes.auto.workspaceDependencies,
     lexicalSymbols: report.modes.lexical.symbols,
     lexicalImports: report.modes.lexical.imports,
+    lexicalWorkspaceDependencies: report.modes.lexical.workspaceDependencies,
     output
   }, null, 2));
   return 0;
