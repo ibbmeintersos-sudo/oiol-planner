@@ -28,6 +28,7 @@ test('CLI validates an existing plan without provider credentials', async () => 
     const result = spawnSync(process.execPath, [cli, '--validate', file], { encoding: 'utf8', env: { PATH: process.env.PATH } });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(JSON.parse(result.stdout).validation.valid, true);
+    assert.ok(JSON.parse(result.stdout).evaluation.qualityDiagnostics);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 

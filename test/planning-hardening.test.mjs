@@ -95,3 +95,31 @@ test('secret redaction handles quoted JSON keys, YAML assignments, and bearer he
   }
   assert.match(safe, /\[REDACTED\]/);
 });
+
+test('quality diagnostics identify review gaps without converting them into hidden scores', () => {
+  const plan = validPlan();
+  plan.tasks[0].description = '';
+  plan.tasks[0].acceptanceCriteria = [];
+  plan.tasks[0].writeScope = [];
+  plan.architecture.components[0].responsibilities = [];
+  plan.architecture.decisions = [{ id: 'd1', decision: 'Use a modular boundary' }];
+  plan.risks = [{ id: 'risk1', description: 'Provider choice is unknown' }];
+  plan.clarifications = [{ id: 'q1', question: 'Which provider?', blocking: true, resolved: false }];
+  const result = evaluatePlan(plan);
+  assert.deepEqual(result.qualityDiagnostics.tasksWithoutDescription, ['t1']);
+  assert.deepEqual(result.qualityDiagnostics.tasksWithoutAcceptanceCriteria, ['t1']);
+  assert.deepEqual(result.qualityDiagnostics.tasksWithoutWriteScope, ['t1']);
+  assert.deepEqual(result.qualityDiagnostics.componentsWithoutResponsibilities, ['c1']);
+  assert.deepEqual(result.qualityDiagnostics.decisionsWithoutAlternatives, ['d1']);
+  assert.deepEqual(result.qualityDiagnostics.risksWithoutMitigation, ['risk1']);
+  assert.deepEqual(result.qualityDiagnostics.unresolvedBlockingClarifications, ['q1']);
+});
+
+test('Markdown report includes non-blocking plan quality diagnostics', () => {
+  const plan = validPlan();
+  plan.tasks[0].description = '';
+  plan.evaluation = evaluatePlan(plan);
+  const markdown = renderPlanMarkdown(plan);
+  assert.match(markdown, /Non-blocking quality review signals/);
+  assert.match(markdown, /Tasks without descriptions: t1/);
+});

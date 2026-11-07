@@ -80,7 +80,7 @@ The CLI deterministic validator checks requirement coverage, unique IDs, task/co
 
 Use --format md when generating a plan, or combine --validate with --format md to render an existing JSON plan. The report includes executive summary, requirements, architecture, task table, dependencies, scopes, acceptance criteria, suggested planning waves, risks, open clarifications, requirement traceability, and validation findings.
 
-The report explicitly distinguishes planned work from completed or verified work.
+The report explicitly distinguishes planned work from completed or verified work. It also surfaces non-blocking quality review signals—such as missing task descriptions, weakly specified architecture decisions, and risks without mitigations—without disguising them as a definitive quality score.
 
 ## Existing repository analysis
 

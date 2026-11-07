@@ -8,6 +8,8 @@ const list = values => Array.isArray(values) && values.length ? values.map(value
 export function renderPlanMarkdown(plan = {}) {
   const validation = plan.validation || {};
   const evaluation = plan.evaluation?.metrics || {};
+  const quality = plan.evaluation?.qualityDiagnostics || {};
+  const signal = value => Array.isArray(value) && value.length ? value.map(text).join(', ') : 'None recorded';
   const tasks = Array.isArray(plan.tasks) ? plan.tasks.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
   const graph = plan.dependencyGraph || { nodes: [], edges: [] };
   const schedule = topologicalWaves(tasks, Array.isArray(graph.edges) ? graph.edges : []);
@@ -32,7 +34,22 @@ export function renderPlanMarkdown(plan = {}) {
     '- **Requirement coverage:** ' + (Number.isFinite(evaluation.requirementCoverage) ? (evaluation.requirementCoverage * 100).toFixed(1) + '%' : Number.isFinite(validation.requirementCoverage) ? (validation.requirementCoverage * 100).toFixed(1) + '%' : 'Not recorded'),
     '- **Acceptance criteria:** ' + (Number.isFinite(evaluation.acceptanceCriteriaCount) ? evaluation.acceptanceCriteriaCount : tasks.reduce((n, task) => n + (task.acceptanceCriteria?.length || 0), 0)),
     '- **Dependency graph:** ' + (schedule.cycle ? 'Cycle detected' : schedule.error ? 'Invalid graph' : 'Acyclic'), '',
-    '## Requirements', '',
+    '',
+    '## Non-blocking quality review signals',
+    '',
+    '- **Requirements without requirement-level acceptance criteria:** ' + signal(quality.requirementsWithoutAcceptanceCriteria),
+    '- **Tasks without descriptions:** ' + signal(quality.tasksWithoutDescription),
+    '- **Tasks without acceptance criteria:** ' + signal(quality.tasksWithoutAcceptanceCriteria),
+    '- **Tasks without a declared write scope:** ' + signal(quality.tasksWithoutWriteScope),
+    '- **Components without responsibilities:** ' + signal(quality.componentsWithoutResponsibilities),
+    '- **Architecture decisions without alternatives:** ' + signal(quality.decisionsWithoutAlternatives),
+    '- **Risks without mitigation:** ' + signal(quality.risksWithoutMitigation),
+    '- **Clarifications without a question:** ' + signal(quality.clarificationsWithoutQuestion),
+    '- **Unresolved blocking clarifications:** ' + signal(quality.unresolvedBlockingClarifications),
+    '',
+    '*These are review prompts, not automatic proof of a defective plan. Some may be intentional for the project context.*',
+    '',
+    '## Requirements',
     requirements.length ? requirements.map(req => '- **' + text(req.id) + '** — ' + text(req.statement) + (req.priority ? ' (priority: ' + text(req.priority) + ')' : '')).join('\n') : '- No requirements recorded.',
     '', '## Architecture', '',
     ...(Array.isArray(plan.architecture?.components) && plan.architecture.components.some(item => item && typeof item === 'object' && !Array.isArray(item))

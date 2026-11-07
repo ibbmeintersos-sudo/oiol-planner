@@ -7,7 +7,6 @@ import { HybridPlanner } from './core/planner.mjs';
 import { evaluatePlan } from './core/evaluate.mjs';
 import { deriveTaskInterfaces } from './core/task-interface.mjs';
 import { buildTraceability } from './core/traceability.mjs';
-import { validatePlan } from './core/validator.mjs';
 import { renderPlanMarkdown } from './core/report.mjs';
 
 function parseArgs(argv) {
@@ -57,8 +56,9 @@ async function main() {
   if (options.help) { console.log(help); return; }
   if (options.validate) {
     const source = JSON.parse(await fs.readFile(path.resolve(options.validate), 'utf8'));
-    const validation = validatePlan(source, source.project || {});
-    const plan = { ...source, validation };
+    const evaluation = evaluatePlan(source, source.project || {});
+    const validation = evaluation.validation;
+    const plan = { ...source, validation, evaluation };
     if (!validation.valid) process.exitCode = 2;
     const format = options.format || (options.out?.toLowerCase().endsWith('.md') ? 'md' : 'json');
     if (!['json', 'md'].includes(format)) throw new Error('--format must be json or md');
