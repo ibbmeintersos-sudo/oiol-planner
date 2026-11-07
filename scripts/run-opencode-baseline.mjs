@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { createHash } from 'node:crypto';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 import { OpenCodeClient } from '../src/adapters/opencode/client.mjs';
 import { runOpenCodeBaselineScenario } from '../src/benchmark/opencode-baseline.mjs';
 import { REVIEW_SYSTEM_PROMPT } from '../src/core/prompts.mjs';
@@ -64,7 +64,7 @@ export async function main(){
    workspaceRoot=await fs.mkdtemp(path.join(os.tmpdir(),'oiol-opencode-baseline-'));
    const projectDirectory=path.join(workspaceRoot,'project');
    if(scenario.project.fixturePath){
-    const fixtureSource=path.resolve(path.dirname(new URL(import.meta.url).pathname),'..',scenario.project.fixturePath);
+    const fixtureSource=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',scenario.project.fixturePath);
     await fs.cp(fixtureSource,projectDirectory,{recursive:true});
    }else await fs.mkdir(projectDirectory,{recursive:true});
    const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:projectDirectory,timeoutMs:baseConfig.timeoutMs});
