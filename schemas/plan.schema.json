@@ -14,14 +14,15 @@
     "tasks",
     "dependencyGraph",
     "risks",
-    "clarifications"
+    "clarifications",
+    "contractVersion"
   ],
   "properties": {
     "schemaVersion": {
       "const": "1.0.0"
     },
     "contractVersion": {
-      "type": "string"
+      "const": "1.0"
     },
     "id": {
       "type": "string",
@@ -98,7 +99,8 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/edge"
-          }
+          },
+          "uniqueItems": true
         }
       },
       "additionalProperties": true
@@ -277,7 +279,8 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "uniqueItems": true
         },
         "acceptanceCriteria": {
           "type": "array",
@@ -389,6 +392,66 @@
             "required": [
               "verificationStatus"
             ]
+          },
+          {
+            "required": [
+              "executionStatus"
+            ]
+          },
+          {
+            "required": [
+              "runStatus"
+            ]
+          },
+          {
+            "required": [
+              "runState"
+            ]
+          },
+          {
+            "required": [
+              "attempts"
+            ]
+          },
+          {
+            "required": [
+              "finishedAt"
+            ]
+          },
+          {
+            "required": [
+              "actualDuration"
+            ]
+          },
+          {
+            "required": [
+              "logs"
+            ]
+          },
+          {
+            "required": [
+              "workerId"
+            ]
+          },
+          {
+            "required": [
+              "agentId"
+            ]
+          },
+          {
+            "required": [
+              "leaseId"
+            ]
+          },
+          {
+            "required": [
+              "retryCount"
+            ]
+          },
+          {
+            "required": [
+              "lastError"
+            ]
           }
         ]
       }
@@ -397,7 +460,8 @@
       "type": "object",
       "required": [
         "from",
-        "to"
+        "to",
+        "type"
       ],
       "properties": {
         "from": {

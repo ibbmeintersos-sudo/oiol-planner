@@ -20,7 +20,7 @@ test('evaluation exposes conflict pairs',()=>{const p=structuredClone(base);p.ta
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { HybridPlanner } from '../src/core/planner.mjs';
+import { HybridPlanner, evaluateReviewGate } from '../src/core/planner.mjs';
 import { parseJson } from '../src/providers/base.mjs';
 import { scanRepository } from '../src/scanner/repository.mjs';
 const makePlan=()=>structuredClone(base);
@@ -81,3 +81,34 @@ test('scanner marks excerpts as untrusted and records content provenance',async(
 test('validator rejects unsupported plan schema versions',()=>{const p=structuredClone(base);p.schemaVersion='9.9.9';assert.equal(validatePlan(p).valid,false);});
 test('sequence-only dependencies do not imply artifact input contracts',()=>{const p=structuredClone(base);p.tasks.push({...p.tasks[0],id:'t2',dependencies:['t1']});p.dependencyGraph.nodes.push('t2');p.dependencyGraph.edges=[{from:'t1',to:'t2',type:'finish_to_start'}];const r=validatePlan(p);assert.equal(r.valid,true);assert.equal(r.errors.length,0);});
 test('declared task inputs must reference named outputs from dependencies',()=>{const p=structuredClone(base);p.tasks.push({...p.tasks[0],id:'t2',dependencies:['t1'],inputs:[{fromTaskId:'t1',outputName:'missing'}]});p.dependencyGraph.nodes.push('t2');p.dependencyGraph.edges=[{from:'t1',to:'t2',type:'finish_to_start'}];const r=validatePlan(p);assert.equal(r.valid,false);assert.ok(r.errors.some(x=>x.includes('output not declared')));});
+
+
+test('review gate blocks critical findings even when reviewer says approved', () => {
+  const gate = evaluateReviewGate({
+    validation: { valid: true },
+    review: { status: 'approved', findings: [{ severity: 'critical', message: 'Security boundary is missing' }] },
+    reviewerConfiguration: { distinct: true }
+  });
+  assert.equal(gate.status, 'blocked');
+  assert.deepEqual(gate.reasons, ['unresolved_critical_findings']);
+});
+
+test('review gate requires high findings to be resolved before human-review readiness', () => {
+  const gate = evaluateReviewGate({
+    validation: { valid: true },
+    review: { status: 'approved', findings: [{ severity: 'high', message: 'Rollback strategy is missing' }] },
+    reviewerConfiguration: { distinct: true }
+  });
+  assert.equal(gate.status, 'needs_revision');
+  assert.equal(gate.unresolvedHighCount, 1);
+});
+
+test('review gate passes only a valid plan with approved clean review and distinct configuration', () => {
+  const gate = evaluateReviewGate({
+    validation: { valid: true },
+    review: { status: 'approved', findings: [{ severity: 'low', message: 'Minor naming note' }] },
+    reviewerConfiguration: { distinct: true }
+  });
+  assert.equal(gate.status, 'passed');
+  assert.equal(gate.passed, true);
+});

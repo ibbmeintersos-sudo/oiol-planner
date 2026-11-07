@@ -220,3 +220,38 @@ test('repository evidence citations require both exact source and excerpt finger
   assert.ok(result.errors.some(error => error.includes('exact source fingerprint')));
   assert.ok(result.errors.some(error => error.includes('exact excerpt fingerprint')));
 });
+
+
+test('versioned plan contract requires the declared contract version', () => {
+  const plan = validPlan();
+  plan.contractVersion = '9.0';
+  assert.ok(validatePlan(plan).errors.some(error => error.includes('contractVersion')));
+});
+
+test('dependency graph rejects duplicate dependencies and non-canonical edge types', () => {
+  const duplicate = validPlan();
+  duplicate.tasks[0].dependencies = ['t1', 't1'];
+  duplicate.dependencyGraph.edges = [
+    { from: 't1', to: 't1', type: 'finish_to_start' },
+    { from: 't1', to: 't1', type: 'finish_to_start' }
+  ];
+  assert.ok(validatePlan(duplicate).errors.some(error => error.includes('duplicate dependencies')));
+  const wrongType = validPlan();
+  wrongType.tasks.push({ ...wrongType.tasks[0], id: 't2', dependencies: ['t1'] });
+  wrongType.dependencyGraph.nodes.push('t2');
+  wrongType.dependencyGraph.edges = [{ from: 't1', to: 't2', type: 'start_to_start' }];
+  assert.ok(validatePlan(wrongType).errors.some(error => error.includes('must declare type finish_to_start')));
+});
+
+test('published schema requires contract version, unique dependencies and typed graph edges', async () => {
+  const example = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../examples/plan.v1.json', import.meta.url), 'utf8'));
+  const missingVersion = structuredClone(example);
+  delete missingVersion.contractVersion;
+  assert.equal((await validatePlanSchema(missingVersion)).valid, false);
+  const duplicateDependency = structuredClone(example);
+  duplicateDependency.tasks[0].dependencies = ['t2', 't2'];
+  assert.equal((await validatePlanSchema(duplicateDependency)).valid, false);
+  const missingEdgeType = structuredClone(example);
+  missingEdgeType.dependencyGraph.edges.push({ from: missingEdgeType.tasks[0].id, to: missingEdgeType.tasks[1].id });
+  assert.equal((await validatePlanSchema(missingEdgeType)).valid, false);
+});

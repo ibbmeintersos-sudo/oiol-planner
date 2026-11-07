@@ -45,28 +45,28 @@ export class HybridPlanner {
     }
     let review=null,reviewError=null;
     if(validation.valid&&this.reviewer) {
-      try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
+      try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data,plan); }
       catch(error) { reviewError=error; }
       for(let round=0;round<this.maxRepairRounds&&review&&hasHighFindings(review);round++) {
         const fixed=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
         plan=normalize(fixed.data,project); validation=await validateContract(plan,project);
         if(!validation.valid) break;
-        try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
+        try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data,plan); }
         catch(error) { review=null; reviewError=error; break; }
       }
     }
     const reviewerConfiguration=compareReviewerConfiguration(this.provider,this.reviewer);
+    const gate=evaluateReviewGate({validation,review,reviewerConfiguration});
     plan.review={
       ...(review||{status:'needs_revision',summary:reviewError?'Review unavailable: '+reviewError.message:'No reviewer configured',findings:[]}),
       configurationDistinct:reviewerConfiguration.distinct,
       configurationDifference:reviewerConfiguration.differences,
-      configuration:reviewerConfiguration
+      configuration:reviewerConfiguration,
+      gate
     };
     plan.validation=validation;
     plan.providerUsage=usage;
-    const critical=review?.findings?.some(x=>x.severity==='critical')||false;
-    const high=review?.findings?.some(x=>x.severity==='high')||false;
-    plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high||!reviewerConfiguration.distinct?'needs_revision':'ready_for_review';
+    plan.status=gate.status==='blocked'?'blocked':gate.status==='passed'?'ready_for_review':'needs_revision';
     return plan;
   }
 }
@@ -91,9 +91,35 @@ function normalize(raw,project) {
   if(!Array.isArray(plan.clarifications)) plan.clarifications=[];
   return plan;
 }
-function validateReview(review) {
+function validateReview(review, plan) {
   if(!isObject(review)||!['approved','needs_revision','blocked'].includes(review.status)||!Array.isArray(review.findings)) throw new Error('Reviewer returned an invalid review contract');
-  for(const finding of review.findings) if(!isObject(finding)||!['low','medium','high','critical'].includes(finding.severity)||typeof finding.message!=='string') throw new Error('Reviewer returned an invalid finding');
+  const taskIds=new Set((Array.isArray(plan?.tasks)?plan.tasks:[]).map(task=>task?.id).filter(id=>typeof id==='string'));
+  for(const finding of review.findings) {
+    if(!isObject(finding)||!['low','medium','high','critical'].includes(finding.severity)||typeof finding.message!=='string'||!finding.message.trim()) throw new Error('Reviewer returned an invalid finding');
+    if(finding.taskId!==undefined&&finding.taskId!==null&&(typeof finding.taskId!=='string'||!taskIds.has(finding.taskId))) throw new Error('Reviewer finding references an unknown task: '+String(finding.taskId));
+  }
   return {...review,summary:typeof review.summary==='string'?review.summary:''};
 }
 function hasHighFindings(review){return review.findings.some(x=>x.severity==='high'||x.severity==='critical');}
+
+export function evaluateReviewGate({validation,review,reviewerConfiguration}={}) {
+  const findings=Array.isArray(review?.findings)?review.findings:[];
+  const critical=findings.filter(item=>item?.severity==='critical');
+  const high=findings.filter(item=>item?.severity==='high');
+  const reasons=[];
+  if(validation?.valid!==true) reasons.push('plan_contract_invalid');
+  if(!review) reasons.push('review_unavailable');
+  else if(review.status!=='approved') reasons.push('review_not_approved');
+  if(critical.length) reasons.push('unresolved_critical_findings');
+  if(high.length) reasons.push('unresolved_high_findings');
+  if(reviewerConfiguration?.distinct!==true) reasons.push('reviewer_configuration_not_distinct');
+  const blocked=validation?.valid!==true||review?.status==='blocked'||critical.length>0;
+  const passed=!blocked&&review?.status==='approved'&&high.length===0&&reviewerConfiguration?.distinct===true;
+  return {
+    status:blocked?'blocked':passed?'passed':'needs_revision',
+    passed,
+    reasons,
+    unresolvedCriticalCount:critical.length,
+    unresolvedHighCount:high.length
+  };
+}

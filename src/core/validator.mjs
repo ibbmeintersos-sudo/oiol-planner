@@ -1,10 +1,11 @@
 import { safePath, isObject } from './utils.mjs';
-import { SCHEMA_VERSION, PLAN_STATUSES } from '../contracts/types.mjs';
+import { CONTRACT_VERSION, SCHEMA_VERSION, PLAN_STATUSES } from '../contracts/types.mjs';
 import { dependencyEdgesFromTasks, canonicalEdgeKey, topologicalWaves } from './graph.mjs';
 export function validatePlan(plan, project={}) {
   const errors=[], warnings=[];
   if(!isObject(plan)) return result(['Plan must be a JSON object'],warnings,0,0,null);
   if(plan.schemaVersion && plan.schemaVersion!==SCHEMA_VERSION) errors.push('Unsupported plan schemaVersion: '+plan.schemaVersion);
+  if(plan.schemaVersion && plan.contractVersion!==CONTRACT_VERSION) errors.push('Unsupported or missing contractVersion: '+String(plan.contractVersion));
   if(!plan.schemaVersion) warnings.push('Legacy plan has no schemaVersion; validate it against the published schema before external handoff');
   if(plan.status && !PLAN_STATUSES.includes(plan.status)) errors.push('Unsupported plan status: '+plan.status);
   for (const field of ['execution', 'executionState', 'executionRun', 'runId', 'executionId']) {
@@ -62,7 +63,9 @@ export function validatePlan(plan, project={}) {
     if(!Array.isArray(task.acceptanceCriteria)||!task.acceptanceCriteria.length||task.acceptanceCriteria.some(x=>typeof x!=='string'||!x.trim())) errors.push(`Task ${task.id} must have non-empty string acceptance criteria`);
     for(const req of Array.isArray(task.requirementIds)?task.requirementIds:[]) {if(!reqIds.has(req))errors.push(`Task ${task.id} references unknown requirement ${req}`);else covered.add(req);}
     for(const comp of Array.isArray(task.componentIds)?task.componentIds:[]) if(!compIds.has(comp)) errors.push(`Task ${task.id} references unknown component ${comp}`);
-    for(const dep of Array.isArray(task.dependencies)?task.dependencies:[]) {
+    const taskDependencies=Array.isArray(task.dependencies)?task.dependencies:[];
+    if(new Set(taskDependencies).size!==taskDependencies.length) errors.push(`Task ${task.id} contains duplicate dependencies`);
+    for(const dep of taskDependencies) {
       const producer=tasks.find(candidate=>candidate?.id===dep);
       if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
 
@@ -90,7 +93,7 @@ export function validatePlan(plan, project={}) {
   if(actualNodes.length!==expectedNodes.length||actualNodes.some((x,i)=>x!==expectedNodes[i])) errors.push('Dependency graph nodes do not exactly match task IDs');
   for(const edge of graph.edges) {
     if(!isObject(edge)||!taskIds.has(edge.from)||!taskIds.has(edge.to)) errors.push(`Dependency edge references unknown task: ${edge?.from} -> ${edge?.to}`);
-    else if(edge.type&&edge.type!=='finish_to_start') errors.push(`Unsupported dependency edge type: ${edge.type}`);
+    else if(edge.type!=='finish_to_start') errors.push(`Dependency edge ${edge.from} -> ${edge.to} must declare type finish_to_start`);
   }
   const schedule=topologicalWaves(tasks,expected);
   if(schedule.cycle) errors.push(`Dependency graph contains a cycle: ${schedule.remaining.join(', ')}`);
