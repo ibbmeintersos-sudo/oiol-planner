@@ -5,6 +5,7 @@ import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
 const project={kind:'greenfield',name:'test',request:'test'};
 const scenario={id:'T-1',category:'ambiguous',difficulty:'hard',project,expectedSignals:[['identity provider','idp'],['saml','oidc']],mustClarify:true,clarificationSignals:[['identity provider','idp'],['protocol','saml','oidc']]};
 const plan={
+ status:'blocked',
  requirements:[{id:'r1',statement:'Configure identity provider and OIDC protocol'}],
  architecture:{components:[{id:'c1',name:'Identity integration'}]},
  tasks:[{id:'t1',title:'Prepare identity provider integration',requirementIds:['r1'],componentIds:['c1'],dependencies:[],acceptanceCriteria:['Provider configuration is documented','OIDC metadata validation is tested'],writeScope:['src/identity']}],
