@@ -13,7 +13,7 @@ test('Gemini provider encodes model and API key and parses JSON',async()=>{let u
 test('Ollama provider uses non-streaming JSON mode',async()=>{let body;const provider=new OllamaProvider({model:'qwen-local',fetchImpl:async(url,options)=>{body=JSON.parse(options.body);return response({message:{content:'{"ok":true}'},prompt_eval_count:3,eval_count:2});}});const result=await provider.requestJson({system:'s',user:'u'});assert.equal(result.data.ok,true);assert.equal(body.stream,false);assert.equal(body.format,'json');});
 test('provider retries transient server failures but not authentication failures',async()=>{let transientCalls=0;const retrying=new OpenAICompatibleProvider({baseUrl:'https://llm.example',model:'m',maxRetries:1,fetchImpl:async()=>{transientCalls++;return transientCalls===1?response({error:{message:'temporary'}},503):response({choices:[{message:{content:'{"ok":true}'}}]});}});assert.equal((await retrying.requestJson({system:'s',user:'u'})).data.ok,true);assert.equal(transientCalls,2);let authCalls=0;const denied=new OpenAICompatibleProvider({baseUrl:'https://llm.example',model:'m',maxRetries:3,fetchImpl:async()=>{authCalls++;return response({error:{message:'unauthorized'}},401);}});await assert.rejects(()=>denied.requestJson({system:'s',user:'u'}),/unauthorized/);assert.equal(authCalls,1);});
 test('provider rejects successful HTTP responses without model text',async()=>{const provider=new OpenAICompatibleProvider({baseUrl:'https://llm.example',model:'m',fetchImpl:async()=>response({choices:[]})});await assert.rejects(()=>provider.requestJson({system:'s',user:'u'}),/missing choices/);});
-test('OpenCode adapter applies auth, encodes session IDs and parses JSON',async()=>{const calls=[];const client=new OpenCodeClient({baseUrl:'http://127.0.0.1:4096',password:'secret',directory:'/workspace',fetchImpl:async(url,options)=>{calls.push({url,options});return new Response('{"id":"session"}',{status:200});}});const result=await client.getSession('a/b');assert.equal(result.id,'session');assert.equal(calls[0].url,'http://127.0.0.1:4096/session/a%2Fb');assert.equal(calls[0].options.headers.authorization,'Basic '+Buffer.from('opencode:secret').toString('base64'));});
+test('OpenCode adapter applies auth, encodes session IDs and parses JSON',async()=>{const calls=[];const client=new OpenCodeClient({baseUrl:'http://127.0.0.1:4096',password:'secret',directory:'/workspace',fetchImpl:async(url,options)=>{calls.push({url,options});return new Response('{"id":"session"}',{status:200});}});const result=await client.getSession('a/b');assert.equal(result.id,'session');assert.equal(calls[0].url,'http://127.0.0.1:4096/session/a%2Fb');assert.equal(calls[0].options.headers.authorization,'Basic '+Buffer.from('opencode:secret').toString('base64'));assert.equal(calls[0].options.headers['x-opencode-directory'],'%2Fworkspace');});
 test('OpenCode adapter rejects unsafe routes and malformed JSON',async()=>{const client=new OpenCodeClient({fetchImpl:async()=>new Response('not-json',{status:200})});await assert.rejects(()=>client.request('//evil.example'),/configured server/);await assert.rejects(()=>client.health(),/invalid JSON/);});
 test('OpenCode adapter reports request timeouts',async()=>{const client=new OpenCodeClient({timeoutMs:5,fetchImpl:(_url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError'))))});await assert.rejects(()=>client.health(),/timed out after 5ms/);});
 test('OpenCode adapter accepts empty 204 responses',async()=>{const client=new OpenCodeClient({fetchImpl:async()=>new Response(null,{status:204})});assert.equal(await client.request('/session',{method:'DELETE'}),null);});
@@ -85,4 +85,18 @@ test('OpenCode task runner treats an empty write scope as no write permission',a
     {id:'scope-task',title:'No writes',acceptanceCriteria:['works'],writeScope:[]},
     {runId:'scope-run',results:new Map()}
   ),/outside the task write scope/);
+});
+
+
+test('OpenCode client rejects relative project directories',()=>{
+  assert.throws(()=>new OpenCodeClient({directory:'relative/project'}),/absolute path/);
+});
+
+test('OpenCode client routes every request to the configured project directory',async()=>{
+  const headers=[];
+  const client=new OpenCodeClient({directory:'/workspace/project with spaces',fetchImpl:async(_url,options)=>{headers.push(options.headers);return new Response('{"healthy":true}',{status:200});}});
+  await client.health();
+  await client.listSessions();
+  assert.equal(headers.length,2);
+  assert.ok(headers.every(value=>value['x-opencode-directory']==='%2Fworkspace%2Fproject%20with%20spaces'));
 });
