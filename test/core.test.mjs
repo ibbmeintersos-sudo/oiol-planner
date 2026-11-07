@@ -50,3 +50,7 @@ test('validator rejects single-backslash traversal in write scopes',()=>{
   p.tasks[0].writeScope=['src\\..\\outside'];
   assert.equal(validatePlan(p).valid,false);
 });
+
+
+test('unresolved blocking clarification is a validation error',()=>{const p=makePlan();p.clarifications=[{id:'q1',question:'Which identity provider?',blocking:true,resolved:false}];const result=validatePlan(p);assert.equal(result.valid,false);assert.match(result.errors.join(' '),/Unresolved blocking clarification/);});
+test('resolved blocking clarification does not block validation',()=>{const p=makePlan();p.clarifications=[{id:'q1',question:'Which identity provider?',blocking:true,resolved:true}];assert.equal(validatePlan(p).valid,true);});
