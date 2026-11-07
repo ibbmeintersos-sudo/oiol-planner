@@ -120,3 +120,24 @@ test('empty human-review template rows preserve missing run coverage without inv
   assert.equal(report.certificationReady, false);
   assert.equal(report.scenarioRunsWithAtLeastTwoReviewers, 0);
 });
+
+test('P2 quality dimensions block certification when any scenario/run median is below three', () => {
+  const lowQualityRow = reviewer => {
+    const values = row(reviewer, 4).split(',');
+    const index = header.split(',').indexOf('nfr_coverage_1_5');
+    values[index] = '2';
+    return values.join(',');
+  };
+  const report = aggregateHumanReviews(parseCsv(header + '\n' + lowQualityRow('Reviewer A') + '\n' + lowQualityRow('Reviewer B')), ['T-1']);
+  assert.equal(report.completeReviewerCoverage, true);
+  assert.equal(report.qualityDimensionFailures.length, 1);
+  assert.equal(report.qualityDimensionFailures[0].dimension, 'nfr_coverage_1_5');
+  assert.equal(report.certificationReady, false);
+});
+
+test('blank review templates are not counted as submitted reviews', () => {
+  const csv = header + ',run_id,plan_file\n' + Array(header.split(',').length + 2).fill('').map((value, index) => index === 0 ? 'T-1' : value).join(',') + ',run-1,plan.json\n';
+  const report = aggregateHumanReviews(parseCsv(csv), ['T-1']);
+  assert.equal(report.reviewCount, 0);
+  assert.equal(report.reviewTemplateRowCount, 1);
+});

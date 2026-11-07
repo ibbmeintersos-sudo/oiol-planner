@@ -63,6 +63,7 @@ function parseSeverity(value, label) {
   throw new Error(label + ' must be none, low, medium, high, or critical');
 }
 const severityRank = value => ['none', 'low', 'medium', 'high', 'critical'].indexOf(value);
+const QUALITY_DIMENSIONS = ['nfr_coverage_1_5','test_strategy_1_5','rollback_strategy_1_5','unknowns_transparency_1_5','risk_estimation_1_5'];
 
 export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(item => item.id)) {
   if (!Array.isArray(rows)) throw new Error('Human review rows must be an array');
@@ -70,6 +71,7 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
   if (!runIds.length) runIds.push('single-run');
   const grouped = new Map();
   const unique = new Set();
+  let submittedReviewCount = 0;
 
   for (const [index, row] of rows.entries()) {
     const scenarioId = String(row.scenario_id || '').trim();
@@ -93,6 +95,7 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
     const adjudicated = parseScore(row.adjudicated_overall_1_5, 'adjudicated_overall_1_5', true);
     const adjudicationNotes = String(row.adjudication_notes || '').trim();
     if (adjudicated !== null && !adjudicationNotes) throw new Error('Adjudication notes are required when an adjudicated score is supplied');
+    submittedReviewCount++;
     const entry = { scenarioId, runId, reviewerId, scores, highestFindingSeverity, evidenceNotes, adjudicated, adjudicationNotes };
     const list = grouped.get(scenarioId + '::' + runId) || [];
     list.push(entry);
@@ -150,6 +153,10 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
   const expectedCells = expectedScenarioIds.length * runIds.length;
   const unresolvedDisagreements = scenarioRunResults.filter(item => item.disagreementUnresolved)
     .map(item => runIds.length === 1 ? item.scenarioId : item.scenarioId + '::' + item.runId);
+  const qualityDimensionFailures = scenarioRunResults.flatMap(item =>
+    QUALITY_DIMENSIONS.filter(dimension => Number.isFinite(item.dimensionMedians[dimension]) && item.dimensionMedians[dimension] < 3)
+      .map(dimension => ({ scenarioId: item.scenarioId, runId: item.runId, dimension, median: item.dimensionMedians[dimension] }))
+  );
   const criticalScenarios = scenarioResults.filter(item => item.highestFindingSeverity === 'critical').map(item => item.scenarioId);
   const highSeverityScenarios = scenarioResults.filter(item => item.highestFindingSeverity === 'high').map(item => item.scenarioId);
   const blockingFindingScenarios = scenarioResults.filter(item => ['high', 'critical'].includes(item.highestFindingSeverity)).map(item => item.scenarioId);
@@ -157,12 +164,13 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
   const minimumScenarioScore = overallScores.length ? Math.min(...overallScores) : null;
   const overallMedian = median(overallScores);
   const completeReviewerCoverage = scenarioRunResults.length === expectedCells && covered === expectedCells;
-  const certificationReady = completeReviewerCoverage && unresolvedDisagreements.length === 0 &&
+  const certificationReady = completeReviewerCoverage && unresolvedDisagreements.length === 0 && qualityDimensionFailures.length === 0 &&
     blockingFindingScenarios.length === 0 && overallMedian !== null && overallMedian >= 4 && minimumScenarioScore >= 3;
 
   return {
     protocolVersion: '1.2',
-    reviewCount: rows.length,
+    reviewCount: submittedReviewCount,
+    reviewTemplateRowCount: rows.length,
     runCount: runIds.length,
     expectedRunIds: runIds,
     expectedScenarioCount: expectedScenarioIds.length,
@@ -172,6 +180,7 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
     overallMedian,
     minimumScenarioScore,
     unresolvedDisagreements,
+    qualityDimensionFailures,
     criticalScenarios,
     highSeverityScenarios,
     blockingFindingScenarios,
@@ -183,6 +192,7 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
       'Scores are human-entered and depend on reviewer calibration.',
       'For multi-run series, every scenario/run plan requires two distinct blind reviewers; reviewers must use plan_file and plan_scenario_selector.',
       'A high or critical finding blocks certification regardless of average score.',
+      'Each P2 quality dimension (NFR, test strategy, rollback, unknowns, and risk estimation) must have a median score of at least 3 for every scenario/run.'
       'Disagreements with an overall score spread of 2 or more require a documented adjudicated score.'
     ]
   };
