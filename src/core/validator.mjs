@@ -1,11 +1,11 @@
 import { safePath, isObject } from './utils.mjs';
-import { CONTRACT_VERSION, SCHEMA_VERSION, PLAN_STATUSES } from '../contracts/types.mjs';
+import { CONTRACT_VERSION, SCHEMA_VERSION, PLAN_SCHEMA_CONTRACTS, PLAN_STATUSES } from '../contracts/types.mjs';
 import { dependencyEdgesFromTasks, canonicalEdgeKey, topologicalWaves } from './graph.mjs';
 export function validatePlan(plan, project={}) {
   const errors=[], warnings=[];
   if(!isObject(plan)) return result(['Plan must be a JSON object'],warnings,0,0,null);
-  if(plan.schemaVersion && plan.schemaVersion!==SCHEMA_VERSION) errors.push('Unsupported plan schemaVersion: '+plan.schemaVersion);
-  if(plan.schemaVersion && plan.contractVersion!==CONTRACT_VERSION) errors.push('Unsupported or missing contractVersion: '+String(plan.contractVersion));
+  if(plan.schemaVersion && !Object.hasOwn(PLAN_SCHEMA_CONTRACTS, plan.schemaVersion)) errors.push('Unsupported plan schemaVersion: '+plan.schemaVersion);
+  if(plan.schemaVersion && Object.hasOwn(PLAN_SCHEMA_CONTRACTS, plan.schemaVersion) && plan.contractVersion!==PLAN_SCHEMA_CONTRACTS[plan.schemaVersion]) errors.push('Unsupported or missing contractVersion for schema '+plan.schemaVersion+': '+String(plan.contractVersion));
   if(!plan.schemaVersion) warnings.push('Legacy plan has no schemaVersion; validate it against the published schema before external handoff');
   if(plan.status && !PLAN_STATUSES.includes(plan.status)) errors.push('Unsupported plan status: '+plan.status);
   for (const field of ['execution', 'executionState', 'executionRun', 'runId', 'executionId']) {
