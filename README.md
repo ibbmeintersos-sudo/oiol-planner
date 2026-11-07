@@ -73,7 +73,7 @@ The scanner does **not** run package scripts, tests, build commands, hooks, or a
 
 ## OpenCode adapter
 
-`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval, prompting, aborting and reading diffs. It validates the base URL, supports configurable Basic Auth, propagates cancellation, bounds request duration, encodes session IDs, and rejects malformed responses. `OpenCodeTaskRunner` uses this client to create one session per task and collect its response and diff.
+`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval, prompting, aborting and reading diffs. It validates the base URL, supports configurable Basic Auth, propagates cancellation, bounds request duration, encodes session IDs, and rejects malformed responses. Configure the client with an absolute `directory` path to route every API request to the intended repository through OpenCode's `x-opencode-directory` header; omitting it falls back to the server's default working directory. `OpenCodeTaskRunner` uses this client to create one session per task and collect its response and diff.
 
 ## Validation and scheduling
 
