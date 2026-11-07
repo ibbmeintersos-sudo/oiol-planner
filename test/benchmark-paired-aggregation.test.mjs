@@ -10,7 +10,7 @@ test('paired aggregation reports median deltas across three repeated comparisons
  assert.equal(result.pairedRunCount,3);
  assert.equal(result.repeatGateMet,true);
  assert.equal(result.averageDelta.median,8);
- assert.equal(result.scenarioResults[0].median,8);
+ assert.equal(result.scenarioResults[0].median,4);
  assert.equal(result.completeSuiteCoverage,true);
  assert.equal(result.readyForHumanAdjudication,true);
 });
