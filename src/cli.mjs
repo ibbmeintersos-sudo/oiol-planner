@@ -20,28 +20,29 @@ function parseArgs(argv) {
   return options;
 }
 const options = parseArgs(process.argv.slice(2));
-const help = \`OIOL — Intelligent Engineering Planning System
-
-Usage:
-  node src/cli.mjs --mode greenfield --name "My App" --request "Build ..." --out plan.json
-  node src/cli.mjs --mode existing --repo ./repo --request "Improve ..." --format md --out plan.md
-  node src/cli.mjs --validate plan.json
-  node src/cli.mjs --validate plan.json --format md --out plan-review.md
-
-Options:
-  --mode greenfield|existing   Planning context
-  --name NAME                  Project name
-  --repo PATH                  Existing repository to analyze (read-only scan)
-  --request TEXT               Engineering request
-  --format json|md             Output format (default: json)
-  --out PATH                   Write the resulting artifact to a file
-  --validate PATH              Validate an existing plan without calling a provider
-  --repairs N                  Maximum planning repair rounds (0-5)
-
-Environment: OIOL_PROVIDER, OIOL_MODEL, OIOL_BASE_URL, OIOL_API_KEY,
-             OIOL_TIMEOUT_MS, OIOL_MAX_RETRIES, OIOL_REVIEW_PROVIDER
-Providers: openai-compatible, anthropic, gemini, ollama
-\`;
+const help = [
+  'OIOL — Intelligent Engineering Planning System',
+  '',
+  'Usage:',
+  '  node src/cli.mjs --mode greenfield --name "My App" --request "Build ..." --out plan.json',
+  '  node src/cli.mjs --mode existing --repo ./repo --request "Improve ..." --format md --out plan.md',
+  '  node src/cli.mjs --validate plan.json',
+  '  node src/cli.mjs --validate plan.json --format md --out plan-review.md',
+  '',
+  'Options:',
+  '  --mode greenfield|existing   Planning context',
+  '  --name NAME                  Project name',
+  '  --repo PATH                  Existing repository to analyze (read-only scan)',
+  '  --request TEXT               Engineering request',
+  '  --format json|md             Output format (default: json)',
+  '  --out PATH                   Write the resulting artifact to a file',
+  '  --validate PATH              Validate an existing plan without calling a provider',
+  '  --repairs N                  Maximum planning repair rounds (0-5)',
+  '',
+  'Environment: OIOL_PROVIDER, OIOL_MODEL, OIOL_BASE_URL, OIOL_API_KEY,',
+  '             OIOL_TIMEOUT_MS, OIOL_MAX_RETRIES, OIOL_REVIEW_PROVIDER',
+  'Providers: openai-compatible, anthropic, gemini, ollama'
+].join('\\n');
 async function writeOutput(content, destination) {
   if (destination) {
     const resolved = path.resolve(destination);
