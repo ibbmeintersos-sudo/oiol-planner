@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONTRACT_VERSION, SCHEMA_VERSION } from '../src/contracts/types.mjs';
-import { SUPPORTED_SCHEMA_KEYWORDS, validateJsonSchema } from '../src/core/schema-validator.mjs';
+import { SUPPORTED_SCHEMA_KEYWORDS, validateJsonSchema, validatePlanSchema } from '../src/core/schema-validator.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan.schema.json'), 'utf8'));

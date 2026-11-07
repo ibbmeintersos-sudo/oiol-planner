@@ -46,7 +46,7 @@ test('traceability is planning-only and exposes requirement-to-acceptance mappin
 });
 
 test('empty plans declare the published schema version', () => {
-  assert.equal(emptyPlan({ kind: 'greenfield' }).schemaVersion, '1.0.0');
+  assert.equal(emptyPlan({ kind: 'greenfield' }).schemaVersion, SCHEMA_VERSION);
 });
 
 test('published plan schema is draft 2020-12 and defines the planning contract', async () => {
