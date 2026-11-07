@@ -56,7 +56,7 @@ test('unresolved blocking clarification is a validation error',()=>{const p=make
 test('resolved blocking clarification does not block validation',()=>{const p=makePlan();p.clarifications=[{id:'q1',question:'Which identity provider?',blocking:true,resolved:true}];assert.equal(validatePlan(p).valid,true);});
 
 
-test('same provider cannot independently certify its own plan',async()=>{const provider={async requestJson(){return {data:makePlan()};}};const plan=await new HybridPlanner({provider,maxRepairRounds:0}).createPlan({});assert.equal(plan.review.independent,false);assert.equal(plan.status,'needs_revision');});
+test('same provider cannot independently certify its own plan',async()=>{const provider={async requestJson(){return {data:makePlan()};}};const plan=await new HybridPlanner({provider,maxRepairRounds:0}).createPlan({});assert.equal(plan.review.configurationDistinct,false);assert.equal(plan.status,'needs_revision');});
 test('distinct reviewer can certify a valid plan',async()=>{const provider={model:'planner-model',baseUrl:'https://planner.example',async requestJson(){return {data:makePlan()};}},reviewer={model:'review-model',baseUrl:'https://review.example',async requestJson(){return {data:{status:'approved',summary:'Independent review passed',findings:[]}};}};const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:0}).createPlan({});assert.equal(plan.review.independent,true);assert.equal(plan.status,'ready_for_review');});
 
 

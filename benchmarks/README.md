@@ -100,7 +100,7 @@ Do not commit API keys or private benchmark results containing sensitive reposit
 | Clarification discipline | 20 | Required blocking clarification appears for ambiguous cases; no unnecessary blocker for clear cases |
 | Acceptance criteria | 15 | At least two criteria per task reaches full credit |
 | Scoped tasks | 10 | Each task has a non-empty write scope |
-| Independent review | 5 | Planner marks review as independent |
+| Reviewer configuration separation | 5 | Planner and reviewer have different provider/model/endpoint configuration; this is not proof of independent judgment |
 
 This rubric is intentionally transparent and imperfect. Signal matching is lexical, not semantic; it can miss good paraphrases and reward superficial keyword inclusion. Treat automated scores as screening signals, not a final quality verdict. The current score does not measure code correctness, architecture novelty, real test execution, or factual grounding beyond the scenario fixtures.
 

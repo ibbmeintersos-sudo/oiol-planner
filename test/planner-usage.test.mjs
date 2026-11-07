@@ -18,7 +18,7 @@ class ReviewerProvider {
  async requestJson(){this.calls++;return {data:{status:'approved',summary:'Accepted',findings:[]},model:this.model,usage:{input_tokens:60,output_tokens:10}};}
 }
 
-test('planner preserves per-role usage metadata for planning and independent review',async()=>{
+test('planner preserves per-role usage metadata for planning and distinct reviewer configuration',async()=>{
  const provider=new PlannerProvider(),reviewer=new ReviewerProvider();
  const result=await new HybridPlanner({provider,reviewer,maxRepairRounds:0}).createPlan(project);
  assert.equal(result.status,'ready_for_review');
@@ -26,7 +26,7 @@ test('planner preserves per-role usage metadata for planning and independent rev
  assert.equal(result.providerUsage.reviewer.requests,1);
  assert.equal(result.providerUsage.planner.calls[0].usage.total_tokens,140);
  assert.equal(result.providerUsage.reviewer.calls[0].usage.input_tokens,60);
- assert.equal(result.review.independent,true);
+ assert.equal(result.review.configurationDistinct,true);
 });
 
 test('planner usage records absent provider usage without fabricating token counts',async()=>{

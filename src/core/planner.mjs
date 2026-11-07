@@ -3,6 +3,24 @@ import { PLANNER_SYSTEM_PROMPT, plannerUserPrompt, REVIEW_SYSTEM_PROMPT } from '
 import { validatePlan } from './validator.mjs';
 import { dependencyEdgesFromTasks } from './graph.mjs';
 import { isObject } from './utils.mjs';
+
+function providerConfiguration(provider) {
+  return {
+    providerType: provider?.constructor?.name || 'unknown',
+    model: provider?.model || null,
+    endpoint: provider?.baseUrl || null
+  };
+}
+function compareReviewerConfiguration(planner, reviewer) {
+  const planning = providerConfiguration(planner);
+  const reviewing = providerConfiguration(reviewer);
+  const differences = [];
+  for (const key of ['providerType', 'model', 'endpoint']) {
+    if (planning[key] !== reviewing[key]) differences.push(key);
+  }
+  return { distinct: Boolean(reviewer && reviewer !== planner && differences.length), differences, planner: planning, reviewer: reviewing };
+}
+
 export class HybridPlanner {
   constructor({provider,reviewer=provider,maxRepairRounds=2}={}) {
     if(!provider) throw new Error('A planning provider is required');
@@ -36,13 +54,18 @@ export class HybridPlanner {
         catch(error) { review=null; reviewError=error; break; }
       }
     }
-    const independentReview=Boolean(this.reviewer&&this.reviewer!==this.provider&&(this.reviewer.constructor!==this.provider.constructor||this.reviewer.model!==this.provider.model||this.reviewer.baseUrl!==this.provider.baseUrl));
-    plan.review={...(review||{status:'needs_revision',summary:reviewError?`Review unavailable: ${reviewError.message}`:'No reviewer configured',findings:[]}),independent:independentReview};
+    const reviewerConfiguration=compareReviewerConfiguration(this.provider,this.reviewer);
+    plan.review={
+      ...(review||{status:'needs_revision',summary:reviewError?'Review unavailable: '+reviewError.message:'No reviewer configured',findings:[]}),
+      configurationDistinct:reviewerConfiguration.distinct,
+      configurationDifference:reviewerConfiguration.differences,
+      configuration:reviewerConfiguration
+    };
     plan.validation=validation;
     plan.providerUsage=usage;
     const critical=review?.findings?.some(x=>x.severity==='critical')||false;
     const high=review?.findings?.some(x=>x.severity==='high')||false;
-    plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high||!independentReview?'needs_revision':'ready_for_review';
+    plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high||!reviewerConfiguration.distinct?'needs_revision':'ready_for_review';
     return plan;
   }
 }

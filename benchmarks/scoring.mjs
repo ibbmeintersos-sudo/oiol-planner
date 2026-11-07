@@ -26,14 +26,14 @@ export function scoreScenario(scenario, result) {
     clarificationDiscipline:clarificationPass?clarificationRate:0,
     acceptanceCriteria:tasks.length?Math.min(1,criteria/(tasks.length*2)):0,
     scopedTasks:scopeRate,
-    independentReview:plan.review?.independent===true?1:0
+    reviewerConfigurationSeparation:plan.review?.configurationDistinct===true?1:0
   };
-  const weights={structuralValidity:25,requirementSignalCoverage:25,clarificationDiscipline:20,acceptanceCriteria:15,scopedTasks:10,independentReview:5};
+  const weights={structuralValidity:25,requirementSignalCoverage:25,clarificationDiscipline:20,acceptanceCriteria:15,scopedTasks:10,reviewerConfigurationSeparation:5};
   const score=Object.entries(weights).reduce((sum,[key,weight])=>sum+dimensions[key]*weight,0);
   const blockers=[];
   if(unexpectedValidationErrors.length) blockers.push(...unexpectedValidationErrors);
   if(!clarificationPass) blockers.push(scenario.mustClarify?'Expected a blocking unresolved clarification but none was produced':'Unexpected blocking clarification for an adequately specified scenario');
-  if(scenario.mustClarify&&plan.status!=='blocked') blockers.push('Ambiguous scenario did not block implementation pending clarification');
+  if(scenario.mustClarify&&plan.status!=='blocked') blockers.push('Ambiguous scenario did not block planning pending clarification');
   if(!scenario.mustClarify&&plan.status==='blocked') blockers.push('Plan is blocked for a scenario not expected to require clarification');
   return {
     scenarioId:scenario.id,category:scenario.category,difficulty:scenario.difficulty,
@@ -41,7 +41,8 @@ export function scoreScenario(scenario, result) {
     validation:{valid:validation.valid,structurallyValid:unexpectedValidationErrors.length===0,errors:validation.errors,expectedGateErrors:expectedClarificationErrors,warnings:validation.warnings},
     requirementSignals:signalResults,clarificationSignals:clarificationResults,
     clarificationPass,blockingClarification,taskCount:tasks.length,acceptanceCriteriaCount:criteria,
-    tasksWithWriteScope:tasksWithScope,independentReview:plan.review?.independent===true,
+    tasksWithWriteScope:tasksWithScope,
+    reviewerConfigurationDistinct:plan.review?.configurationDistinct===true,
     elapsedMs:result?.elapsedMs??null,blockers
   };
 }

@@ -11,7 +11,7 @@ const plan={
  tasks:[{id:'t1',title:'Prepare identity provider integration',requirementIds:['r1'],componentIds:['c1'],dependencies:[],acceptanceCriteria:['Provider configuration is documented','OIDC metadata validation is tested'],writeScope:['src/identity']}],
  dependencyGraph:{nodes:['t1'],edges:[]},
  clarifications:[{id:'q1',question:'Which identity provider and protocol should be used?',blocking:true,resolved:false}],
- review:{independent:true}
+ review:{configurationDistinct:true}
 };
 test('benchmark rubric rewards correct blocking clarification and scenario coverage',()=>{
  const result=scoreScenario(scenario,{plan,elapsedMs:12});
