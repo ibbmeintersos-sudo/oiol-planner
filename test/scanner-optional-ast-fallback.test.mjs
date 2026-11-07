@@ -7,8 +7,9 @@ import { runScannerAccuracyBenchmark } from '../benchmarks/scanner-accuracy.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-test('scanner defaults to bounded lexical analysis when optional Tree-sitter is absent', async () => {
+test('scanner defaults to bounded lexical analysis when optional Tree-sitter is absent', async (t) => {
   const result = await scanRepository(path.join(ROOT, 'benchmarks/fixtures/scanner-adversarial'));
+  if (result.structure.astRuntimeAvailable) { t.skip('Optional Tree-sitter dependency is installed in this job'); return; }
   assert.equal(result.structure.analysisMode, 'auto');
   assert.equal(result.structure.astRuntimeAvailable, false);
   assert.equal(result.structure.astFileCount, 0);
@@ -17,8 +18,9 @@ test('scanner defaults to bounded lexical analysis when optional Tree-sitter is 
   assert.match(result.structure.astRuntimeLoadError || result.structure.analysisNotes.join(' '), /Tree-sitter|runtime|grammar|AST/i);
 });
 
-test('scanner accuracy benchmark remains available without the optional AST package', async () => {
+test('scanner accuracy benchmark remains available without the optional AST package', async (t) => {
   const report = await runScannerAccuracyBenchmark();
+  if (report.modes.auto.astRuntimeAvailable) { t.skip('Optional Tree-sitter dependency is installed in this job'); return; }
   assert.equal(report.modes.auto.astRuntimeAvailable, false);
   assert.equal(report.modes.auto.astFileCount, 0);
   assert.ok(report.modes.auto.lexicalFallbackFileCount > 0);
