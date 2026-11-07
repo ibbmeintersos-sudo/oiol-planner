@@ -64,7 +64,7 @@ Configuration is read from .env when supported by the Node runtime, or from shel
 
 ## Plan contract and validation
 
-The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. Every newly generated plan declares `schemaVersion: "1.0.0"` and `contractVersion: "1.0"`. The built-in validator supports a documented keyword subset; exact semantics, unsupported keywords, and the migration policy are in `schemas/README.md`.
+The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. New plans declare `schemaVersion: "1.1.0"` and `contractVersion: "1.1"`; plans at `1.0.0` remain validated against their frozen schema snapshot. The built-in validator supports a documented keyword subset; exact semantics, unsupported keywords, and the migration policy are in `schemas/README.md`.
 
 Validate an existing plan without calling a model:
 
@@ -141,3 +141,15 @@ OIOL reports measurable quality evidence for non-functional requirements, test-s
 ## Optional delivery adapters
 
 The GitHub Issues and Linear adapters sit outside the planning core. They can produce a local JSON preview without network access. Publishing is a separate explicit CLI action using a user-supplied token; neither adapter runs code, changes repository files, or marks a planned task as complete.
+
+
+### Create external planning tickets
+
+Preview planned tasks as local JSON; neither command makes a network request by default:
+
+~~~sh
+node src/cli.mjs --export github-issues --input plan.json --owner OWNER --repo REPO --out issues-preview.json
+node src/cli.mjs --export linear --input plan.json --team-id TEAM_UUID --out linear-preview.json
+~~~
+
+Review the preview and destination before publishing. External writes require the additional `--publish` flag and credentials supplied through environment variables (GitHub: `OIOL_GITHUB_TOKEN` or `GITHUB_TOKEN`; Linear: `LINEAR_API_KEY`, optionally `LINEAR_AUTH_MODE=oauth`). These adapters create issue descriptions only. They do not implement tasks or track completion.

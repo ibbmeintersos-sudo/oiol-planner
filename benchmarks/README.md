@@ -95,12 +95,17 @@ Do not commit API keys or private benchmark results containing sensitive reposit
 
 | Dimension | Weight | Evidence |
 |---|---:|---|
-| Structural validity | 25 | Deterministic plan validator, including exact evidence-ID/source/fingerprint matching against the actual scanned project and schema validity when recorded |
-| Requirement signal coverage | 25 | Expected scenario concepts found in plan JSON |
-| Clarification discipline | 20 | Required blocking clarification appears for ambiguous cases; no unnecessary blocker for clear cases |
-| Acceptance criteria | 15 | At least two criteria per task reaches full credit |
-| Scoped tasks | 10 | Each task has a non-empty write scope |
-| Reviewer configuration separation | 5 | Planner and reviewer have different provider/model/endpoint configuration; this is not proof of independent judgment |
+| Structural validity | 20 | Deterministic semantic and schema checks, exact evidence provenance, dependency consistency |
+| Requirement signal coverage | 15 | Expected scenario concepts found in plan JSON |
+| Clarification discipline | 15 | Required blocking clarification appears for ambiguous cases; no unnecessary blocker for clear cases |
+| Acceptance criteria | 10 | At least two criteria per task reaches full credit |
+| Scoped tasks | 5 | Each task has a non-empty write scope |
+| Reviewer configuration separation | 5 | Planner and reviewer have different provider/model/endpoint configuration; not proof of independent judgment |
+| Measurable NFRs | 10 | Quality attribute, metric, target, unit, measurement method, and acceptance criterion |
+| Test strategy | 5 | Approach, levels, coverage, entry/exit criteria, and test-data plan |
+| Rollback strategy | 5 | Applicability/rationale or strategy, triggers, steps, verification, and data compatibility |
+| Unknown transparency | 5 | Explicit unknownsReviewed state and unknown impact/resolution/blocking fields |
+| Risk estimation | 5 | Likelihood × impact estimates, confidence, assessment basis, and mitigation completeness |
 
 This rubric is intentionally transparent and imperfect. Signal matching is lexical, not semantic; it can miss good paraphrases and reward superficial keyword inclusion. Treat automated scores as screening signals, not a final quality verdict. The current score does not measure code correctness, architecture novelty, real test execution, or factual grounding beyond the scenario fixtures.
 
@@ -118,7 +123,12 @@ Score each dimension from 1 to 5:
 4. **Acceptance criteria:** Are outcomes observable, testable, and sufficiently complete?
 5. **Scope and safety:** Are write scopes bounded, destructive actions avoided, and existing-project conventions respected?
 6. **Clarification quality:** Does it ask only necessary questions and block decisions that cannot safely be assumed?
-7. **Overall:** Would you approve this plan for a supervised implementation stage?
+7. **NFR coverage:** Are relevant quality attributes measurable, and are missing targets identified as unknowns rather than invented?
+8. **Test strategy:** Does the plan define levels, coverage, entry/exit criteria, and representative test data?
+9. **Rollback strategy:** Is rollback applicable, reasoned as not applicable, or sufficiently planned for the change?
+10. **Unknown transparency:** Are unresolved unknowns and their impact/resolution approach explicit?
+11. **Risk estimation:** Are likelihood and impact plausible, confidence calibrated, assessment basis recorded, and mitigation linked to the risk?
+12. **Overall:** Would you approve this plan for a supervised implementation stage?
 
 Anchors: 1 = materially unsafe or unusable; 2 = major omissions or rework required; 3 = usable only with meaningful revision; 4 = strong with minor corrections; 5 = precise, complete, and implementation-ready.
 
@@ -178,3 +188,8 @@ npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
 ```
 
 The report evaluates named function symbols and static import specifiers against manually reviewed goldens for the checked-in customer, invoice, order, and adversarial scanner fixtures. It reports TP/FP/FN, precision, recall, and F1 for AST-auto and lexical-only analysis. The goldens are compact regression fixtures; these metrics do not establish accuracy across production repositories or full semantic dependency resolution.
+
+
+### P2 human review gate
+
+Each completed review CSV includes five additional 1–5 dimensions: NFR coverage, test strategy, rollback strategy, unknowns transparency, and risk estimation. The human aggregator requires the median for each of these five dimensions to be at least 3 for every scenario/run, in addition to the existing overall score, coverage, reviewer independence, disagreement adjudication, and severity gates. Blank template rows are not counted as submitted reviews.
