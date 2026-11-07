@@ -37,4 +37,31 @@ export const scenarios = [
     mustClarify:true,
     clarificationSignals:[['metric definition','kpi definition','metric owner'],['data source','source system','authoritative source'],['real-time','freshness','latency']]
   }
+  {
+    id:'GF-ANALYTICS-007'
+    id:'GF-ANALYTICS-007', category:'greenfield', difficulty:'hard',
+    project:{kind:'greenfield',name:'Event Analytics Pipeline',request:'Design an event analytics pipeline that accepts application events, validates schemas, deduplicates retries, processes events asynchronously, supports replay, and exposes operational metrics. Protect personal data and define retention boundaries.',repository:null,constraints:['Separate ingestion from asynchronous processing','Define idempotency and replay behavior','Do not retain unnecessary personal data','Include failure handling and observable service-level indicators'],evidence:[{id:'ev-user-7',type:'user_request',description:'Event analytics pipeline request',source:'user'}]},
+    expectedSignals:[['event ingestion','ingest'],['schema validation','event schema'],['idempotency','deduplication'],['asynchronous','queue','worker'],['replay','reprocessing'],['metrics','observability'],['retention','privacy','personal data']],
+    mustClarify:false
+  },
+  {
+    id:'GF-DOCUMENTS-008', category:'greenfield', difficulty:'hard',
+    project:{kind:'greenfield',name:'Document Processing Service',request:'Plan a document processing service with secure uploads, metadata extraction, background processing, access control, audit history, and configurable retention. Support large files and report processing failures clearly.',repository:null,constraints:['Keep uploaded content private by default','Separate upload from processing lifecycle','Define size and file-type validation','Do not claim malware scanning unless explicitly designed'],evidence:[{id:'ev-user-8',type:'user_request',description:'Document processing service request',source:'user'}]},
+    expectedSignals:[['upload','file ingestion'],['metadata extraction','metadata'],['background processing','worker','queue'],['access control','authorization'],['audit','history'],['retention','lifecycle'],['file size','large files']],
+    mustClarify:false
+  },
+  {
+    id:'EX-SEC-009', category:'existing', difficulty:'hard',
+    project:{kind:'existing',fixturePath:'benchmarks/fixtures/invoice-api',name:'Existing Invoice API',request:'Enforce tenant ownership when retrieving invoices. A user must not access an invoice belonging to another tenant. Preserve the current 200 and 404 response shapes, add authorization tests, and record denied access in the audit trail.',repository:{root:'benchmarks/fixtures/invoice-api',fileCount:6,files:[{path:'src/routes/invoices.mjs',kind:'source'},{path:'src/services/invoices.mjs',kind:'source'},{path:'src/auth/session.mjs',kind:'source'},{path:'test/invoices.test.mjs',kind:'test'},{path:'package.json',kind:'manifest'}],manifests:[{path:'package.json',name:'invoice-api-fixture',scripts:{test:'node --test'}}],scripts:['test'],tests:['test/invoices.test.mjs'],git:{dirty:false,branch:'main'}},constraints:['Preserve existing response compatibility','Enforce tenant isolation at a trusted boundary','Do not rely on client-supplied tenant IDs','Add authorization regression tests'],evidence:[{id:'ev-scan-9',type:'repository_scan',description:'Invoice API fixture scan',source:'benchmarks/fixtures/invoice-api'}]},
+    expectedSignals:[['tenant ownership','tenant isolation','tenant authorization'],['invoice','invoices'],['authorization','access control'],['response compatibility','404','200'],['audit','denied access'],['authorization test','regression test']],
+    mustClarify:false
+  },
+  {
+    id:'AMB-PAY-010', category:'ambiguous', difficulty:'hard',
+    project:{kind:'greenfield',name:'Payment Integration',request:'Integrate payments into our platform so customers can pay easily. Support international customers and handle refunds properly. Choose the best provider and design the implementation.',repository:null,constraints:['Do not assume a payment provider','Do not invent supported countries or currencies','Clarify refund, dispute, and settlement requirements before provider-specific design','Never store raw payment card details'],evidence:[{id:'ev-user-10',type:'user_request',description:'Ambiguous payment integration request',source:'user'}]},
+    expectedSignals:[['payment provider','gateway','processor'],['international','country','region'],['currency','currencies'],['refund','dispute','settlement']],
+    mustClarify:true,
+    clarificationSignals:[['which payment provider','provider selection','payment processor'],['supported countries','geography','markets'],['currencies','settlement currency'],['refund policy','dispute handling','chargeback']]
+  }
+
 ];
