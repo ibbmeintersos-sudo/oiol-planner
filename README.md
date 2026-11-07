@@ -84,9 +84,9 @@ The report explicitly distinguishes planned work from completed or verified work
 
 ## Existing repository analysis
 
-The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. Each included excerpt has a stable evidence ID, a SHA-256 fingerprint of the original file, and a separate SHA-256 fingerprint of the redacted excerpt; the same evidence ID and fingerprints are propagated into the analyzer's evidence records and the context so planner citations resolve to the exact excerpt supplied. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
+The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. Each included excerpt has a stable evidence ID, a SHA-256 fingerprint of the original file, and a separate SHA-256 fingerprint of the redacted excerpt; the same evidence ID and fingerprints are propagated into analyzer evidence and the structural scan's `sourceEvidence` references. The structural pass reports detected languages, framework signals from manifests, conventional/manifest-declared entry points, lexical class/function/type symbols, relative imports that resolve to included files, route-like files, test-like files, and unresolved relative imports. Each structural result is marked as untrusted repository-derived metadata. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
 
-File/import mapping is heuristic in this version. OIOL does not yet provide a complete AST-based symbol index or semantic dependency graph. Repository claims should be grounded in scanner evidence; absence from the bounded scan is not proof that a file, dependency, or behavior does not exist.
+The structural pass is bounded and lexical, not a compiler AST, type checker, or complete semantic dependency graph. Alias resolution, dynamic imports, generated code, reflection, and runtime dependency injection may be missed. Import query/fragment data is stripped and import references are redacted before inclusion. Coverage counts distinguish source files discovered from source files actually analyzed. Repository claims should be grounded in scanner evidence; absence from the bounded scan is not proof that a file, dependency, or behavior does not exist.
 
 Repository text is untrusted input. Prompt-injection patterns and secret redaction require further hardening; neither should be treated as a security boundary.
 
@@ -119,7 +119,7 @@ CI tests Node.js 22 and 24.
 - No live provider benchmark or blinded human evaluation has been completed.
 - The starter benchmark contains ten scenarios and compact synthetic repository fixtures; it is not statistically representative.
 - Automated concept matching is lexical and can miss valid paraphrases or reward superficial keyword inclusion.
-- The repository scanner is bounded and heuristic, not AST- or symbol-aware.
+- The repository scanner provides bounded lexical symbol and local-import analysis, not compiler-AST or type-aware analysis.
 - Prompt-injection isolation, provenance, and secret redaction need stronger evidence and tests.
 - Provider-reported usage may be available, but pricing is not estimated.
 

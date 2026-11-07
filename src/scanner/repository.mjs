@@ -138,7 +138,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     tests,
     configs,
     context: boundedContext,
-    structure,
+    structure: { ...structure, sourceEvidence: snippets.map(({id,path,sourceSha256,excerptSha256}) => ({id,path,sourceSha256,excerptSha256,trustLevel:'untrusted_repository_content'})) },
     snippets,
     contextTruncated,
     scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth }
