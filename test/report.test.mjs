@@ -63,3 +63,20 @@ test('published example plan satisfies deterministic planning validation', async
   assert.equal(validation.valid, true, validation.errors.join('; '));
   assert.equal(example.schemaVersion, SCHEMA_VERSION);
 });
+
+test('markdown report surfaces P2 quality metrics, test strategy, rollback, and risk estimates', () => {
+  const qualityPlan = {
+    ...plan,
+    testStrategy: { approach: 'Risk-based testing', levels: ['unit','integration'], coverage: ['req_1'], entryCriteria: ['Contract reviewed'], exitCriteria: ['Required checks pass'], testData: 'Synthetic accounts' },
+    rollbackPlan: { applicability: 'applicable', rationale: 'Deployment changes a data path', strategy: 'Restore prior compatible version', triggerConditions: ['Error budget exceeded'], steps: ['Stop rollout'], verification: ['Confirm service health'], dataCompatibility: 'Old version can read new records during the rollback window' },
+    unknownsReviewed: true,
+    assumptions: [{ statement: 'Database supports additive migration.', confidence: 'medium', validationApproach: 'Check deployed database version.' }],
+    unknowns: [{ description: 'Production load baseline is unknown.', impact: 'Latency target may be miscalibrated.', resolutionApproach: 'Measure representative load.', blocking: false }],
+    risks: [{ id: 'risk_1', description: 'Capacity may be exceeded', likelihood: 3, impact: 4, severity: 'high', mitigation: 'Load test and admission control' }],
+    evaluation: { planQuality: { nfr: { measurableCount: 1, requirementCount: 1, measurableRate: 1 }, testStrategy: { completedFields: 6, totalFields: 6 }, rollback: { applicability: 'applicable', completeness: 1 }, unknowns: { reviewed: true, count: 1, withResolutionCount: 1 }, assumptions: { validatedCount: 1, count: 1 }, risks: { estimatedCount: 1, count: 1, meanExposure: 12, highOrCriticalCount: 1 } } }
+  };
+  const markdown = renderPlanMarkdown(qualityPlan);
+  for (const value of ['Plan quality evidence','Measurable NFRs','Test strategy','Rollback plan','Likelihood × impact','Derived exposure','resolution: Measure representative load.']) {
+    assert.ok(markdown.includes(value), 'missing P2 quality evidence: ' + value);
+  }
+});

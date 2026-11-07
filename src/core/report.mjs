@@ -10,6 +10,9 @@ export function renderPlanMarkdown(plan = {}) {
   const validation = plan.validation || {};
   const evaluation = plan.evaluation?.metrics || {};
   const quality = plan.evaluation?.qualityDiagnostics || {};
+  const planQuality = plan.evaluation?.planQuality || plan.evaluation?.metrics?.planQuality || {};
+  const testStrategy = plan.testStrategy && typeof plan.testStrategy === 'object' ? plan.testStrategy : {};
+  const rollbackPlan = plan.rollbackPlan && typeof plan.rollbackPlan === 'object' ? plan.rollbackPlan : {};
   const signal = value => Array.isArray(value) && value.length ? value.map(text).join(', ') : 'None recorded';
   const tasks = Array.isArray(plan.tasks) ? plan.tasks.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
   const graph = plan.dependencyGraph || { nodes: [], edges: [] };
@@ -35,6 +38,17 @@ export function renderPlanMarkdown(plan = {}) {
     '- **Requirement coverage:** ' + (Number.isFinite(evaluation.requirementCoverage) ? (evaluation.requirementCoverage * 100).toFixed(1) + '%' : Number.isFinite(validation.requirementCoverage) ? (validation.requirementCoverage * 100).toFixed(1) + '%' : 'Not recorded'),
     '- **Acceptance criteria:** ' + (Number.isFinite(evaluation.acceptanceCriteriaCount) ? evaluation.acceptanceCriteriaCount : tasks.reduce((n, task) => n + (task.acceptanceCriteria?.length || 0), 0)),
     '- **Dependency graph:** ' + (schedule.cycle ? 'Cycle detected' : schedule.error ? 'Invalid graph' : 'Acyclic'), '',
+    '## Plan quality evidence', '',
+    '- **Measurable NFRs:** ' + (planQuality.nfr ? planQuality.nfr.measurableCount + '/' + planQuality.nfr.requirementCount + ' (' + (planQuality.nfr.measurableRate * 100).toFixed(1) + '%)' : 'Not evaluated'),
+    '- **Test strategy completeness:** ' + (planQuality.testStrategy ? planQuality.testStrategy.completedFields + '/' + planQuality.testStrategy.totalFields + ' fields' : 'Not evaluated'),
+    '- **Rollback plan:** ' + (planQuality.rollback ? planQuality.rollback.applicability + ' (' + (planQuality.rollback.completeness * 100).toFixed(1) + '% complete)' : 'Not evaluated'),
+    '- **Unknowns reviewed:** ' + (planQuality.unknowns ? (planQuality.unknowns.reviewed ? 'Yes' : 'No') + '; ' + planQuality.unknowns.count + ' recorded; ' + planQuality.unknowns.withResolutionCount + ' with resolution approach' : 'Not evaluated'),
+    '- **Assumptions with validation approach:** ' + (planQuality.assumptions ? planQuality.assumptions.validatedCount + '/' + planQuality.assumptions.count : 'Not evaluated'),
+    '- **Risks with likelihood × impact estimates:** ' + (planQuality.risks ? planQuality.risks.estimatedCount + '/' + planQuality.risks.count : 'Not evaluated'),
+    '- **Mean estimated risk exposure:** ' + (Number.isFinite(planQuality.risks?.meanExposure) ? planQuality.risks.meanExposure : 'Not recorded'),
+    '- **High/critical estimated risks:** ' + (planQuality.risks?.highOrCriticalCount ?? 'Not recorded'), '',
+    '*These metrics measure the completeness of planning evidence; they do not prove that implementation or verification has occurred.*', ''
+
     '',
     '## Non-blocking quality review signals',
     '',
@@ -63,6 +77,21 @@ export function renderPlanMarkdown(plan = {}) {
     ...(Array.isArray(plan.architecture?.decisions) && plan.architecture.decisions.some(item => item && typeof item === 'object' && !Array.isArray(item))
       ? plan.architecture.decisions.filter(item => item && typeof item === 'object' && !Array.isArray(item)).map(decision => '- **' + text(decision.decision || decision.title) + '** — ' + text(decision.reason || decision.rationale))
       : ['- No explicit decisions recorded.']),
+    '', '## Test strategy', '',
+    '- **Approach:** ' + text(testStrategy.approach || 'Not recorded'),
+    '- **Levels:** ' + text((Array.isArray(testStrategy.levels) ? testStrategy.levels : []).join(', ') || 'Not recorded'),
+    '- **Coverage:** ' + text((Array.isArray(testStrategy.coverage) ? testStrategy.coverage : []).join(', ') || 'Not recorded'),
+    '- **Entry criteria:**', list(testStrategy.entryCriteria),
+    '- **Exit criteria:**', list(testStrategy.exitCriteria),
+    '- **Test data:** ' + text(testStrategy.testData || 'Not recorded'),
+    '', '## Rollback plan', '',
+    '- **Applicability:** ' + text(rollbackPlan.applicability || 'Not recorded'),
+    '- **Rationale:** ' + text(rollbackPlan.rationale || 'Not recorded'),
+    '- **Strategy:** ' + text(rollbackPlan.strategy || 'Not recorded'),
+    '- **Trigger conditions:**', list(rollbackPlan.triggerConditions),
+    '- **Steps:**', list(rollbackPlan.steps),
+    '- **Verification:**', list(rollbackPlan.verification),
+    '- **Data compatibility:** ' + text(rollbackPlan.dataCompatibility || 'Not recorded'),
     '', '## Task breakdown', '',
     '| ID | Task | Dependencies | Requirements | Acceptance criteria | Write scope |',
     '|---|---|---|---|---|---|',
@@ -74,13 +103,14 @@ export function renderPlanMarkdown(plan = {}) {
     '', '## Suggested planning waves', '',
     ...(schedule.waves.length ? schedule.waves.map((wave, index) => '- **Wave ' + (index + 1) + ':** ' + wave.map(text).join(', ')) : ['- No waves could be derived from the supplied task graph.']),
     '', '## Risks', '',
-    ...(risks.length ? risks.map(risk => '- **' + text(risk.severity || 'unspecified') + ' — ' + text(risk.id || 'risk') + ':** ' + text(risk.description) + '\n  - Mitigation: ' + text(risk.mitigation || 'Not specified')) : ['- No risks recorded.']),
+    ...(risks.length ? risks.map(risk => '- **' + text(risk.severity || 'unspecified') + ' — ' + text(risk.id || 'risk') + ':** ' + text(risk.description) + '\n  - Likelihood × impact: ' + text(risk.likelihood ?? 'Not estimated') + ' × ' + text(risk.impact ?? 'Not estimated') + '\n  - Derived exposure: ' + text(Number.isInteger(risk.likelihood) && Number.isInteger(risk.impact) ? risk.likelihood * risk.impact : 'Not estimated') + '\n  - Mitigation: ' + text(risk.mitigation || 'Not specified')) : ['- No risks recorded.']),
     '', '## Assumptions', '',
     list(assumptions),
     '',
     '## Unknowns requiring investigation',
     '',
     list(unknowns),
+    ...unknowns.filter(item => item && typeof item === 'object').map(item => '  - Impact: ' + text(item.impact || 'Not recorded') + '; resolution: ' + text(item.resolutionApproach || 'Not recorded') + '; blocking: ' + text(item.blocking ?? 'Not recorded')),
     '', '## Open questions and clarifications', '',
     ...(clarifications.length ? clarifications.map(item => '- **' + (item.blocking ? 'Blocking' : 'Non-blocking') + ':** ' + text(item.question || item.statement || item.id) + (item.resolved ? ' (resolved)' : '')) : ['- No open questions recorded.']),
     '', '## Requirement traceability', '',
