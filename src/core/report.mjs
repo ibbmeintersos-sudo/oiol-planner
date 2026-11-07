@@ -37,6 +37,9 @@ export function renderPlanMarkdown(plan = {}) {
     ...(Array.isArray(plan.architecture?.components) && plan.architecture.components.length
       ? plan.architecture.components.map(component => '### ' + text(component.name || component.id) + '\n\n' + list(component.responsibilities))
       : ['No architecture components recorded.']),
+    ...(Array.isArray(plan.architecture?.dataFlows) && plan.architecture.dataFlows.length
+      ? ['', '### Key data flows', '', ...plan.architecture.dataFlows.map(flow => '- **' + text(flow.from || flow.source) + ' → ' + text(flow.to || flow.target) + ':** ' + text(flow.description || flow.purpose))]
+      : []),
     '', '### Architecture decisions', '',
     ...(Array.isArray(plan.architecture?.decisions) && plan.architecture.decisions.length
       ? plan.architecture.decisions.map(decision => '- **' + text(decision.decision || decision.title) + '** — ' + text(decision.reason || decision.rationale))
