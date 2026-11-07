@@ -143,11 +143,16 @@ export async function scanRepository(repoPath, {
     }
   }
 
+  // Context-only selections (for example test/config excerpts) must not expand the source-analysis cap.
+  const analysisContents = Object.assign(Object.create(null), sourceContents);
+  const selectedSourceSet = new Set(selectedSources);
+  for (const file of sourceCandidates) if (!selectedSourceSet.has(file)) delete analysisContents[file];
+
   const sourceEvidence = snippets.map(({ id, path, sourceSha256, excerptSha256 }) => ({
     id, path, sourceSha256, excerptSha256, trustLevel: 'untrusted_repository_content'
   }));
   const structure = analyzeRepositoryStructure({
-    files, contents: sourceContents, manifests, sourceEvidence, maxFileBytes, analysisMode
+    files, contents: analysisContents, manifests, sourceEvidence, maxFileBytes, analysisMode
   });
   const structureSummary = [
     'Repository structure analysis (bounded static evidence; not proof of runtime behavior):',

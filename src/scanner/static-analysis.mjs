@@ -172,7 +172,14 @@ function workspaceInventory(files, contents, manifestObjects) {
       if (!declarations || typeof declarations !== 'object' || Array.isArray(declarations)) continue;
       for (const [name, version] of Object.entries(declarations)) {
         const targets = packageByName.get(name) || [];
-        if (targets.length !== 1) continue;
+        if (targets.length === 0) {
+          if (typeof version === 'string' && version.startsWith('workspace:')) diagnostics.push({ kind: 'workspace_dependency_target_not_found', from: fromPackage.path, packageName: name, fromManifest: item.file });
+          continue;
+        }
+        if (targets.length !== 1) {
+          diagnostics.push({ kind: 'workspace_dependency_target_ambiguous', from: fromPackage.path, packageName: name, targetManifests: targets.map(target => target.manifest) });
+          continue;
+        }
         dependencies.push({
           from: fromPackage.path,
           to: targets[0].path,
@@ -206,13 +213,78 @@ function workspaceInventory(files, contents, manifestObjects) {
   };
 }
 
+function parseJsonWithComments(source) {
+  let withoutComments = '';
+  let inString = false, escaped = false, lineComment = false, blockComment = false;
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index], next = source[index + 1];
+    if (lineComment) {
+      if (char === '\n' || char === '\r') {
+        lineComment = false;
+        withoutComments += char;
+      } else withoutComments += ' ';
+      continue;
+    }
+    if (blockComment) {
+      if (char === '*' && next === '/') {
+        blockComment = false;
+        withoutComments += '  ';
+        index++;
+      } else withoutComments += char === '\n' || char === '\r' ? char : ' ';
+      continue;
+    }
+    if (inString) {
+      withoutComments += char;
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+    if (char === '"') {
+      inString = true;
+      withoutComments += char;
+    } else if (char === '/' && next === '/') {
+      lineComment = true;
+      withoutComments += '  ';
+      index++;
+    } else if (char === '/' && next === '*') {
+      blockComment = true;
+      withoutComments += '  ';
+      index++;
+    } else withoutComments += char;
+  }
+
+  let cleaned = '';
+  inString = false;
+  escaped = false;
+  for (let index = 0; index < withoutComments.length; index++) {
+    const char = withoutComments[index];
+    if (inString) {
+      cleaned += char;
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') inString = false;
+      continue;
+    }
+    if (char === '"') {
+      inString = true;
+      cleaned += char;
+    } else if (char === ',') {
+      let lookahead = index + 1;
+      while (/\s/.test(withoutComments[lookahead] || '')) lookahead++;
+      if (withoutComments[lookahead] !== '}' && withoutComments[lookahead] !== ']') cleaned += char;
+    } else cleaned += char;
+  }
+  return JSON.parse(cleaned);
+}
+
 function buildPathAliases(files, contents) {
   const aliases = [], diagnostics = [];
   for (const file of files.filter(item => ['tsconfig.json','jsconfig.json'].includes(path.posix.basename(item)))) {
     const raw = contents[file];
     if (typeof raw !== 'string') continue;
     let config;
-    try { config = JSON.parse(raw); }
+    try { config = parseJsonWithComments(raw); }
     catch { diagnostics.push({ kind: 'invalid_path_alias_config', file }); continue; }
     const options = config.compilerOptions || {};
     const paths = options.paths;
@@ -334,12 +406,17 @@ export function analyzeRepositoryStructure({
     }
   }
 
+  const evidenceByPath = new Map(sourceEvidence.map(item => [norm(item.path), item]));
   const resolvedImports = imports.map(item => {
     if (item.resolved || item.specifier.startsWith('.')) return item;
     const alias = resolvePathAlias(item.from, item.specifier, aliasInfo.aliases, fileSet);
     return alias ? {
       ...item, to: alias.path, resolved: true,
-      resolutionKind: 'tsconfig_path_alias', resolutionConfig: alias.configFile
+      resolutionKind: 'tsconfig_path_alias',
+      resolutionConfig: alias.configFile,
+      resolutionConfigEvidenceId: evidenceByPath.get(norm(alias.configFile))?.id || null,
+      resolutionConfigSourceSha256: evidenceByPath.get(norm(alias.configFile))?.sourceSha256 || null,
+      resolutionConfigExcerptSha256: evidenceByPath.get(norm(alias.configFile))?.excerptSha256 || null
     } : item;
   });
   const uniqueImports = [];
@@ -348,7 +425,6 @@ export function analyzeRepositoryStructure({
     const key = [item.from, item.specifier, item.to || ''].join('\0');
     if (!seenImports.has(key)) { seenImports.add(key); uniqueImports.push(item); }
   }
-  const evidenceByPath = new Map(sourceEvidence.map(item => [norm(item.path), item]));
   const evidencedSymbols = symbols.map(item => attachEvidence(item, item.file, evidenceByPath));
   const evidencedImports = uniqueImports.map(item => attachEvidence(item, item.from, evidenceByPath));
   const edges = evidencedImports.filter(item => item.resolved).map(item => ({
@@ -369,8 +445,12 @@ export function analyzeRepositoryStructure({
     toEvidenceId: evidenceByPath.get(norm(item.toManifest))?.id || null,
     toSourceSha256: evidenceByPath.get(norm(item.toManifest))?.sourceSha256 || null
   }));
-  const findingCount = evidencedSymbols.length + evidencedImports.length;
-  const fingerprintedFindingCount = [...evidencedSymbols, ...evidencedImports].filter(item => item.evidenceId).length;
+  const findingCount = evidencedSymbols.length + evidencedImports.length + workspaceDependencies.length;
+  const fingerprintedFindingCount =
+    [...evidencedSymbols, ...evidencedImports].filter(item => item.evidenceId).length +
+    workspaceDependencies.filter(item => item.fromEvidenceId && item.toEvidenceId).length;
+  const resolvedAliasCount = evidencedImports.filter(item => item.resolutionKind === 'tsconfig_path_alias').length;
+  const fingerprintedAliasConfigCount = evidencedImports.filter(item => item.resolutionKind === 'tsconfig_path_alias' && item.resolutionConfigEvidenceId).length;
 
   return {
     method: ast.parsedFileCount ? 'tree_sitter_ast_with_lexical_fallback' : 'bounded_static_heuristics',
@@ -416,7 +496,10 @@ export function analyzeRepositoryStructure({
     evidenceCoverage: {
       findingCount,
       fingerprintedFindingCount,
-      fingerprintedFindingRate: findingCount ? Number((fingerprintedFindingCount / findingCount).toFixed(4)) : 1
+      fingerprintedFindingRate: findingCount ? Number((fingerprintedFindingCount / findingCount).toFixed(4)) : 1,
+      resolvedAliasCount,
+      fingerprintedAliasConfigCount,
+      aliasConfigFingerprintRate: resolvedAliasCount ? Number((fingerprintedAliasConfigCount / resolvedAliasCount).toFixed(4)) : 1
     },
     unresolvedLocalImports: unresolved.slice(0, 1000),
     unresolvedLocalImportCount: unresolved.length,

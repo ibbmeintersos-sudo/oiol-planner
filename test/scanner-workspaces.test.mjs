@@ -23,14 +23,26 @@ test('scanner resolves workspace package edges and TypeScript path aliases with 
       workspaces: ['apps/*', 'packages/*']
     }, null, 2));
     await put(f.root, 'apps/api/package.json', JSON.stringify({
-      name: '@oiol/api', dependencies: { '@oiol/shared': 'workspace:*' }
+      name: '@oiol/api', dependencies: {
+        '@oiol/shared': 'workspace:*',
+        '@oiol/missing': 'workspace:*'
+      }
     }, null, 2));
     await put(f.root, 'packages/shared/package.json', JSON.stringify({
       name: '@oiol/shared', version: '1.0.0'
     }, null, 2));
-    await put(f.root, 'tsconfig.json', JSON.stringify({
-      compilerOptions: { baseUrl: '.', paths: { '@oiol/shared/*': ['packages/shared/src/*'] } }
-    }, null, 2));
+    await put(f.root, 'tsconfig.json', [
+      '{',
+      '  // JSONC comments and trailing commas are valid in TypeScript configuration files.',
+      '  "compilerOptions": {',
+      '    "baseUrl": ".",',
+      '    "paths": {',
+      '      "@oiol/shared/*": ["packages/shared/src/*",],',
+      '    },',
+      '  },',
+      '}',
+      ''
+    ].join('\n'));
     await put(f.root, 'apps/api/src/handler.ts', [
       "import { log } from '@oiol/shared/logger';",
       'export function createHandler() { return log("ready"); }',
@@ -55,9 +67,13 @@ test('scanner resolves workspace package edges and TypeScript path aliases with 
     assert.equal(imported.to, 'packages/shared/src/logger.ts');
     assert.equal(imported.resolutionKind, 'tsconfig_path_alias');
     assert.ok(imported.evidenceId);
+    assert.ok(imported.resolutionConfigEvidenceId);
+    assert.match(imported.resolutionConfigSourceSha256, /^[a-f0-9]{64}$/);
     assert.match(imported.sourceSha256, /^[a-f0-9]{64}$/);
     assert.match(imported.excerptSha256, /^[a-f0-9]{64}$/);
     assert.equal(structure.evidenceCoverage.fingerprintedFindingRate, 1);
+    assert.equal(structure.evidenceCoverage.aliasConfigFingerprintRate, 1);
+    assert.ok(structure.workspaceGraph.diagnostics.some(item => item.kind === 'workspace_dependency_target_not_found' && item.packageName === '@oiol/missing'));
     assert.ok(structure.workspaceGraph.dependencies[0].fromEvidenceId);
     assert.ok(structure.workspaceGraph.dependencies[0].toEvidenceId);
   } finally {
@@ -85,6 +101,25 @@ test('context budget truncation does not stop bounded structural scanning', asyn
     assert.equal(result.coverage.selectedSourceFiles, 2);
     assert.equal(result.coverage.contextBudgetIndependentOfStructuralAnalysis, true);
     assert.equal(result.coverage.contextOmittedExcerptCount, result.coverage.selectedFiles);
+  } finally {
+    await f.cleanup();
+  }
+});
+
+test('source-file selection cap cannot be exceeded by separately selected test/config files', async () => {
+  const f = await fixture('oiol-source-cap-');
+  try {
+    await put(f.root, 'src/core.js', 'export function core() {}\n');
+    await put(f.root, 'tests/extra.test.js', 'export function outsideCap() {}\n');
+    const result = await scanRepository(f.root, {
+      analysisMode: 'lexical', maxSourceFiles: 1, maxFiles: 20
+    });
+    assert.equal(result.coverage.sourceCandidates, 2);
+    assert.equal(result.coverage.selectedSourceFiles, 1);
+    assert.equal(result.structure.analyzedSourceFileCount, 1);
+    assert.ok(result.structure.symbols.some(item => item.name === 'core'));
+    assert.equal(result.structure.symbols.some(item => item.name === 'outsideCap'), false);
+    assert.equal(result.snippets.some(item => item.path === 'tests/extra.test.js'), true);
   } finally {
     await f.cleanup();
   }

@@ -11,6 +11,7 @@
 - Added explicit Scanner coverage accounting, structural analysis independent of prompt-context truncation, per-finding source fingerprints, workspace dependency inventory, and direct TypeScript path-alias resolution.
 - Prevented repository snippet bodies from bypassing the bounded prompt context; snippets outside that context now carry provenance metadata only.
 - Added manually reviewed Monorepo fixtures and precision/recall/F1 coverage for manifest-declared workspace dependency edges.
+- Enforced the source-analysis file cap independently of test/config context selection; added JSONC parsing for TypeScript path maps, alias-config provenance, and diagnostics for unresolved declared workspace dependencies.
 
 ### Changed
 - Extended benchmark and blinded human-review rubrics with NFR, test strategy, rollback, unknown transparency, and risk-estimation dimensions.
