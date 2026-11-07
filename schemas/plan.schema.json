@@ -652,6 +652,9 @@
             "medium",
             "high"
           ]
+        },
+        "assessmentBasis": {
+          "type": "string"
         }
       },
       "additionalProperties": true

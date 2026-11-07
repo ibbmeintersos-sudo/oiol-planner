@@ -231,7 +231,8 @@
       "mitigation": "Resolve the identity provider and claims contract before provider-specific planning.",
       "likelihood": 3,
       "impact": 4,
-      "confidence": "medium"
+      "confidence": "medium",
+      "assessmentBasis": "Preliminary assessment from the stated requirement and integration boundary; confirm during repository and stakeholder review."
     }
   ],
   "evidence": [
