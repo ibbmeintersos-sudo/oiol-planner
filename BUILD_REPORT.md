@@ -20,9 +20,9 @@ OIOL does not implement code, run project commands or tests, modify target repos
 
 ## Validation evidence
 
-The latest recorded CI run before the v0.4.1 hardening follow-up is [42344839047](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42344839047), which passed on Node.js 22 and 24 with 103 tests passing and no failures.
+The latest CI run is [42346433067](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42346433067). Both Node.js 22 and 24 jobs passed syntax checks and all 112 tests (112 passed, 0 failed).
 
-The v0.4.1 follow-up adds regression coverage for malformed plan structures and repository evidence fingerprints. Its CI result must be checked after the commit is pushed; this report does not claim that those new tests have already passed.
+The passing suite covers malformed plan structures, planning-only contract boundaries, evidence fingerprints, structured secret redaction, quality diagnostics, CLI validation, Markdown reporting, and benchmark tooling.
 
 ## Known limitations
 

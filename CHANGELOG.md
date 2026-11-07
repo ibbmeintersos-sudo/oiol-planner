@@ -10,8 +10,12 @@
 - Clarified the package description as planning-only.
 
 ### Validation
-- Added regression tests for malformed dependency data, malformed task entries, and source/excerpt provenance fingerprints.
-- CI for this follow-up is pending; no passing result is claimed here.
+- Added regression tests for malformed dependency data, malformed task entries, source/excerpt provenance fingerprints, and secret redaction.
+- Hardened redaction for quoted JSON keys, YAML-style assignments, bearer headers, GitHub/AWS/Slack token patterns, and private-key blocks. This remains heuristic defense-in-depth, not a guarantee that all secrets are detected.
+- Made scan truncation explicit with included-file counts and lower-bound metadata.
+- Added non-blocking plan-quality diagnostics for missing descriptions, acceptance criteria, component responsibilities, decision alternatives, mitigations, and clarification questions. These are review prompts, not an opaque quality score.
+- Added these diagnostics to generated plans, validation output, and Markdown reports.
+- CI run 42346433067 passed on Node.js 22 and 24: 112 tests passed, 0 failed.
 
 ## 0.4.0 — planning-only contract and quality foundations
 
