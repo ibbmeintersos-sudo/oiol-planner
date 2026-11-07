@@ -12,7 +12,8 @@
     "check": "find src scripts -type f -name '*.mjs' -print0 | xargs -0 -n1 node --check",
     "plan": "node src/cli.mjs",
     "smoke:opencode": "node scripts/opencode-smoke.mjs",
-    "benchmark:planner": "node scripts/run-planner-benchmark.mjs"
+    "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
+    "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs"
   },
   "license": "MIT"
 }
