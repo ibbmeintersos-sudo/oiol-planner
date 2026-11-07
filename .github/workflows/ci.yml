@@ -27,6 +27,8 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Static syntax checks
         run: npm run check
+      - name: Verify package, changelog, and schema release contracts
+        run: npm run release:check
       - name: Measure scanner fixture precision and recall
         run: npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
       - name: Unit and regression tests

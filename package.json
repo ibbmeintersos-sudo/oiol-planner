@@ -18,7 +18,8 @@
     "benchmark:compare": "node scripts/compare-benchmark-modes.mjs",
     "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs",
     "benchmark:series": "node scripts/run-benchmark-series.mjs",
-    "benchmark:scanner": "node scripts/run-scanner-accuracy-benchmark.mjs"
+    "benchmark:scanner": "node scripts/run-scanner-accuracy-benchmark.mjs",
+    "release:check": "node scripts/check-release.mjs"
   },
   "license": "MIT",
   "optionalDependencies": {
