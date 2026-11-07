@@ -21,22 +21,22 @@ try {
     try{
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(scenario.project);
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,plan});
-      console.log(`[${scenario.id}] ${plan.status} in ${Date.now()-started}ms`);
+      console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
     }catch(error){
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message}});
-      console.error(`[${scenario.id}] ERROR: ${error.message}`);
+      console.error('['+scenario.id+'] ERROR: '+error.message);
     }
   }
   const scores=records.map(record=>{const scenario=chosen.find(x=>x.id===record.scenarioId);return record.error?{scenarioId:record.scenarioId,category:scenario.category,difficulty:scenario.difficulty,score:0,blockers:[record.error.message]}:scoreScenario(scenario,record);});
   const summary=summarizeBenchmark(scores);
   const output={protocolVersion:'1.0',createdAt:new Date().toISOString(),provider:{name:process.env.OIOL_PROVIDER||'openai-compatible',model:process.env.OIOL_MODEL||'gpt-4o-mini'},reviewer:{name:process.env.OIOL_REVIEW_PROVIDER||process.env.OIOL_PROVIDER||'same-as-planner',model:process.env.OIOL_REVIEW_MODEL||process.env.OIOL_MODEL||'gpt-4o-mini'},summary,scores,records};
-  const out=path.resolve(arg('out',`benchmarks/results/run-${Date.now()}.json`));
+  const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
-  await fs.writeFile(out,JSON.stringify(output,null,2)+'\\n');
+  await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
   const csv=['scenario_id,category,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,evidence_notes'];
   for(const row of scores) csv.push([row.scenarioId,row.category,'','','','','','','','',''].join(','));
-  const humanPath=out.replace(/\\.json$/,'-human-review.csv');
-  await fs.writeFile(humanPath,csv.join('\\n')+'\\n');
+  const humanPath=out.replace(/\.json$/,'-human-review.csv');
+  await fs.writeFile(humanPath,csv.join('\n')+'\n');
   console.log(JSON.stringify({summary,resultFile:out,humanReviewFile:humanPath},null,2));
   if(summary.passCount!==summary.scenarioCount) process.exitCode=2;
-}catch(error){console.error(`Benchmark error: ${error.message}`);process.exitCode=1;}
+}catch(error){console.error('Benchmark error: '+error.message);process.exitCode=1;}
