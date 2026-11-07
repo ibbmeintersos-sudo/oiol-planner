@@ -58,7 +58,7 @@ test('OpenCode baseline runner dry-run validates config without contacting OpenC
   assert.equal(await baselineMain(),0);
   const result=JSON.parse(lines.at(-1));
   assert.equal(result.dryRun,true);
-  assert.equal(result.executionMode,'opencode-baseline');
+  assert.equal(result.benchmarkMode,'opencode-baseline');
   assert.deepEqual(result.selected,['GF-API-001']);
   assert.equal(result.liveCalls,false);
  }finally{

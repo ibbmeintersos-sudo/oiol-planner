@@ -15,6 +15,7 @@ test('paired comparison computes per-scenario and aggregate score deltas',()=>{
  assert.equal(result.medianScoreDelta,10);
  assert.deepEqual(result.scenarioResults.map(x=>x.delta),[5,15]);
  assert.equal(result.reviewerComparable,true);
+ assert.equal(compareBenchmarkModes(oi,{...base,reviewer:{provider:'anthropic',model:'other',baseUrl:'https://different.example'}}).reviewerComparable,false);
 });
 
 test('paired comparison rejects mismatched model or resource attestation keys',()=>{
