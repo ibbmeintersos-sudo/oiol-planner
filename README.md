@@ -64,7 +64,7 @@ Configuration is read from .env when supported by the Node runtime, or from shel
 
 ## Plan contract and validation
 
-The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). Every newly generated plan declares schemaVersion: "1.0.0".
+The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. Every newly generated plan declares schemaVersion: "1.0.0".
 
 Validate an existing plan without calling a model:
 

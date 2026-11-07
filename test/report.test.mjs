@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import { renderPlanMarkdown } from '../src/core/report.mjs';
 import { buildTraceability } from '../src/core/traceability.mjs';
 import { SCHEMA_VERSION, emptyPlan } from '../src/contracts/types.mjs';
+import { validatePlan } from '../src/core/validator.mjs';
 
 const plan = {
   schemaVersion: SCHEMA_VERSION,
@@ -52,4 +53,11 @@ test('published plan schema is draft 2020-12 and defines the planning contract',
   assert.equal(schema.properties.schemaVersion.const, SCHEMA_VERSION);
   assert.ok(schema.required.includes('dependencyGraph'));
   assert.ok(schema.required.includes('tasks'));
+});
+
+test('published example plan satisfies deterministic planning validation', async () => {
+  const example = JSON.parse(await fs.readFile(new URL('../examples/plan.v1.json', import.meta.url), 'utf8'));
+  const validation = validatePlan(example, example.project);
+  assert.equal(validation.valid, true, validation.errors.join('; '));
+  assert.equal(example.schemaVersion, SCHEMA_VERSION);
 });
