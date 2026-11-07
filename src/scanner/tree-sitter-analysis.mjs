@@ -42,7 +42,7 @@ function declaredName(node) {
   if (field) return nodeText(field);
   const candidate = node.namedChildren?.find(child => NAME_TYPES.has(child.type));
   if (candidate) return nodeText(candidate);
-  const match = nodeText(node).match(/^(?:export\\s+)?(?:default\\s+)?(?:async\\s+)?(?:function|class|interface|type|enum|struct|trait|mod|fn|def|fun|module|object)\\s+([\\w$]+)/);
+  const match = nodeText(node).match(/^(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function|class|interface|type|enum|struct|trait|mod|fn|def|fun|module|object)\s+([\w$]+)/);
   return match?.[1] || null;
 }
 
@@ -53,20 +53,20 @@ function importsFromNode(node, language) {
   if (language === 'javascript' || language === 'typescript' || language === 'tsx') {
     const source = node.childForFieldName?.('source');
     if (source) return [nodeText(source).replace(/^['"]|['"]$/g, '')];
-    if (node.type === 'export_statement') match = text.match(/\\bfrom\\s*['"]([^'"]+)['"]/);
-    else match = text.match(/(?:import\\s*)['"]([^'"]+)['"]/);
+    if (node.type === 'export_statement') match = text.match(/\bfrom\s*['"]([^'"]+)['"]/);
+    else match = text.match(/(?:import\s*)['"]([^'"]+)['"]/);
   } else if (language === 'python') {
-    match = text.match(/^from\\s+([.\\w]+)\\s+import\\b/) || text.match(/^import\\s+([\\w.]+)/);
+    match = text.match(/^from\s+([.\w]+)\s+import\b/) || text.match(/^import\s+([\w.]+)/);
   } else if (language === 'go') {
     match = text.match(/["']([^"']+)["']/);
   } else if (language === 'rust') {
-    match = text.match(/^(?:pub\\s+)?(?:use|mod)\\s+([\\w:]+)/);
+    match = text.match(/^(?:pub\s+)?(?:use|mod)\s+([\w:]+)/);
   } else if (language === 'java' || language === 'kotlin') {
-    match = text.match(/^import\\s+(?:static\\s+)?([\\w.*]+)/);
+    match = text.match(/^import\s+(?:static\s+)?([\w.*]+)/);
   } else if (language === 'php') {
-    match = text.match(/^use\\s+([\\w\\\\.]+)/);
+    match = text.match(/^use\s+([\w\\.]+)/);
   } else if (language === 'ruby') {
-    match = text.match(/\\b(?:require|require_relative)\\s*\\(?\\s*['"]([^'"]+)['"]/);
+    match = text.match(/\b(?:require|require_relative)\s*\(?\s*['"]([^'"]+)['"]/);
   }
   return match?.[1] ? [match[1]] : [];
 }
