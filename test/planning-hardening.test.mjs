@@ -121,5 +121,5 @@ test('Markdown report includes non-blocking plan quality diagnostics', () => {
   plan.evaluation = evaluatePlan(plan);
   const markdown = renderPlanMarkdown(plan);
   assert.match(markdown, /Non-blocking quality review signals/);
-  assert.match(markdown, /Tasks without descriptions: t1/);
+  assert.match(markdown, /Tasks without descriptions:\*\* t1/);
 });
