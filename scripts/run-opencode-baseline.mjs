@@ -3,14 +3,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
-import { OpenCodeClient } from '../adapters/opencode/client.mjs';
-import { runOpenCodeBaselineScenario } from './opencode-baseline.mjs';
-import { REVIEW_SYSTEM_PROMPT } from '../core/prompts.mjs';
-import { createProvider } from '../providers/index.mjs';
-import { validatePlan } from '../core/validator.mjs';
-import { scenarios } from '../../benchmarks/scenarios.mjs';
-import { scoreScenario, summarizeBenchmark } from '../../benchmarks/scoring.mjs';
-import { selectScenarios, resolveScenarioProject, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from '../../scripts/run-planner-benchmark.mjs';
+import { OpenCodeClient } from '../src/adapters/opencode/client.mjs';
+import { runOpenCodeBaselineScenario } from '../src/benchmark/opencode-baseline.mjs';
+import { REVIEW_SYSTEM_PROMPT } from '../src/core/prompts.mjs';
+import { createProvider } from '../src/providers/index.mjs';
+import { validatePlan } from '../src/core/validator.mjs';
+import { scenarios } from '../benchmarks/scenarios.mjs';
+import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
+import { selectScenarios, resolveScenarioProject, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
 
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
 function parseModelRef(value){
