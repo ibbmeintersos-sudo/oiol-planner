@@ -17,7 +17,7 @@ This benchmark is an evaluation harness, not a claim that OIOL is already high q
 | EX-SEC-009 | Existing Project | Tenant-scoped invoice authorization without response regressions |
 | AMB-PAY-010 | Ambiguous | Payment provider, markets, currencies, refunds, and disputes |
 
-The existing-project cases now point to checked-in, compact Node.js fixture repositories under `benchmarks/fixtures/`. The runner invokes the real repository scanner against those directories before planning; it does not pass the old hand-authored repository summary as if it were scan output. These fixtures are still small synthetic projects, not sanitized production repositories.
+The existing-project cases point to checked-in, compact Node.js fixture repositories under `benchmarks/fixtures/`. Both OIOL and OpenCode runners invoke the real repository scanner against those directories before planning and retain the resulting evidence IDs/fingerprints for scoring; scoring must validate against that actual scan output, not stale hand-authored scenario metadata. These fixtures are still small synthetic projects, not sanitized production repositories.
 
 ## Run
 
@@ -95,7 +95,7 @@ Do not commit API keys or private benchmark results containing sensitive reposit
 
 | Dimension | Weight | Evidence |
 |---|---:|---|
-| Structural validity | 25 | Existing deterministic plan validator |
+| Structural validity | 25 | Deterministic plan validator, including exact evidence-ID/source/fingerprint matching against the actual scanned project and schema validity when recorded |
 | Requirement signal coverage | 25 | Expected scenario concepts found in plan JSON |
 | Clarification discipline | 20 | Required blocking clarification appears for ambiguous cases; no unnecessary blocker for clear cases |
 | Acceptance criteria | 15 | At least two criteria per task reaches full credit |

@@ -9,6 +9,7 @@ import { runOpenCodeBaselineScenario } from '../benchmarks/opencode/baseline.mjs
 import { REVIEW_SYSTEM_PROMPT } from '../src/core/prompts.mjs';
 import { createProvider } from '../src/providers/index.mjs';
 import { validatePlan } from '../src/core/validator.mjs';
+import { validatePlanSchema } from '../src/core/schema-validator.mjs';
 import { scenarios } from '../benchmarks/scenarios.mjs';
 import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
 import { selectScenarios, resolveScenarioProject, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
@@ -41,12 +42,27 @@ function validateReview(review){
  return {...review,summary:typeof review.summary==='string'?review.summary:''};
 }
 async function attachReviewer(plan,project,reviewer,reviewConfig,modelRef,usage){
+ const semantic=validatePlan(plan,project);
+ const schemaValidation=await validatePlanSchema(plan);
+ const validation={
+  ...semantic,
+  valid:semantic.valid&&schemaValidation.valid,
+  errors:[...semantic.errors,...schemaValidation.errors.map(error=>'Schema: '+error)],
+  schemaValidation
+ };
+ plan.validation=validation;
+ if(!validation.valid){
+  plan.status='blocked';
+  plan.review={status:'needs_revision',summary:'Reviewer skipped because the baseline plan failed contract validation',findings:[],configurationDistinct:false,configurationDifference:[]};
+  return;
+ }
  if(!reviewer){
   plan.review={status:'needs_revision',summary:'No distinct reviewer configuration supplied for the OpenCode baseline',findings:[],configurationDistinct:false,configurationDifference:[]};
+  plan.status='needs_revision';
   return;
  }
  try{
-  const result=await reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation:validatePlan(plan,project)},null,2),temperature:0});
+  const result=await reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0});
   usage.reviewer.requests++;
   usage.reviewer.calls.push({model:result.model||reviewer.model||null,usage:result.usage||null});
   const review=validateReview(result.data);
@@ -57,8 +73,10 @@ async function attachReviewer(plan,project,reviewer,reviewConfig,modelRef,usage)
   plan.review={...review,configurationDistinct,configurationDifference:differences};
   if(review.status==='blocked'||review.findings.some(x=>x.severity==='critical'))plan.status='blocked';
   else if(review.status!=='approved'||review.findings.some(x=>x.severity==='high')||!configurationDistinct)plan.status='needs_revision';
+  else plan.status='ready_for_review';
  }catch(error){
   plan.review={status:'needs_revision',summary:'Reviewer request failed: '+error.message,findings:[],configurationDistinct:false,configurationDifference:[]};
+  plan.status='needs_revision';
  }
 }
 
@@ -88,7 +106,7 @@ export async function main(){
    usage.planner.calls.push({model:baseline.messageInfo?.model||baseConfig.modelRef?.modelID||null,usage:baseline.usage||null});
    await attachReviewer(plan,project,reviewer,reviewConfig,baseConfig.modelRef,usage);
    plan.providerUsage=usage;
-   record={scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git}:null,plan,cleanupWarning:baseline.cleanupWarning,diffCount:baseline.diffCount};
+   record={scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan,cleanupWarning:baseline.cleanupWarning,diffCount:baseline.diffCount};
   }catch(error){
    record={scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message,cleanupWarning:error.cleanupWarning||null}};
   }finally{

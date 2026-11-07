@@ -13,8 +13,20 @@ export function scoreScenario(scenario, result) {
   const clarificationRate=clarificationResults.length?clarificationResults.filter(x=>x.matched).length/clarificationResults.length:1;
   const blockingClarification=clarifications.some(q=>q?.blocking===true&&q?.resolved!==true);
   const clarificationPass=scenario.mustClarify?blockingClarification:!blockingClarification;
-  const validation=validatePlan(plan,scenario.project);
-  const tasks=Array.isArray(plan.tasks)?plan.tasks:[];
+  const validationProject=result?.projectEvidence?.evidence
+    ? {...(plan.project||scenario.project),evidence:result.projectEvidence.evidence}
+    : plan.project||scenario.project;
+  const semanticValidation=validatePlan(plan,validationProject);
+  const schemaValidation=plan.validation?.schemaValidation||null;
+  const schemaErrors=schemaValidation&&!schemaValidation.valid
+    ? (schemaValidation.errors||[]).map(error=>'Schema: '+error)
+    : [];
+  const validation={
+    ...semanticValidation,
+    valid:semanticValidation.valid&&(!schemaValidation||schemaValidation.valid),
+    errors:[...semanticValidation.errors,...schemaErrors]
+  };
+  const tasks=Array.isArray(plan.tasks)?plan.tasks.filter(task=>task&&typeof task==='object'&&!Array.isArray(task)):[];
   const criteria=tasks.reduce((n,t)=>n+(Array.isArray(t.acceptanceCriteria)?t.acceptanceCriteria.length:0),0);
   const tasksWithScope=tasks.filter(t=>Array.isArray(t.writeScope)&&t.writeScope.length>0).length;
   const scopeRate=tasks.length?tasksWithScope/tasks.length:0;
@@ -38,7 +50,7 @@ export function scoreScenario(scenario, result) {
   return {
     scenarioId:scenario.id,category:scenario.category,difficulty:scenario.difficulty,
     status:plan.status||'missing',score:Number(score.toFixed(2)),dimensions,weights,
-    validation:{valid:validation.valid,structurallyValid:unexpectedValidationErrors.length===0,errors:validation.errors,expectedGateErrors:expectedClarificationErrors,warnings:validation.warnings},
+    validation:{valid:validation.valid,structurallyValid:unexpectedValidationErrors.length===0,schemaValid:schemaValidation?.valid??null,errors:validation.errors,expectedGateErrors:expectedClarificationErrors,warnings:validation.warnings},
     requirementSignals:signalResults,clarificationSignals:clarificationResults,
     clarificationPass,blockingClarification,taskCount:tasks.length,acceptanceCriteriaCount:criteria,
     tasksWithWriteScope:tasksWithScope,

@@ -85,7 +85,7 @@ export async function main() {
     try{
       const project=await resolveScenarioProject(scenario);
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
-      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git}:null,plan});
+      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan});
       console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
     }catch(error){
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message}});

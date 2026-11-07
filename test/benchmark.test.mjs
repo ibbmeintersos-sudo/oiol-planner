@@ -35,3 +35,51 @@ test('benchmark summary reports median and category averages',()=>{
  assert.equal(result.medianScore,70);
  assert.equal(result.byCategory.greenfield.average,70);
 });
+
+test('benchmark scoring validates citations against the actual scanned project evidence, not stale scenario metadata', () => {
+  const evidence = {
+    id: 'REPO-0123456789ab', type: 'repository_file_excerpt',
+    description: 'Redacted source excerpt', source: 'src/service.mjs',
+    trustLevel: 'untrusted_repository_content',
+    sourceSha256: 'a'.repeat(64), excerptSha256: 'b'.repeat(64)
+  };
+  const existingScenario = {
+    ...scenario,
+    project: { kind: 'existing', evidence: [{ id: 'OLD-SCENARIO-ID', type: 'repository_file_excerpt', source: 'old/path.mjs' }] },
+    expectedSignals: [], clarificationSignals: [], mustClarify: false
+  };
+  const existingPlan = {
+    status: 'ready_for_review',
+    project: { kind: 'existing', evidence: [evidence] },
+    evidence: [{ ...evidence }],
+    requirements: [{ id: 'r1', statement: 'Expose the service' }],
+    architecture: { components: [{ id: 'c1', name: 'Service' }], decisions: [] },
+    tasks: [{ id: 't1', title: 'Define service', requirementIds: ['r1'], componentIds: ['c1'], dependencies: [], acceptanceCriteria: ['The service contract is documented'], writeScope: ['docs/service'] }],
+    dependencyGraph: { nodes: ['t1'], edges: [] }, risks: [], clarifications: [],
+    review: { configurationDistinct: true },
+    validation: { schemaValidation: { valid: true, errors: [] } }
+  };
+  const result = scoreScenario(existingScenario, {
+    plan: existingPlan,
+    projectEvidence: { evidence: [evidence] }
+  });
+  assert.equal(result.validation.valid, true);
+  assert.equal(result.validation.schemaValid, true);
+  assert.equal(result.blockers.length, 0);
+});
+
+test('benchmark scoring includes schema failures as structural blockers', () => {
+ const invalidPlan = {
+  ...plan,
+  validation: { schemaValidation: { valid: false, errors: ['$.status is required'] } }
+ };
+ const result = scoreScenario(scenario, { plan: invalidPlan });
+ assert.equal(result.validation.schemaValid, false);
+ assert.ok(result.blockers.some(error => error.includes('Schema: $.status is required')));
+});
+
+test('benchmark scoring remains safe when a task entry is malformed', () => {
+ const malformed = { ...plan, tasks: [null] };
+ assert.doesNotThrow(() => scoreScenario(scenario, { plan: malformed }));
+ assert.equal(scoreScenario(scenario, { plan: malformed }).taskCount, 0);
+});
