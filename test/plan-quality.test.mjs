@@ -66,6 +66,7 @@ test('missing quality sections are exposed as diagnostics without turning them i
   assert.ok(result.qualityDiagnostics.rollbackPlanMissingFields.length>0);
   assert.equal(result.qualityDiagnostics.unknownsNotReviewed,true);
   assert.deepEqual(result.qualityDiagnostics.risksWithoutEstimates,['r1']);
+  assert.deepEqual(result.qualityDiagnostics.risksWithoutConfidenceOrBasis,['r1']);
 });
 
 test('benchmark score contains the five P2 plan-quality dimensions',()=>{
@@ -97,6 +98,8 @@ test('risk quality reports confidence coverage and the basis used for an estimat
   assert.equal(quality.risks.estimatedCount,2);
   assert.equal(quality.risks.confidenceRatedCount,1);
   assert.equal(quality.risks.confidenceRate,0.5);
+  assert.equal(quality.risks.assessmentBasisCount,1);
+  assert.equal(quality.risks.assessmentBasisRate,0.5);
   assert.equal(quality.risks.exposure[0].assessmentBasis,'Single regional dependency.');
 });
 

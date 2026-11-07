@@ -44,7 +44,7 @@ export function renderPlanMarkdown(plan = {}) {
     '- **Rollback plan:** ' + (planQuality.rollback ? planQuality.rollback.applicability + ' (' + (planQuality.rollback.completeness * 100).toFixed(1) + '% complete)' : 'Not evaluated'),
     '- **Unknowns reviewed:** ' + (planQuality.unknowns ? (planQuality.unknowns.reviewed ? 'Yes' : 'No') + '; ' + planQuality.unknowns.count + ' recorded; ' + planQuality.unknowns.withResolutionCount + ' with resolution approach' : 'Not evaluated'),
     '- **Assumptions with validation approach:** ' + (planQuality.assumptions ? planQuality.assumptions.validatedCount + '/' + planQuality.assumptions.count : 'Not evaluated'),
-    '- **Risks with likelihood × impact estimates:** ' + (planQuality.risks ? planQuality.risks.estimatedCount + '/' + planQuality.risks.count : 'Not evaluated'),
+    '- **Risk estimates / confidence / assessment basis:** ' + (planQuality.risks ? planQuality.risks.estimatedCount + '/' + planQuality.risks.count + ' / ' + planQuality.risks.confidenceRatedCount + '/' + planQuality.risks.count + ' / ' + planQuality.risks.assessmentBasisCount + '/' + planQuality.risks.count : 'Not evaluated'),
     '- **Mean estimated risk exposure:** ' + (Number.isFinite(planQuality.risks?.meanExposure) ? planQuality.risks.meanExposure : 'Not recorded'),
     '- **High/critical estimated risks:** ' + (planQuality.risks?.highOrCriticalCount ?? 'Not recorded'), '',
     '*These metrics measure the completeness of planning evidence; they do not prove that implementation or verification has occurred.*', '',

@@ -45,7 +45,7 @@ export function scoreScenario(scenario, result) {
     testStrategy:planQuality.testStrategy.completeness,
     rollbackStrategy:planQuality.rollback.completeness,
     unknownsTransparency:planQuality.unknowns.transparency,
-    riskEstimation:planQuality.risks.estimatedRate*0.6+planQuality.risks.mitigationRate*0.25+planQuality.risks.confidenceRate*0.15
+    riskEstimation:planQuality.risks.estimatedRate*0.5+planQuality.risks.mitigationRate*0.15+planQuality.risks.confidenceRate*0.2+planQuality.risks.assessmentBasisRate*0.15
   };
   const weights={structuralValidity:20,requirementSignalCoverage:15,clarificationDiscipline:15,acceptanceCriteria:10,scopedTasks:5,reviewerConfigurationSeparation:5,nfrMeasurement:10,testStrategy:5,rollbackStrategy:5,unknownsTransparency:5,riskEstimation:5};
   const score=Object.entries(weights).reduce((sum,[key,weight])=>sum+dimensions[key]*weight,0);
