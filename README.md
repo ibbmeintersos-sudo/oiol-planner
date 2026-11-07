@@ -49,7 +49,7 @@ Supported providers:
 | Google Gemini | `gemini` | `generateContent` API |
 | Ollama | `ollama` | Local `/api/chat` endpoint |
 
-Configuration is read from `.env` when supported by the Node runtime, or from shell environment variables. `OIOL_TIMEOUT_MS` controls request timeout and `OIOL_MAX_RETRIES` controls bounded retry attempts (0–5). Do not commit `.env`.
+Configuration is read from `.env` when supported by the Node runtime, or from shell environment variables. `OIOL_TIMEOUT_MS` controls planning request timeout and `OIOL_MAX_RETRIES` controls bounded retry attempts (0–5). For an independent review gate, configure `OIOL_REVIEW_PROVIDER` and its optional model, base URL, API key, and timeout variables. If no distinct reviewer provider is configured, the planner may perform a same-provider critique, but the result is deliberately kept at `needs_revision`; self-review cannot certify readiness. A distinct reviewer provider returning `approved` with no high/critical findings can produce `ready_for_review`, which still requires human approval before execution. Do not commit `.env`.
 
 ## Output structure
 
