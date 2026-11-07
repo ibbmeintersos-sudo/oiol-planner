@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { scenarios } from '../benchmarks/scenarios.mjs';
-import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,6);
@@ -79,5 +79,18 @@ test('benchmark dry-run works without credentials and makes no provider calls',a
     if(previousKey===undefined) delete process.env.OIOL_API_KEY; else process.env.OIOL_API_KEY=previousKey;
     if(previousOptIn===undefined) delete process.env.OIOL_BENCHMARK_ALLOW_LIVE; else process.env.OIOL_BENCHMARK_ALLOW_LIVE=previousOptIn;
     console.log=previousLog;
+  }
+});
+
+test('Existing Project benchmark scenarios are analyzed from real fixture repositories',async()=>{
+  for(const scenario of scenarios.filter(x=>x.category==='existing')) {
+    const project=await resolveScenarioProject(scenario);
+    assert.equal(project.kind,'existing');
+    assert.ok(project.repository.fileCount>=5,scenario.id);
+    assert.ok(project.repository.manifests.some(x=>x.endsWith('package.json')),scenario.id);
+    assert.ok(project.repository.tests.length>0,scenario.id);
+    assert.ok(project.repository.snippets.some(x=>x.path.endsWith('.mjs')),scenario.id);
+    assert.ok(project.repository.context.length>0,scenario.id);
+    assert.equal(Object.hasOwn(project,'fixturePath'),false);
   }
 });
