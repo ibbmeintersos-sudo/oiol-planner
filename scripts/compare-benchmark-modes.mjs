@@ -27,10 +27,10 @@ export function compareBenchmarkModes(oiol,baseline){
  return {
   protocolVersion:'1.0',comparedAt:new Date().toISOString(),oiolRunId:oiol.runId,baselineRunId:baseline.runId,
   comparisonKey:oiol.comparisonKey,budgetKey:oiol.budgetKey,scenarioCount:rows.length,
-  oiOLAverageScore:oiol.summary?.averageScore??avg(rows.map(x=>x.oiolScore)),
+  oiolAverageScore:oiol.summary?.averageScore??avg(rows.map(x=>x.oiolScore)),
   baselineAverageScore:baseline.summary?.averageScore??avg(rows.map(x=>x.baselineScore)),
   averageScoreDelta:avg(deltas),medianScoreDelta:median(deltas),
-  oiOLPassCount:oiol.summary?.passCount??null,baselinePassCount:baseline.summary?.passCount??null,
+  oiolPassCount:oiol.summary?.passCount??null,baselinePassCount:baseline.summary?.passCount??null,
   reviewerComparable,scenarioResults:rows,
   interpretation:'Positive delta means OIOL scored higher on this automated rubric. This is not evidence of superiority without repeated paired runs and blinded human review.',
   limitations:['comparisonKey and budgetKey are operator attestations, not independently verified hardware/model-budget measurements.','Reviewer configurations differ; this comparison is not fully apples-to-apples until reviewer settings are aligned.','Automated lexical scoring can reward keyword inclusion and cannot establish technical correctness.','Use at least three paired runs and human review before drawing conclusions.']
