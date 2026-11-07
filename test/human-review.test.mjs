@@ -74,5 +74,5 @@ test('human review CLI aggregates the complete benchmark suite from reviewer CSV
     assert.equal(report.reviewCount,scenarios.length*2);
     assert.equal(report.completeReviewerCoverage,true);
     assert.equal(report.certificationReady,true);
-  }finally{await rm(root,{recursive:true,force:true});}
+  }finally{await rm(root,{recursive:true,force:true,maxRetries:10,retryDelay:100});}
 });

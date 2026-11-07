@@ -30,7 +30,7 @@ test('CLI validates an existing plan without provider credentials', async () => 
     assert.equal(result.status, 0, result.stderr);
     assert.equal(JSON.parse(result.stdout).validation.valid, true);
     assert.ok(JSON.parse(result.stdout).evaluation.qualityDiagnostics);
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
 });
 
 test('CLI renders Markdown from an existing plan without provider credentials', async () => {
@@ -42,7 +42,7 @@ test('CLI renders Markdown from an existing plan without provider credentials', 
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /# Engineering Plan/);
     assert.match(result.stdout, /Define endpoint contract/);
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
 });
 
 test('CLI returns a validation failure for an invalid plan', async () => {
@@ -55,7 +55,7 @@ test('CLI returns a validation failure for an invalid plan', async () => {
     const result = spawnSync(process.execPath, [cli, '--validate', file], { encoding: 'utf8', env: { PATH: process.env.PATH } });
     assert.equal(result.status, 2);
     assert.equal(JSON.parse(result.stdout).validation.valid, false);
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
 });
 
 test('CLI rejects a plan that violates the published schema even when semantic checks pass', async () => {
@@ -71,7 +71,7 @@ test('CLI rejects a plan that violates the published schema even when semantic c
     assert.equal(output.validation.schemaValidation.valid, false);
     assert.equal(output.status, 'blocked');
     assert.ok(output.validation.errors.some(error => error.includes('status')));
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
 });
 
 test('CLI returns a structured validation failure for a null JSON document', async () => {
@@ -84,5 +84,5 @@ test('CLI returns a structured validation failure for a null JSON document', asy
     const output = JSON.parse(result.stdout);
     assert.equal(output.status, 'blocked');
     assert.equal(output.validation.valid, false);
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
 });
