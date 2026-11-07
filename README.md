@@ -145,6 +145,14 @@ OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
 
 The runner writes a JSON result and a blank human-review CSV under `benchmarks/results/` (ignored by Git). Use `npm run benchmark:planner -- --list` to list the catalog or `npm run benchmark:planner -- --scenarios GF-API-001,EX-API-003 --dry-run` to validate selection and inspect configuration without making provider calls. Unknown and duplicate scenario IDs are rejected. Each result records a configuration fingerprint and explicitly labels same-provider review as non-independent. Provider-reported token usage is aggregated when available; pricing is deliberately not estimated because provider rates vary and are not configured. The automated rubric is a screening heuristic; certification still requires independent human review and repeated runs. No benchmark result or superiority claim is made until the live suite has actually been run.
 
+The suite now scans checked-in Existing Project fixture repositories through the actual repository analyzer. Repeat-run aggregation is available through `npm run benchmark:aggregate -- --inputs run-1.json,run-2.json,run-3.json`.
+
+An OpenCode-only baseline runner is also available. It uses the configured OpenCode `plan` agent, a disposable copy of each fixture, and a post-run diff check:
+```bash
+OIOL_OPENCODE_MODEL=providerID/modelID OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:opencode -- --scenarios all
+```
+The baseline prompt prohibits implementation; any detected file change fails the scenario and the temporary workspace is removed. This is not a sandbox, so configure the OpenCode agent with read-only permissions. Paired reports can be created with `npm run benchmark:compare -- --oiol oiol.json --baseline baseline.json`, then aggregated with `npm run benchmark:compare:aggregate -- --inputs pair-1.json,pair-2.json,pair-3.json`. The comparison requires matching, explicitly declared comparison and budget keys. These keys are operator attestations, not proof of identical execution resources. No live provider or OpenCode baseline run has yet been completed.
+
 ## License
 
 MIT
