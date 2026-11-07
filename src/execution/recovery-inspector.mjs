@@ -6,13 +6,16 @@ export function inspectExecutionRun(events,{expectedPlanId,expectedPlanFingerpri
   if(typeof runId!=='string'||!runId) throw new Error('Run event stream has no valid runId');
   const states=new Map();
   const attempts=new Map();
-  let planId=null,planFingerprint=null,taskCount=null,finished=false,runStatus=null;
+  let planId=null,planFingerprint=null,taskCount=null,taskIds=null,finished=false,runStatus=null;
+  const eventIds=new Set();
 
   for(let index=0;index<events.length;index++) {
     const event=events[index];
     if(!event||typeof event!=='object'||event.runId!==runId) throw new Error(`Invalid run event at position ${index+1}: runId mismatch`);
     if(event.sequence!==index+1) throw new Error(`Invalid run event sequence at position ${index+1}: expected ${index+1}`);
     if(typeof event.eventId!=='string'||!event.eventId||typeof event.type!=='string'||typeof event.at!=='string'||!Number.isFinite(Date.parse(event.at))) throw new Error(`Invalid run event metadata at sequence ${event.sequence}`);
+    if(eventIds.has(event.eventId)) throw new Error(`Duplicate eventId in run event stream: ${event.eventId}`);
+    eventIds.add(event.eventId);
     if(finished) throw new Error('Run event stream contains events after run.finished');
 
     if(index===0) {
@@ -22,6 +25,10 @@ export function inspectExecutionRun(events,{expectedPlanId,expectedPlanFingerpri
       planId=event.planId;
       planFingerprint=event.planFingerprint;
       taskCount=event.taskCount;
+      if(event.taskIds!==undefined) {
+        if(!Array.isArray(event.taskIds)||event.taskIds.length!==taskCount||event.taskIds.some(taskId=>typeof taskId!=='string'||!taskId)||new Set(event.taskIds).size!==event.taskIds.length) throw new Error('Run event stream has an invalid taskIds ledger');
+        taskIds=new Set(event.taskIds);
+      }
       if(expectedPlanId!==undefined&&expectedPlanId!==planId) throw new Error('Run event planId does not match the expected plan');
       if(expectedPlanFingerprint!==undefined&&expectedPlanFingerprint!==planFingerprint) throw new Error('Run event fingerprint does not match the expected plan revision');
       continue;
@@ -38,6 +45,7 @@ export function inspectExecutionRun(events,{expectedPlanId,expectedPlanFingerpri
 
     const taskId=event.taskId;
     if(typeof taskId!=='string'||!taskId) throw new Error(`Task event at sequence ${event.sequence} has no taskId`);
+    if(taskIds&&!taskIds.has(taskId)) throw new Error(`Task event references unknown taskId: ${taskId}`);
     const current=states.get(taskId)?.status;
     if(event.type==='task.ready') {
       if(current!==undefined) throw new Error(`Task ${taskId} received task.ready more than once`);
