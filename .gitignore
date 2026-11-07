@@ -7,3 +7,6 @@ coverage/
 *.log
 *.tmp
 .plan-cache/
+
+# Benchmark outputs may contain private repository context or provider metadata
+benchmarks/results/

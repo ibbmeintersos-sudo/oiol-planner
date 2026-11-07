@@ -1,13 +1,54 @@
 import { safePath, isObject } from './utils.mjs';
+import { CONTRACT_VERSION, SCHEMA_VERSION, PLAN_STATUSES } from '../contracts/types.mjs';
 import { dependencyEdgesFromTasks, canonicalEdgeKey, topologicalWaves } from './graph.mjs';
 export function validatePlan(plan, project={}) {
   const errors=[], warnings=[];
   if(!isObject(plan)) return result(['Plan must be a JSON object'],warnings,0,0,null);
+  if(plan.schemaVersion && plan.schemaVersion!==SCHEMA_VERSION) errors.push('Unsupported plan schemaVersion: '+plan.schemaVersion);
+  if(plan.schemaVersion && plan.contractVersion!==CONTRACT_VERSION) errors.push('Unsupported or missing contractVersion: '+String(plan.contractVersion));
+  if(!plan.schemaVersion) warnings.push('Legacy plan has no schemaVersion; validate it against the published schema before external handoff');
+  if(plan.status && !PLAN_STATUSES.includes(plan.status)) errors.push('Unsupported plan status: '+plan.status);
+  for (const field of ['execution', 'executionState', 'executionRun', 'runId', 'executionId']) {
+    if (Object.hasOwn(plan, field)) errors.push('Planning-only contract forbids execution field: ' + field);
+  }
   if(!Array.isArray(plan.requirements)) errors.push('Plan requirements must be an array');
   if(!isObject(plan.architecture)||!Array.isArray(plan.architecture.components)) errors.push('Plan architecture.components must be an array');
   if(!Array.isArray(plan.tasks)) errors.push('Plan tasks must be an array');
   if(!isObject(plan.dependencyGraph)||!Array.isArray(plan.dependencyGraph.nodes)||!Array.isArray(plan.dependencyGraph.edges)) errors.push('Plan dependencyGraph.nodes and edges must be arrays');
   if(errors.length) return result(errors,warnings,0,Array.isArray(plan.tasks)?plan.tasks.length:0,null);
+
+  if(plan.evidence!==undefined) {
+    if(!Array.isArray(plan.evidence)) errors.push('Plan evidence must be an array');
+    else {
+      const knownEvidence=new Map((Array.isArray(project.evidence)?project.evidence:[])
+        .filter(item=>isObject(item)&&typeof item.id==='string')
+        .map(item=>[item.id,item]));
+      const seenEvidence=new Set();
+      for(const item of plan.evidence) {
+        if(!isObject(item)) { errors.push('Evidence entry must be an object'); continue; }
+        if(typeof item.id!=='string'||!item.id.trim()) errors.push('Evidence entry is missing a valid id');
+        else if(seenEvidence.has(item.id)) errors.push('Duplicate evidence id: '+item.id);
+        else seenEvidence.add(item.id);
+        if(typeof item.source!=='string'||!item.source.trim()) errors.push('Evidence '+(item.id||'unspecified')+' is missing a source');
+        if(knownEvidence.size&&typeof item.id==='string') {
+          const known=knownEvidence.get(item.id);
+          if(!known) errors.push('Evidence '+item.id+' is not present in the supplied project evidence');
+          else {
+            if(item.source!==known.source) errors.push('Evidence '+item.id+' source does not match the supplied project evidence');
+            const citedSourceHash=item.sourceSha256||item.sha256;
+            const knownSourceHash=known.sourceSha256||known.sha256;
+            if(known.type==='repository_file_excerpt') {
+              if(!item.sourceSha256||item.sourceSha256!==knownSourceHash) errors.push('Evidence '+item.id+' must preserve the exact source fingerprint');
+              if(!item.excerptSha256||item.excerptSha256!==known.excerptSha256) errors.push('Evidence '+item.id+' must preserve the exact excerpt fingerprint');
+            } else if(citedSourceHash&&knownSourceHash&&citedSourceHash!==knownSourceHash) errors.push('Evidence '+item.id+' source fingerprint does not match the supplied project evidence');
+            if(item.excerptSha256&&known.excerptSha256&&item.excerptSha256!==known.excerptSha256) errors.push('Evidence '+item.id+' excerpt fingerprint does not match the supplied project evidence');
+          }
+        }
+      }
+    }
+  } else if(project.kind==='existing'&&Array.isArray(project.evidence)&&project.evidence.some(item=>item?.type==='repository_file_excerpt')) {
+    warnings.push('Existing-repository plan has no explicit evidence citations; repository-derived claims should cite supplied evidence IDs');
+  }
   const reqs=plan.requirements,tasks=plan.tasks,comps=plan.architecture.components;
   const unique=(items,label)=>{const seen=new Set();for(const item of items){if(!isObject(item)||typeof item.id!=='string'||!item.id.trim())errors.push(`${label} is missing a valid id`);else if(seen.has(item.id))errors.push(`Duplicate ${label} id: ${item.id}`);else seen.add(item.id);}};
   unique(reqs,'requirement'); unique(tasks,'task'); unique(comps,'component');
@@ -15,11 +56,32 @@ export function validatePlan(plan, project={}) {
   for(const task of tasks) {
     if(!isObject(task)){errors.push('Task entry must be an object');continue;}
     if(typeof task.title!=='string'||!task.title.trim()) errors.push(`Task ${task.id} has no title`);
+    for (const field of ['status', 'execution', 'executionState', 'executionRun', 'executionId', 'runId', 'runStatus', 'runState', 'executionStatus', 'startedAt', 'finishedAt', 'completedAt', 'attempt', 'attempts', 'retryCount', 'result', 'lastError', 'logs', 'workerId', 'agentId', 'leaseId', 'actualDuration', 'verified', 'verificationStatus']) {
+      if (Object.hasOwn(task, field)) errors.push(`Task ${task.id} contains execution-state field: ${field}`);
+    }
     for(const field of ['requirementIds','componentIds','dependencies','acceptanceCriteria','writeScope']) if(!Array.isArray(task[field])) errors.push(`Task ${task.id}.${field} must be an array`);
     if(!Array.isArray(task.acceptanceCriteria)||!task.acceptanceCriteria.length||task.acceptanceCriteria.some(x=>typeof x!=='string'||!x.trim())) errors.push(`Task ${task.id} must have non-empty string acceptance criteria`);
     for(const req of Array.isArray(task.requirementIds)?task.requirementIds:[]) {if(!reqIds.has(req))errors.push(`Task ${task.id} references unknown requirement ${req}`);else covered.add(req);}
     for(const comp of Array.isArray(task.componentIds)?task.componentIds:[]) if(!compIds.has(comp)) errors.push(`Task ${task.id} references unknown component ${comp}`);
-    for(const dep of Array.isArray(task.dependencies)?task.dependencies:[]) if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
+    const taskDependencies=Array.isArray(task.dependencies)?task.dependencies:[];
+    if(new Set(taskDependencies).size!==taskDependencies.length) errors.push(`Task ${task.id} contains duplicate dependencies`);
+    for(const dep of taskDependencies) {
+      const producer=tasks.find(candidate=>candidate?.id===dep);
+      if(!taskIds.has(dep)) errors.push(`Task ${task.id} has unknown dependency ${dep}`);
+
+    }
+    if(task.outputs!==undefined&&(!Array.isArray(task.outputs)||task.outputs.some(output=>!(typeof output==='string'&&output.trim())&&!(isObject(output)&&typeof output.name==='string'&&output.name.trim())))) errors.push(`Task ${task.id}.outputs must contain named strings or objects`);
+    if(task.inputs!==undefined&&!Array.isArray(task.inputs)) errors.push(`Task ${task.id}.inputs must be an array`);
+    for(const input of Array.isArray(task.inputs)?task.inputs:[]) {
+      if(!isObject(input)||typeof input.fromTaskId!=='string'||!input.fromTaskId.trim()||typeof input.outputName!=='string'||!input.outputName.trim()) {
+        errors.push(`Task ${task.id} has an invalid input contract; fromTaskId and outputName are required`);
+        continue;
+      }
+      if(!Array.isArray(task.dependencies)||!task.dependencies.includes(input.fromTaskId)) errors.push(`Task ${task.id} input ${input.outputName} references ${input.fromTaskId}, which is not a declared dependency`);
+      const producer=tasks.find(candidate=>candidate?.id===input.fromTaskId);
+      const outputs=(Array.isArray(producer?.outputs)?producer.outputs:[]).map(output=>typeof output==='string'?output:output?.name).filter(Boolean);
+      if(!producer||!outputs.includes(input.outputName)) errors.push(`Task ${task.id} input ${input.outputName} references an output not declared by ${input.fromTaskId}`);
+    }
     for(const scope of Array.isArray(task.writeScope)?task.writeScope:[]) if(!safePath(scope)) errors.push(`Unsafe or invalid write scope in ${task.id}: ${scope}`);
     if(task.verification?.command&&/\b(rm\s+-rf|format\s+c:|del\s+\/s|DROP\s+DATABASE)\b/i.test(task.verification.command)) errors.push(`Destructive verification command in ${task.id}`);
   }
@@ -31,13 +93,16 @@ export function validatePlan(plan, project={}) {
   if(actualNodes.length!==expectedNodes.length||actualNodes.some((x,i)=>x!==expectedNodes[i])) errors.push('Dependency graph nodes do not exactly match task IDs');
   for(const edge of graph.edges) {
     if(!isObject(edge)||!taskIds.has(edge.from)||!taskIds.has(edge.to)) errors.push(`Dependency edge references unknown task: ${edge?.from} -> ${edge?.to}`);
-    else if(edge.type&&edge.type!=='finish_to_start') errors.push(`Unsupported dependency edge type: ${edge.type}`);
+    else if(edge.type!=='finish_to_start') errors.push(`Dependency edge ${edge.from} -> ${edge.to} must declare type finish_to_start`);
   }
   const schedule=topologicalWaves(tasks,expected);
   if(schedule.cycle) errors.push(`Dependency graph contains a cycle: ${schedule.remaining.join(', ')}`);
   if(schedule.error) errors.push(`Dependency scheduler error: ${schedule.error}`);
-  if((plan.clarifications||[]).some(x=>x?.blocking&&!x?.resolved)) warnings.push('Unresolved blocking clarifications remain');
-  if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; execution must preserve them');
+  for(const clarification of (Array.isArray(plan.clarifications)?plan.clarifications:[])) {
+    if(!isObject(clarification)) { errors.push('Clarification entry must be an object'); continue; }
+    if(clarification.blocking===true && clarification.resolved!==true) errors.push(`Unresolved blocking clarification: ${String(clarification.question||clarification.id||'unspecified')}`);
+  }
+  if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; the plan must explicitly account for them and avoid unrelated overwrites');
   if(!tasks.length) errors.push('Plan contains no tasks');
   return result(errors,warnings,reqs.length?covered.size/reqs.length:1,tasks.length,schedule);
 }

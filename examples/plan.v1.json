@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractVersion": "1.0",
+  "id": "sample_api_plan_v1",
+  "status": "needs_revision",
+  "summary": "A small example plan demonstrating requirement traceability, explicit task outputs, and a dependency graph.",
+  "project": {
+    "kind": "greenfield",
+    "name": "Sample Inventory API",
+    "request": "Design a small inventory API with item lookup and stock adjustment."
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Clients can retrieve an inventory item by its identifier.",
+      "priority": "high",
+      "category": "functional",
+      "acceptanceCriteria": [
+        "A known item returns its identifier, name, and available quantity.",
+        "An unknown item produces the documented not-found response."
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Stock adjustments preserve an auditable reason and quantity delta.",
+      "priority": "high",
+      "category": "business_rule",
+      "acceptanceCriteria": [
+        "Each adjustment records item, delta, reason, actor reference, and timestamp.",
+        "Invalid adjustments are rejected according to the documented quantity rules."
+      ]
+    }
+  ],
+  "assumptions": [
+    "The API is consumed by authenticated internal applications."
+  ],
+  "unknowns": [
+    "The identity provider and authorization claims have not yet been selected."
+  ],
+  "constraints": [
+    "Raw credentials must not be included in the plan or repository."
+  ],
+  "architecture": {
+    "components": [
+      {
+        "id": "CMP-API",
+        "name": "Inventory API",
+        "responsibilities": [
+          "Expose item lookup and stock adjustment contracts.",
+          "Validate request data and map domain outcomes to API responses."
+        ],
+        "interfaces": [
+          {
+            "name": "Inventory HTTP API",
+            "protocol": "HTTPS",
+            "format": "JSON"
+          }
+        ]
+      }
+    ],
+    "decisions": [
+      {
+        "decision": "Keep stock adjustment rules in a domain service.",
+        "reason": "The rules should not be duplicated across transport handlers.",
+        "alternatives": [
+          "Implement rules directly in route handlers"
+        ]
+      }
+    ],
+    "dataFlows": [
+      {
+        "from": "Authenticated client",
+        "to": "Inventory API",
+        "description": "Request and response exchange over the documented API."
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Define inventory API contracts",
+      "description": "Specify lookup and stock-adjustment request/response contracts.",
+      "requirementIds": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "componentIds": [
+        "CMP-API"
+      ],
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "The contract defines success, validation, and not-found response shapes.",
+        "The stock-adjustment schema requires a reason and quantity delta."
+      ],
+      "writeScope": [
+        "docs/api"
+      ],
+      "outputs": [
+        {
+          "name": "inventory-api-contract",
+          "type": "openapi",
+          "path": "docs/api/inventory.yaml"
+        }
+      ]
+    },
+    {
+      "id": "TASK-002",
+      "title": "Design inventory domain rules",
+      "description": "Document quantity validation and adjustment invariants against the API contract.",
+      "requirementIds": [
+        "REQ-002"
+      ],
+      "componentIds": [
+        "CMP-API"
+      ],
+      "dependencies": [
+        "TASK-001"
+      ],
+      "acceptanceCriteria": [
+        "The domain rules define allowed and rejected adjustment cases.",
+        "Every rule is traceable to REQ-002."
+      ],
+      "writeScope": [
+        "docs/domain"
+      ],
+      "outputs": [
+        "inventory-domain-rules"
+      ],
+      "inputs": [
+        {
+          "fromTaskId": "TASK-001",
+          "outputName": "inventory-api-contract"
+        }
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "title": "Specify API acceptance scenarios",
+      "description": "Map contract and domain rules to observable acceptance scenarios.",
+      "requirementIds": [
+        "REQ-001",
+        "REQ-002"
+      ],
+      "componentIds": [
+        "CMP-API"
+      ],
+      "dependencies": [
+        "TASK-001",
+        "TASK-002"
+      ],
+      "acceptanceCriteria": [
+        "Scenarios cover known and unknown item lookup.",
+        "Scenarios cover valid and invalid stock adjustments."
+      ],
+      "writeScope": [
+        "docs/acceptance"
+      ],
+      "outputs": [
+        "inventory-acceptance-scenarios"
+      ],
+      "inputs": [
+        {
+          "fromTaskId": "TASK-001",
+          "outputName": "inventory-api-contract"
+        },
+        {
+          "fromTaskId": "TASK-002",
+          "outputName": "inventory-domain-rules"
+        }
+      ]
+    }
+  ],
+  "dependencyGraph": {
+    "nodes": [
+      "TASK-001",
+      "TASK-002",
+      "TASK-003"
+    ],
+    "edges": [
+      {
+        "from": "TASK-001",
+        "to": "TASK-002",
+        "type": "finish_to_start"
+      },
+      {
+        "from": "TASK-001",
+        "to": "TASK-003",
+        "type": "finish_to_start"
+      },
+      {
+        "from": "TASK-002",
+        "to": "TASK-003",
+        "type": "finish_to_start"
+      }
+    ]
+  },
+  "risks": [
+    {
+      "id": "RISK-001",
+      "severity": "medium",
+      "description": "Unspecified identity provider may affect authentication integration design.",
+      "mitigation": "Resolve the identity provider and claims contract before provider-specific planning."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-001",
+      "type": "user_request",
+      "description": "Inventory API request supplied for this example.",
+      "source": "user",
+      "trustLevel": "user_requirement"
+    }
+  ],
+  "clarifications": [
+    {
+      "id": "Q-001",
+      "question": "Which identity provider and authorization claims should the API use?",
+      "blocking": false,
+      "resolved": false
+    }
+  ],
+  "review": null,
+  "metadata": {
+    "createdAt": "2026-11-07T00:00:00.000Z",
+    "example": true
+  }
+}
