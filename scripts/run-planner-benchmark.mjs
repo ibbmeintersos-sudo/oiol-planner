@@ -110,7 +110,7 @@ export async function main() {
     const {review,providerUsage,validation,...blindPlan}=record.plan;
     const reviewPlanFile=path.join(reviewPlanDir,record.scenarioId+'.json');
     await fs.writeFile(reviewPlanFile,JSON.stringify(blindPlan,null,2)+'\n');
-    reviewPlanByScenario.set(record.scenarioId,reviewPlanFile);
+    reviewPlanByScenario.set(record.scenarioId,path.relative(path.dirname(out),reviewPlanFile).split(path.sep).join('/'));
   }
   const csvCell=value=>'"'+String(value??'').replaceAll('"','""')+'"';
   const csv=['scenario_id,category,run_id,plan_file,reviewer_slot,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
