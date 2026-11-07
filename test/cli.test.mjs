@@ -86,3 +86,43 @@ test('CLI returns a structured validation failure for a null JSON document', asy
     assert.equal(output.validation.valid, false);
   } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
 });
+
+
+test('CLI exports a GitHub Issues preview without credentials or network calls', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-cli-github-preview-'));
+  try {
+    const file = path.join(root, 'plan.json');
+    await writeFile(file, JSON.stringify(validPlan));
+    const result = spawnSync(process.execPath, [cli, '--export', 'github-issues', '--input', file, '--owner', 'example-owner', '--repo', 'example-repo'], { encoding: 'utf8', env: { PATH: process.env.PATH } });
+    assert.equal(result.status, 0, result.stderr);
+    const preview = JSON.parse(result.stdout);
+    assert.equal(preview.adapter, 'github-issues');
+    assert.equal(preview.previewOnly, true);
+    assert.equal(preview.issues.length, 1);
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
+});
+
+test('CLI exports a Linear preview without credentials or network calls', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-cli-linear-preview-'));
+  try {
+    const file = path.join(root, 'plan.json');
+    await writeFile(file, JSON.stringify(validPlan));
+    const result = spawnSync(process.execPath, [cli, '--export', 'linear', '--input', file, '--team-id', 'team-uuid'], { encoding: 'utf8', env: { PATH: process.env.PATH } });
+    assert.equal(result.status, 0, result.stderr);
+    const preview = JSON.parse(result.stdout);
+    assert.equal(preview.adapter, 'linear');
+    assert.equal(preview.previewOnly, true);
+    assert.equal(preview.issues[0].payload.teamId, 'team-uuid');
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
+});
+
+test('CLI publishing is explicit and fails closed without external credentials', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-cli-publish-optin-'));
+  try {
+    const file = path.join(root, 'plan.json');
+    await writeFile(file, JSON.stringify(validPlan));
+    const result = spawnSync(process.execPath, [cli, '--export', 'github-issues', '--input', file, '--owner', 'example-owner', '--repo', 'example-repo', '--publish'], { encoding: 'utf8', env: { PATH: process.env.PATH } });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /GitHub token is required/);
+  } finally { await rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
+});
