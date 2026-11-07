@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://oiol.dev/schemas/plan-1.0.0.schema.json",
+  "$id": "urn:oiol:schemas:plan:1.0.0",
   "title": "OIOL Engineering Plan",
   "description": "Portable planning artifact. It describes proposed engineering work and does not represent execution state.",
   "type": "object",

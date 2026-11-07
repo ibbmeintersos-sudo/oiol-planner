@@ -52,11 +52,10 @@ function parseScore(value,label,optional=false){
   if(!Number.isInteger(score)||score<1||score>5)throw new Error(label+' must be an integer from 1 to 5');
   return score;
 }
-function parseBoolean(value,label){
-  const normalized=String(value??'').trim().toLowerCase();
-  if(['yes','true','1'].includes(normalized))return true;
-  if(['no','false','0'].includes(normalized))return false;
-  throw new Error(label+' must be yes or no');
+function parseSeverity(value,label){
+  const severity=String(value??'').trim().toLowerCase();
+  if(['none','low','medium','high','critical'].includes(severity))return severity;
+  throw new Error(label+' must be none, low, medium, high, or critical');
 }
 
 export function aggregateHumanReviews(rows,expectedScenarioIds=scenarios.map(item=>item.id)){
@@ -73,13 +72,13 @@ export function aggregateHumanReviews(rows,expectedScenarioIds=scenarios.map(ite
     unique.add(key);
     const scores={};
     for(const dimension of DIMENSIONS)scores[dimension]=parseScore(row[dimension],dimension);
-    const criticalFinding=parseBoolean(row.critical_finding_yes_no,'critical_finding_yes_no');
+    const highestFindingSeverity=parseSeverity(row.highest_finding_severity,'highest_finding_severity');
     const evidenceNotes=String(row.evidence_notes||'').trim();
     if(!evidenceNotes)throw new Error('Evidence notes are required for '+scenarioId+' / '+reviewerId);
     const adjudicated=parseScore(row.adjudicated_overall_1_5,'adjudicated_overall_1_5',true);
     const adjudicationNotes=String(row.adjudication_notes||'').trim();
     if(adjudicated!==null&&!adjudicationNotes)throw new Error('Adjudication notes are required when an adjudicated score is supplied');
-    const entry={scenarioId,reviewerId,scores,criticalFinding,evidenceNotes,adjudicated,adjudicationNotes};
+    const entry={scenarioId,reviewerId,scores,highestFindingSeverity,evidenceNotes,adjudicated,adjudicationNotes};
     const list=grouped.get(scenarioId)||[];
     list.push(entry);grouped.set(scenarioId,list);
   }
@@ -98,19 +97,21 @@ export function aggregateHumanReviews(rows,expectedScenarioIds=scenarios.map(ite
       dimensionMedians,
       overallMedian:overall,
       rawOverallSpread:spread,
-      criticalFinding:reviews.some(review=>review.criticalFinding),
+      highestFindingSeverity:reviews.reduce((highest,review)=>['none','low','medium','high','critical'].indexOf(review.highestFindingSeverity)>['none','low','medium','high','critical'].indexOf(highest)?review.highestFindingSeverity:highest,'none'),
       disagreementUnresolved,
       adjudication:adjudication?{score:adjudication.adjudicated,notes:adjudication.adjudicationNotes}:null
     };
   });
   const covered=scenarioResults.filter(item=>item.reviewerCount>=2).length;
   const unresolvedDisagreements=scenarioResults.filter(item=>item.disagreementUnresolved).map(item=>item.scenarioId);
-  const criticalScenarios=scenarioResults.filter(item=>item.criticalFinding).map(item=>item.scenarioId);
+  const criticalScenarios=scenarioResults.filter(item=>item.highestFindingSeverity==='critical').map(item=>item.scenarioId);
+  const highSeverityScenarios=scenarioResults.filter(item=>item.highestFindingSeverity==='high').map(item=>item.scenarioId);
+  const blockingFindingScenarios=scenarioResults.filter(item=>['high','critical'].includes(item.highestFindingSeverity)).map(item=>item.scenarioId);
   const overallScores=scenarioResults.map(item=>item.overallMedian).filter(Number.isFinite);
   const minimumScenarioScore=overallScores.length?Math.min(...overallScores):null;
   const overallMedian=median(overallScores);
   const allCovered=scenarioResults.length===expectedScenarioIds.length&&covered===expectedScenarioIds.length;
-  const certificationReady=allCovered&&unresolvedDisagreements.length===0&&criticalScenarios.length===0&&overallMedian!==null&&overallMedian>=4&&minimumScenarioScore>=3;
+  const certificationReady=allCovered&&unresolvedDisagreements.length===0&&blockingFindingScenarios.length===0&&overallMedian!==null&&overallMedian>=4&&minimumScenarioScore>=3;
   return {
     protocolVersion:'1.0',
     reviewCount:rows.length,
@@ -124,7 +125,7 @@ export function aggregateHumanReviews(rows,expectedScenarioIds=scenarios.map(ite
     scenarioResults,
     certificationReady,
     decision:certificationReady?'human_review_gate_passed':'human_review_gate_not_met',
-    limitations:['Scores are human-entered and depend on reviewer calibration.','A critical finding blocks certification regardless of average score.','Disagreements with an overall score spread of 2 or more require a documented adjudicated score.']
+    limitations:['Scores are human-entered and depend on reviewer calibration.','A high or critical finding blocks certification regardless of average score.','Disagreements with an overall score spread of 2 or more require a documented adjudicated score.']
   };
 }
 

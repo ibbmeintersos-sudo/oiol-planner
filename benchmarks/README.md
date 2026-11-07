@@ -126,7 +126,7 @@ Resolve reviewer disagreements by recording both original scores and an adjudica
 
     npm run benchmark:human-review -- --inputs reviewer-a.csv,reviewer-b.csv --out benchmarks/results/human-review-aggregate.json
 
-The aggregator requires two distinct reviewers per scenario, evidence notes, and a documented adjudication when overall scores differ by 2 or more points. Any critical finding blocks the human-review gate regardless of averages.
+The aggregator requires two distinct reviewers per scenario, evidence notes, and a documented adjudication when overall scores differ by 2 or more points. Any high or critical finding blocks the human-review gate regardless of averages.
 
 ## Certification decision
 
