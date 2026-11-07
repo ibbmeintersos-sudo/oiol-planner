@@ -200,12 +200,12 @@ test('JSONL event store discards only a torn final record and remains appendable
   try{
     const file=path.join(directory,'events.jsonl');
     const first={eventId:'e1',runId:'torn',sequence:1,type:'run.started',at:new Date().toISOString()};
-    await writeFile(file,JSON.stringify(first)+'\\n'+ '{"eventId":"e2","runId":"torn","sequence":2,"type":"task.started"', 'utf8');
+    await writeFile(file,JSON.stringify(first)+'\n'+ '{"eventId":"e2","runId":"torn","sequence":2,"type":"task.started"', 'utf8');
     const store=new JsonlEventStore(file);
     assert.deepEqual((await store.read('torn')).map(event=>event.eventId),['e1']);
     await store.append({eventId:'e2-recovered',runId:'torn',sequence:2,type:'task.started',at:new Date().toISOString()});
     assert.deepEqual((await store.read('torn')).map(event=>event.sequence),[1,2]);
-    assert.ok((await readFile(file,'utf8')).endsWith('\\n'));
+    assert.ok((await readFile(file,'utf8')).endsWith('\n'));
   }finally{await rm(directory,{recursive:true,force:true});}
 });
 
@@ -213,7 +213,7 @@ test('JSONL event store still rejects a malformed complete record',async()=>{
   const directory=await mkdtemp(path.join(os.tmpdir(),'oiol-events-malformed-'));
   try{
     const file=path.join(directory,'events.jsonl');
-    await writeFile(file,'{not-json}\\n','utf8');
+    await writeFile(file,'{not-json}\n','utf8');
     const store=new JsonlEventStore(file);
     await assert.rejects(()=>store.read('bad'),/Corrupt event log at line 1/);
   }finally{await rm(directory,{recursive:true,force:true});}
