@@ -98,7 +98,7 @@ export async function main() {
   const summary=summarizeBenchmark(scores);
   const comparisonKey=process.env.OIOL_BENCHMARK_COMPARISON_KEY||null,budgetKey=process.env.OIOL_BENCHMARK_BUDGET_KEY||null;
   const runId=createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16);
-  const output={protocolVersion:'1.2',runnerVersion:'1.2.0',benchmarkMode:'oiol',comparisonKey,budgetKey,runId,createdAt:new Date().toISOString(),maxRepairRounds,configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.2',benchmarkMode:'oiol',comparisonKey,budgetKey,maxRepairRounds,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
+  const output={protocolVersion:'1.3',runnerVersion:'1.3.0',benchmarkMode:'oiol',comparisonKey,budgetKey,runId,createdAt:new Date().toISOString(),maxRepairRounds,configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.2',benchmarkMode:'oiol',comparisonKey,budgetKey,maxRepairRounds,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
@@ -113,10 +113,10 @@ export async function main() {
     reviewPlanByScenario.set(record.scenarioId,path.relative(path.dirname(out),reviewPlanFile).split(path.sep).join('/'));
   }
   const csvCell=value=>'"'+String(value??'').replaceAll('"','""')+'"';
-  const csv=['scenario_id,category,run_id,plan_file,reviewer_slot,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
+  const csv=['scenario_id,category,run_id,plan_file,reviewer_slot,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,nfr_coverage_1_5,test_strategy_1_5,rollback_strategy_1_5,unknowns_transparency_1_5,risk_estimation_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
   for(const row of scores) {
     const reviewPlanFile=reviewPlanByScenario.get(row.scenarioId)||'';
-    for(const reviewerSlot of [1,2]) csv.push([row.scenarioId,row.category,runId,reviewPlanFile,reviewerSlot,...Array(12).fill('')].map(csvCell).join(','));
+    for(const reviewerSlot of [1,2]) csv.push([row.scenarioId,row.category,runId,reviewPlanFile,reviewerSlot,...Array(17).fill('')].map(csvCell).join(','));
   }
   const humanPath=out.replace(/\.json$/,'-human-review.csv');
   await fs.writeFile(humanPath,csv.join('\n')+'\n');

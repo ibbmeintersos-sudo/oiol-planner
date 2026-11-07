@@ -11,6 +11,11 @@ const DIMENSIONS = [
   'acceptance_criteria_1_5',
   'scope_and_safety_1_5',
   'clarification_quality_1_5',
+  'nfr_coverage_1_5',
+  'test_strategy_1_5',
+  'rollback_strategy_1_5',
+  'unknowns_transparency_1_5',
+  'risk_estimation_1_5',
   'overall_1_5'
 ];
 
@@ -156,7 +161,7 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
     blockingFindingScenarios.length === 0 && overallMedian !== null && overallMedian >= 4 && minimumScenarioScore >= 3;
 
   return {
-    protocolVersion: '1.1',
+    protocolVersion: '1.2',
     reviewCount: rows.length,
     runCount: runIds.length,
     expectedRunIds: runIds,
