@@ -23,6 +23,7 @@ test('OpenCode baseline creates a read-only planning session and always cleans i
  const client={
   async createSession(title){calls.push(['create',title]);return {id:'session-1'};},
   async prompt(id,parts,options){calls.push(['prompt',id,options.agent,options.model]);assert.match(parts[0].text,/Do not modify files/);return {info:{role:'assistant',id:'message-1'},parts:[{type:'text',text:JSON.stringify(validPlan)}]};},
+  async getSessionDiff(){return [];},
   async deleteSession(id){calls.push(['delete',id]);}
  };
  const result=await runOpenCodeBaselineScenario({client,scenario,agent:'plan',model:{providerID:'test',modelID:'model'}});
@@ -37,6 +38,7 @@ test('OpenCode baseline deletes a session even when the model returns invalid JS
  const client={
   async createSession(){return {id:'session-2'};},
   async prompt(){return {info:{role:'assistant'},parts:[{type:'text',text:'not JSON'}]};},
+  async getSessionDiff(){return [];},
   async deleteSession(){deleted=true;}
  };
  await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/valid JSON plan/);
@@ -63,4 +65,16 @@ test('OpenCode baseline runner dry-run validates config without contacting OpenC
   if(previousOptIn===undefined)delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;else process.env.OIOL_BENCHMARK_ALLOW_LIVE=previousOptIn;
   console.log=previousLog;
  }
+});
+
+test('OpenCode baseline rejects any file changes despite read-only prompt',async()=>{
+ let deleted=false;
+ const client={
+  async createSession(){return {id:'session-3'};},
+  async prompt(){return {info:{role:'assistant'},parts:[{type:'text',text:JSON.stringify(validPlan)}]};},
+  async getSessionDiff(){return [{file:'src/unauthorized.mjs'}];},
+  async deleteSession(){deleted=true;}
+ };
+ await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/violated its read-only contract/);
+ assert.equal(deleted,true);
 });
