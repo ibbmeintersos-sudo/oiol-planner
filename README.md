@@ -134,6 +134,17 @@ npm test
 
 CI workflow: `.github/workflows/ci.yml`.
 
+
+## Planner quality benchmark
+
+A six-scenario starter benchmark covers Greenfield, Existing Project, multi-component design, and ambiguous requirements. Read the [benchmark protocol](benchmarks/README.md), configure planning/reviewer providers, then explicitly opt in to live provider calls:
+
+```bash
+OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
+```
+
+The runner writes a JSON result and a blank human-review CSV under `benchmarks/results/` (ignored by Git). The automated rubric is a screening heuristic; certification still requires independent human review and repeated runs. No benchmark result or superiority claim is made until the live suite has actually been run.
+
 ## License
 
 MIT
