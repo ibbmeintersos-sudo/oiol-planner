@@ -4,6 +4,8 @@ const marker = (planId, taskId) => '<!-- OIOL_PLAN:' + planId + ':TASK:' + taskI
 
 function assertPlan(plan) {
   if (!plan || typeof plan !== 'object' || Array.isArray(plan)) throw new Error('A plan JSON object is required');
+  if (plan.status === 'blocked') throw new Error('Blocked plans cannot be exported to Linear');
+  if (plan.validation?.valid === false) throw new Error('Plans with failed validation cannot be exported to Linear');
   if (!asText(plan.id)) throw new Error('Plan id is required for an external handoff');
   if (!Array.isArray(plan.tasks) || plan.tasks.length === 0) throw new Error('The plan must contain at least one task');
   const ids = new Set();

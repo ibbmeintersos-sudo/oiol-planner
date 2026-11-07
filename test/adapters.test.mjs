@@ -122,3 +122,36 @@ test('adapters reject execution-state data instead of exporting execution record
   assert.throws(()=>mapPlanToGitHubIssues(invalid,{owner:'o',repo:'r'}),/execution-state field/);
   assert.throws(()=>mapPlanToLinearIssues(invalid,{teamId:'t'}),/execution-state field/);
 });
+
+
+test('GitHub adapter reports already-created issues if a later issue request fails',async()=>{
+  let calls=0;
+  await assert.rejects(
+    ()=>publishGitHubIssues(plan,{owner:'example-owner',repo:'customer-api',token:'test-token',publish:true,fetchImpl:async()=>{
+      calls++;
+      if(calls===1) return {ok:true,status:201,json:async()=>({number:1,title:'First',html_url:'https://github.com/example-owner/customer-api/issues/1'})};
+      return {ok:false,status:422,json:async()=>({message:'Validation failed'})};
+    }}),
+    error=>error.partialPublish===true&&error.publishedIssues.length===1&&error.publishedIssues[0].number===1
+  );
+});
+
+test('Linear adapter reports already-created issues if a later mutation fails',async()=>{
+  let calls=0;
+  await assert.rejects(
+    ()=>publishLinearIssues(plan,{teamId:'team-uuid',token:'linear-test-key',publish:true,fetchImpl:async(url,options)=>{
+      calls++;
+      if(calls===1) {
+        const input=JSON.parse(options.body).variables.input;
+        return {ok:true,status:200,json:async()=>({data:{issueCreate:{success:true,issue:{id:'first-id',identifier:'ENG-1',title:input.title,url:'https://linear.app/acme/issue/ENG-1'}}}})};
+      }
+      return {ok:true,status:200,json:async()=>({errors:[{message:'Second issue rejected'}]})};
+    }}),
+    error=>error.partialPublish===true&&error.publishedIssues.length===1&&error.publishedIssues[0].identifier==='ENG-1'
+  );
+});
+
+test('blocked plans and plans with failed validation cannot be exported',()=>{
+  assert.throws(()=>mapPlanToGitHubIssues({...plan,status:'blocked'},{owner:'o',repo:'r'}),/Blocked plans/);
+  assert.throws(()=>mapPlanToLinearIssues({...plan,validation:{valid:false}},{teamId:'t'}),/failed validation/);
+});

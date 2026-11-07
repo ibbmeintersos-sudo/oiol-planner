@@ -164,6 +164,15 @@ async function main() {
   if (plan.status === 'blocked' || !validation?.valid) process.exitCode = 2;
 }
 main().catch(error => {
-  console.error('OIOL error: ' + error.message);
+  if (Array.isArray(error.publishedIssues) && error.publishedIssues.length) {
+    console.error(JSON.stringify({
+      error: error.message,
+      partialPublish: true,
+      publishedIssues: error.publishedIssues,
+      guidance: 'Some issues were created before the failure. Review these references before retrying to avoid duplicates.'
+    }, null, 2));
+  } else {
+    console.error('OIOL error: ' + error.message);
+  }
   process.exitCode = 1;
 });
