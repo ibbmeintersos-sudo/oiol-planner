@@ -1,4 +1,4 @@
-import { isObject, redact } from '../core/utils.mjs';
+import { isObject, redact, safePath } from '../core/utils.mjs';
 
 export class OpenCodeTaskRunner {
   constructor({client,verifyTask,agent,model,taskTimeoutMs=600000,maxDependencyContextChars=12000}={}) {
@@ -37,6 +37,7 @@ export class OpenCodeTaskRunner {
       const assistantText=message.parts.filter(part=>part?.type==='text'&&typeof part.text==='string').map(part=>part.text).join('\n');
       const diff=await this.client.getSessionDiff(sessionId,{signal:controller.signal,timeoutMs:remaining()});
       if(!Array.isArray(diff)) throw new Error('OpenCode returned an invalid session diff');
+      assertDiffWithinWriteScope(diff,task.writeScope||[]);
       return {sessionId,messageId:message.info.id||null,assistantText,diff,parts:message.parts};
     } catch(error) {
       if(sessionId&&typeof this.client.abortSession==='function') {
@@ -81,4 +82,20 @@ function buildTaskPrompt(task,dependencyResults,maxChars) {
     '',
     'At completion, report the implementation summary, files changed, checks actually performed, unresolved risks, and any acceptance criteria that remain unverified.'
   ].join('\n');
+}
+
+function assertDiffWithinWriteScope(diff,writeScope) {
+  if(!Array.isArray(writeScope)) throw new Error('Task writeScope must be an array');
+  const scopes=writeScope.map(scope=>String(scope).replaceAll('\\\\','/').replace(/\\/$/,''));
+  const violations=[];
+  for(const item of diff) {
+    if(!isObject(item)||typeof item.file!=='string'||!safePath(item.file)) {
+      violations.push('[invalid diff path]');
+      continue;
+    }
+    const file=item.file.replaceAll('\\\\','/');
+    const allowed=scopes.some(scope=>safePath(scope)&&(file===scope||file.startsWith(scope+'/')));
+    if(!allowed) violations.push(file);
+  }
+  if(violations.length) throw new Error(`OpenCode changed files outside the task write scope: ${violations.slice(0,20).join(', ')}`);
 }
