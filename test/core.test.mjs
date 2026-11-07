@@ -14,7 +14,7 @@ test('dependency cycle is detected',()=>{const p=structuredClone(base);p.tasks.p
 test('topological waves respect dependencies',()=>{const r=topologicalWaves([{id:'a'},{id:'b'},{id:'c'}],[{from:'a',to:'c'}]);assert.deepEqual(r.waves[0],['a','b']);assert.deepEqual(r.waves[1],['c']);});
 test('write scopes serialize overlapping work',()=>{const r=topologicalWaves([{id:'a',writeScope:['src']},{id:'b',writeScope:['src/auth']}]);assert.equal(r.waves.length,2);});
 test('revision detects added and changed tasks',()=>{const n=structuredClone(base);n.tasks[0].title='Improve login';n.tasks.push({id:'t2'});const r=comparePlans(base,n);assert.deepEqual(r.modified,['t1']);assert.deepEqual(r.new,['t2']);});
-test('traceability distinguishes mapped from verified',()=>{const t=buildTraceability(base);assert.equal(t.mappingCoverage,1);assert.equal(t.verificationComplete,false);});
+test('traceability reports planned requirement mapping without execution verification',()=>{const t=buildTraceability(base);assert.equal(t.mappingCoverage,1);assert.equal(t.rows[0].status,'mapped');assert.equal('verificationComplete' in t,false);});
 test('evaluation exposes conflict pairs',()=>{const p=structuredClone(base);p.tasks.push({id:'t2',title:'other',acceptanceCriteria:['ok'],writeScope:['src/auth']});assert.deepEqual(evaluatePlan(p).metrics.concurrentWriteConflictPairs,[['t1','t2']]);});
 
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';

@@ -1,157 +1,127 @@
-# OIOL Planner
+# OIOL — Intelligent Engineering Planning System
 
-**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.3.0**
+OIOL turns a software goal into a reviewable, structured engineering plan. Its product is the plan: requirement understanding, repository analysis, architecture, task decomposition, dependencies, acceptance criteria, risk analysis, and traceability.
 
-OIOL is a hybrid planning and human-gated execution layer intended to sit above OpenCode. It turns a software request into a structured plan, validates it deterministically, then can coordinate approved tasks through an injected runner.
+**OIOL is a planning system. It does not implement tasks, run project commands, modify the target repository, verify completed implementation, or manage execution state.** The generated plan is handed to a human or an external implementation tool such as OpenCode.
 
- > OIOL does not perform unreviewed autonomous changes. Execution requires an explicit approval bound to the exact plan revision and a separate task-verification callback. The OpenCode runner can delegate implementation to an OpenCode server.
+## What OIOL produces
 
-## Design principles
+- Structured requirements, priorities, assumptions, unknowns, and clarifying questions.
+- Existing-repository context based on bounded, read-only scanning.
+- Architecture components, design decisions, alternatives, and rationale.
+- Small, scoped tasks with requirement/component links and explicit dependencies.
+- Acceptance criteria that describe observable outcomes.
+- A dependency graph and suggested planning waves.
+- Risks, constraints, evidence references, and requirement-to-task traceability.
+- Deterministic structural validation and a portable JSON contract.
+- A human-readable Markdown engineering-plan report.
 
-- Keep OpenCode Core untouched; integrate through a thin HTTP adapter.
-- Support both greenfield and existing repositories.
-- Use an LLM for understanding and planning, deterministic code for validation and scheduling.
-- Treat repository content as untrusted context. Do not execute project scripts during scanning.
-- No automatic plan approval. A review result of `approved` yields `ready_for_review`, not execution authorization.
-- Preserve user changes and expose uncertainty rather than inventing repository facts.
+## Product boundary
+
+| OIOL responsibility | Outside OIOL |
+|---|---|
+| Understand and analyze the request | Implementing source-code changes |
+| Inspect repository structure and selected evidence read-only | Running tests, builds, scripts, or shell commands |
+| Design and justify architecture | Applying migrations or deployments |
+| Decompose work and define dependencies | Scheduling or executing implementation tasks |
+| Define acceptance criteria and planned test strategy | Claiming tests passed or work was verified |
+| Validate plan structure and internal consistency | Managing worktrees, commits, merges, retries, or recovery |
+| Export a handoff artifact | Controlling the receiving implementation tool |
+
+A task's write scope, dependencies, outputs, and acceptance criteria are planning interfaces. They describe intended work for the recipient; they are not execution permissions or enforcement mechanisms inside OIOL.
 
 ## Requirements
 
-- Node.js 22 or newer (the package engine requirement is `>=22`).
+- Node.js 22 or newer.
 - An LLM provider endpoint for plan generation. Ollama can be used locally.
 - No runtime npm dependencies in this preview.
 
 ## Quick start
 
-```bash
-cp .env.example .env
-# Edit .env and set OIOL_API_KEY / provider configuration
-npm test
-node src/cli.mjs --mode greenfield --name "Inventory Service" \
-  --request "Build an inventory API with products, stock adjustments, and audit history" \
-  --out plan.json
-```
+    cp .env.example .env
+    # Configure provider settings in .env
+    npm test
+    node src/cli.mjs --mode greenfield --name "Inventory Service" \
+      --request "Design an inventory API with products, stock adjustments, and audit history" \
+      --out plan.json
 
 Existing repository:
 
-```bash
-node src/cli.mjs --mode existing --repo /path/to/repository \
-  --request "Add role-based access control without breaking existing API behavior" \
-  --out plan.json
-```
+    node src/cli.mjs --mode existing --repo /path/to/repository \
+      --request "Plan role-based access control without breaking existing API behavior" \
+      --format md --out engineering-plan.md
 
 Supported providers:
 
-| Provider | `OIOL_PROVIDER` | Notes |
+| Provider | OIOL_PROVIDER | Notes |
 |---|---|---|
-| OpenAI-compatible | `openai-compatible` | Default; configurable base URL |
-| Anthropic | `anthropic` | Messages API |
-| Google Gemini | `gemini` | `generateContent` API |
-| Ollama | `ollama` | Local `/api/chat` endpoint |
+| OpenAI-compatible | openai-compatible | Default; configurable base URL |
+| Anthropic | anthropic | Messages API |
+| Google Gemini | gemini | generateContent API |
+| Ollama | ollama | Local /api/chat endpoint |
 
-Configuration is read from `.env` when supported by the Node runtime, or from shell environment variables. `OIOL_TIMEOUT_MS` controls planning request timeout and `OIOL_MAX_RETRIES` controls bounded retry attempts (0–5). For an independent review gate, configure `OIOL_REVIEW_PROVIDER` and its optional model, base URL, API key, and timeout variables. If no distinct reviewer provider is configured, the planner may perform a same-provider critique, but the result is deliberately kept at `needs_revision`; self-review cannot certify readiness. A distinct reviewer provider returning `approved` with no high/critical findings can produce `ready_for_review`, which still requires human approval before execution. Do not commit `.env`.
+Configuration is read from .env when supported by the Node runtime, or from shell environment variables. For a separate reviewer, configure OIOL_REVIEW_PROVIDER and optional reviewer model, base URL, API key, and timeout variables. A same-provider critique cannot certify readiness. A distinct reviewer approval can move a structurally valid plan to ready_for_review; this means ready for human review, not implementation authorization or evidence of implementation.
 
-## Output structure
+## Plan contract and validation
 
-The JSON plan contains:
+The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). Every newly generated plan declares schemaVersion: "1.0.0".
 
-- `project`: greenfield or existing-project context and scan evidence.
-- `requirements`: uniquely identified requirements and priorities.
-- `architecture`: components and decisions.
-- `tasks`: scoped tasks, requirement/component references, dependencies, acceptance criteria, and write scopes.
-- `dependencyGraph`: finish-to-start edges and topological execution waves.
-- `risks`, `clarifications`, `review`, and deterministic `validation`.
-- `evaluation`: transparent metrics rather than one opaque score.
-- `taskInterfaces`: derived task inputs, outputs and consumers.
-- `traceability`: planned mapping separated from actual verification completion.
+Validate an existing plan without calling a model:
 
-## Existing repository scanner
+    node src/cli.mjs --validate plan.json
 
-The scanner collects Git branch/commit/dirty state, bounded working-tree file candidates, manifests, scripts, test/config paths and a bounded source context. Discovery stops at the configured file/depth limits rather than enumerating the entire tree first. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies basic secret redaction. File/import mapping is intentionally heuristic in this preview; it is not a full AST or semantic index.
+Produce a review report from an existing plan:
 
-The scanner does **not** run package scripts, tests, build commands, hooks, or arbitrary code from the target repository.
+    node src/cli.mjs --validate plan.json --format md --out engineering-plan.md
 
-## OpenCode adapter
+The CLI deterministic validator checks requirement coverage, unique IDs, task/component references, safe relative write-scope syntax, dependency graph consistency, cycles, and unresolved blocking clarifications. It is a semantic consistency layer for planning artifacts; it is not a full JSON Schema implementation. Consumers that require formal contract validation should validate against schemas/plan.schema.json with a Draft 2020-12 compliant JSON Schema validator as well.
 
-`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval, prompting, aborting and reading diffs. It validates the base URL, supports configurable Basic Auth, propagates cancellation, bounds request duration, encodes session IDs, and rejects malformed responses. Configure the client with an absolute `directory` path to route every API request to the intended repository through OpenCode's `x-opencode-directory` header; omitting it falls back to the server's default working directory. `OpenCodeTaskRunner` uses this client to create one session per task and collect its response and diff.
+## Human-readable report
 
-## Validation and scheduling
+Use --format md when generating a plan, or combine --validate with --format md to render an existing JSON plan. The report includes executive summary, requirements, architecture, task table, dependencies, scopes, acceptance criteria, suggested planning waves, risks, open clarifications, requirement traceability, and validation findings.
 
-The deterministic validator enforces the plan structure, unique IDs, requirement coverage, valid task/component references, safe relative write scopes, exact agreement between task dependencies and graph edges/nodes, supported edge types, and cycle-free scheduling. Missing requirement coverage is a blocking error. The scheduler builds deterministic topological waves and conservatively serializes tasks whose write scopes overlap. It does not prove semantic independence of tasks.
+The report explicitly distinguishes planned work from completed or verified work.
 
-## Execution orchestration preview
+## Existing repository analysis
 
-The execution package is a separate orchestration core. It does not execute shell commands itself; callers must inject a runner implementing `execute(task, context)` and `verify(task, result, context)`.
+The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
 
-Before execution, the engine requires:
+File/import mapping is heuristic in this version. OIOL does not yet provide a complete AST-based symbol index or semantic dependency graph. Repository claims should be grounded in scanner evidence; absence from the bounded scan is not proof that a file, dependency, or behavior does not exist.
 
-- A plan with status `ready_for_review` that passes deterministic validation.
-- An explicit approval object bound to the exact plan fingerprint, approver and timestamp.
-- An explicit event store. `JsonlEventStore` persists append-only events with restrictive file permissions and validates the event schema plus strictly increasing per-run sequence numbers; `InMemoryEventStore` is for tests and ephemeral use. The JSONL implementation is a single-process, single-writer store, not a distributed lock or multi-process transaction coordinator. On initialization it discards an invalid, non-newline-terminated final fragment as a torn append, while malformed newline-terminated records remain hard errors; this is crash-tail repair, not tamper-proof audit storage.
+Repository text is untrusted input. Prompt-injection patterns and secret redaction require further hardening; neither should be treated as a security boundary.
 
-Execution uses validated dependency waves, bounded concurrency, dependency-scoped task outputs, verification gates, fail-fast as an option, cancellation signaling and stable per-task idempotency keys. Automatic retries default to **zero** because repeating a task can duplicate side effects. Enabling execution retries requires `runner.idempotent === true`, and an error is retried only when the configured `retryOn(error, task, context)` policy returns `true` (default: `error.retryable === true`). A stable idempotency key is supplied, but the engine cannot prove that an external runner actually honors it.
+## Planning quality benchmark
 
-The run-start event now records the exact planned task-ID ledger (in addition to its count); the recovery inspector checks that subsequent task events refer only to those IDs and rejects duplicate event IDs within a run. Older event logs without the optional `taskIds` field remain inspectable, but do not receive this stronger membership check. The JSONL store is intentionally single-process/single-writer: sharing one file between multiple Node processes is not safe.
+The ten-scenario benchmark covers Greenfield, Existing Project, multi-component architecture, and ambiguous requirements. Read benchmarks/README.md.
 
-Recovery is deliberately not automatic. `engine.inspectRun(runId)` (also exported as `inspectExecutionRun()`) replays a validated event stream and reports completed, failed, blocked, skipped, not-started, and uncertain tasks without resuming anything. Reusing a run ID is rejected, and a process interruption after a side effect but before its completion event can leave the task outcome uncertain. The event log is not an exactly-once guarantee. A future recovery manager must reconcile uncertain tasks with the runner before retrying.
+List scenarios or validate a selection without provider calls:
 
-The OpenCode runner is covered by fake-transport contract tests, but it has not yet been tested against a live OpenCode server.
-### OpenCode runner
+    npm run benchmark:planner -- --list
+    npm run benchmark:planner -- --scenarios GF-API-001,EX-API-003 --dry-run
 
-`OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, applies a configurable task timeout (10 minutes by default), aborts failed sessions when possible, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
+Live planning benchmark calls can incur provider charges and require explicit opt-in:
 
-Live API smoke test (requires a running OpenCode server and an absolute project path):
-```bash
-OIOL_OPENCODE_DIRECTORY=/absolute/path/to/repository npm run smoke:opencode
-```
-Optional settings: `OIOL_OPENCODE_URL`, `OIOL_OPENCODE_USERNAME`, and `OIOL_OPENCODE_PASSWORD`. The smoke test checks server health, creates a temporary session, reads it back, and deletes it; it does not send a prompt or modify project files. This test must be run against the actual OpenCode server before claiming live integration.
+    OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
 
-The OpenCode server operates against the project directory in which `opencode serve` is started. The server adapter follows the documented `/session` and `/session/:id/message` API shape; session creation sends a title, and prompts use typed `parts`. The runner currently does not isolate tasks in Git worktrees, so it declares itself non-concurrency-safe and the engine serializes its tasks. Do not enable parallel writes until a tested worktree adapter exists.
-## Security notes
+The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. No live provider quality score or superiority claim is made until those experiments have actually been completed.
 
-- Never put credentials in project prompts or repository files.
-- Repository text is untrusted input and may contain prompt injection.
-- Redaction is heuristic and cannot guarantee removal of all secrets.
-- Review all generated plans before execution.
-- The planner does not modify the scanned repository.
-
-## Current limitations
-
-- Provider contract tests exercise request/response shapes and retry behavior through fake HTTP transports. No live provider request with real credentials has been run.
-- OpenCode adapter and task runner have fake-transport contract tests; no live OpenCode server end-to-end test is included.
-- No AST-based import graph, Git worktree isolation, worker recovery manager, merge coordinator, or exactly-once recovery.
-- No baseline benchmark against stock OpenCode has yet been run. Performance or quality superiority is not claimed.
-- Provider review can be unavailable; in that case the plan remains `needs_revision`.
-- Provider and OpenCode tests use fake HTTP transports; live API/server compatibility still needs environment-backed integration tests.
-- This is an engineering preview, not a production-ready autonomous development platform.
+An OpenCode planning-only baseline adapter and paired comparison scripts are available for evaluation. They are benchmark tooling, not OIOL execution features. Configure the receiving OpenCode plan agent with read-only permissions; the adapter's diff check is not a sandbox.
 
 ## Development
 
-```bash
-npm run check
-npm test
-```
+    npm run check
+    npm test
 
-CI workflow: `.github/workflows/ci.yml`.
+CI tests Node.js 22 and 24.
 
+## Current limitations
 
-## Planner quality benchmark
-
-A ten-scenario starter benchmark covers Greenfield, Existing Project, multi-component design, and ambiguous requirements. Read the [benchmark protocol](benchmarks/README.md), configure planning/reviewer providers, then explicitly opt in to live provider calls:
-
-```bash
-OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
-```
-
-The runner writes a JSON result and a blank human-review CSV under `benchmarks/results/` (ignored by Git). Use `npm run benchmark:planner -- --list` to list the catalog or `npm run benchmark:planner -- --scenarios GF-API-001,EX-API-003 --dry-run` to validate selection and inspect configuration without making provider calls. Unknown and duplicate scenario IDs are rejected. Each result records a configuration fingerprint and explicitly labels same-provider review as non-independent. Provider-reported token usage is aggregated when available; pricing is deliberately not estimated because provider rates vary and are not configured. The automated rubric is a screening heuristic; certification still requires independent human review and repeated runs. No benchmark result or superiority claim is made until the live suite has actually been run.
-
-The suite now scans checked-in Existing Project fixture repositories through the actual repository analyzer. Repeat-run aggregation is available through `npm run benchmark:aggregate -- --inputs run-1.json,run-2.json,run-3.json`.
-
-An OpenCode-only baseline runner is also available. It uses the configured OpenCode `plan` agent, a disposable copy of each fixture, and a post-run diff check:
-```bash
-OIOL_OPENCODE_MODEL=providerID/modelID OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:opencode -- --scenarios all
-```
-The baseline prompt prohibits implementation; any detected file change fails the scenario and the temporary workspace is removed. This is not a sandbox, so configure the OpenCode agent with read-only permissions. Paired reports can be created with `npm run benchmark:compare -- --oiol oiol.json --baseline baseline.json`, then aggregated with `npm run benchmark:compare:aggregate -- --inputs pair-1.json,pair-2.json,pair-3.json`. The comparison requires matching, explicitly declared comparison and budget keys. These keys are operator attestations, not proof of identical execution resources. No live provider or OpenCode baseline run has yet been completed.
+- No live provider benchmark or blinded human evaluation has been completed.
+- The starter benchmark contains ten scenarios and compact synthetic repository fixtures; it is not statistically representative.
+- Automated concept matching is lexical and can miss valid paraphrases or reward superficial keyword inclusion.
+- The repository scanner is bounded and heuristic, not AST- or symbol-aware.
+- Prompt-injection isolation, provenance, and secret redaction need stronger evidence and tests.
+- Provider-reported usage may be available, but pricing is not estimated.
 
 ## License
 
