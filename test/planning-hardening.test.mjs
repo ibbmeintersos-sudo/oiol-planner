@@ -11,6 +11,7 @@ import { evaluatePlan } from '../src/core/evaluate.mjs';
 import { scanRepository } from '../src/scanner/repository.mjs';
 import { renderPlanMarkdown } from '../src/core/report.mjs';
 import { redact } from '../src/core/utils.mjs';
+import { validatePlanSchema } from '../src/core/schema-validator.mjs';
 
 const validPlan = () => ({
   schemaVersion: '1.0.0',
@@ -122,4 +123,25 @@ test('Markdown report includes non-blocking plan quality diagnostics', () => {
   const markdown = renderPlanMarkdown(plan);
   assert.match(markdown, /Non-blocking quality review signals/);
   assert.match(markdown, /Tasks without descriptions:\*\* t1/);
+});
+
+test('published JSON Schema validates the example and rejects missing required contract fields', async () => {
+  const example = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../examples/plan.v1.json', import.meta.url), 'utf8'));
+  const valid = await validatePlanSchema(example);
+  assert.equal(valid.valid, true, valid.errors.join('\n'));
+  const invalid = structuredClone(example);
+  delete invalid.status;
+  const result = await validatePlanSchema(invalid);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some(error => error.includes('status')));
+});
+
+test('published JSON Schema rejects execution state in plans and tasks', async () => {
+  const example = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../examples/plan.v1.json', import.meta.url), 'utf8'));
+  const rootState = structuredClone(example);
+  rootState.execution = { status: 'completed' };
+  assert.equal((await validatePlanSchema(rootState)).valid, false);
+  const taskState = structuredClone(example);
+  taskState.tasks[0].status = 'completed';
+  assert.equal((await validatePlanSchema(taskState)).valid, false);
 });

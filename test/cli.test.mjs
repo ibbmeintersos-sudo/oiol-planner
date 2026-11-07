@@ -56,3 +56,19 @@ test('CLI returns a validation failure for an invalid plan', async () => {
     assert.equal(JSON.parse(result.stdout).validation.valid, false);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test('CLI rejects a plan that violates the published schema even when semantic checks pass', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-cli-schema-'));
+  try {
+    const file = path.join(root, 'plan.json');
+    const invalid = structuredClone(validPlan);
+    delete invalid.status;
+    await writeFile(file, JSON.stringify(invalid));
+    const result = spawnSync(process.execPath, [cli, '--validate', file], { encoding: 'utf8', env: { PATH: process.env.PATH } });
+    assert.equal(result.status, 2);
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.validation.schemaValidation.valid, false);
+    assert.equal(output.status, 'blocked');
+    assert.ok(output.validation.errors.some(error => error.includes('status')));
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

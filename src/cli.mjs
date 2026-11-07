@@ -5,6 +5,7 @@ import { analyzeProject } from './analyzer/project-analyzer.mjs';
 import { createProvider } from './providers/index.mjs';
 import { HybridPlanner } from './core/planner.mjs';
 import { evaluatePlan } from './core/evaluate.mjs';
+import { validatePlanSchema } from './core/schema-validator.mjs';
 import { deriveTaskInterfaces } from './core/task-interface.mjs';
 import { buildTraceability } from './core/traceability.mjs';
 import { renderPlanMarkdown } from './core/report.mjs';
@@ -57,9 +58,15 @@ async function main() {
   if (options.validate) {
     const source = JSON.parse(await fs.readFile(path.resolve(options.validate), 'utf8'));
     const evaluation = evaluatePlan(source, source.project || {});
-    const validation = evaluation.validation;
-    const plan = { ...source, validation, evaluation };
-    if (!validation.valid) process.exitCode = 2;
+    const schemaValidation = await validatePlanSchema(source);
+    const validation = {
+      ...evaluation.validation,
+      valid: evaluation.validation.valid && schemaValidation.valid,
+      errors: [...evaluation.validation.errors, ...schemaValidation.errors.map(error => 'Schema: ' + error)],
+      schemaValidation
+    };
+    const plan = { ...source, validation, evaluation: { ...evaluation, validation, schemaValidation } };
+    if (!validation.valid) { plan.status = 'blocked'; process.exitCode = 2; }
     const format = options.format || (options.out?.toLowerCase().endsWith('.md') ? 'md' : 'json');
     if (!['json', 'md'].includes(format)) throw new Error('--format must be json or md');
     await writeOutput(format === 'md' ? renderPlanMarkdown(plan) : JSON.stringify(plan, null, 2), options.out);
@@ -92,7 +99,16 @@ async function main() {
   }) : provider;
   const planner = new HybridPlanner({ provider, reviewer, maxRepairRounds: Number(options.repairs ?? 2) });
   const plan = await planner.createPlan(project);
-  plan.evaluation = evaluatePlan(plan, project);
+  const evaluation = evaluatePlan(plan, project);
+  const schemaValidation = await validatePlanSchema(plan);
+  plan.validation = {
+    ...evaluation.validation,
+    valid: evaluation.validation.valid && schemaValidation.valid,
+    errors: [...evaluation.validation.errors, ...schemaValidation.errors.map(error => 'Schema: ' + error)],
+    schemaValidation
+  };
+  plan.evaluation = { ...evaluation, validation: plan.validation, schemaValidation };
+  if (!schemaValidation.valid) plan.status = 'blocked';
   plan.taskInterfaces = deriveTaskInterfaces(plan);
   plan.traceability = buildTraceability(plan);
   const validation = plan.validation;
