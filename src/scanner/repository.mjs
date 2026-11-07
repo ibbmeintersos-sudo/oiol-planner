@@ -120,6 +120,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     'AST-parsed source files: ' + structure.astFileCount,
     'Lexical fallback source files: ' + structure.lexicalFallbackFileCount,
     'Syntax-error files: ' + structure.syntaxErrorFileCount,
+    'Bundled Tree-sitter grammars: ' + (structure.availableGrammarLanguages.slice(0, 24).join(', ') || 'not exposed'),
     'Local import edges: ' + structure.dependencyGraph.edgeCount,
     'Unresolved relative imports: ' + structure.unresolvedLocalImportCount,
     'Route-like files: ' + structure.routeFiles.length,

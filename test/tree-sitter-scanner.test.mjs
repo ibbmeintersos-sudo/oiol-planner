@@ -27,6 +27,8 @@ test('Tree-sitter AST extracts JavaScript declarations and ignores import-like c
     const result = await scanRepository(f.root);
     const structure = result.structure;
     assert.equal(structure.astFileCount, 2, JSON.stringify(structure.parserDiagnostics));
+    assert.ok(structure.availableGrammarLanguages.includes('javascript'));
+    assert.ok(structure.imports.some(item => item.specifier === './helper.js' && item.line === 2 && item.trustLevel === 'untrusted_repository_metadata'));
     assert.ok(structure.symbols.some(item => item.name === 'boot' && item.kind === 'function' && item.source === 'tree_sitter_ast'));
     assert.ok(structure.symbols.some(item => item.name === 'make' && item.kind === 'function'));
     assert.ok(structure.symbols.some(item => item.name === 'Engine' && item.kind === 'class'));
@@ -57,6 +59,7 @@ test('Tree-sitter AST resolves Python relative imports and extracts class/functi
     const result = await scanRepository(f.root);
     const structure = result.structure;
     assert.ok(structure.astFileCount >= 2, JSON.stringify(structure.parserDiagnostics));
+    assert.ok(structure.availableGrammarLanguages.includes('python'));
     assert.ok(structure.symbols.some(item => item.file === 'pkg/service.py' && item.name === 'Planner' && item.kind === 'class'));
     assert.ok(structure.symbols.some(item => item.file === 'pkg/service.py' && item.name === 'build_plan' && item.kind === 'function'));
     assert.ok(structure.imports.some(item => item.from === 'pkg/service.py' && item.specifier === '.helpers' && item.to === 'pkg/helpers.py'));

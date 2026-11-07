@@ -9,6 +9,19 @@ const EXTENSION_LANGUAGE = new Map([
 ]);
 
 const parserCache = new Map();
+let grammarCatalogCache = null;
+
+function availableGrammarLanguages() {
+  if (grammarCatalogCache) return grammarCatalogCache;
+  try {
+    grammarCatalogCache = typeof TreeSitter.availableLanguages === 'function'
+      ? [...new Set(TreeSitter.availableLanguages())].sort()
+      : [];
+  } catch {
+    grammarCatalogCache = [];
+  }
+  return grammarCatalogCache;
+}
 const MAX_NODES_PER_FILE = 50000;
 const MAX_DEPTH = 128;
 
@@ -128,7 +141,7 @@ function classifySymbol(language, node, sourceBytes, lineStarts) {
   if (!symbolKind) return null;
   const name = nodeName(node, sourceBytes);
   if (!name) return null;
-  return { name, kind: symbolKind, line: byteLine(lineStarts, node.startByte()), source: 'tree_sitter_ast' };
+  return { name, kind: symbolKind, line: byteLine(lineStarts, node.startByte()), source: 'tree_sitter_ast', trustLevel: 'untrusted_repository_metadata' };
 }
 
 function importSpecifiers(language, nodeKind, text) {
@@ -261,6 +274,7 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
               const target = resolveLocalImport(file, language, safeSpecifier, fileSet);
               imports.push({
                 from: file, to: target, specifier: safeSpecifier,
+                line: byteLine(lineStarts, node.startByte()),
                 resolved: Boolean(target), trustLevel: 'untrusted_repository_metadata',
                 source: 'tree_sitter_ast'
               });
@@ -301,6 +315,7 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
     failedFileCount: failedFiles.length,
     parseCounts,
     visitedNodeCount: visitedNodes,
-    method: 'tree_sitter_ast'
+    method: 'tree_sitter_ast',
+    availableLanguages: availableGrammarLanguages()
   };
 }

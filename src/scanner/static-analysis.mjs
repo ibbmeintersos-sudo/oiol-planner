@@ -103,7 +103,7 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     lexicalFallbackFiles.push(file);
     const language = EXT.get(path.posix.extname(file).toLowerCase());
     const source = contents[file];
-    for (const symbol of symbolsFor(source, language)) symbols.push({ file, ...symbol });
+    for (const symbol of symbolsFor(source, language)) symbols.push({ file, ...symbol, trustLevel: 'untrusted_repository_metadata' });
     for (const specifier of importsFor(source, language)) {
       const safeSpecifier = redact(specifier.split(/[?#]/, 1)[0]).slice(0, 200);
       const target = resolveRelativeImport(file, language, safeSpecifier, fileSet);
@@ -157,6 +157,7 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     nodeLimitFileCount: ast.parsedFiles.filter(item => item.nodeLimitReached).length,
     depthLimitFileCount: ast.parsedFiles.filter(item => item.depthLimitReached).length,
     parseCounts: ast.parseCounts,
+    availableGrammarLanguages: ast.availableLanguages,
     visitedAstNodeCount: ast.visitedNodeCount,
     symbols: symbols.slice(0, 4000),
     symbolCount: symbols.length,
