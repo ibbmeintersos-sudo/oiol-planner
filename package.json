@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "find src scripts -type f -name '*.mjs' -print0 | xargs -0 -n1 node --check",
+    "check": "node scripts/check.mjs",
     "plan": "node src/cli.mjs",
     "smoke:opencode": "node scripts/opencode-smoke.mjs",
     "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
