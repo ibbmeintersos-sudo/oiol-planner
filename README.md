@@ -100,6 +100,12 @@ The OpenCode runner is covered by fake-transport contract tests, but it has not 
 
 `OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, applies a configurable task timeout (10 minutes by default), aborts failed sessions when possible, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
 
+Live API smoke test (requires a running OpenCode server and an absolute project path):
+```bash
+OIOL_OPENCODE_DIRECTORY=/absolute/path/to/repository npm run smoke:opencode
+```
+Optional settings: `OIOL_OPENCODE_URL`, `OIOL_OPENCODE_USERNAME`, and `OIOL_OPENCODE_PASSWORD`. The smoke test checks server health, creates a temporary session, reads it back, and deletes it; it does not send a prompt or modify project files. This test must be run against the actual OpenCode server before claiming live integration.
+
 The OpenCode server operates against the project directory in which `opencode serve` is started. The server adapter follows the documented `/session` and `/session/:id/message` API shape; session creation sends a title, and prompts use typed `parts`. The runner currently does not isolate tasks in Git worktrees, so it declares itself non-concurrency-safe and the engine serializes its tasks. Do not enable parallel writes until a tested worktree adapter exists.
 ## Security notes
 
