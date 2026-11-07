@@ -57,7 +57,7 @@ export async function main() {
   const report=aggregateRuns(runs);
   const output=path.resolve(readArg('out')||'benchmarks/results/repeat-aggregate.json');
   await fs.mkdir(path.dirname(output),{recursive:true});
-  await fs.writeFile(output,JSON.stringify(report,null,2)+'\\n');
+  await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify({runCount:report.runCount,scenarioCount:report.scenarioCount,failureRate:report.failureRate,certificationReadyForHumanReview:report.certificationReadyForHumanReview,output},null,2));
   return report.certificationReadyForHumanReview?0:2;
 }
