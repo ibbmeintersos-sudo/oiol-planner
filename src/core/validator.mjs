@@ -7,6 +7,9 @@ export function validatePlan(plan, project={}) {
   if(plan.schemaVersion && plan.schemaVersion!==SCHEMA_VERSION) errors.push('Unsupported plan schemaVersion: '+plan.schemaVersion);
   if(!plan.schemaVersion) warnings.push('Legacy plan has no schemaVersion; validate it against the published schema before external handoff');
   if(plan.status && !PLAN_STATUSES.includes(plan.status)) errors.push('Unsupported plan status: '+plan.status);
+  for (const field of ['execution', 'executionState', 'executionRun', 'runId', 'executionId']) {
+    if (Object.hasOwn(plan, field)) errors.push('Planning-only contract forbids execution field: ' + field);
+  }
   if(!Array.isArray(plan.requirements)) errors.push('Plan requirements must be an array');
   if(!isObject(plan.architecture)||!Array.isArray(plan.architecture.components)) errors.push('Plan architecture.components must be an array');
   if(!Array.isArray(plan.tasks)) errors.push('Plan tasks must be an array');
@@ -19,6 +22,9 @@ export function validatePlan(plan, project={}) {
   for(const task of tasks) {
     if(!isObject(task)){errors.push('Task entry must be an object');continue;}
     if(typeof task.title!=='string'||!task.title.trim()) errors.push(`Task ${task.id} has no title`);
+    for (const field of ['status', 'execution', 'executionState', 'startedAt', 'completedAt', 'attempt', 'result', 'verified', 'verificationStatus']) {
+      if (Object.hasOwn(task, field)) errors.push(`Task ${task.id} contains execution-state field: ${field}`);
+    }
     for(const field of ['requirementIds','componentIds','dependencies','acceptanceCriteria','writeScope']) if(!Array.isArray(task[field])) errors.push(`Task ${task.id}.${field} must be an array`);
     if(!Array.isArray(task.acceptanceCriteria)||!task.acceptanceCriteria.length||task.acceptanceCriteria.some(x=>typeof x!=='string'||!x.trim())) errors.push(`Task ${task.id} must have non-empty string acceptance criteria`);
     for(const req of Array.isArray(task.requirementIds)?task.requirementIds:[]) {if(!reqIds.has(req))errors.push(`Task ${task.id} references unknown requirement ${req}`);else covered.add(req);}

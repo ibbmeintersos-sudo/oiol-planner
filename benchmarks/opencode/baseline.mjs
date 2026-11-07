@@ -1,4 +1,4 @@
-import { isObject } from '../core/utils.mjs';
+import { isObject } from '../../src/core/utils.mjs';
 
 export function buildBaselinePrompt(project) {
   return [

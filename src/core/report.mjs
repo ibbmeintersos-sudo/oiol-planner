@@ -8,14 +8,14 @@ const list = values => Array.isArray(values) && values.length ? values.map(value
 export function renderPlanMarkdown(plan = {}) {
   const validation = plan.validation || {};
   const evaluation = plan.evaluation?.metrics || {};
-  const tasks = Array.isArray(plan.tasks) ? plan.tasks : [];
+  const tasks = Array.isArray(plan.tasks) ? plan.tasks.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
   const graph = plan.dependencyGraph || { nodes: [], edges: [] };
   const schedule = topologicalWaves(tasks, Array.isArray(graph.edges) ? graph.edges : []);
-  const risks = Array.isArray(plan.risks) ? plan.risks : [];
-  const clarifications = Array.isArray(plan.clarifications) ? plan.clarifications : [];
-  const requirements = Array.isArray(plan.requirements) ? plan.requirements : [];
-  const traceability = plan.traceability?.rows || buildTraceability(plan).rows;
-  const taskInterfaces = Array.isArray(plan.taskInterfaces) ? plan.taskInterfaces : deriveTaskInterfaces(plan);
+  const risks = Array.isArray(plan.risks) ? plan.risks.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
+  const clarifications = Array.isArray(plan.clarifications) ? plan.clarifications.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
+  const requirements = Array.isArray(plan.requirements) ? plan.requirements.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
+  const traceability = (Array.isArray(plan.traceability?.rows) ? plan.traceability.rows : buildTraceability(plan).rows).filter(item => item && typeof item === 'object' && !Array.isArray(item));
+  const taskInterfaces = Array.isArray(plan.taskInterfaces) ? plan.taskInterfaces.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : deriveTaskInterfaces(plan);
   const assumptions = Array.isArray(plan.assumptions) ? plan.assumptions : [];
   const unknowns = Array.isArray(plan.unknowns) ? plan.unknowns : [];
   const lines = [
@@ -35,24 +35,24 @@ export function renderPlanMarkdown(plan = {}) {
     '## Requirements', '',
     requirements.length ? requirements.map(req => '- **' + text(req.id) + '** — ' + text(req.statement) + (req.priority ? ' (priority: ' + text(req.priority) + ')' : '')).join('\n') : '- No requirements recorded.',
     '', '## Architecture', '',
-    ...(Array.isArray(plan.architecture?.components) && plan.architecture.components.length
-      ? plan.architecture.components.map(component => '### ' + text(component.name || component.id) + '\n\n' + list(component.responsibilities))
+    ...(Array.isArray(plan.architecture?.components) && plan.architecture.components.some(item => item && typeof item === 'object' && !Array.isArray(item))
+      ? plan.architecture.components.filter(item => item && typeof item === 'object' && !Array.isArray(item)).map(component => '### ' + text(component.name || component.id) + '\n\n' + list(component.responsibilities))
       : ['No architecture components recorded.']),
-    ...(Array.isArray(plan.architecture?.dataFlows) && plan.architecture.dataFlows.length
-      ? ['', '### Key data flows', '', ...plan.architecture.dataFlows.map(flow => '- **' + text(flow.from || flow.source) + ' → ' + text(flow.to || flow.target) + ':** ' + text(flow.description || flow.purpose))]
+    ...(Array.isArray(plan.architecture?.dataFlows) && plan.architecture.dataFlows.some(item => item && typeof item === 'object' && !Array.isArray(item))
+      ? ['', '### Key data flows', '', ...plan.architecture.dataFlows.filter(item => item && typeof item === 'object' && !Array.isArray(item)).map(flow => '- **' + text(flow.from || flow.source) + ' → ' + text(flow.to || flow.target) + ':** ' + text(flow.description || flow.purpose))]
       : []),
     '', '### Architecture decisions', '',
-    ...(Array.isArray(plan.architecture?.decisions) && plan.architecture.decisions.length
-      ? plan.architecture.decisions.map(decision => '- **' + text(decision.decision || decision.title) + '** — ' + text(decision.reason || decision.rationale))
+    ...(Array.isArray(plan.architecture?.decisions) && plan.architecture.decisions.some(item => item && typeof item === 'object' && !Array.isArray(item))
+      ? plan.architecture.decisions.filter(item => item && typeof item === 'object' && !Array.isArray(item)).map(decision => '- **' + text(decision.decision || decision.title) + '** — ' + text(decision.reason || decision.rationale))
       : ['- No explicit decisions recorded.']),
     '', '## Task breakdown', '',
     '| ID | Task | Dependencies | Requirements | Acceptance criteria | Write scope |',
     '|---|---|---|---|---|---|',
-    ...(tasks.length ? tasks.map(task => '| ' + text(task.id) + ' | ' + text(task.title) + ' | ' + text((task.dependencies || []).join(', ') || '—') + ' | ' + text((task.requirementIds || []).join(', ') || '—') + ' | ' + text((task.acceptanceCriteria || []).join('; ') || 'Missing') + ' | ' + text((task.writeScope || []).join(', ') || 'Not specified') + ' |') : ['| — | No tasks | — | — | — | — |']),
+    ...(tasks.length ? tasks.map(task => '| ' + text(task.id) + ' | ' + text(task.title) + ' | ' + text((Array.isArray(task.dependencies) ? task.dependencies : []).join(', ') || '—') + ' | ' + text((Array.isArray(task.requirementIds) ? task.requirementIds : []).join(', ') || '—') + ' | ' + text((Array.isArray(task.acceptanceCriteria) ? task.acceptanceCriteria : []).join('; ') || 'Missing') + ' | ' + text((Array.isArray(task.writeScope) ? task.writeScope : []).join(', ') || 'Not specified') + ' |') : ['| — | No tasks | — | — | — | — |']),
     '', '## Task handoff interfaces', '',
     '| Task | Inputs from dependencies | Declared outputs | Consumers |',
     '|---|---|---|---|',
-    ...(taskInterfaces.length ? taskInterfaces.map(item => '| ' + text(item.taskId) + ' | ' + text((item.inputs || []).map(input => input.resolved ? input.fromTaskId + ': ' + input.outputs.map(output => output.name).join(', ') : 'MISSING OUTPUT from ' + input.fromTaskId).join('; ') || 'None') + ' | ' + text((item.outputs || []).map(output => output.name).join(', ') || 'None declared') + ' | ' + text((item.consumers || []).join(', ') || 'None') + ' |') : ['| — | No task interfaces | — | — |']),
+    ...(taskInterfaces.length ? taskInterfaces.map(item => '| ' + text(item.taskId) + ' | ' + text((Array.isArray(item.inputs) ? item.inputs : []).map(input => input.resolved ? input.fromTaskId + ': ' + (Array.isArray(input.outputs) ? input.outputs : []).map(output => output.name).join(', ') : 'MISSING OUTPUT from ' + input.fromTaskId).join('; ') || 'None') + ' | ' + text((Array.isArray(item.outputs) ? item.outputs : []).map(output => output.name).join(', ') || 'None declared') + ' | ' + text((Array.isArray(item.consumers) ? item.consumers : []).join(', ') || 'None') + ' |') : ['| — | No task interfaces | — | — |']),
     '', '## Suggested planning waves', '',
     ...(schedule.waves.length ? schedule.waves.map((wave, index) => '- **Wave ' + (index + 1) + ':** ' + wave.map(text).join(', ')) : ['- No waves could be derived from the supplied task graph.']),
     '', '## Risks', '',

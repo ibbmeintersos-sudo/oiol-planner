@@ -1,0 +1,87 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { validatePlan } from '../src/core/validator.mjs';
+import { dependencyEdgesFromTasks, topologicalWaves } from '../src/core/graph.mjs';
+import { deriveTaskInterfaces } from '../src/core/task-interface.mjs';
+import { evaluatePlan } from '../src/core/evaluate.mjs';
+import { scanRepository } from '../src/scanner/repository.mjs';
+import { renderPlanMarkdown } from '../src/core/report.mjs';
+
+const validPlan = () => ({
+  schemaVersion: '1.0.0',
+  id: 'plan_hardening',
+  status: 'needs_revision',
+  project: { kind: 'greenfield', name: 'Hardening fixture' },
+  requirements: [{ id: 'r1', statement: 'Expose a stable API' }],
+  architecture: { components: [{ id: 'c1', name: 'API' }], decisions: [] },
+  tasks: [{
+    id: 't1', title: 'Define API contract', requirementIds: ['r1'], componentIds: ['c1'],
+    dependencies: [], acceptanceCriteria: ['The contract defines the response'], writeScope: ['docs/api']
+  }],
+  dependencyGraph: { nodes: ['t1'], edges: [] },
+  risks: [],
+  clarifications: []
+});
+
+test('malformed task dependencies never crash graph derivation', () => {
+  assert.deepEqual(dependencyEdgesFromTasks([{ id: 't1', dependencies: 'not-an-array' }]), []);
+  assert.equal(topologicalWaves([{ id: 't1', dependencies: 'not-an-array' }], []).waves.length, 1);
+  assert.equal(topologicalWaves([null], []).error, 'invalid_task_id');
+  assert.equal(topologicalWaves([{ id: 't1' }], [null]).error, 'invalid_edge');
+});
+
+test('validator reports malformed dependency arrays instead of throwing', () => {
+  const plan = validPlan();
+  plan.tasks[0].dependencies = 't2';
+  assert.doesNotThrow(() => validatePlan(plan));
+  assert.equal(validatePlan(plan).valid, false);
+});
+
+test('evaluation and handoff interfaces tolerate malformed task entries', () => {
+  const plan = validPlan();
+  plan.tasks.push(null);
+  assert.doesNotThrow(() => evaluatePlan(plan));
+  assert.equal(deriveTaskInterfaces(plan).length, 1);
+});
+
+test('repository snippets carry verifiable source and excerpt fingerprints', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-provenance-'));
+  try {
+    await mkdir(path.join(root, 'src'));
+    const source = 'export const api_key = "sk-123456789012345678901234567890";\nexport const value = 1;\n';
+    await writeFile(path.join(root, 'src', 'index.js'), source);
+    const result = await scanRepository(root);
+    const snippet = result.snippets.find(item => item.path === 'src/index.js');
+    assert.ok(snippet);
+    assert.match(snippet.id, /^REPO-[a-f0-9]{12}$/);
+    assert.equal(snippet.sourceSha256, createHash('sha256').update(source).digest('hex'));
+    assert.equal(snippet.excerptSha256, createHash('sha256').update(snippet.content).digest('hex'));
+    assert.equal(snippet.sha256, snippet.sourceSha256);
+    assert.equal(snippet.redactionChangedContent, true);
+    assert.doesNotMatch(snippet.content, /sk-123456789012345678901234567890/);
+    assert.match(result.context, new RegExp(snippet.id));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('Markdown reporting remains available for structurally malformed plans', () => {
+  const plan = validPlan();
+  plan.tasks.push(null);
+  plan.architecture.components.push(null);
+  assert.doesNotThrow(() => renderPlanMarkdown(plan));
+  assert.match(renderPlanMarkdown(plan), /Define API contract/);
+});
+
+test('planning-only validator rejects execution state at plan and task levels', () => {
+  const rootState = validPlan();
+  rootState.execution = { status: 'completed' };
+  assert.equal(validatePlan(rootState).valid, false);
+  const taskState = validPlan();
+  taskState.tasks[0].status = 'completed';
+  assert.equal(validatePlan(taskState).valid, false);
+});

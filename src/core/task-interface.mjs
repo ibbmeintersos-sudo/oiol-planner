@@ -8,8 +8,10 @@ function normalizeOutput(output) {
 }
 
 export function deriveTaskInterfaces(plan = {}) {
-  const tasks = Array.isArray(plan.tasks) ? plan.tasks : [];
-  const byId = new Map(tasks.map(task => [task.id, task]));
+  const tasks = Array.isArray(plan.tasks)
+    ? plan.tasks.filter(task => task && typeof task === 'object' && !Array.isArray(task))
+    : [];
+  const byId = new Map(tasks.filter(task => typeof task.id === 'string').map(task => [task.id, task]));
   const normalizedOutputs = new Map(tasks.map(task => [
     task.id,
     (Array.isArray(task.outputs) ? task.outputs : []).map(normalizeOutput).filter(Boolean)
@@ -28,17 +30,17 @@ export function deriveTaskInterfaces(plan = {}) {
       };
     });
     return {
-      taskId: task.id,
-      title: task.title,
+      taskId: task.id ?? null,
+      title: task.title ?? '',
       inputs,
       outputs: normalizedOutputs.get(task.id) || [],
       acceptanceCriteria: Array.isArray(task.acceptanceCriteria) ? task.acceptanceCriteria : [],
       consumers: tasks.filter(candidate =>
         Array.isArray(candidate.inputs) && candidate.inputs.some(input => input?.fromTaskId === task.id)
-      ).map(candidate => candidate.id),
+      ).map(candidate => candidate.id).filter(Boolean),
       dependents: tasks.filter(candidate =>
         Array.isArray(candidate.dependencies) && candidate.dependencies.includes(task.id)
-      ).map(candidate => candidate.id)
+      ).map(candidate => candidate.id).filter(Boolean)
     };
   });
 }

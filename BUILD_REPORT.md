@@ -1,57 +1,35 @@
-# OIOL Planner v0.2.1 — Engineering hardening report
+# OIOL — Intelligent Engineering Planning System
+## Build and validation report — v0.4.1
 
-## Provenance
+## Product boundary
 
-This codebase began as a reconstructed implementation based on the retained v0.1.0 design specification. It is not byte-for-byte identical to the earlier unavailable archive.
+OIOL produces engineering plans. It analyzes requirements and existing repositories, proposes architecture and trade-offs, decomposes work, defines task dependencies and artifact interfaces, specifies acceptance criteria, records risks and unknowns, validates plan consistency, and exports reviewable handoff artifacts.
 
-## v0.1.1 — Core integrity
+OIOL does not implement code, run project commands or tests, modify target repositories, verify completed implementation, or manage execution state. The legacy execution prototype from earlier versions has been retired from the product source.
 
-- Enforced blocking requirement coverage and stricter plan structure.
-- Required exact agreement between task dependencies and graph nodes/edges.
-- Hardened topological scheduling, path validation and bounded repository discovery.
-- Prevented high/critical review findings and review failures from being treated as approval.
-- Added CI for syntax checks and automated tests.
-- Removed the one-time archive extraction workflow from normal push events.
+## Implemented capabilities
 
-## v0.1.2 — Provider and OpenCode reliability
+- Four provider adapters: OpenAI-compatible, Anthropic, Gemini, and Ollama.
+- Greenfield and bounded existing-repository analysis.
+- Structured plan contract with JSON Schema Draft 2020-12 and a complete example.
+- Deterministic validation for IDs, requirement coverage, references, task inputs/outputs, dependency graph consistency, cycles, safe relative scopes, and blocking clarifications.
+- Planning-only requirement traceability.
+- Markdown engineering-plan report.
+- Repository evidence identifiers and separate SHA-256 fingerprints for original source files and redacted excerpts.
+- Ten-scenario planning benchmark harness, repeated-run aggregation, paired OpenCode planning baseline, and human-review aggregation protocol.
 
-- Added injectable HTTP transports to all provider adapters.
-- Validated successful response payloads and classified retryable HTTP errors.
-- Exposed timeout and bounded retry settings through CLI configuration.
-- Hardened OpenCode HTTP calls with URL validation, timeout handling, session ID encoding and JSON response validation.
-- Added contract tests for OpenAI-compatible, Anthropic, Gemini, Ollama and OpenCode adapters.
-- Improved evaluation dependency diagnostics.
-- Propagated re-verification requirements to transitive downstream tasks when upstream tasks change.
+## Validation evidence
 
-## v0.2.0 — Human-gated execution orchestration
+The latest recorded CI run before the v0.4.1 hardening follow-up is [42344839047](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42344839047), which passed on Node.js 22 and 24 with 103 tests passing and no failures.
 
-- Added a deterministic task state machine and dependency-aware execution engine.
-- Requires explicit human approval bound to a SHA-256 fingerprint of the exact plan revision.
-- Requires a runner with separate execute and verify methods.
-- Requires an explicit event store; includes in-memory and append-only JSONL implementations with restrictive file permissions and sequence checks.
-- Uses bounded concurrency, but only when the runner explicitly declares concurrency safety; otherwise it serializes work.
-- Exposes only declared dependency outputs to each task.
-- Retries default to zero; optional retries reuse stable task idempotency keys.
-- Supports fail-fast, cancellation and blocked dependents after failures.
-- Added OpenCode task runner using documented server routes; it requires a separate verification callback, uses a configurable 10-minute task timeout by default, attempts to abort sessions on prompt failures, and serializes tasks because no Git worktree isolation is implemented.
-- No automatic resume or exactly-once guarantee is claimed.
+The v0.4.1 follow-up adds regression coverage for malformed plan structures and repository evidence fingerprints. Its CI result must be checked after the commit is pushed; this report does not claim that those new tests have already passed.
 
-## Automated validation
+## Known limitations
 
-GitHub Actions runs Node.js 20 syntax checks over every source module and the complete node:test suite.
-
-- v0.1.2 integration CI: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42298070272
-- v0.2.0 push CI: https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42299201813
-
-The v0.2.0 push CI passed 62 tests: 62 passed, 0 failed. Provider and OpenCode tests use fake HTTP transports; no live provider credentials or OpenCode server were used.
-
-## Remaining limitations
-
-- No Git worktree isolation or safe parallel OpenCode task execution.
-- No process-crash recovery/reconciliation for uncertain tasks; no exactly-once semantics.
-- No merge coordinator or final repository acceptance gate that runs a configurable test matrix.
-- Repository scanning and secret redaction remain heuristic.
-- No live provider/OpenCode end-to-end test matrix.
-- No benchmark against stock OpenCode or other coding agents; superiority is not established.
-- The CLI currently creates plans; the execution engine is exposed as a library and is not yet wired into an end-user execution command.
-- Not production-ready for unattended autonomous repository modification.
+- No live provider benchmark or blinded human evaluation has been completed.
+- The benchmark contains ten synthetic scenarios and is not statistically representative.
+- Automated concept matching is lexical and can reward superficial keyword inclusion.
+- Repository analysis is bounded and heuristic, not AST- or symbol-aware.
+- Prompt-injection resistance and secret redaction are defense-in-depth measures, not a security boundary.
+- Provider usage may be available; pricing is not estimated.
+- Reviewer configuration separation is not proof of independent judgment.

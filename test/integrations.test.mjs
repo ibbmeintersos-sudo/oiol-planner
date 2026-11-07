@@ -4,7 +4,7 @@ import { OpenAICompatibleProvider } from '../src/providers/openai-compatible.mjs
 import { AnthropicProvider } from '../src/providers/anthropic.mjs';
 import { GeminiProvider } from '../src/providers/gemini.mjs';
 import { OllamaProvider } from '../src/providers/ollama.mjs';
-import { OpenCodeClient } from '../src/adapters/opencode/client.mjs';
+import { OpenCodeClient } from '../benchmarks/opencode/client.mjs';
 
 const response=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json'}});
 

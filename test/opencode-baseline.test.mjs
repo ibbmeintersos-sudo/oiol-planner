@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildBaselinePrompt, parseBaselinePlan, runOpenCodeBaselineScenario } from '../src/benchmark/opencode-baseline.mjs';
+import { buildBaselinePrompt, parseBaselinePlan, runOpenCodeBaselineScenario } from '../benchmarks/opencode/baseline.mjs';
 
 const scenario={id:'GF-API-001',project:{kind:'greenfield',name:'Test API',request:'Create an API'}};
 const validPlan={contractVersion:'1.0',id:'p1',status:'needs_revision',project:scenario.project,requirements:[],architecture:{components:[],decisions:[]},tasks:[],dependencyGraph:{nodes:[],edges:[]},risks:[],evidence:[],clarifications:[],review:null};

@@ -342,7 +342,56 @@
           }
         }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "status"
+            ]
+          },
+          {
+            "required": [
+              "execution"
+            ]
+          },
+          {
+            "required": [
+              "executionState"
+            ]
+          },
+          {
+            "required": [
+              "startedAt"
+            ]
+          },
+          {
+            "required": [
+              "completedAt"
+            ]
+          },
+          {
+            "required": [
+              "attempt"
+            ]
+          },
+          {
+            "required": [
+              "result"
+            ]
+          },
+          {
+            "required": [
+              "verified"
+            ]
+          },
+          {
+            "required": [
+              "verificationStatus"
+            ]
+          }
+        ]
+      }
     },
     "edge": {
       "type": "object",
@@ -409,5 +458,34 @@
       "additionalProperties": true
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "execution"
+        ]
+      },
+      {
+        "required": [
+          "executionState"
+        ]
+      },
+      {
+        "required": [
+          "executionRun"
+        ]
+      },
+      {
+        "required": [
+          "runId"
+        ]
+      },
+      {
+        "required": [
+          "executionId"
+        ]
+      }
+    ]
+  }
 }
