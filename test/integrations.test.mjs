@@ -58,3 +58,31 @@ test('OpenCode task runner rejects traversal and absolute paths in diffs',async(
     ),/outside the task write scope/);
   }
 });
+
+
+test('OpenCode task runner fails closed for invalid write scopes',async()=>{
+  const client={
+    async createSession(){return {id:'scope-session'};},
+    async prompt(){return {info:{id:'scope-message',role:'assistant'},parts:[]};},
+    async getSessionDiff(){return [];}
+  };
+  const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});
+  await assert.rejects(()=>runner.execute(
+    {id:'scope-task',title:'Bad scope',acceptanceCriteria:['works'],writeScope:['src\\..\\outside']},
+    {runId:'scope-run',results:new Map()}
+  ),/invalid path/);
+});
+
+test('OpenCode task runner treats an empty write scope as no write permission',async()=>{
+  const client={
+    async createSession(){return {id:'scope-session'};},
+    async prompt(){return {info:{id:'scope-message',role:'assistant'},parts:[]};},
+    async getSessionDiff(){return [{file:'README.md',patch:'@@'}];},
+    async abortSession(){}
+  };
+  const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});
+  await assert.rejects(()=>runner.execute(
+    {id:'scope-task',title:'No writes',acceptanceCriteria:['works'],writeScope:[]},
+    {runId:'scope-run',results:new Map()}
+  ),/outside the task write scope/);
+});
