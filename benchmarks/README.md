@@ -75,7 +75,7 @@ Create a paired report:
 npm run benchmark:compare -- --oiol benchmarks/results/oiol.json --baseline benchmarks/results/opencode-baseline.json
 ```
 
-The report includes per-scenario score deltas and explicitly flags whether reviewer configuration matches. A positive automated score delta is not a quality claim. Repeat paired comparisons at least three times and complete blinded human review before drawing conclusions.
+The OpenCode baseline runs in a disposable copy of each fixture workspace, inspects the session diff, rejects any file changes, and removes the temporary workspace afterwards. This is post-execution detection plus cleanup, not a sandbox; configure the OpenCode plan agent with read-only permissions. The paired report includes per-scenario score deltas and explicitly flags whether reviewer configuration matches. A positive automated score delta is not a quality claim. Repeat paired comparisons at least three times and complete blinded human review before drawing conclusions.
 
 Aggregate three or more paired comparison reports:
 
