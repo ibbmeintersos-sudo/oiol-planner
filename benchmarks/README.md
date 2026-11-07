@@ -43,6 +43,40 @@ npm run benchmark:aggregate -- --inputs benchmarks/results/run-a.json,benchmarks
 
 The aggregator rejects mixed configuration fingerprints and duplicate run IDs, reports per-scenario median/min/max/spread and failure rate, and only marks the automated gate ready for human review when at least three runs cover every scenario without automated failures. It does not itself certify quality.
 
+## OpenCode baseline and paired comparison
+
+Run the OpenCode-only baseline against the same scenario set. Configure an explicit model reference and use the OpenCode `plan` agent (or another agent whose permissions are verified as read-only):
+
+```sh
+OIOL_OPENCODE_MODEL=providerID/modelID \
+OIOL_OPENCODE_AGENT=plan \
+OIOL_BENCHMARK_COMPARISON_KEY=model-family-and-version \
+OIOL_BENCHMARK_BUDGET_KEY=declared-budget-profile \
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+npm run benchmark:opencode -- --scenarios all
+```
+
+Run OIOL with the matching model identity and the same comparison/budget keys:
+
+```sh
+OIOL_PROVIDER=openai-compatible \
+OIOL_MODEL=model-id \
+OIOL_BENCHMARK_COMPARISON_KEY=model-family-and-version \
+OIOL_BENCHMARK_BUDGET_KEY=declared-budget-profile \
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+npm run benchmark:planner -- --scenarios all
+```
+
+The keys are operator attestations, not automatic proof that server-side model settings, token limits, tools, or compute budgets are identical. Do not compare runs unless they truly use the same model, scenario snapshot, reviewer setup, and resource budget.
+
+Create a paired report:
+
+```sh
+npm run benchmark:compare -- --oiol benchmarks/results/oiol.json --baseline benchmarks/results/opencode-baseline.json
+```
+
+The report includes per-scenario score deltas and explicitly flags whether reviewer configuration matches. A positive automated score delta is not a quality claim. Repeat paired comparisons at least three times and complete blinded human review before drawing conclusions.
+
 Do not commit API keys or private benchmark results containing sensitive repository details.
 
 ## Automated rubric (100 points)
