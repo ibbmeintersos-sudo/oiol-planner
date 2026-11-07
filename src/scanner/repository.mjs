@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { redact } from '../core/utils.mjs';
+import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
 const exec = promisify(execFile);
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
@@ -80,11 +81,13 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   ])];
   let context = '', contextTruncated = false;
   const snippets = [];
+  const sourceContents = Object.create(null);
   for (const file of selected) {
     try {
       const buffer = await fs.readFile(path.join(root, file));
       if (buffer.length > maxFileBytes || buffer.includes(0)) continue;
       const sourceText = buffer.toString('utf8');
+      sourceContents[file] = sourceText;
       const redactedText = redact(sourceText);
       const content = redactedText.slice(0, 5000);
       const id = evidenceId(file);
@@ -108,6 +111,18 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     } catch {}
   }
 
+  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests });
+  const structureSummary = [
+    'Repository structure analysis (bounded static heuristics; evidence, not certainty):',
+    'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
+    'Frameworks: ' + (structure.frameworks.join(', ') || 'not detected'),
+    'Entry points: ' + (structure.entryPoints.join(', ') || 'not detected'),
+    'Local import edges: ' + structure.dependencyGraph.edgeCount,
+    'Unresolved relative imports: ' + structure.unresolvedLocalImportCount,
+    'Route-like files: ' + structure.routeFiles.length,
+    'Test-like files: ' + structure.testFiles.length
+  ].join('\\n');
+  const boundedContext = context.length + structureSummary.length <= maxContextChars ? context + '\\n\\n' + structureSummary : context;
   return {
     kind: 'existing',
     root,
@@ -122,7 +137,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     scripts: [...new Set(scripts)],
     tests,
     configs,
-    context,
+    context: boundedContext,
+    structure,
     snippets,
     contextTruncated,
     scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth }
