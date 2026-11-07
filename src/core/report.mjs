@@ -1,5 +1,6 @@
 import { topologicalWaves } from './graph.mjs';
 import { deriveTaskInterfaces } from './task-interface.mjs';
+import { buildTraceability } from './traceability.mjs';
 
 const text = value => String(value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ').trim();
 const list = values => Array.isArray(values) && values.length ? values.map(value => '- ' + text(value)).join('\n') : '- None recorded';
@@ -13,7 +14,7 @@ export function renderPlanMarkdown(plan = {}) {
   const risks = Array.isArray(plan.risks) ? plan.risks : [];
   const clarifications = Array.isArray(plan.clarifications) ? plan.clarifications : [];
   const requirements = Array.isArray(plan.requirements) ? plan.requirements : [];
-  const traceability = plan.traceability?.rows || [];
+  const traceability = plan.traceability?.rows || buildTraceability(plan).rows;
   const taskInterfaces = Array.isArray(plan.taskInterfaces) ? plan.taskInterfaces : deriveTaskInterfaces(plan);
   const assumptions = Array.isArray(plan.assumptions) ? plan.assumptions : [];
   const unknowns = Array.isArray(plan.unknowns) ? plan.unknowns : [];
