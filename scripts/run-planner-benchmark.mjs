@@ -31,7 +31,7 @@ export function benchmarkConfigFingerprint(config) {
   return createHash('sha256').update(JSON.stringify(config)).digest('hex');
 }
 
-function aggregateUsage(records) {
+export function aggregateUsage(records) {
   const totals={promptTokens:0,completionTokens:0,totalTokens:0,reportedCalls:0,unreportedCalls:0};
   for(const record of records) for(const role of ['planner','reviewer']) {
     for(const call of record.plan?.providerUsage?.[role]?.calls||[]) {
