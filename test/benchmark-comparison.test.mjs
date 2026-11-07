@@ -13,7 +13,7 @@ test('paired comparison computes per-scenario and aggregate score deltas',()=>{
  const result=compareBenchmarkModes(oi,base);
  assert.equal(result.averageScoreDelta,10);
  assert.equal(result.medianScoreDelta,10);
- assert.deepEqual(result.scenarioResults.map(x=>x.delta),[15,5]);
+ assert.deepEqual(result.scenarioResults.map(x=>x.delta),[5,15]);
  assert.equal(result.reviewerComparable,true);
 });
 
