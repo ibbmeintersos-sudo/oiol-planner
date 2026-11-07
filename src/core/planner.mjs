@@ -28,7 +28,7 @@ export class HybridPlanner {
         catch(error) { review=null; reviewError=error; break; }
       }
     }
-    const independentReview=Boolean(this.reviewer&&this.reviewer!==this.provider);
+    const independentReview=Boolean(this.reviewer&&this.reviewer!==this.provider&&(this.reviewer.constructor!==this.provider.constructor||this.reviewer.model!==this.provider.model||this.reviewer.baseUrl!==this.provider.baseUrl));
     plan.review={...(review||{status:'needs_revision',summary:reviewError?`Review unavailable: ${reviewError.message}`:'No reviewer configured',findings:[]}),independent:independentReview};
     plan.validation=validation;
     const critical=review?.findings?.some(x=>x.severity==='critical')||false;
