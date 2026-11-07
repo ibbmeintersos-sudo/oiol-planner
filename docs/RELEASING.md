@@ -10,6 +10,15 @@ The repository changelog records the progression from 0.4.0 to 0.4.1 and then 0.
 
 Because the package is still in the 0.x series, a minor release may introduce changes that would normally need a major release after 1.0. Keep those changes documented and migration steps explicit.
 
+## Release cadence
+
+- **Minor release train:** target one planned release window every four weeks. Scope is cut near the start of the cycle; the release is postponed if a quality gate, migration note, security review, or CI matrix is incomplete.
+- **Patch releases:** publish outside the train when a backward-compatible fix is ready and all required checks pass. Security fixes are not held for the monthly window.
+- **Release candidates:** create a release-candidate tag only when the changelog, package version, schema compatibility, and automated tests are ready. Gather feedback before creating the final tag.
+- **No date-driven releases:** the four-week window is a planning cadence, not permission to ship a release that has failed checks. Carry incomplete changes into the next window rather than weakening the gate.
+
+For the current 0.5.0 line, use 0.5.x for compatible fixes and target 0.6.0 for the next additive capability release. Keep plan schema versions independent from package release numbers.
+
 ## Release checklist
 
 1. Ensure [Unreleased] in CHANGELOG.md describes user-visible changes and any migration notes.

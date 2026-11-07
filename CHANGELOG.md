@@ -6,6 +6,7 @@
 - Added deterministic plan-quality metrics for measurable NFRs, test strategy completeness, rollback strategy completeness, reviewed unknowns, validated assumptions, and likelihood × impact risk exposure.
 - Added plan schema 1.1.0 with immutable version snapshots while retaining validation support for schema 1.0.0 plans.
 - Added optional GitHub Issues and Linear handoff adapters with local preview as the default and explicit publishing as an opt-in.
+- Added measurable risk confidence and assessment-basis coverage, plus blocking-unknown validation.
 - Added architecture, contribution, security, and release-process documentation.
 
 ### Changed
