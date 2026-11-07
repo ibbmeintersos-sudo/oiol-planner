@@ -1,10 +1,12 @@
 {
   "name": "oiol-planner",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": false,
   "type": "module",
   "description": "Planning-only intelligent engineering system with deterministic plan validation and portable handoff",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "node --test",
     "check": "node scripts/check.mjs",
@@ -16,5 +18,8 @@
     "benchmark:compare": "node scripts/compare-benchmark-modes.mjs",
     "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@xberg-io/tree-sitter-language-pack-wasm": "1.25.0"
+  }
 }

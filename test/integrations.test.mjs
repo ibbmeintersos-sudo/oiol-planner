@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import path from 'node:path';
 import { OpenAICompatibleProvider } from '../src/providers/openai-compatible.mjs';
 import { AnthropicProvider } from '../src/providers/anthropic.mjs';
 import { GeminiProvider } from '../src/providers/gemini.mjs';
@@ -68,7 +69,7 @@ test('OpenCode client applies auth, encodes session IDs and parses JSON',async()
   assert.equal(result.id,'session');
   assert.equal(calls[0].url,'http://127.0.0.1:4096/session/a%2Fb');
   assert.equal(calls[0].options.headers.authorization,'Basic '+Buffer.from('opencode:secret').toString('base64'));
-  assert.equal(calls[0].options.headers['x-opencode-directory'],'%2Fworkspace');
+  assert.equal(calls[0].options.headers['x-opencode-directory'],encodeURIComponent(path.resolve('/workspace')));
 });
 
 test('OpenCode client rejects unsafe routes and malformed JSON',async()=>{
@@ -105,7 +106,7 @@ test('OpenCode client routes requests to the configured project directory',async
   await client.health();
   await client.listSessions();
   assert.equal(headers.length,2);
-  assert.ok(headers.every(value=>value['x-opencode-directory']==='%2Fworkspace%2Fproject%20with%20spaces'));
+  assert.ok(headers.every(value=>value['x-opencode-directory']===encodeURIComponent(path.resolve('/workspace/project with spaces'))));
 });
 
 test('OpenCode client deletes only the requested session ID',async()=>{

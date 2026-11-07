@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.5.0 — Tree-sitter AST repository analysis
+
+### Added
+- Added a pinned WebAssembly Tree-sitter language-pack dependency with a bundled grammar subset, avoiding parser grammar downloads during repository scans.
+- Added syntax-tree-based extraction of declarations and import references, syntax-recovery diagnostics, bounded source-size/depth/node traversal, and AST coverage metadata.
+- Preserved bounded lexical fallback for unsupported grammars or files that cannot be parsed.
+- Added regression fixtures for JavaScript AST extraction, comment false positives, Python relative imports, and syntax-error recovery.
+
+### Changed
+- Updated the scanner methodology and limitations documentation to distinguish AST evidence from lexical fallback.
+- Updated CI to install the locked dependency set before running static checks and tests.
+- Kept the product planning-only: repository scanning remains read-only and does not run project code or commands.
+
+### Validation
+- CI run [42407390684](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407390684) passed on Node.js 22 and 24: 138 tests passed, 0 failed in each job.
+
 ## 0.4.1 — planning integrity and provenance hardening
 
 ### Changed
@@ -13,13 +29,10 @@
 - Added regression tests for malformed dependency data, malformed task entries, source/excerpt provenance fingerprints, and secret redaction.
 - Hardened redaction for quoted JSON keys, YAML-style assignments, bearer headers, GitHub/AWS/Slack token patterns, and private-key blocks. This remains heuristic defense-in-depth, not a guarantee that all secrets are detected.
 - Made scan truncation explicit with included-file counts and lower-bound metadata.
-- Added non-blocking plan-quality diagnostics for missing descriptions, acceptance criteria, component responsibilities, decision alternatives, mitigations, and clarification questions. These are review prompts, not an opaque quality score.
-- Added these diagnostics to generated plans, validation output, and Markdown reports.
-- Added a schema-aware validator for the published contract's supported JSON Schema keywords. HybridPlanner now rejects schema-invalid plans before reviewer evaluation; the offline CLI validates the same contract without provider calls.
-- Kept the validator explicit about its supported keyword subset; external consumers should use a standards-compliant Draft 2020-12 implementation.
-- Added plan-evidence contract validation: cited IDs and sources must match supplied project evidence, and repository excerpt citations must preserve exact source and excerpt fingerprints.
-- Aligned OIOL and OpenCode benchmark scoring with the actual scanner evidence captured for each run; schema-invalid plans are now structural blockers in benchmark scoring, and the OpenCode baseline is schema-validated before reviewer evaluation.
-- CI run 42347639742 passed on Node.js 22 and 24: 125 tests passed, 0 failed.
+- Added non-blocking plan-quality diagnostics for missing descriptions, acceptance criteria, component responsibilities, decision alternatives, mitigations, and clarification questions.
+- Added a schema-aware validator for the published contract's supported JSON Schema keywords. HybridPlanner rejects schema-invalid plans before reviewer evaluation; the offline CLI validates the same contract without provider calls.
+- Added plan-evidence contract validation and aligned benchmark scoring with actual scanner evidence.
+- CI run 42349275375 passed on Node.js 22 and 24.
 
 ## 0.4.0 — planning-only contract and quality foundations
 
