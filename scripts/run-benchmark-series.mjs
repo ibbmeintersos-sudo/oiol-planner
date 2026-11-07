@@ -46,6 +46,7 @@ export async function runBenchmarkSeries({ runs = 3, outDir } = {}) {
   if (selectedIds.length !== 10) throw new Error('The published planning benchmark must contain exactly ten scenarios.');
   const runFiles = [];
   const reviewFiles = [];
+  const reviewPlanFiles = [];
 
   for (let index = 0; index < runs; index++) {
     const runFile = path.join(outputDir, 'run-' + String(index + 1).padStart(2, '0') + '.json');
@@ -62,6 +63,10 @@ export async function runBenchmarkSeries({ runs = 3, outDir } = {}) {
     try {
       await fs.access(reviewFile);
       reviewFiles.push(reviewFile);
+      const reviewPlanDir=runFile.replace(/\\.json$/,'-review-plans');
+      const entries=await fs.readdir(reviewPlanDir);
+      if(entries.length!==selectedIds.length) throw new Error('Blinded review plan packet is incomplete for repetition '+(index+1));
+      reviewPlanFiles.push(...entries.map(name=>path.join(reviewPlanDir,name)));
     } catch {
       throw new Error('Human-review sheet was not produced for run ' + (index + 1));
     }
@@ -75,6 +80,7 @@ export async function runBenchmarkSeries({ runs = 3, outDir } = {}) {
     seriesProtocolVersion: '1.0.0',
     runFiles: runFiles.map(file => path.basename(file)),
     humanReviewFiles: reviewFiles.map(file => path.basename(file)),
+    blindedReviewPlanFiles: reviewPlanFiles.map(file => path.relative(outputDir,file)),
     humanReviewStatus: 'pending_human_review',
     humanReviewRequiredPlans: runs * selectedIds.length,
     humanReviewRequiredRows: runs * selectedIds.length * 2,
@@ -99,7 +105,8 @@ export async function runBenchmarkSeries({ runs = 3, outDir } = {}) {
       scenarioId: item.scenarioId, median: item.median, spread: item.spread, failedRuns: item.failedRuns
     })),
     outputDir, aggregatePath, consolidatedReviewPath,
-    humanReviewStatus: 'pending_human_review'
+    humanReviewStatus: 'pending_human_review',
+    blindedReviewPlanCount: reviewPlanFiles.length
   }, null, 2));
   return { aggregate, outputDir, aggregatePath, consolidatedReviewPath };
 }

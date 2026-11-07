@@ -2,7 +2,7 @@ name: OIOL CI
 
 on:
   push:
-    branches: [main, "hardening/**", "feature/**"]
+    branches: [main, "hardening/**", "feature/**", "quality/**"]
   pull_request:
   workflow_dispatch:
 
@@ -27,5 +27,15 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Static syntax checks
         run: npm run check
+      - name: Measure scanner fixture precision and recall
+        run: npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
       - name: Unit and regression tests
         run: npm test
+      - name: Upload scanner accuracy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanner-accuracy-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: benchmarks/results/scanner-accuracy.json
+          if-no-files-found: ignore
+          retention-days: 30

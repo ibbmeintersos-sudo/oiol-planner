@@ -16,10 +16,12 @@
     "benchmark:human-review": "node scripts/aggregate-human-reviews.mjs",
     "benchmark:opencode": "node scripts/run-opencode-baseline.mjs",
     "benchmark:compare": "node scripts/compare-benchmark-modes.mjs",
-    "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs"
+    "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs",
+    "benchmark:series": "node scripts/run-benchmark-series.mjs",
+    "benchmark:scanner": "node scripts/run-scanner-accuracy-benchmark.mjs"
   },
   "license": "MIT",
-  "dependencies": {
+  "optionalDependencies": {
     "@xberg-io/tree-sitter-language-pack-wasm": "1.25.0"
   }
 }

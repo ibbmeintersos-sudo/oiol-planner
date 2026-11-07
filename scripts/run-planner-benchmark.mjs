@@ -84,7 +84,7 @@ export async function main() {
     const started=Date.now();
     try{
       const project=await resolveScenarioProject(scenario);
-      const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
+      const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds}).createPlan(project);
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan});
       console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
     }catch(error){
@@ -96,13 +96,24 @@ export async function main() {
   const summary=summarizeBenchmark(scores);
   const comparisonKey=process.env.OIOL_BENCHMARK_COMPARISON_KEY||null,budgetKey=process.env.OIOL_BENCHMARK_BUDGET_KEY||null;
   const runId=createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16);
-  const output={protocolVersion:'1.2',runnerVersion:'1.2.0',benchmarkMode:'oiol',comparisonKey,budgetKey,runId,createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.1',benchmarkMode:'oiol',comparisonKey,budgetKey,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
+  const maxRepairRounds=Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2);
+  const output={protocolVersion:'1.2',runnerVersion:'1.2.0',benchmarkMode:'oiol',comparisonKey,budgetKey,runId,createdAt:new Date().toISOString(),maxRepairRounds,configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.2',benchmarkMode:'oiol',comparisonKey,budgetKey,maxRepairRounds,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
+  const reviewPlanDir=out.replace(/\.json$/,'-review-plans');
+  await fs.mkdir(reviewPlanDir,{recursive:true});
+  const reviewPlanByScenario=new Map();
+  for(const record of records) {
+    if(!record.plan) continue;
+    const {review,providerUsage,validation,...blindPlan}=record.plan;
+    const reviewPlanFile=path.join(reviewPlanDir,record.scenarioId+'.json');
+    await fs.writeFile(reviewPlanFile,JSON.stringify(blindPlan,null,2)+'\n');
+    reviewPlanByScenario.set(record.scenarioId,reviewPlanFile);
+  }
   const csvCell=value=>'"'+String(value??'').replaceAll('"','""')+'"';
-  const csv=['scenario_id,category,run_id,plan_file,plan_scenario_selector,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
-  for(const row of scores) csv.push([row.scenarioId,row.category,runId,out,'records[].scenarioId='+row.scenarioId,...Array(12).fill('')].map(csvCell).join(','));
+  const csv=['scenario_id,category,run_id,plan_file,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
+  for(const row of scores) csv.push([row.scenarioId,row.category,runId,reviewPlanByScenario.get(row.scenarioId)||'',...Array(12).fill('')].map(csvCell).join(','));
   const humanPath=out.replace(/\.json$/,'-human-review.csv');
   await fs.writeFile(humanPath,csv.join('\n')+'\n');
   console.log(JSON.stringify({summary,resultFile:out,humanReviewFile:humanPath},null,2));

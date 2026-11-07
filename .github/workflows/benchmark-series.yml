@@ -1,0 +1,62 @@
+name: OIOL repeated live benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Number of full ten-scenario repetitions (minimum 3)
+        required: true
+        default: "3"
+        type: choice
+        options:
+          - "3"
+          - "4"
+          - "5"
+
+permissions:
+  contents: read
+
+jobs:
+  repeated-planning-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OIOL_BENCHMARK_ALLOW_LIVE: "1"
+      OIOL_PROVIDER: ${{ vars.OIOL_PROVIDER || 'openai-compatible' }}
+      OIOL_MODEL: ${{ vars.OIOL_MODEL }}
+      OIOL_BASE_URL: ${{ vars.OIOL_BASE_URL }}
+      OIOL_API_KEY: ${{ secrets.OIOL_API_KEY }}
+      OIOL_REVIEW_PROVIDER: ${{ vars.OIOL_REVIEW_PROVIDER }}
+      OIOL_REVIEW_MODEL: ${{ vars.OIOL_REVIEW_MODEL }}
+      OIOL_REVIEW_BASE_URL: ${{ vars.OIOL_REVIEW_BASE_URL }}
+      OIOL_REVIEW_API_KEY: ${{ secrets.OIOL_REVIEW_API_KEY }}
+      OIOL_TIMEOUT_MS: "120000"
+      OIOL_MAX_RETRIES: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify provider credentials
+        shell: bash
+        run: |
+          if [[ "$OIOL_PROVIDER" != "ollama" && -z "$OIOL_API_KEY" ]]; then
+            echo "Repository secret OIOL_API_KEY is required for a remote planner provider." >&2
+            exit 1
+          fi
+          if [[ -n "$OIOL_REVIEW_PROVIDER" && "$OIOL_REVIEW_PROVIDER" != "ollama" && -z "$OIOL_REVIEW_API_KEY" ]]; then
+            echo "Repository secret OIOL_REVIEW_API_KEY is required for a separate remote reviewer." >&2
+            exit 1
+          fi
+      - name: Run repeated series across all ten scenarios
+        run: npm run benchmark:series -- --runs "${{ inputs.runs }}" --out-dir "benchmarks/results/live-${{ github.run_id }}"
+      - name: Upload raw plans, blinded review packets, and aggregates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oiol-live-benchmark-${{ github.run_id }}
+          path: benchmarks/results/live-${{ github.run_id }}
+          if-no-files-found: error
+          retention-days: 30

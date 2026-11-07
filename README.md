@@ -34,7 +34,7 @@ A task's write scope, dependencies, outputs, and acceptance criteria are plannin
 
 - Node.js 22 or newer.
 - An LLM provider endpoint for plan generation. Ollama can be used locally.
-- One pinned runtime dependency: `@xberg-io/tree-sitter-language-pack-wasm` 1.25.0. Its curated grammar subset is bundled in the package; scanning does not download parser grammars at runtime.
+- An optional pinned AST dependency: `@xberg-io/tree-sitter-language-pack-wasm` 1.25.0. When installed, the scanner uses bundled Tree-sitter grammars where available. If the package or a grammar is unavailable, bounded lexical analysis remains available; no parser grammar is downloaded at scan time.
 
 ## Quick start
 
@@ -64,7 +64,7 @@ Configuration is read from .env when supported by the Node runtime, or from shel
 
 ## Plan contract and validation
 
-The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. Every newly generated plan declares schemaVersion: "1.0.0".
+The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. Every newly generated plan declares `schemaVersion: "1.0.0"` and `contractVersion: "1.0"`. The built-in validator supports a documented keyword subset; exact semantics, unsupported keywords, and the migration policy are in `schemas/README.md`.
 
 Validate an existing plan without calling a model:
 
@@ -84,11 +84,11 @@ The report explicitly distinguishes planned work from completed or verified work
 
 ## Existing repository analysis
 
-The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. Each included excerpt has a stable evidence ID, a SHA-256 fingerprint of the original file, and a separate SHA-256 fingerprint of the redacted excerpt; the same evidence ID and fingerprints are propagated into analyzer evidence and the structural scan's `sourceEvidence` references. The structural pass uses Tree-sitter concrete syntax trees for languages available in the pinned WebAssembly grammar bundle. It extracts syntax-aware declarations and import references, records parser-recovery diagnostics, resolves supported relative imports against files included in the scan, and retains bounded lexical fallback for unsupported languages or files that cannot be parsed. It also reports framework signals from manifests, conventional/manifest-declared entry points, route-like files, test-like files, and explicit AST/lexical coverage counts. Each structural result is marked as untrusted repository-derived metadata. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
+The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. Each included excerpt has a stable evidence ID, a SHA-256 fingerprint of the original file, and a separate SHA-256 fingerprint of the redacted excerpt; the same evidence ID and fingerprints are propagated into analyzer evidence and the structural scan's `sourceEvidence` references. The structural pass uses Tree-sitter concrete syntax trees when the optional WebAssembly language-pack dependency is installed and a bundled grammar is available. AST can be disabled per scan with `scanRepository(path, { analysisMode: "lexical" })`. It extracts syntax-aware declarations and import references, records parser-recovery diagnostics, resolves supported relative imports against files included in the scan, and retains bounded lexical fallback for unsupported languages or files that cannot be parsed. It also reports framework signals from manifests, conventional/manifest-declared entry points, route-like files, test-like files, and explicit AST/lexical coverage counts. Each structural result is marked as untrusted repository-derived metadata. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
 
 Tree-sitter produces concrete syntax trees, not type checking, complete symbol resolution, or proof of runtime behavior. The bundled WASM grammar set is curated; unsupported languages use lexical fallback. Package aliases, tsconfig/path aliases, workspace resolution, dynamic imports, generated code, reflection, and runtime dependency injection may remain unresolved. Parser errors are retained as diagnostics rather than treated as proof that the whole file is unusable. Coverage counts distinguish source files discovered, source files read, and files parsed by AST. Repository claims should be grounded in scanner evidence; absence from the bounded scan is not proof that a file, dependency, or behavior does not exist.
 
-Repository text is untrusted input. Prompt-injection patterns and secret redaction require further hardening; neither should be treated as a security boundary.
+Repository content is passed to the planner in a structured JSON input envelope that separates trusted user requests from explicitly labeled untrusted repository payloads. Planner and reviewer instructions treat repository fields and prior generated plans as data, not instructions. This is defense in depth, not a guaranteed isolation boundary: model behavior can still be influenced by adversarial content, so repository evidence remains untrusted and requires human review. Secret redaction is heuristic and must not be treated as a security boundary.
 
 ## Planning quality benchmark
 
@@ -103,7 +103,13 @@ Live planning benchmark calls can incur provider charges and require explicit op
 
     OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
 
-The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. Filled review sheets can be combined with npm run benchmark:human-review; the gate requires two reviewers per scenario, documented evidence, adjudication of large disagreements, and no critical findings. No live provider quality score or superiority claim is made until those experiments have actually been completed.
+Run a full repeated 3 × 10-scenario series and create blinded review packets:
+
+    OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:series -- --runs 3 --out-dir benchmarks/results/series-2026-11-07
+
+The series writes raw runs, aggregate medians/min/max/spread, one sanitized review-plan file per scenario/run (provider and automatic-review metadata removed), and a consolidated CSV. Every one of the 30 plans requires two independent blind human reviews (60 review rows). Human review remains pending until actual reviewers complete the sheets; the runner does not invent scores.
+
+The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. Filled consolidated review sheets can be combined with `npm run benchmark:human-review`; the gate requires two distinct reviewers per scenario/run plan, documented evidence, adjudication of large disagreements, and no high or critical findings. No live provider quality score or superiority claim is made until those experiments have actually been completed. Run `npm run benchmark:scanner` to measure function-symbol and import precision/recall against manually reviewed fixture goldens in both `auto` and `lexical` modes.
 
 An OpenCode planning-only baseline adapter and paired comparison scripts are available for evaluation. They are benchmark tooling, not OIOL execution features. Configure the receiving OpenCode plan agent with read-only permissions; the adapter's diff check is not a sandbox.
 
@@ -116,11 +122,11 @@ CI tests Node.js 22 and 24.
 
 ## Current limitations
 
-- No live provider benchmark or blinded human evaluation has been completed.
+- Live provider results and blinded human evaluation are not committed by default; use the opt-in repeated benchmark and retain its raw outputs and completed review aggregate.
 - The starter benchmark contains ten scenarios and compact synthetic repository fixtures; it is not statistically representative.
 - Automated concept matching is lexical and can miss valid paraphrases or reward superficial keyword inclusion.
-- Repository analysis is bounded and uses Tree-sitter AST where a bundled grammar is available, with lexical fallback elsewhere; it is not type-aware or a complete semantic dependency graph.
-- Prompt-injection isolation, provenance, and secret redaction need stronger evidence and tests.
+- Repository analysis is bounded and uses optional Tree-sitter AST where a bundled grammar is available, with lexical fallback elsewhere. `npm run benchmark:scanner` reports precision/recall on compact manually reviewed fixtures; these measurements do not establish production-repository accuracy or a complete semantic dependency graph.
+- Prompt-injection handling uses structured trusted/untrusted input fields and explicit system instructions, but is not a model isolation guarantee; provenance and heuristic redaction still require adversarial evaluation.
 - Provider-reported usage may be available, but pricing is not estimated.
 
 ## License
