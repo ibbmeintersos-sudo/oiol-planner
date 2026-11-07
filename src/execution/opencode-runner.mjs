@@ -86,7 +86,7 @@ function buildTaskPrompt(task,dependencyResults,maxChars) {
 
 function assertDiffWithinWriteScope(diff,writeScope) {
   if(!Array.isArray(writeScope)) throw new Error('Task writeScope must be an array');
-  const scopes=writeScope.map(scope=>String(scope).replaceAll('\\','/').replace(/\\/$/,''));
+  const scopes=writeScope.map(scope=>{if(typeof scope!=='string'||!safePath(scope)) throw new Error('Task writeScope contains an invalid path');return scope.replaceAll('\\','/').replace(/\/$/,'');});
   const violations=[];
   for(const item of diff) {
     if(!isObject(item)||typeof item.file!=='string'||!safePath(item.file)) {
