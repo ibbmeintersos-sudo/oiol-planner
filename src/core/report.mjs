@@ -2,7 +2,7 @@ import { topologicalWaves } from './graph.mjs';
 import { deriveTaskInterfaces } from './task-interface.mjs';
 import { buildTraceability } from './traceability.mjs';
 
-const text = value => String(value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ').trim();
+const text = value => String(value && typeof value === 'object' ? (value.statement || value.description || value.question || JSON.stringify(value)) : value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ').trim();
 const list = values => Array.isArray(values) && values.length ? values.map(value => '- ' + text(value)).join('\n') : '- None recorded';
 
 export function renderPlanMarkdown(plan = {}) {
