@@ -34,11 +34,31 @@ export class JsonlEventStore {
     this.eventIds=new Set();
     this.initialized=false;
   }
+  async #discardTornTail(content){
+    if(!content||content.endsWith('\n')) return content;
+    const lastNewline=content.lastIndexOf('\n');
+    const completePrefix=lastNewline>=0?content.slice(0,lastNewline+1):'';
+    const tail=content.slice(lastNewline+1);
+    let tailIsJson=false;
+    try{JSON.parse(tail);tailIsJson=true;}catch{}
+    const handle=await fs.open(this.filePath,'r+');
+    try{
+      if(tailIsJson){
+        await handle.write('\n',Buffer.byteLength(content,'utf8'),'utf8');
+        await handle.sync();
+        return content+'\n';
+      }
+      await handle.truncate(Buffer.byteLength(completePrefix,'utf8'));
+      await handle.sync();
+      return completePrefix;
+    }finally{await handle.close();}
+  }
   async #initialize(){
     if(this.initialized) return;
     let content;
     try{content=await fs.readFile(this.filePath,'utf8');}
     catch(error){if(error.code==='ENOENT'){this.initialized=true;return;}throw error;}
+    content=await this.#discardTornTail(content);
     for(const [index,line] of content.split('\n').entries()){
       if(!line.trim()) continue;
       let event;
