@@ -46,7 +46,7 @@ export async function runOpenCodeBaselineScenario({client,scenario,project=scena
     if(message.info.error)throw new Error('OpenCode baseline assistant reported an error');
     const assistantText=message.parts.filter(part=>part?.type==='text'&&typeof part.text==='string').map(part=>part.text).join('\n');
     const plan=parseBaselinePlan(assistantText);
-    result={scenarioId:scenario.id,plan,assistantText,sessionId,messageId:message.info.id||null,elapsedMs:Date.now()-startedAt};
+    result={scenarioId:scenario.id,plan,assistantText,sessionId,messageId:message.info.id||null,messageInfo:{model:message.info.model||null},usage:message.info.tokens||message.info.usage||null,elapsedMs:Date.now()-startedAt};
   }catch(error){runError=error;}
   finally{
     if(sessionId){try{await client.deleteSession(sessionId,{signal,timeoutMs:5000});}catch(error){cleanupWarning=error.message;}}
