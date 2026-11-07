@@ -4,8 +4,8 @@
 
 ### Added
 - Added a pinned WebAssembly Tree-sitter language-pack dependency with a bundled grammar subset, avoiding parser grammar downloads during repository scans.
-- Added syntax-tree-based extraction of declarations and import references, syntax-recovery diagnostics, bounded parsing, and AST coverage metadata.
-- Preserved bounded lexical fallback for unsupported grammars and files that cannot be parsed.
+- Added syntax-tree-based extraction of declarations and import references, syntax-recovery diagnostics, bounded source-size/depth/node traversal, and AST coverage metadata.
+- Preserved bounded lexical fallback for unsupported grammars or files that cannot be parsed.
 - Added regression fixtures for JavaScript AST extraction, comment false positives, Python relative imports, and syntax-error recovery.
 
 ### Changed
@@ -14,7 +14,7 @@
 - Kept the product planning-only: repository scanning remains read-only and does not run project code or commands.
 
 ### Validation
-- CI validation is pending on the feature branch. Results will be recorded after Node.js 22 and 24 jobs complete.
+- CI run [42407128785](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407128785) passed on Node.js 22 and 24: 138 tests passed, 0 failed in each job.
 
 ## 0.4.1 — planning integrity and provenance hardening
 
@@ -32,7 +32,7 @@
 - Added non-blocking plan-quality diagnostics for missing descriptions, acceptance criteria, component responsibilities, decision alternatives, mitigations, and clarification questions.
 - Added a schema-aware validator for the published contract's supported JSON Schema keywords. HybridPlanner rejects schema-invalid plans before reviewer evaluation; the offline CLI validates the same contract without provider calls.
 - Added plan-evidence contract validation and aligned benchmark scoring with actual scanner evidence.
-- CI run 42349275375 passed on Node.js 22 and 24: 135 tests passed on Node.js 24; both jobs succeeded.
+- CI run 42349275375 passed on Node.js 22 and 24.
 
 ## 0.4.0 — planning-only contract and quality foundations
 

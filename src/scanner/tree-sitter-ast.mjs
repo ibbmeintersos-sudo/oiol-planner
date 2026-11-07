@@ -242,6 +242,7 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
       root = tree.rootNode();
       const stack = [{ node: root, depth: 0 }];
       let fileNodeCount = 0;
+      let depthLimitReached = false;
       while (stack.length && fileNodeCount < MAX_NODES_PER_FILE) {
         const current = stack.pop();
         const node = current.node;
@@ -249,6 +250,7 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
           visitedNodes++;
           fileNodeCount++;
           if (current.depth > MAX_DEPTH) continue;
+          if (current.depth === MAX_DEPTH && node.childCount() > 0) depthLimitReached = true;
           const kind = node.kind();
           const symbol = classifySymbol(language, node, sourceBytes, lineStarts);
           if (symbol) symbols.push({ file, ...symbol });
@@ -282,7 +284,7 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
         }
       }
       while (stack.length) safeFree(stack.pop().node);
-      parsedFiles.push({ file, language, hasError: Boolean(root.hasError?.()), nodeLimitReached: fileNodeCount >= MAX_NODES_PER_FILE });
+      parsedFiles.push({ file, language, hasError: Boolean(root.hasError?.()), nodeLimitReached: fileNodeCount >= MAX_NODES_PER_FILE, depthLimitReached });
       parseCounts[language] = (parseCounts[language] || 0) + 1;
     } catch (error) {
       failedFiles.push({ file, language, reason: String(error?.message || error).slice(0, 180) });

@@ -22,16 +22,16 @@ OIOL does not implement code, run project commands or tests, modify target repos
 
 ## Validation evidence
 
-This branch introduces a new parser dependency and AST extraction path. CI validation is pending for this branch; no test-pass claim is made in this report until the Node.js 22 and 24 jobs complete successfully.
+CI run [42407128785](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407128785) passed on Node.js 22 and Node.js 24. Both jobs passed static syntax checks and all 138 tests (138 passed, 0 failed).
 
-The regression suite adds JavaScript AST extraction and comment false-positive checks, Python package-relative import resolution, and syntax-recovery diagnostics. Existing scanner tests are updated to assert AST coverage while preserving the prior evidence, graph, and planning-only contract checks.
+The regression suite covers JavaScript AST extraction and comment false-positive checks, Python package-relative import resolution, syntax-recovery diagnostics, existing scanner evidence and graph behavior, and the planning-only contract.
 
 ## Known limitations
 
 - The WebAssembly grammar bundle is curated; unsupported languages use lexical fallback.
 - Tree-sitter produces concrete syntax trees, not type checking, complete symbol resolution, or proof of runtime behavior.
 - Package aliases, workspace resolution, dynamic imports, generated code, reflection, and runtime dependency injection may remain unresolved.
-- The scanner remains bounded by file-count, file-size, context-size, and depth limits; absence from a scan is not proof of absence.
+- The scanner remains bounded by file-count, file-size, context-size, AST-depth, and visited-node limits; absence from a scan is not proof of absence.
 - No live provider benchmark or blinded human evaluation has been completed.
 - Prompt-injection resistance and secret redaction are defense-in-depth measures, not a security boundary.
 - Reviewer configuration separation is not proof of independent judgment.

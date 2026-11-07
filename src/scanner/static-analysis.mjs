@@ -154,6 +154,8 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     unsupportedLanguageFileCount: ast.unsupportedFileCount,
     parseFailureFileCount: ast.failedFileCount,
     syntaxErrorFileCount: ast.parsedFiles.filter(item => item.hasError).length,
+    nodeLimitFileCount: ast.parsedFiles.filter(item => item.nodeLimitReached).length,
+    depthLimitFileCount: ast.parsedFiles.filter(item => item.depthLimitReached).length,
     parseCounts: ast.parseCounts,
     visitedAstNodeCount: ast.visitedNodeCount,
     symbols: symbols.slice(0, 4000),
