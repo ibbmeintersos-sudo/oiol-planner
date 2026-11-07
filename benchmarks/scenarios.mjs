@@ -36,9 +36,8 @@ export const scenarios = [
     expectedSignals:[['dashboard','visualization'],['metric','kpi'],['data source','source system']],
     mustClarify:true,
     clarificationSignals:[['metric definition','kpi definition','metric owner'],['data source','source system','authoritative source'],['real-time','freshness','latency']]
-  }
+  },
   {
-    id:'GF-ANALYTICS-007'
     id:'GF-ANALYTICS-007', category:'greenfield', difficulty:'hard',
     project:{kind:'greenfield',name:'Event Analytics Pipeline',request:'Design an event analytics pipeline that accepts application events, validates schemas, deduplicates retries, processes events asynchronously, supports replay, and exposes operational metrics. Protect personal data and define retention boundaries.',repository:null,constraints:['Separate ingestion from asynchronous processing','Define idempotency and replay behavior','Do not retain unnecessary personal data','Include failure handling and observable service-level indicators'],evidence:[{id:'ev-user-7',type:'user_request',description:'Event analytics pipeline request',source:'user'}]},
     expectedSignals:[['event ingestion','ingest'],['schema validation','event schema'],['idempotency','deduplication'],['asynchronous','queue','worker'],['replay','reprocessing'],['metrics','observability'],['retention','privacy','personal data']],
