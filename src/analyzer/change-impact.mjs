@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 
 const STOP_WORDS = new Set([
   'a','an','and','are','as','at','be','by','for','from','in','into','is','it','of','on','or','our',
-  'the','to','was','we','with','without','please','should','need','want','implement','support','new','existing',
+  'the','to','was','we','with','without','please','should','need','want','implement','support','new','existing','api',
   'add','change','create','update','modify','fix','make','remove','delete','refactor','improve','enhance',
   'اريد','أريد','نريد','من','في','على','الى','إلى','عن','مع','هذا','هذه','ذلك','ثم','و','او','أو',
   'ان','أن','يتم','تم','لي','النظام','التطبيق','المشروع','الخاص','به','تعديل','تحديث','اضافه','إضافة',
@@ -11,7 +11,7 @@ const STOP_WORDS = new Set([
 
 const TOKEN_GROUPS = [
   ['auth','authentication','authenticate','authorization','authorize','login','signin','sign-in','log-in','دخول','الدخول','تسجيل','مصادقة'],
-  ['user','users','account','accounts','profile','profiles','مستخدم','مستخدمين','المستخدم','المستخدمين','حساب','حسابات','الحساب'],
+  ['user','users','account','accounts','مستخدم','مستخدمين','المستخدم','المستخدمين','حساب','حسابات','الحساب'],
   ['order','orders','طلب','طلبات','الطلب','الطلبات'],
   ['product','products','منتج','منتجات','المنتج','المنتجات'],
   ['payment','payments','pay','billing','دفع','مدفوعات','المدفوعات','الفوترة'],
@@ -21,7 +21,7 @@ const TOKEN_GROUPS = [
   ['inventory','stock','warehouse','مخزون','المخزون','المستودع','المخازن'],
   ['report','reports','analytics','تقرير','تقارير','التقارير','تحليلات'],
   ['search','query','بحث','البحث','استعلام'],
-  ['route','routes','endpoint','api','مسار','مسارات','نقطة']
+  ['route','routes','endpoint','مسار','مسارات','نقطة']
 ];
 
 function normalizeToken(value) {
@@ -61,6 +61,14 @@ const sorted = values => [...values].sort((a, b) => a.localeCompare(b));
 const round = value => Number(value.toFixed(3));
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const normPath = value => String(value || '').replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/+/g, '/');
+
+function isTestFilePath(value) {
+  const file = normPath(value);
+  const base = file.split('/').at(-1) || '';
+  return /(^|\/)(__tests__|tests?|spec)(\/|$)/i.test(file) ||
+    /\.(?:test|spec)\.[^.]+$/i.test(base) ||
+    /(^|\/)(?:test|spec)[_-]/i.test(file);
+}
 
 function tokenIntersection(queryTokens, featureTokens) {
   return new Set([...queryTokens].filter(token => featureTokens.has(token)));
@@ -238,7 +246,7 @@ function impactedTests(repository, structure, impactedPaths, directMatches, maxT
   const testPaths = new Set([
     ...(Array.isArray(repository.tests) ? repository.tests : []),
     ...(Array.isArray(structure.testFiles) ? structure.testFiles : [])
-  ].map(normPath));
+  ].filter(isTestFilePath).map(normPath));
   const directSet = new Set(directMatches.map(item => item.path));
   const impactedSet = new Set(impactedPaths);
   const importsByTest = new Map();
@@ -330,7 +338,7 @@ export function analyzeChangeImpact({
   const testPathSet = new Set([
     ...(Array.isArray(repository.tests) ? repository.tests : []),
     ...(Array.isArray(structure.testFiles) ? structure.testFiles : [])
-  ].map(normPath));
+  ].filter(isTestFilePath).map(normPath));
   const sourceFiles = sorted(new Set((structure.dependencyGraph?.nodes || []).map(normPath)))
     .filter(file => !testPathSet.has(file));
   const workspacePackages = structure.workspaceGraph?.packages || [];

@@ -9,7 +9,8 @@ function makeRepository({ truncated = false } = {}) {
     'apps/admin-worker/src/admin-route.ts',
     'test/auth/session.test.ts',
     'test/profile/profile-route.test.ts',
-    'packages/shared/src/logger.ts'
+    'packages/shared/src/logger.ts',
+    'src/users/testimonial-service.ts'
   ];
   const edges = [
     { from: 'apps/customer-api/src/profile-route.ts', to: 'packages/auth-core/src/session-manager.ts', kind: 'imports' },
@@ -35,7 +36,7 @@ function makeRepository({ truncated = false } = {}) {
     fileCountIsLowerBound: truncated,
     truncated,
     depthTruncated: false,
-    tests: ['test/auth/session.test.ts', 'test/profile/profile-route.test.ts'],
+    tests: ['test/auth/session.test.ts', 'test/profile/profile-route.test.ts', 'src/users/testimonial-service.ts'],
     coverage: { sourceFilesOmittedBySelectionLimit: 0, readFailureCount: 0, oversizedFileCount: 0 },
     structure: {
       analysisMode: 'auto',
@@ -47,7 +48,8 @@ function makeRepository({ truncated = false } = {}) {
       symbols: [
         { file: files[0], name: 'userSession', kind: 'class' },
         { file: files[1], name: 'readProfile', kind: 'function' },
-        { file: files[2], name: 'loadAdminDashboard', kind: 'function' }
+        { file: files[2], name: 'loadAdminDashboard', kind: 'function' },
+        { file: files[6], name: 'findUserReviews', kind: 'function' }
       ],
       imports,
       testFiles: ['test/auth/session.test.ts', 'test/profile/profile-route.test.ts'],
@@ -89,6 +91,8 @@ test('change impact distinguishes direct targets, reverse dependents, and likely
     item.propagation === 'reverse_import_dependency'
   ));
   assert.equal(result.potentiallyAffectedFiles.some(item => item.path.startsWith('test/')), false);
+  assert.ok(result.directMatches.some(item => item.path === 'src/users/testimonial-service.ts'));
+  assert.equal(result.affectedTests.some(item => item.path === 'src/users/testimonial-service.ts'), false);
   assert.ok(result.affectedTests.some(item =>
     item.path === 'test/auth/session.test.ts' &&
     item.association === 'resolved_test_import_to_impacted_file' &&
