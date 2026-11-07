@@ -28,11 +28,12 @@ export class HybridPlanner {
         catch(error) { review=null; reviewError=error; break; }
       }
     }
-    plan.review=review||{status:'needs_revision',summary:reviewError?`Review unavailable: ${reviewError.message}`:'No reviewer configured',findings:[]};
+    const independentReview=Boolean(this.reviewer&&this.reviewer!==this.provider);
+    plan.review={...(review||{status:'needs_revision',summary:reviewError?`Review unavailable: ${reviewError.message}`:'No reviewer configured',findings:[]}),independent:independentReview};
     plan.validation=validation;
     const critical=review?.findings?.some(x=>x.severity==='critical')||false;
     const high=review?.findings?.some(x=>x.severity==='high')||false;
-    plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high?'needs_revision':'ready_for_review';
+    plan.status=!validation.valid||critical||review?.status==='blocked'?'blocked':!review||review.status!=='approved'||high||!independentReview?'needs_revision':'ready_for_review';
     return plan;
   }
 }
