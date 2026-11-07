@@ -50,9 +50,11 @@ export function aggregateUsage(records) {
       const usage=call.usage;
       if(!usage||typeof usage!=='object') { totals.unreportedCalls++; continue; }
       totals.reportedCalls++;
-      totals.promptTokens+=Number(usage.prompt_tokens??usage.input_tokens??0)||0;
-      totals.completionTokens+=Number(usage.completion_tokens??usage.output_tokens??0)||0;
-      totals.totalTokens+=Number(usage.total_tokens??((Number(usage.prompt_tokens??usage.input_tokens??0)||0)+(Number(usage.completion_tokens??usage.output_tokens??0)||0)))||0;
+      const prompt=Number(usage.prompt_tokens??usage.input_tokens??usage.promptTokenCount??0)||0;
+      const completion=Number(usage.completion_tokens??usage.output_tokens??usage.candidatesTokenCount??usage.completionTokenCount??0)||0;
+      totals.promptTokens+=prompt;
+      totals.completionTokens+=completion;
+      totals.totalTokens+=Number(usage.total_tokens??usage.totalTokenCount??(prompt+completion))||0;
     }
   }
   return {...totals,available:totals.reportedCalls>0,cost:null,costNote:'Provider pricing is not applied; token usage is reported only when the provider returns usage metadata.'};
