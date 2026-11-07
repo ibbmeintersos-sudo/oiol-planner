@@ -141,4 +141,4 @@ Do not certify based on a single model run or aggregate score. Minimum evidence 
 - Existing-project fixtures are real checked-in fixture repositories scanned by the repository analyzer, but remain small synthetic projects and need sanitized production repositories for stronger external validity.
 - Automated concept matching is lexical and requires human review.
 - Human-review CSV is a blank collection template; scores must be entered by reviewers.
-- Provider-reported token usage is aggregated when available; pricing is not estimated. A paired baseline OpenCode vs OpenCode+OIOL execution adapter is still required for a fair comparison.
+- Provider-reported token usage is aggregated when available; pricing is not estimated. A paired planning-only baseline harness is available; comparable runs still require identical models, inputs, reviewer configuration, and resource budgets.

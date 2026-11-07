@@ -42,7 +42,7 @@ function validateReview(review){
 }
 async function attachReviewer(plan,project,reviewer,reviewConfig,modelRef,usage){
  if(!reviewer){
-  plan.review={status:'needs_revision',summary:'No independent reviewer configured for the OpenCode baseline',findings:[],independent:false};
+  plan.review={status:'needs_revision',summary:'No distinct reviewer configuration supplied for the OpenCode baseline',findings:[],configurationDistinct:false,configurationDifference:[]};
   return;
  }
  try{
@@ -50,12 +50,15 @@ async function attachReviewer(plan,project,reviewer,reviewConfig,modelRef,usage)
   usage.reviewer.requests++;
   usage.reviewer.calls.push({model:result.model||reviewer.model||null,usage:result.usage||null});
   const review=validateReview(result.data);
-  const independent=Boolean(modelRef&&(reviewConfig.provider!==modelRef.providerID||reviewConfig.model!==modelRef.modelID));
-  plan.review={...review,independent};
+  const differences=[];
+  if(reviewConfig.provider!==modelRef.providerID)differences.push('provider');
+  if(reviewConfig.model!==modelRef.modelID)differences.push('model');
+  const configurationDistinct=differences.length>0;
+  plan.review={...review,configurationDistinct,configurationDifference:differences};
   if(review.status==='blocked'||review.findings.some(x=>x.severity==='critical'))plan.status='blocked';
-  else if(review.status!=='approved'||review.findings.some(x=>x.severity==='high'))plan.status='needs_revision';
+  else if(review.status!=='approved'||review.findings.some(x=>x.severity==='high')||!configurationDistinct)plan.status='needs_revision';
  }catch(error){
-  plan.review={status:'needs_revision',summary:'Independent review failed: '+error.message,findings:[],independent:false};
+  plan.review={status:'needs_revision',summary:'Reviewer request failed: '+error.message,findings:[],configurationDistinct:false,configurationDifference:[]};
  }
 }
 
@@ -98,7 +101,7 @@ export async function main(){
  }
  const scores=records.map(record=>{const scenario=chosen.find(x=>x.id===record.scenarioId);return record.error?{scenarioId:record.scenarioId,category:scenario.category,difficulty:scenario.difficulty,score:0,blockers:[record.error.message]}:scoreScenario(scenario,record);});
  const summary=summarizeBenchmark(scores);
- const publicReview=reviewConfig?{provider:reviewConfig.provider,model:reviewConfig.model,baseUrl:reviewConfig.baseUrl,timeoutMs:reviewConfig.timeoutMs,maxRetries:reviewConfig.maxRetries,credentialConfigured:Boolean(reviewConfig.apiKey)}:{mode:'no independent reviewer configured'};
+ const publicReview=reviewConfig?{provider:reviewConfig.provider,model:reviewConfig.model,baseUrl:reviewConfig.baseUrl,timeoutMs:reviewConfig.timeoutMs,maxRetries:reviewConfig.maxRetries,credentialConfigured:Boolean(reviewConfig.apiKey)}:{mode:'no distinct reviewer configuration supplied'};
  const comparisonKey=process.env.OIOL_BENCHMARK_COMPARISON_KEY||null,budgetKey=process.env.OIOL_BENCHMARK_BUDGET_KEY||null;
  const output={protocolVersion:'1.1',runnerVersion:'1.0.0',executionMode:'opencode-baseline',comparisonKey,budgetKey,runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|baseline|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.1',executionMode:'opencode-baseline',comparisonKey,budgetKey,openCode:{baseUrl:baseConfig.baseUrl,agent:baseConfig.agent,model:baseConfig.modelRef},reviewer:publicReview,scenarioIds:chosen.map(x=>x.id).sort()}),provider:{name:'OpenCode',baseUrl:baseConfig.baseUrl,agent:baseConfig.agent,model:baseConfig.modelRef},reviewer:publicReview,usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['OpenCode baseline requires an explicitly selected read-only plan agent.','OpenCode token usage is included only if the message response exposes compatible usage metadata.','For a fair paired comparison, use the same scenario selection, repository fixtures, model, reviewer, and resource budget in both modes.','OpenCode model and agent configuration must be recorded; a default server model cannot be assumed equivalent to the OIOL provider model.']};
  const out=path.resolve(arg('out','benchmarks/results/opencode-baseline-'+Date.now()+'.json'));

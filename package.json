@@ -9,7 +9,6 @@
     "test": "node --test",
     "check": "node scripts/check.mjs",
     "plan": "node src/cli.mjs",
-    "smoke:opencode": "node scripts/opencode-smoke.mjs",
     "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
     "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs",
     "benchmark:opencode": "node scripts/run-opencode-baseline.mjs",
