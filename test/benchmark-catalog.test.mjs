@@ -48,13 +48,13 @@ test('benchmark configuration fingerprint is stable and changes with configurati
 test('usage aggregation normalizes common provider token field names and never invents cost',()=>{
   const result=aggregateUsage([
     {plan:{providerUsage:{planner:{calls:[{usage:{prompt_tokens:100,completion_tokens:25,total_tokens:125}}]},reviewer:{calls:[{usage:{input_tokens:50,output_tokens:10}}]}}}},
-    {plan:{providerUsage:{planner:{calls:[{usage:null}]},reviewer:{calls:[]}}}}
+    {plan:{providerUsage:{planner:{calls:[{usage:null},{usage:{promptTokenCount:20,candidatesTokenCount:5,totalTokenCount:25}}]},reviewer:{calls:[]}}}}
   ]);
   assert.equal(result.available,true);
-  assert.equal(result.promptTokens,150);
-  assert.equal(result.completionTokens,35);
-  assert.equal(result.totalTokens,185);
-  assert.equal(result.reportedCalls,2);
+  assert.equal(result.promptTokens,170);
+  assert.equal(result.completionTokens,40);
+  assert.equal(result.totalTokens,210);
+  assert.equal(result.reportedCalls,3);
   assert.equal(result.unreportedCalls,1);
   assert.equal(result.cost,null);
 });
