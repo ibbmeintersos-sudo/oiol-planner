@@ -2,7 +2,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
 import { createProvider } from '../src/providers/index.mjs';
 import { HybridPlanner } from '../src/core/planner.mjs';
 import { scenarios } from '../benchmarks/scenarios.mjs';
@@ -29,6 +30,13 @@ function publicConfig(config) {
 }
 export function benchmarkConfigFingerprint(config) {
   return createHash('sha256').update(JSON.stringify(config)).digest('hex');
+}
+
+export async function resolveScenarioProject(scenario) {
+  const fixturePath=scenario.project?.fixturePath;
+  if(!fixturePath) return scenario.project;
+  const repoPath=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',fixturePath);
+  return analyzeProject({mode:'existing',repo:repoPath,name:scenario.project.name,request:scenario.project.request});
 }
 
 export function aggregateUsage(records) {
@@ -69,8 +77,9 @@ export async function main() {
   for(const scenario of chosen){
     const started=Date.now();
     try{
-      const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(scenario.project);
-      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,plan});
+      const project=await resolveScenarioProject(scenario);
+      const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
+      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git}:null,plan});
       console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
     }catch(error){
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message}});
