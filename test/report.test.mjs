@@ -24,12 +24,14 @@ const plan = {
   dependencyGraph: { nodes: ['task_1'], edges: [] },
   risks: [{ id: 'risk_1', severity: 'medium', description: 'Session theft', mitigation: 'Short-lived tokens' }],
   clarifications: [{ id: 'q1', question: 'Which identity provider?', blocking: true, resolved: false }],
+  assumptions: [{ statement: 'Users are internal staff.' }],
+  unknowns: [{ question: 'Which identity provider will be selected?' }],
   validation: { valid: true, errors: [], warnings: [] }
 };
 
 test('markdown report includes planning essentials and explicit planning-only disclaimer', () => {
   const markdown = renderPlanMarkdown(plan);
-  for (const value of ['Engineering Plan', 'Sample API', 'task_1', 'Wave 1', 'Session theft', 'Which identity provider?', 'Requirement traceability', 'req_1', 'Users can sign in', 'Task handoff interfaces', 'not evidence that implementation']) {
+  for (const value of ['Engineering Plan', 'Sample API', 'task_1', 'Wave 1', 'Session theft', 'Which identity provider?', 'Requirement traceability', 'req_1', 'Users can sign in', 'Task handoff interfaces', 'Users are internal staff.', 'Which identity provider will be selected?', 'not evidence that implementation']) {
     assert.ok(markdown.includes(value), 'missing report content: ' + value);
   }
 });
