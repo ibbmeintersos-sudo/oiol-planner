@@ -12,9 +12,14 @@ export function validatePlan(plan, project={}) {
   const unique=(items,label)=>{const seen=new Set();for(const item of items){if(!isObject(item)||typeof item.id!=='string'||!item.id.trim())errors.push(`${label} is missing a valid id`);else if(seen.has(item.id))errors.push(`Duplicate ${label} id: ${item.id}`);else seen.add(item.id);}};
   unique(reqs,'requirement'); unique(tasks,'task'); unique(comps,'component');
   const reqIds=new Set(reqs.map(x=>x?.id)),taskIds=new Set(tasks.map(x=>x?.id)),compIds=new Set(comps.map(x=>x?.id)),covered=new Set();
+  for(const req of reqs) {
+    if(!isObject(req)) continue;
+    if(typeof req.statement!=='string'||!req.statement.trim()) errors.push(`Requirement ${req.id} has no statement`);
+  }
   for(const task of tasks) {
     if(!isObject(task)){errors.push('Task entry must be an object');continue;}
     if(typeof task.title!=='string'||!task.title.trim()) errors.push(`Task ${task.id} has no title`);
+    if(typeof task.description!=='string'||!task.description.trim()) errors.push(`Task ${task.id} has no actionable description`);
     for(const field of ['requirementIds','componentIds','dependencies','acceptanceCriteria','writeScope']) if(!Array.isArray(task[field])) errors.push(`Task ${task.id}.${field} must be an array`);
     if(!Array.isArray(task.acceptanceCriteria)||!task.acceptanceCriteria.length||task.acceptanceCriteria.some(x=>typeof x!=='string'||!x.trim())) errors.push(`Task ${task.id} must have non-empty string acceptance criteria`);
     for(const req of Array.isArray(task.requirementIds)?task.requirementIds:[]) {if(!reqIds.has(req))errors.push(`Task ${task.id} references unknown requirement ${req}`);else covered.add(req);}
@@ -36,7 +41,11 @@ export function validatePlan(plan, project={}) {
   const schedule=topologicalWaves(tasks,expected);
   if(schedule.cycle) errors.push(`Dependency graph contains a cycle: ${schedule.remaining.join(', ')}`);
   if(schedule.error) errors.push(`Dependency scheduler error: ${schedule.error}`);
-  if((plan.clarifications||[]).some(x=>x?.blocking&&!x?.resolved)) warnings.push('Unresolved blocking clarifications remain');
+  if(!Array.isArray(plan.clarifications)) errors.push('Plan clarifications must be an array');
+  else for(const clarification of plan.clarifications) {
+    if(!isObject(clarification)) errors.push('Clarification entry must be an object');
+    else if(clarification.blocking===true&&clarification.resolved!==true) errors.push(`Unresolved blocking clarification: ${clarification.question||clarification.id||'unnamed'}`);
+  }
   if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; execution must preserve them');
   if(!tasks.length) errors.push('Plan contains no tasks');
   return result(errors,warnings,reqs.length?covered.size/reqs.length:1,tasks.length,schedule);
