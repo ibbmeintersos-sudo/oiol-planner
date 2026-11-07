@@ -13,7 +13,8 @@
     "plan": "node src/cli.mjs",
     "smoke:opencode": "node scripts/opencode-smoke.mjs",
     "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
-    "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs"
+    "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs",
+    "benchmark:opencode": "node scripts/run-opencode-baseline.mjs"
   },
   "license": "MIT"
 }
