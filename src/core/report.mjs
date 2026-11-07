@@ -1,4 +1,5 @@
 import { topologicalWaves } from './graph.mjs';
+import { deriveTaskInterfaces } from './task-interface.mjs';
 
 const text = value => String(value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ').trim();
 const list = values => Array.isArray(values) && values.length ? values.map(value => '- ' + text(value)).join('\n') : '- None recorded';
@@ -13,6 +14,9 @@ export function renderPlanMarkdown(plan = {}) {
   const clarifications = Array.isArray(plan.clarifications) ? plan.clarifications : [];
   const requirements = Array.isArray(plan.requirements) ? plan.requirements : [];
   const traceability = plan.traceability?.rows || [];
+  const taskInterfaces = Array.isArray(plan.taskInterfaces) ? plan.taskInterfaces : deriveTaskInterfaces(plan);
+  const assumptions = Array.isArray(plan.assumptions) ? plan.assumptions : [];
+  const unknowns = Array.isArray(plan.unknowns) ? plan.unknowns : [];
   const lines = [
     '# Engineering Plan', '',
     '- **Plan:** ' + text(plan.id || 'unspecified'),
@@ -41,10 +45,20 @@ export function renderPlanMarkdown(plan = {}) {
     '| ID | Task | Dependencies | Requirements | Acceptance criteria | Write scope |',
     '|---|---|---|---|---|---|',
     ...(tasks.length ? tasks.map(task => '| ' + text(task.id) + ' | ' + text(task.title) + ' | ' + text((task.dependencies || []).join(', ') || '—') + ' | ' + text((task.requirementIds || []).join(', ') || '—') + ' | ' + text((task.acceptanceCriteria || []).join('; ') || 'Missing') + ' | ' + text((task.writeScope || []).join(', ') || 'Not specified') + ' |') : ['| — | No tasks | — | — | — | — |']),
+    '', '## Task handoff interfaces', '',
+    '| Task | Inputs from dependencies | Declared outputs | Consumers |',
+    '|---|---|---|---|',
+    ...(taskInterfaces.length ? taskInterfaces.map(item => '| ' + text(item.taskId) + ' | ' + text((item.inputs || []).map(input => input.resolved ? input.fromTaskId + ': ' + input.outputs.map(output => output.name).join(', ') : 'MISSING OUTPUT from ' + input.fromTaskId).join('; ') || 'None') + ' | ' + text((item.outputs || []).map(output => output.name).join(', ') || 'None declared') + ' | ' + text((item.consumers || []).join(', ') || 'None') + ' |') : ['| — | No task interfaces | — | — |']),
     '', '## Suggested planning waves', '',
     ...(schedule.waves.length ? schedule.waves.map((wave, index) => '- **Wave ' + (index + 1) + ':** ' + wave.map(text).join(', ')) : ['- No waves could be derived from the supplied task graph.']),
     '', '## Risks', '',
     ...(risks.length ? risks.map(risk => '- **' + text(risk.severity || 'unspecified') + ' — ' + text(risk.id || 'risk') + ':** ' + text(risk.description) + '\n  - Mitigation: ' + text(risk.mitigation || 'Not specified')) : ['- No risks recorded.']),
+    '', '## Assumptions', '',
+    list(assumptions),
+    '',
+    '## Unknowns requiring investigation',
+    '',
+    list(unknowns),
     '', '## Open questions and clarifications', '',
     ...(clarifications.length ? clarifications.map(item => '- **' + (item.blocking ? 'Blocking' : 'Non-blocking') + ':** ' + text(item.question || item.statement || item.id) + (item.resolved ? ' (resolved)' : '')) : ['- No open questions recorded.']),
     '', '## Requirement traceability', '',

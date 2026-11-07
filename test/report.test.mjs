@@ -28,7 +28,7 @@ const plan = {
 
 test('markdown report includes planning essentials and explicit planning-only disclaimer', () => {
   const markdown = renderPlanMarkdown(plan);
-  for (const value of ['Engineering Plan', 'Sample API', 'task_1', 'Wave 1', 'Session theft', 'Which identity provider?', 'Requirement traceability', 'not evidence that implementation']) {
+  for (const value of ['Engineering Plan', 'Sample API', 'task_1', 'Wave 1', 'Session theft', 'Which identity provider?', 'Requirement traceability', 'Task handoff interfaces', 'not evidence that implementation']) {
     assert.ok(markdown.includes(value), 'missing report content: ' + value);
   }
 });
