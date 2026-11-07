@@ -12,6 +12,7 @@ import { scanRepository } from '../src/scanner/repository.mjs';
 import { renderPlanMarkdown } from '../src/core/report.mjs';
 import { redact } from '../src/core/utils.mjs';
 import { validatePlanSchema } from '../src/core/schema-validator.mjs';
+import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
 
 const validPlan = () => ({
   schemaVersion: '1.0.0',
@@ -144,4 +145,24 @@ test('published JSON Schema rejects execution state in plans and tasks', async (
   const taskState = structuredClone(example);
   taskState.tasks[0].status = 'completed';
   assert.equal((await validatePlanSchema(taskState)).valid, false);
+});
+
+test('analyzer evidence IDs and hashes match the exact scanner excerpts supplied to the planner', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-analyzer-evidence-'));
+  try {
+    await mkdir(path.join(root, 'src'));
+    await writeFile(path.join(root, 'src', 'service.mjs'), 'export const value = 42;\n');
+    const project = await analyzeProject({ mode: 'existing', repo: root, request: 'Review this service' });
+    const snippet = project.repository.snippets.find(item => item.path === 'src/service.mjs');
+    const evidence = project.evidence.find(item => item.source === 'src/service.mjs');
+    assert.ok(snippet);
+    assert.ok(evidence);
+    assert.equal(evidence.id, snippet.id);
+    assert.equal(evidence.sourceSha256, snippet.sourceSha256);
+    assert.equal(evidence.excerptSha256, snippet.excerptSha256);
+    assert.equal(evidence.trustLevel, 'untrusted_repository_content');
+    assert.match(project.repository.context, new RegExp(evidence.id));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
