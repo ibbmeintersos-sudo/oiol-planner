@@ -25,7 +25,7 @@ test('repeat aggregation refuses to mix configuration fingerprints',()=>{
 test('repeat aggregation does not certify incomplete scenario coverage or failed runs',()=>{
  const report=aggregateRuns([makeRun('r1',95),makeRun('r2',95),makeRun('r3',50,'GF-API-001')]);
  assert.equal(report.certificationReadyForHumanReview,false);
- assert.equal(report.failureRate,1/3);
+ assert.equal(report.failureRate,0.3333);
 });
 
 test('repeat aggregation rejects duplicate run identifiers',()=>{
