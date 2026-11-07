@@ -10,7 +10,8 @@
   "scripts": {
     "test": "node --test",
     "check": "find src -type f -name '*.mjs' -print0 | xargs -0 -n1 node --check",
-    "plan": "node src/cli.mjs"
+    "plan": "node src/cli.mjs",
+    "smoke:opencode": "node scripts/opencode-smoke.mjs"
   },
   "license": "MIT"
 }
