@@ -42,3 +42,25 @@ test('OpenCode baseline deletes a session even when the model returns invalid JS
  await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/valid JSON plan/);
  assert.equal(deleted,true);
 });
+
+import { main as baselineMain } from '../scripts/run-opencode-baseline.mjs';
+
+test('OpenCode baseline runner dry-run validates config without contacting OpenCode',async()=>{
+ const previousArgv=process.argv,previousOptIn=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+ const lines=[],previousLog=console.log;
+ try{
+  process.argv=['node','run-opencode-baseline.mjs','--scenarios','GF-API-001','--dry-run'];
+  delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+  console.log=value=>lines.push(String(value));
+  assert.equal(await baselineMain(),0);
+  const result=JSON.parse(lines.at(-1));
+  assert.equal(result.dryRun,true);
+  assert.equal(result.executionMode,'opencode-baseline');
+  assert.deepEqual(result.selected,['GF-API-001']);
+  assert.equal(result.liveCalls,false);
+ }finally{
+  process.argv=previousArgv;
+  if(previousOptIn===undefined)delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;else process.env.OIOL_BENCHMARK_ALLOW_LIVE=previousOptIn;
+  console.log=previousLog;
+ }
+});
