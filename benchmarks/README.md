@@ -1,6 +1,6 @@
 # OIOL Planner quality benchmark
 
-This benchmark is an evaluation harness, not a claim that OIOL is already high quality. It contains six versioned scenarios across Greenfield, Existing Project, ambiguous requirements, and multi-component architecture.
+This benchmark is an evaluation harness, not a claim that OIOL is already high quality. It contains ten versioned scenarios across Greenfield, Existing Project, ambiguous requirements, and multi-component architecture.
 
 ## Scenario set
 
@@ -12,6 +12,10 @@ This benchmark is an evaluation harness, not a claim that OIOL is already high q
 | EX-MONOLITH-004 | Existing Project / multi-component | Reliable asynchronous notifications in a monolith |
 | AMB-AUTH-005 | Ambiguous | SSO provider, protocol, and identity-domain ambiguity |
 | AMB-DATA-006 | Ambiguous | Undefined metrics, data sources, and real-time latency |
+| GF-ANALYTICS-007 | Greenfield / data pipeline | Event ingestion, idempotency, replay, privacy, and observability |
+| GF-DOCUMENTS-008 | Greenfield / multi-component | Secure uploads, metadata extraction, background processing, and retention |
+| EX-SEC-009 | Existing Project | Tenant-scoped invoice authorization without response regressions |
+| AMB-PAY-010 | Ambiguous | Payment provider, markets, currencies, refunds, and disputes |
 
 The existing-project cases now point to checked-in, compact Node.js fixture repositories under `benchmarks/fixtures/`. The runner invokes the real repository scanner against those directories before planning; it does not pass the old hand-authored repository summary as if it were scan output. These fixtures are still small synthetic projects, not sanitized production repositories.
 
@@ -123,7 +127,7 @@ Resolve reviewer disagreements by recording both original scores and an adjudica
 ## Certification decision
 
 Do not certify based on a single model run or aggregate score. Minimum evidence before release:
-- All six scenarios completed; no hidden failures.
+- All ten scenarios completed; no hidden failures.
 - Every ambiguous case correctly blocks provider-specific implementation pending clarification.
 - No critical or high severity human finding remains unresolved.
 - Median human overall score >= 4/5, with no scenario below 3/5.
@@ -133,7 +137,7 @@ Do not certify based on a single model run or aggregate score. Minimum evidence 
 
 ## Current limitations
 
-- The six-case set is a starter suite, not statistically representative.
+- The ten-case set is a starter suite, not statistically representative.
 - Existing-project fixtures are real checked-in fixture repositories scanned by the repository analyzer, but remain small synthetic projects and need sanitized production repositories for stronger external validity.
 - Automated concept matching is lexical and requires human review.
 - Human-review CSV is a blank collection template; scores must be entered by reviewers.
