@@ -14,7 +14,7 @@
 - Kept the product planning-only: repository scanning remains read-only and does not run project code or commands.
 
 ### Validation
-- CI run [42407128785](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407128785) passed on Node.js 22 and 24: 138 tests passed, 0 failed in each job.
+- CI run [42407390684](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407390684) passed on Node.js 22 and 24: 138 tests passed, 0 failed in each job.
 
 ## 0.4.1 — planning integrity and provenance hardening
 

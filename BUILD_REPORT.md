@@ -22,7 +22,7 @@ OIOL does not implement code, run project commands or tests, modify target repos
 
 ## Validation evidence
 
-CI run [42407128785](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407128785) passed on Node.js 22 and Node.js 24. Both jobs passed static syntax checks and all 138 tests (138 passed, 0 failed).
+CI run [42407390684](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42407390684) passed on Node.js 22 and Node.js 24. Both jobs passed static syntax checks and all 138 tests (138 passed, 0 failed).
 
 The regression suite covers JavaScript AST extraction and comment false-positive checks, Python package-relative import resolution, syntax-recovery diagnostics, existing scanner evidence and graph behavior, and the planning-only contract.
 
