@@ -18,8 +18,10 @@ export function scoreScenario(scenario, result) {
   const criteria=tasks.reduce((n,t)=>n+(Array.isArray(t.acceptanceCriteria)?t.acceptanceCriteria.length:0),0);
   const tasksWithScope=tasks.filter(t=>Array.isArray(t.writeScope)&&t.writeScope.length>0).length;
   const scopeRate=tasks.length?tasksWithScope/tasks.length:0;
+  const expectedClarificationErrors=scenario.mustClarify&&blockingClarification?validation.errors.filter(x=>x.startsWith('Unresolved blocking clarification:')):[];
+  const unexpectedValidationErrors=validation.errors.filter(x=>!expectedClarificationErrors.includes(x));
   const dimensions={
-    structuralValidity:validation.valid?1:0,
+    structuralValidity:unexpectedValidationErrors.length===0?1:0,
     requirementSignalCoverage:signalRate,
     clarificationDiscipline:clarificationPass?clarificationRate:0,
     acceptanceCriteria:tasks.length?Math.min(1,criteria/(tasks.length*2)):0,
@@ -29,13 +31,14 @@ export function scoreScenario(scenario, result) {
   const weights={structuralValidity:25,requirementSignalCoverage:25,clarificationDiscipline:20,acceptanceCriteria:15,scopedTasks:10,independentReview:5};
   const score=Object.entries(weights).reduce((sum,[key,weight])=>sum+dimensions[key]*weight,0);
   const blockers=[];
-  if(!validation.valid) blockers.push(...validation.errors);
+  if(unexpectedValidationErrors.length) blockers.push(...unexpectedValidationErrors);
   if(!clarificationPass) blockers.push(scenario.mustClarify?'Expected a blocking unresolved clarification but none was produced':'Unexpected blocking clarification for an adequately specified scenario');
-  if(plan.status==='blocked'&&!scenario.mustClarify) blockers.push('Plan is blocked for a scenario not expected to require clarification');
+  if(scenario.mustClarify&&plan.status!=='blocked') blockers.push('Ambiguous scenario did not block implementation pending clarification');
+  if(!scenario.mustClarify&&plan.status==='blocked') blockers.push('Plan is blocked for a scenario not expected to require clarification');
   return {
     scenarioId:scenario.id,category:scenario.category,difficulty:scenario.difficulty,
     status:plan.status||'missing',score:Number(score.toFixed(2)),dimensions,weights,
-    validation:{valid:validation.valid,errors:validation.errors,warnings:validation.warnings},
+    validation:{valid:validation.valid,structurallyValid:unexpectedValidationErrors.length===0,errors:validation.errors,expectedGateErrors:expectedClarificationErrors,warnings:validation.warnings},
     requirementSignals:signalResults,clarificationSignals:clarificationResults,
     clarificationPass,blockingClarification,taskCount:tasks.length,acceptanceCriteriaCount:criteria,
     tasksWithWriteScope:tasksWithScope,independentReview:plan.review?.independent===true,
