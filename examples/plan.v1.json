@@ -125,6 +125,12 @@
       ],
       "outputs": [
         "inventory-domain-rules"
+      ],
+      "inputs": [
+        {
+          "fromTaskId": "TASK-001",
+          "outputName": "inventory-api-contract"
+        }
       ]
     },
     {
@@ -151,6 +157,16 @@
       ],
       "outputs": [
         "inventory-acceptance-scenarios"
+      ],
+      "inputs": [
+        {
+          "fromTaskId": "TASK-001",
+          "outputName": "inventory-api-contract"
+        },
+        {
+          "fromTaskId": "TASK-002",
+          "outputName": "inventory-domain-rules"
+        }
       ]
     }
   ],

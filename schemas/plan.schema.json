@@ -319,6 +319,27 @@
         },
         "verification": {
           "type": "object"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "fromTaskId",
+              "outputName"
+            ],
+            "properties": {
+              "fromTaskId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "outputName": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
         }
       },
       "additionalProperties": true

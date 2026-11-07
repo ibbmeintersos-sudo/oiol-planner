@@ -4,7 +4,7 @@ const plannerRules = [
   'The plan must include:',
   '- Requirements with stable IDs, clear statements, priority, category (functional, non_functional, constraint, business_rule, or quality_attribute), and measurable acceptance criteria.',
   '- Architecture components, responsibilities, key data flows, integration boundaries, and explicit decisions. For material choices, record alternatives and trade-offs, not just the selected option.',
-  '- Small, independently understandable tasks. Every task must map to requirements and architecture components, state dependencies, list precise acceptance criteria, bounded relative writeScope paths, and explicit named outputs when another task consumes its result.',
+  '- Small, independently understandable tasks. Every task must map to requirements and architecture components, state dependencies, list precise acceptance criteria, bounded relative writeScope paths, and explicit named outputs when another task consumes its result; declare each consumed artifact in task.inputs with fromTaskId and outputName. Dependencies used only for sequencing do not need an input declaration.',
   '- A dependencyGraph whose nodes and edges exactly match task dependencies.',
   '- Risks with likelihood/impact where possible, mitigation, assumptions, unknowns, and clarifications. Block decisions that cannot safely be assumed.',
   '- For existing systems, include compatibility constraints, migration sequencing, rollback considerations, security/privacy, observability, and a planned test strategy when relevant. These are design/planning recommendations only; do not claim that tests or migrations have been run.',
