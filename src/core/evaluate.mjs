@@ -31,9 +31,10 @@ export function evaluatePlanQuality(plan = {}) {
   const resolvedUnknowns = unknowns.filter(item => hasText(item.description || item.question) && hasText(item.impact) && hasText(item.resolutionApproach) && typeof item.blocking === 'boolean');
   const risks = objects(source.risks);
   const estimatedRisks = risks.filter(item => Number.isInteger(item.likelihood) && item.likelihood >= 1 && item.likelihood <= 5 && Number.isInteger(item.impact) && item.impact >= 1 && item.impact <= 5);
+  const risksWithConfidence = risks.filter(item => ['low','medium','high'].includes(item.confidence));
   const riskExposure = estimatedRisks.map(item => {
     const score = item.likelihood * item.impact;
-    return { id: item.id || item.description, likelihood: item.likelihood, impact: item.impact, score,
+    return { id: item.id || item.description, likelihood: item.likelihood, impact: item.impact, confidence: item.confidence || 'not_recorded', assessmentBasis: item.assessmentBasis || null, score,
       band: score >= 15 ? 'critical' : score >= 10 ? 'high' : score >= 5 ? 'medium' : 'low' };
   });
   const assumptions = objects(source.assumptions);
@@ -44,7 +45,7 @@ export function evaluatePlanQuality(plan = {}) {
     rollback: { applicability:rollback.applicability||'not_recorded', notApplicable, completeness:rollbackFields.filter(Boolean).length/rollbackFields.length, completedFields:rollbackFields.filter(Boolean).length, totalFields:rollbackFields.length,
       missingFields:notApplicable?(hasText(rollback.rationale)?[]:['rationale']):['applicability','strategy','triggerConditions','steps','verification','dataCompatibility'].filter((_,i)=>!rollbackFields[i]) },
     unknowns: { reviewed:unknownsReviewed, count:unknowns.length, withResolutionCount:resolvedUnknowns.length, transparency:unknownsReviewed?(unknowns.length?resolvedUnknowns.length/unknowns.length:1):0, unresolvedBlockingCount:unknowns.filter(x=>x.blocking===true).length },
-    risks: { count:risks.length, estimatedCount:estimatedRisks.length, estimatedRate:risks.length?estimatedRisks.length/risks.length:0, mitigatedEstimatedCount:estimatedRisks.filter(x=>hasText(x.mitigation)).length, mitigationRate:risks.length?estimatedRisks.filter(x=>hasText(x.mitigation)).length/risks.length:0,
+    risks: { count:risks.length, estimatedCount:estimatedRisks.length, estimatedRate:risks.length?estimatedRisks.length/risks.length:0, confidenceRatedCount:risksWithConfidence.length, confidenceRate:risks.length?risksWithConfidence.length/risks.length:0, mitigatedEstimatedCount:estimatedRisks.filter(x=>hasText(x.mitigation)).length, mitigationRate:risks.length?estimatedRisks.filter(x=>hasText(x.mitigation)).length/risks.length:0,
       exposure:riskExposure, meanExposure:riskExposure.length?Number((riskExposure.reduce((s,x)=>s+x.score,0)/riskExposure.length).toFixed(2)):null, highOrCriticalCount:riskExposure.filter(x=>['high','critical'].includes(x.band)).length },
     assumptions: { count:assumptions.length, validatedCount:validatedAssumptions.length, validationRate:assumptions.length?validatedAssumptions.length/assumptions.length:0 }
   };

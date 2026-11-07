@@ -98,6 +98,10 @@ export function validatePlan(plan, project={}) {
   const schedule=topologicalWaves(tasks,expected);
   if(schedule.cycle) errors.push(`Dependency graph contains a cycle: ${schedule.remaining.join(', ')}`);
   if(schedule.error) errors.push(`Dependency scheduler error: ${schedule.error}`);
+  for(const unknown of (Array.isArray(plan.unknowns)?plan.unknowns:[])) {
+    if(!isObject(unknown)) { errors.push('Unknown entry must be an object'); continue; }
+    if(unknown.blocking===true) errors.push('Unresolved blocking unknown: '+String(unknown.description||unknown.question||unknown.id||'unspecified'));
+  }
   for(const clarification of (Array.isArray(plan.clarifications)?plan.clarifications:[])) {
     if(!isObject(clarification)) { errors.push('Clarification entry must be an object'); continue; }
     if(clarification.blocking===true && clarification.resolved!==true) errors.push(`Unresolved blocking clarification: ${String(clarification.question||clarification.id||'unspecified')}`);

@@ -19,7 +19,7 @@ const plannerRules = [
   '- Include a structured testStrategy with approach, levels, coverage, entryCriteria, exitCriteria, and testData. State what is proposed, not what has already passed.',
   '- Include a structured rollbackPlan. When rollback is applicable, state strategy, triggerConditions, steps, verification, and dataCompatibility. If it is genuinely not applicable, set applicability to not_applicable and explain the rationale.',
   '- Set unknownsReviewed to true only after explicitly reviewing unresolved unknowns. Represent each unknown with description, impact, resolutionApproach, and a blocking boolean. List assumptions with statement, confidence (low/medium/high), and validationApproach.',
-  '- Estimate each material risk with likelihood and impact on the documented 1-to-5 ordinal scales, provide mitigation, and do not fabricate precision. Omit estimates when evidence is insufficient and explain the uncertainty.',
+  '- Estimate each material risk with likelihood and impact on the documented 1-to-5 ordinal scales, provide confidence (low/medium/high) and assessmentBasis, provide mitigation, and do not fabricate precision. Omit estimates when evidence is insufficient and explain the uncertainty.',
   '',
   'Use concrete, bounded tasks and avoid broad rewrites. Every requirement must be mapped to one or more tasks. Do not include credentials, secrets, or destructive operations. Do not describe implementation as completed. Return the plan JSON object with requirements, architecture, tasks, dependencyGraph, risks, clarifications, evidence, and summary.'
 ].join('\n');
