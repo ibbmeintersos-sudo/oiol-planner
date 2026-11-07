@@ -47,8 +47,7 @@ export function renderPlanMarkdown(plan = {}) {
     '- **Risks with likelihood × impact estimates:** ' + (planQuality.risks ? planQuality.risks.estimatedCount + '/' + planQuality.risks.count : 'Not evaluated'),
     '- **Mean estimated risk exposure:** ' + (Number.isFinite(planQuality.risks?.meanExposure) ? planQuality.risks.meanExposure : 'Not recorded'),
     '- **High/critical estimated risks:** ' + (planQuality.risks?.highOrCriticalCount ?? 'Not recorded'), '',
-    '*These metrics measure the completeness of planning evidence; they do not prove that implementation or verification has occurred.*', ''
-
+    '*These metrics measure the completeness of planning evidence; they do not prove that implementation or verification has occurred.*', '',
     '',
     '## Non-blocking quality review signals',
     '',

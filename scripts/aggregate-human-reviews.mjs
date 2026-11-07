@@ -192,7 +192,7 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
       'Scores are human-entered and depend on reviewer calibration.',
       'For multi-run series, every scenario/run plan requires two distinct blind reviewers; reviewers must use plan_file and plan_scenario_selector.',
       'A high or critical finding blocks certification regardless of average score.',
-      'Each P2 quality dimension (NFR, test strategy, rollback, unknowns, and risk estimation) must have a median score of at least 3 for every scenario/run.'
+      'Each P2 quality dimension (NFR, test strategy, rollback, unknowns, and risk estimation) must have a median score of at least 3 for every scenario/run.',
       'Disagreements with an overall score spread of 2 or more require a documented adjudicated score.'
     ]
   };
