@@ -159,3 +159,28 @@ test('event stores reject duplicate event identifiers',async()=>{
   await store.append({eventId:'same',runId:'r1',sequence:1,type:'run.started',at});
   await assert.rejects(()=>store.append({eventId:'same',runId:'r2',sequence:1,type:'run.started',at}),/Duplicate eventId/);
 });
+
+
+test('run ledger records exact task IDs and recovery rejects unknown tasks',()=>{
+  const at=new Date().toISOString();
+  const events=[
+    {eventId:'e1',runId:'ledger',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:1,taskIds:['t1']},
+    {eventId:'e2',runId:'ledger',sequence:2,type:'task.ready',at,taskId:'rogue'}
+  ];
+  assert.throws(()=>inspectExecutionRun(events),/unknown taskId/);
+});
+
+test('recovery inspector rejects duplicate event IDs within a run',()=>{
+  const at=new Date().toISOString();
+  const events=[
+    {eventId:'same',runId:'dup-events',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:1},
+    {eventId:'same',runId:'dup-events',sequence:2,type:'task.ready',at,taskId:'t1'}
+  ];
+  assert.throws(()=>inspectExecutionRun(events),/Duplicate eventId/);
+});
+
+test('run start ledger rejects duplicate or incomplete task IDs',()=>{
+  const at=new Date().toISOString();
+  const events=[{eventId:'e1',runId:'bad-ledger',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:2,taskIds:['t1','t1']}];
+  assert.throws(()=>inspectExecutionRun(events),/invalid taskIds ledger/);
+});
