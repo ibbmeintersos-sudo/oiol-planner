@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { scenarios as benchmarkScenarios } from '../benchmarks/scenarios.mjs';
 
 const median=values=>{
   const sorted=[...values].sort((a,b)=>a-b);
@@ -31,6 +32,11 @@ export function aggregateRuns(runs) {
     const values=rows.map(x=>x.score);
     return {scenarioId,...stats(values),runs:rows,failedRuns:rows.filter(x=>x.blockers.length>0||x.score<80).length};
   });
+  const expectedScenarioIds=benchmarkScenarios.map(x=>x.id).sort();
+  const completeCoverage=runs.every(run=>{
+    const ids=(run.scores||[]).map(x=>x.scenarioId).sort();
+    return ids.length===expectedScenarioIds.length&&ids.every((id,index)=>id===expectedScenarioIds[index]);
+  });
   const scores=runs.map(x=>Number(x.summary?.averageScore)).filter(Number.isFinite);
   const failures=runs.reduce((n,x)=>n+(x.scores||[]).filter(s=>s.blockers?.length||s.score<80).length,0);
   const total=runs.reduce((n,x)=>n+(x.scores||[]).length,0);
@@ -39,10 +45,10 @@ export function aggregateRuns(runs) {
     configurationFingerprint:[...fingerprints][0],runCount:runs.length,
     repeatedRunGate:{minimumRuns:3,met:runs.length>=3},
     runAverageScore:stats(scores),
-    scenarioCount:scenarios.length,scenarioResults:scenarios,
+    scenarioCount:scenarios.length,expectedScenarioCount:expectedScenarioIds.length,completeSuiteCoverage:completeCoverage,scenarioResults:scenarios,
     failedScenarioObservations:failures,totalScenarioObservations:total,
     failureRate:total?Number((failures/total).toFixed(4)):null,
-    certificationReadyForHumanReview:runs.length>=3&&scenarios.every(x=>x.count===runs.length)&&failures===0,
+    certificationReadyForHumanReview:runs.length>=3&&completeCoverage&&scenarios.every(x=>x.count===runs.length)&&failures===0,
     limitations:['This aggregation does not replace blinded human review.','Runs must use the same configuration fingerprint; repository snapshots and budgets must also be held constant by the operator.','The automated pass threshold is a screening gate, not proof of quality.']
   };
 }
