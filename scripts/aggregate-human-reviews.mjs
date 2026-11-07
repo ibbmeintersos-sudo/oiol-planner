@@ -70,8 +70,12 @@ export function aggregateHumanReviews(rows, expectedScenarioIds = scenarios.map(
     const scenarioId = String(row.scenario_id || '').trim();
     const runId = String(row.run_id || '').trim() || 'single-run';
     const reviewerId = String(row.reviewer_id || '').trim();
-    if (!scenarioId || !reviewerId) throw new Error('Review row ' + (index + 1) + ' requires scenario_id and reviewer_id');
+    if (!scenarioId) throw new Error('Review row ' + (index + 1) + ' requires scenario_id');
     if (!expectedScenarioIds.includes(scenarioId)) throw new Error('Unknown scenario_id in review row: ' + scenarioId);
+    const hasReviewInput = DIMENSIONS.some(dimension => String(row[dimension] ?? '').trim() !== '') ||
+      String(row.highest_finding_severity ?? '').trim() !== '' || String(row.evidence_notes ?? '').trim() !== '';
+    if (!reviewerId && !hasReviewInput) continue;
+    if (!reviewerId) throw new Error('Review row ' + (index + 1) + ' has review data but no reviewer_id');
     const key = scenarioId + '::' + runId + '::' + reviewerId;
     if (unique.has(key)) throw new Error('Duplicate review for scenario ' + scenarioId + ' / run ' + runId + ' by reviewer ' + reviewerId);
     unique.add(key);

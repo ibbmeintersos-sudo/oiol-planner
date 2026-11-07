@@ -102,3 +102,17 @@ test('human review aggregation rejects duplicate reviewer submissions for the sa
     /Duplicate review/
   );
 });
+
+
+test('empty human-review template rows preserve missing run coverage without inventing scores', () => {
+  const multiRunHeader = header + ',run_id,plan_file';
+  const rows = [
+    ['T-1','greenfield','','','','','','','','','','','','','run-1','plans/run-1/T-1.json'].join(','),
+    ['T-1','greenfield','','','','','','','','','','','','','run-2','plans/run-2/T-1.json'].join(',')
+  ];
+  const report = aggregateHumanReviews(parseCsv(multiRunHeader + '\n' + rows.join('\n')), ['T-1']);
+  assert.equal(report.runCount, 2);
+  assert.equal(report.completeReviewerCoverage, false);
+  assert.equal(report.certificationReady, false);
+  assert.equal(report.scenarioRunsWithAtLeastTwoReviewers, 0);
+});
