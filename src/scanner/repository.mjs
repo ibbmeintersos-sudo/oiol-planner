@@ -40,7 +40,8 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
   return { files, discovered, truncated, depthTruncated };
 }
 
-export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12 } = {}) {
+export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, analysisMode = 'auto' } = {}) {
+  if (!['auto', 'lexical'].includes(analysisMode)) throw new Error('analysisMode must be auto or lexical');
   for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth })) {
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
   }
@@ -111,12 +112,14 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     } catch {}
   }
 
-  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests });
+  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests, maxFileBytes, analysisMode });
   const structureSummary = [
     'Repository structure analysis (Tree-sitter AST where bundled grammars are available; bounded lexical fallback otherwise; evidence, not certainty):',
     'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
     'Frameworks: ' + (structure.frameworks.join(', ') || 'not detected'),
     'Entry points: ' + (structure.entryPoints.join(', ') || 'not detected'),
+    'Scanner analysis mode: ' + structure.analysisMode,
+    'AST runtime available: ' + structure.astRuntimeAvailable,
     'AST-parsed source files: ' + structure.astFileCount,
     'Lexical fallback source files: ' + structure.lexicalFallbackFileCount,
     'Syntax-error files: ' + structure.syntaxErrorFileCount,
@@ -145,6 +148,6 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     structure: { ...structure, sourceEvidence: snippets.map(({id,path,sourceSha256,excerptSha256}) => ({id,path,sourceSha256,excerptSha256,trustLevel:'untrusted_repository_content'})) },
     snippets,
     contextTruncated,
-    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth }
+    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth, analysisMode }
   };
 }

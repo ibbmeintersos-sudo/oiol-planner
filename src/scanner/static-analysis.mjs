@@ -81,7 +81,8 @@ function resolveRelativeImport(file, language, specifier, fileSet) {
   return null;
 }
 
-export function analyzeRepositoryStructure({ files = [], contents = {}, manifests = [], maxFileBytes = 16000 } = {}) {
+export function analyzeRepositoryStructure({ files = [], contents = {}, manifests = [], maxFileBytes = 16000, analysisMode = 'auto' } = {}) {
+  if (!['auto', 'lexical'].includes(analysisMode)) throw new Error('analysisMode must be auto or lexical');
   const normalized = files.map(norm);
   const fileSet = new Set(normalized);
   const sources = normalized.filter(file => EXT.has(path.posix.extname(file).toLowerCase()));
@@ -93,7 +94,14 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     analyzed.push(file);
   }
 
-  const ast = analyzeWithTreeSitter({ files: analyzed, contents, maxFileBytes });
+  const ast = analysisMode === 'lexical'
+    ? {
+        symbols: [], imports: [], diagnostics: [], parsedFiles: [], unsupportedFiles: [], failedFiles: [],
+        parsedFileCount: 0, unsupportedFileCount: 0, failedFileCount: 0, parseCounts: {},
+        visitedNodeCount: 0, method: 'lexical_only', availableLanguages: [], runtimeAvailable: false,
+        runtimeLoadError: 'AST disabled by scanner configuration'
+      }
+    : analyzeWithTreeSitter({ files: analyzed, contents, maxFileBytes });
   const astFiles = new Set(ast.parsedFiles.map(item => item.file));
   const symbols = [...ast.symbols], imports = [...ast.imports];
   const lexicalFallbackFiles = [];
@@ -145,6 +153,9 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
 
   return {
     method: ast.parsedFileCount ? 'tree_sitter_ast_with_lexical_fallback' : 'bounded_static_heuristics',
+    analysisMode,
+    astRuntimeAvailable: Boolean(ast.runtimeAvailable),
+    astRuntimeLoadError: ast.runtimeLoadError || null,
     trustLevel: 'untrusted_repository_analysis',
     languages,
     sourceFileCount: sources.length,

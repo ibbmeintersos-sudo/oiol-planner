@@ -1,4 +1,10 @@
-import * as TreeSitter from '@xberg-io/tree-sitter-language-pack-wasm';
+let TreeSitter = null;
+let treeSitterLoadError = null;
+try {
+  TreeSitter = await import('@xberg-io/tree-sitter-language-pack-wasm');
+} catch (error) {
+  treeSitterLoadError = String(error?.message || error).slice(0, 180);
+}
 import { redact } from '../core/utils.mjs';
 
 const EXTENSION_LANGUAGE = new Map([
@@ -14,7 +20,7 @@ let grammarCatalogCache = null;
 function availableGrammarLanguages() {
   if (grammarCatalogCache) return grammarCatalogCache;
   try {
-    grammarCatalogCache = typeof TreeSitter.availableLanguages === 'function'
+    grammarCatalogCache = typeof TreeSitter?.availableLanguages === 'function'
       ? [...new Set(TreeSitter.availableLanguages())].sort()
       : [];
   } catch {
@@ -31,7 +37,7 @@ function safeFree(value) {
 
 function parserFor(language) {
   if (parserCache.has(language)) return parserCache.get(language);
-  if (typeof TreeSitter.getParser !== 'function') throw new Error('Tree-sitter WASM getParser API is unavailable');
+  if (typeof TreeSitter?.getParser !== 'function') throw new Error('Tree-sitter optional runtime is unavailable' + (treeSitterLoadError ? ': ' + treeSitterLoadError : ''));
   const parser = TreeSitter.getParser(language);
   parserCache.set(language, parser);
   return parser;
@@ -316,6 +322,8 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
     parseCounts,
     visitedNodeCount: visitedNodes,
     method: 'tree_sitter_ast',
+    runtimeAvailable: Boolean(TreeSitter && typeof TreeSitter.getParser === 'function'),
+    runtimeLoadError: treeSitterLoadError,
     availableLanguages: availableGrammarLanguages()
   };
 }
