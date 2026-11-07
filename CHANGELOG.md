@@ -15,7 +15,9 @@
 - Made scan truncation explicit with included-file counts and lower-bound metadata.
 - Added non-blocking plan-quality diagnostics for missing descriptions, acceptance criteria, component responsibilities, decision alternatives, mitigations, and clarification questions. These are review prompts, not an opaque quality score.
 - Added these diagnostics to generated plans, validation output, and Markdown reports.
-- CI run 42346433067 passed on Node.js 22 and 24: 112 tests passed, 0 failed.
+- Added a schema-aware validator for the published contract's supported JSON Schema keywords. HybridPlanner now rejects schema-invalid plans before reviewer evaluation; the offline CLI validates the same contract without provider calls.
+- Kept the validator explicit about its supported keyword subset; external consumers should use a standards-compliant Draft 2020-12 implementation.
+- CI run 42346850007 passed on Node.js 22 and 24: 116 tests passed, 0 failed.
 
 ## 0.4.0 — planning-only contract and quality foundations
 

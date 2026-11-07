@@ -11,18 +11,20 @@ OIOL does not implement code, run project commands or tests, modify target repos
 
 - Four provider adapters: OpenAI-compatible, Anthropic, Gemini, and Ollama.
 - Greenfield and bounded existing-repository analysis.
-- Structured plan contract with JSON Schema Draft 2020-12 and a complete example.
+- Structured plan contract with JSON Schema Draft 2020-12, a complete example, and an internal validator for the published schema's supported keyword subset.
+- Schema validation in HybridPlanner before reviewer evaluation, plus offline schema and semantic validation in the CLI.
 - Deterministic validation for IDs, requirement coverage, references, task inputs/outputs, dependency graph consistency, cycles, safe relative scopes, and blocking clarifications.
 - Planning-only requirement traceability.
+- Non-blocking plan-quality diagnostics surfaced in JSON and Markdown reports.
 - Markdown engineering-plan report.
 - Repository evidence identifiers and separate SHA-256 fingerprints for original source files and redacted excerpts.
 - Ten-scenario planning benchmark harness, repeated-run aggregation, paired OpenCode planning baseline, and human-review aggregation protocol.
 
 ## Validation evidence
 
-The latest CI run is [42346433067](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42346433067). Both Node.js 22 and 24 jobs passed syntax checks and all 112 tests (112 passed, 0 failed).
+The latest CI run is [42346850007](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42346850007). Both Node.js 22 and 24 jobs passed syntax checks and all 116 tests (116 passed, 0 failed).
 
-The passing suite covers malformed plan structures, planning-only contract boundaries, evidence fingerprints, structured secret redaction, quality diagnostics, CLI validation, Markdown reporting, and benchmark tooling.
+The passing suite covers published-schema validation, planner gating before reviewer evaluation, malformed plan structures, planning-only contract boundaries, evidence fingerprints, structured secret redaction, quality diagnostics, CLI validation, Markdown reporting, and benchmark tooling.
 
 ## Known limitations
 
