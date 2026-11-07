@@ -146,3 +146,35 @@ Do not certify based on a single model run or aggregate score. Minimum evidence 
 - Automated concept matching is lexical and requires human review.
 - Human-review CSV is a blank collection template; scores must be entered by reviewers.
 - Provider-reported token usage is aggregated when available; pricing is not estimated. A paired planning-only baseline harness is available; comparable runs still require identical models, inputs, reviewer configuration, and resource budgets.
+
+## Repeated 3 × 10 benchmark and blinded human review
+
+Use the series runner instead of manually launching the single-run command three times:
+
+```sh
+OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:series -- --runs 3 --out-dir benchmarks/results/series-<date>
+```
+
+The runner requires 3–5 repetitions and executes all ten scenarios per repetition. It stores each raw JSON run, a `repeat-aggregate.json` with per-scenario and overall median/min/max/spread, sanitized plan files for human review (provider identity, automated review, and validation metadata are removed), and one consolidated review CSV.
+
+The CSV contains two review slots for every scenario/run plan. Two independent reviewers must fill one slot each, set their own stable `reviewer_id`, record the highest finding severity, and cite concrete plan evidence in `evidence_notes`. Do not use the same reviewer identity in both slots. Open the `plan_file` listed in the row; it intentionally omits provider and automated-review metadata to reduce bias.
+
+After all review slots are complete, aggregate the human-entered scores:
+
+```sh
+npm run benchmark:human-review -- --inputs benchmarks/results/series-<date>/human-review-all-runs.csv --out benchmarks/results/series-<date>/human-review-aggregate.json
+```
+
+Incomplete blank rows remain missing coverage and cannot pass. A high or critical finding blocks the human gate; large scoring disagreements require a documented adjudicated score. Keep raw plans, review packets, aggregate JSON, and the completed human review artifact together when publishing results.
+
+Live provider calls may incur cost. Do not describe a benchmark or human review as completed until the generated artifacts exist and the reviewer rows have actually been completed.
+
+## Scanner precision and recall
+
+Run the fixture accuracy benchmark without provider calls:
+
+```sh
+npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
+```
+
+The report evaluates named function symbols and static import specifiers against manually reviewed goldens for the checked-in customer, invoice, order, and adversarial scanner fixtures. It reports TP/FP/FN, precision, recall, and F1 for AST-auto and lexical-only analysis. The goldens are compact regression fixtures; these metrics do not establish accuracy across production repositories or full semantic dependency resolution.
