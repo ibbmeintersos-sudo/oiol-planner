@@ -10,6 +10,7 @@ import { deriveTaskInterfaces } from '../src/core/task-interface.mjs';
 import { evaluatePlan } from '../src/core/evaluate.mjs';
 import { scanRepository } from '../src/scanner/repository.mjs';
 import { renderPlanMarkdown } from '../src/core/report.mjs';
+import { redact } from '../src/core/utils.mjs';
 
 const validPlan = () => ({
   schemaVersion: '1.0.0',
@@ -84,4 +85,13 @@ test('planning-only validator rejects execution state at plan and task levels', 
   const taskState = validPlan();
   taskState.tasks[0].status = 'completed';
   assert.equal(validatePlan(taskState).valid, false);
+});
+
+test('secret redaction handles quoted JSON keys, YAML assignments, and bearer headers', () => {
+  const source = '{"api_key":"super secret with spaces","password":"p@ss"}\nAPI_KEY=plain-secret\nAuthorization: Bearer header-secret-value';
+  const safe = redact(source);
+  for (const secret of ['super secret with spaces', 'p@ss', 'plain-secret', 'header-secret-value']) {
+    assert.equal(safe.includes(secret), false, 'secret leaked: ' + secret);
+  }
+  assert.match(safe, /\[REDACTED\]/);
 });

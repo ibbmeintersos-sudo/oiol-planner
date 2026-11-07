@@ -14,7 +14,7 @@ const evidenceId = file => 'REPO-' + sha256(file).slice(0, 12);
 
 async function walkBounded(root, { maxFiles, maxDepth }) {
   const files = [];
-  let discovered = 0, truncated = false;
+  let discovered = 0, truncated = false, depthTruncated = false;
   async function visit(rel = '', depth = 0) {
     if (truncated || depth > maxDepth) return;
     let entries;
@@ -24,7 +24,10 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
       if (truncated) break;
       const relative = path.posix.join(rel.replaceAll('\\', '/'), entry.name);
       if (IGNORE.has(entry.name) || SENSITIVE.test(relative) || entry.isSymbolicLink()) continue;
-      if (entry.isDirectory()) await visit(relative, depth + 1);
+      if (entry.isDirectory()) {
+        if (depth >= maxDepth) depthTruncated = true;
+        else await visit(relative, depth + 1);
+      }
       else if (entry.isFile()) {
         discovered++;
         if (files.length < maxFiles) files.push(relative);
@@ -33,7 +36,7 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
     }
   }
   await visit();
-  return { files, discovered, truncated };
+  return { files, discovered, truncated, depthTruncated };
 }
 
 export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12 } = {}) {
@@ -111,7 +114,10 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     git,
     files: files.map(file => ({ path: file })),
     fileCount: scan.discovered,
+    includedFileCount: files.length,
+    fileCountIsLowerBound: scan.truncated || scan.depthTruncated,
     truncated: scan.truncated,
+    depthTruncated: scan.depthTruncated,
     manifests,
     scripts: [...new Set(scripts)],
     tests,
