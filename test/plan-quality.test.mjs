@@ -88,3 +88,23 @@ test('benchmark score contains the five P2 plan-quality dimensions',()=>{
   assert.equal(Object.values(row.weights).reduce((sum,value)=>sum+value,0),100);
   assert.equal(row.planQuality.risks.estimatedCount,1);
 });
+
+test('risk quality reports confidence coverage and the basis used for an estimate',()=>{
+  const quality=evaluatePlanQuality({risks:[
+    {id:'r1',description:'Availability loss',likelihood:3,impact:4,confidence:'medium',assessmentBasis:'Single regional dependency.',mitigation:'Define recovery.'},
+    {id:'r2',description:'Documentation issue',likelihood:1,impact:1,mitigation:'Review docs.'}
+  ]});
+  assert.equal(quality.risks.estimatedCount,2);
+  assert.equal(quality.risks.confidenceRatedCount,1);
+  assert.equal(quality.risks.confidenceRate,0.5);
+  assert.equal(quality.risks.exposure[0].assessmentBasis,'Single regional dependency.');
+});
+
+test('blocking unknowns are counted as decision blockers',()=>{
+  const quality=evaluatePlanQuality({
+    unknownsReviewed:true,
+    unknowns:[{id:'u1',description:'Provider undecided',impact:'Trust model unknown',resolutionApproach:'Confirm with owner.',blocking:true}]
+  });
+  assert.equal(quality.unknowns.unresolvedBlockingCount,1);
+  assert.equal(quality.unknowns.transparency,1);
+});

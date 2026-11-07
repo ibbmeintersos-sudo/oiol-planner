@@ -273,3 +273,11 @@ test('scanner reports unresolved relative imports and heuristic limitations',asy
 
  
 test('scanner resolves Python package-relative imports and identifies arrow-function symbols',async()=>{const root=await mkdtemp(path.join(os.tmpdir(),'oiol-polyglot-'));try{await mkdir(path.join(root,'pkg'),{recursive:true});await writeFile(path.join(root,'pkg','__init__.py'),'');await writeFile(path.join(root,'pkg','helpers.py'),'def helper():\n return True\n');await writeFile(path.join(root,'pkg','app.py'),'from .helpers import helper\n');await writeFile(path.join(root,'app.js'),'export const boot = () => true;\n');const r=await scanRepository(root);assert.equal(r.structure.unresolvedLocalImportCount,0);assert.ok(r.structure.imports.some(x=>x.from==='pkg/app.py'&&x.to==='pkg/helpers.py'));assert.ok(r.structure.symbols.some(x=>x.name==='boot'&&x.kind==='function'));}finally{await rm(root,{recursive:true,force:true,maxRetries:10,retryDelay:100});}});
+
+test('unresolved blocking unknowns are semantic validation errors',()=>{
+  const plan=validPlan();
+  plan.unknowns=[{id:'u1',description:'Identity provider is not selected.',impact:'The trust model cannot be finalized.',resolutionApproach:'Confirm the provider with the application owner.',blocking:true}];
+  const result=validatePlan(plan,plan.project);
+  assert.equal(result.valid,false);
+  assert.ok(result.errors.some(error=>error.includes('Unresolved blocking unknown')));
+});
