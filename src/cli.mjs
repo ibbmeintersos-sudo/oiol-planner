@@ -57,7 +57,8 @@ async function main() {
   if (options.help) { console.log(help); return; }
   if (options.validate) {
     const source = JSON.parse(await fs.readFile(path.resolve(options.validate), 'utf8'));
-    const evaluation = evaluatePlan(source, source.project || {});
+    const sourceProject = source && typeof source === 'object' && !Array.isArray(source) ? source.project || {} : {};
+    const evaluation = evaluatePlan(source, sourceProject);
     const schemaValidation = await validatePlanSchema(source);
     const validation = {
       ...evaluation.validation,

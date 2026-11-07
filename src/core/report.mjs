@@ -6,6 +6,7 @@ const text = value => String(value && typeof value === 'object' ? (value.stateme
 const list = values => Array.isArray(values) && values.length ? values.map(value => '- ' + text(value)).join('\n') : '- None recorded';
 
 export function renderPlanMarkdown(plan = {}) {
+  plan = plan && typeof plan === 'object' && !Array.isArray(plan) ? plan : {};
   const validation = plan.validation || {};
   const evaluation = plan.evaluation?.metrics || {};
   const quality = plan.evaluation?.qualityDiagnostics || {};

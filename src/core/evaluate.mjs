@@ -9,13 +9,14 @@ const label = (item, index, prefix) => item.id || item.name || item.title || pre
 const hasItems = value => Array.isArray(value) && value.some(item => typeof item === 'string' ? item.trim() : item && typeof item === 'object');
 
 export function evaluatePlan(plan, project = {}) {
+  const source = plan && typeof plan === 'object' && !Array.isArray(plan) ? plan : {};
   const validation = validatePlan(plan, project);
-  const tasks = objects(plan?.tasks);
-  const requirements = objects(plan?.requirements);
-  const components = objects(plan?.architecture?.components);
-  const decisions = objects(plan?.architecture?.decisions);
-  const risks = objects(plan?.risks);
-  const clarifications = objects(plan?.clarifications);
+  const tasks = objects(source.tasks);
+  const requirements = objects(source.requirements);
+  const components = objects(source.architecture?.components);
+  const decisions = objects(source.architecture?.decisions);
+  const risks = objects(source.risks);
+  const clarifications = objects(source.clarifications);
   const acceptance = tasks.reduce((count, task) =>
     count + (Array.isArray(task.acceptanceCriteria) ? task.acceptanceCriteria.length : 0), 0);
   const conflicts = [];
@@ -24,7 +25,7 @@ export function evaluatePlan(plan, project = {}) {
       if (overlaps(tasks[i].writeScope || [], tasks[j].writeScope || [])) conflicts.push([tasks[i].id, tasks[j].id]);
     }
   }
-  const interfaces = deriveTaskInterfaces(plan);
+  const interfaces = deriveTaskInterfaces(source);
   const unresolvedTaskInputs = interfaces.flatMap(item =>
     item.inputs.filter(input => !input.resolved).map(input => ({
       taskId: item.taskId,

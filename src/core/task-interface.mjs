@@ -8,8 +8,9 @@ function normalizeOutput(output) {
 }
 
 export function deriveTaskInterfaces(plan = {}) {
-  const tasks = Array.isArray(plan.tasks)
-    ? plan.tasks.filter(task => task && typeof task === 'object' && !Array.isArray(task))
+  const source = plan && typeof plan === 'object' && !Array.isArray(plan) ? plan : {};
+  const tasks = Array.isArray(source.tasks)
+    ? source.tasks.filter(task => task && typeof task === 'object' && !Array.isArray(task))
     : [];
   const byId = new Map(tasks.filter(task => typeof task.id === 'string').map(task => [task.id, task]));
   const normalizedOutputs = new Map(tasks.map(task => [

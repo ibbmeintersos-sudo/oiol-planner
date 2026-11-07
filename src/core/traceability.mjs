@@ -4,8 +4,9 @@
  * planned work has been implemented or verified.
  */
 export function buildTraceability(plan = {}) {
-  const requirements = Array.isArray(plan.requirements) ? plan.requirements.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
-  const tasks = Array.isArray(plan.tasks) ? plan.tasks.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
+  const source = plan && typeof plan === 'object' && !Array.isArray(plan) ? plan : {};
+  const requirements = Array.isArray(source.requirements) ? source.requirements.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
+  const tasks = Array.isArray(source.tasks) ? source.tasks.filter(item => item && typeof item === 'object' && !Array.isArray(item)) : [];
   const rows = requirements.map(requirement => {
     const linkedTasks = tasks.filter(task =>
       Array.isArray(task.requirementIds) && task.requirementIds.includes(requirement.id)

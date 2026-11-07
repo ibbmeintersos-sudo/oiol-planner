@@ -72,3 +72,16 @@ test('CLI rejects a plan that violates the published schema even when semantic c
     assert.ok(output.validation.errors.some(error => error.includes('status')));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test('CLI returns a structured validation failure for a null JSON document', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-cli-null-'));
+  try {
+    const file = path.join(root, 'plan.json');
+    await writeFile(file, 'null');
+    const result = spawnSync(process.execPath, [cli, '--validate', file], { encoding: 'utf8', env: { PATH: process.env.PATH } });
+    assert.equal(result.status, 2);
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.status, 'blocked');
+    assert.equal(output.validation.valid, false);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});

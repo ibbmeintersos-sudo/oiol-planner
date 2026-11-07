@@ -13,6 +13,7 @@ import { renderPlanMarkdown } from '../src/core/report.mjs';
 import { redact } from '../src/core/utils.mjs';
 import { validatePlanSchema } from '../src/core/schema-validator.mjs';
 import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
+import { buildTraceability } from '../src/core/traceability.mjs';
 
 const validPlan = () => ({
   schemaVersion: '1.0.0',
@@ -165,4 +166,12 @@ test('analyzer evidence IDs and hashes match the exact scanner excerpts supplied
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test('null plan input is reported safely by evaluation, traceability, interfaces, and Markdown', () => {
+  assert.doesNotThrow(() => evaluatePlan(null));
+  assert.deepEqual(deriveTaskInterfaces(null), []);
+  assert.doesNotThrow(() => buildTraceability(null));
+  assert.doesNotThrow(() => renderPlanMarkdown(null));
+  assert.equal(evaluatePlan(null).validation.valid, false);
 });
