@@ -6,5 +6,14 @@ export function evaluatePlan(plan,project={}) {
   const conflicts=[];
   for(let i=0;i<tasks.length;i++) for(let j=i+1;j<tasks.length;j++) if(overlaps(tasks[i].writeScope||[],tasks[j].writeScope||[])) conflicts.push([tasks[i].id,tasks[j].id]);
   const errors=validation.errors.join('\n');
-  return {validation,metrics:{requirementCoverage:validation.requirementCoverage,acceptanceCriteriaCount:acceptance,dependencyValidity:!(/dependenc|graph|cycle/i.test(errors)),repositorySafety:!(/unsafe|destructive/i.test(errors)),concurrentWriteConflictPairs:conflicts}};
+  return {
+    validation,
+    metrics:{
+      requirementCoverage:validation.requirementCoverage,
+      acceptanceCriteriaCount:acceptance,
+      dependencyValidity:!(/dependenc|graph|cycle/i.test(errors)),
+      repositorySafety:!(/unsafe|destructive/i.test(errors)),
+      writeScopeOverlapPairs:conflicts
+    }
+  };
 }
