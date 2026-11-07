@@ -32,7 +32,7 @@ export class HybridPlanner {
         const fixed=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
         plan=normalize(fixed.data,project); validation=validatePlan(plan,project);
         if(!validation.valid) break;
-        try { review=validateReview((await this.reviewer.requestJson({system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
+        try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data); }
         catch(error) { review=null; reviewError=error; break; }
       }
     }
