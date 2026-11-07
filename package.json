@@ -15,7 +15,8 @@
     "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
     "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs",
     "benchmark:opencode": "node scripts/run-opencode-baseline.mjs",
-    "benchmark:compare": "node scripts/compare-benchmark-modes.mjs"
+    "benchmark:compare": "node scripts/compare-benchmark-modes.mjs",
+    "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs"
   },
   "license": "MIT"
 }
