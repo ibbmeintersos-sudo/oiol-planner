@@ -7,7 +7,7 @@ import { scanRepository } from '../src/scanner/repository.mjs';
 
 async function fixture(prefix) {
   const root = await mkdtemp(path.join(os.tmpdir(), prefix));
-  return { root, cleanup: () => rm(root, { recursive: true, force: true }) };
+  return { root, cleanup: () => rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }) };
 }
 
 test('Tree-sitter AST extracts JavaScript declarations and ignores import-like comments', async () => {
