@@ -16,7 +16,7 @@ OIOL does not implement code, run project commands or tests, modify target repos
 - Planning-only requirement traceability, Markdown plan reporting, and non-blocking plan-quality diagnostics.
 - Repository evidence identifiers aligned between scanner context and analyzer evidence records, with separate SHA-256 fingerprints for original source files and redacted excerpts.
 - Tree-sitter concrete-syntax-tree parsing through the pinned WebAssembly language-pack dependency for languages included in its bundled grammar subset.
-- AST-derived declarations and import references, parser-recovery diagnostics, bounded parse byte/time/node limits, and explicit AST-versus-lexical-fallback coverage.
+- AST-derived declarations and import references, parser-recovery diagnostics, bounded source bytes, AST depth, and visited-node limits, and explicit AST-versus-lexical-fallback coverage.
 - Bounded lexical fallback for unsupported grammars or files that cannot be parsed; scanner never executes repository code or scripts.
 - Ten-scenario planning benchmark harness, paired OpenCode planning baseline, and human-review aggregation protocol.
 

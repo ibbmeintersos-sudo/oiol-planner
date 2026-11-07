@@ -16,12 +16,10 @@ function safeFree(value) {
   try { value?.free?.(); } catch {}
 }
 
-function parserFor(language, { maxSourceBytes, parseTimeoutMs }) {
+function parserFor(language) {
   if (parserCache.has(language)) return parserCache.get(language);
   if (typeof TreeSitter.getParser !== 'function') throw new Error('Tree-sitter WASM getParser API is unavailable');
   const parser = TreeSitter.getParser(language);
-  parser.setMaxSourceBytes?.(maxSourceBytes);
-  parser.setParseTimeoutMs?.(BigInt(parseTimeoutMs));
   parserCache.set(language, parser);
   return parser;
 }
@@ -212,7 +210,7 @@ function resolveLocalImport(file, language, specifier, fileSet) {
   return null;
 }
 
-export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes = 16000, parseTimeoutMs = 150 } = {}) {
+export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes = 16000 } = {}) {
   const fileSet = new Set(files.map(file => file.replaceAll('\\', '/').replace(/^\.\//, '')));
   const symbols = [], imports = [], diagnostics = [];
   const parsedFiles = [], unsupportedFiles = [], failedFiles = [];
@@ -229,7 +227,7 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
     if (sourceBytes.length > maxFileBytes) continue;
     const lineStarts = lineStartsFor(sourceBytes);
     let parser;
-    try { parser = parserFor(language, { maxSourceBytes: maxFileBytes, parseTimeoutMs }); }
+    try { parser = parserFor(language); }
     catch (error) {
       unsupportedFiles.push({ file, language, reason: String(error?.message || error).slice(0, 180) });
       continue;
