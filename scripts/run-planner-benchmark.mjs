@@ -31,6 +31,21 @@ export function benchmarkConfigFingerprint(config) {
   return createHash('sha256').update(JSON.stringify(config)).digest('hex');
 }
 
+function aggregateUsage(records) {
+  const totals={promptTokens:0,completionTokens:0,totalTokens:0,reportedCalls:0,unreportedCalls:0};
+  for(const record of records) for(const role of ['planner','reviewer']) {
+    for(const call of record.plan?.providerUsage?.[role]?.calls||[]) {
+      const usage=call.usage;
+      if(!usage||typeof usage!=='object') { totals.unreportedCalls++; continue; }
+      totals.reportedCalls++;
+      totals.promptTokens+=Number(usage.prompt_tokens??usage.input_tokens??0)||0;
+      totals.completionTokens+=Number(usage.completion_tokens??usage.output_tokens??0)||0;
+      totals.totalTokens+=Number(usage.total_tokens??((Number(usage.prompt_tokens??usage.input_tokens??0)||0)+(Number(usage.completion_tokens??usage.output_tokens??0)||0)))||0;
+    }
+  }
+  return {...totals,available:totals.reportedCalls>0,cost:null,costNote:'Provider pricing is not applied; token usage is reported only when the provider returns usage metadata.'};
+}
+
 export async function main() {
   const selected=arg('scenarios','all');
   const chosen=selectScenarios(selected);
@@ -64,7 +79,7 @@ export async function main() {
   }
   const scores=records.map(record=>{const scenario=chosen.find(x=>x.id===record.scenarioId);return record.error?{scenarioId:record.scenarioId,category:scenario.category,difficulty:scenario.difficulty,score:0,blockers:[record.error.message]}:scoreScenario(scenario,record);});
   const summary=summarizeBenchmark(scores);
-  const output={protocolVersion:'1.1',runnerVersion:'1.1.0',runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider'}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},summary,scores,records,limitations:['Token and cost accounting are unavailable at the planner orchestration boundary.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
+  const output={protocolVersion:'1.1',runnerVersion:'1.1.0',runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider'}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token and cost accounting are unavailable at the planner orchestration boundary.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
