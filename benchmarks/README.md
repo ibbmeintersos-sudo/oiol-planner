@@ -13,7 +13,7 @@ This benchmark is an evaluation harness, not a claim that OIOL is already high q
 | AMB-AUTH-005 | Ambiguous | SSO provider, protocol, and identity-domain ambiguity |
 | AMB-DATA-006 | Ambiguous | Undefined metrics, data sources, and real-time latency |
 
-The existing-project cases use deliberately compact repository evidence fixtures. They test planning against known repository facts; they are not substitutes for scanning and benchmarking a real repository checkout.
+The existing-project cases now point to checked-in, compact Node.js fixture repositories under `benchmarks/fixtures/`. The runner invokes the real repository scanner against those directories before planning; it does not pass the old hand-authored repository summary as if it were scan output. These fixtures are still small synthetic projects, not sanitized production repositories.
 
 ## Run
 
@@ -34,6 +34,14 @@ OIOL_BENCHMARK_ALLOW_LIVE=1 node scripts/run-planner-benchmark.mjs --scenarios G
 The runner writes:
 - A JSON record with full plans, provider metadata, elapsed times, deterministic scores, and blockers.
 - A CSV human-review sheet with one row per scenario.
+
+Aggregate repeated runs from the same provider/model/configuration after running the suite at least three times:
+
+```sh
+npm run benchmark:aggregate -- --inputs benchmarks/results/run-a.json,benchmarks/results/run-b.json,benchmarks/results/run-c.json
+```
+
+The aggregator rejects mixed configuration fingerprints and duplicate run IDs, reports per-scenario median/min/max/spread and failure rate, and only marks the automated gate ready for human review when at least three runs cover every scenario without automated failures. It does not itself certify quality.
 
 Do not commit API keys or private benchmark results containing sensitive repository details.
 
@@ -84,7 +92,7 @@ Do not certify based on a single model run or aggregate score. Minimum evidence 
 ## Current limitations
 
 - The six-case set is a starter suite, not statistically representative.
-- Existing-project fixtures are synthetic metadata and need real, sanitized repositories.
+- Existing-project fixtures are real checked-in fixture repositories scanned by the repository analyzer, but remain small synthetic projects and need sanitized production repositories for stronger external validity.
 - Automated concept matching is lexical and requires human review.
 - Human-review CSV is a blank collection template; scores must be entered by reviewers.
-- Provider response usage/token accounting and baseline OpenCode comparison are not yet automated.
+- Provider-reported token usage is aggregated when available; pricing is not estimated. A paired baseline OpenCode vs OpenCode+OIOL execution adapter is still required for a fair comparison.
