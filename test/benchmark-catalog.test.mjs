@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { scenarios } from '../benchmarks/scenarios.mjs';
-import { selectScenarios, benchmarkConfigFingerprint } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,6);
@@ -43,4 +43,18 @@ test('benchmark configuration fingerprint is stable and changes with configurati
   const a={provider:'ollama',model:'qwen2.5:7b',baseUrl:'http://localhost:11434'};
   assert.equal(benchmarkConfigFingerprint(a),benchmarkConfigFingerprint({...a}));
   assert.notEqual(benchmarkConfigFingerprint(a),benchmarkConfigFingerprint({...a,model:'qwen2.5:14b'}));
+});
+
+test('usage aggregation normalizes common provider token field names and never invents cost',()=>{
+  const result=aggregateUsage([
+    {plan:{providerUsage:{planner:{calls:[{usage:{prompt_tokens:100,completion_tokens:25,total_tokens:125}}]},reviewer:{calls:[{usage:{input_tokens:50,output_tokens:10}}]}}}},
+    {plan:{providerUsage:{planner:{calls:[{usage:null}]},reviewer:{calls:[]}}}}
+  ]);
+  assert.equal(result.available,true);
+  assert.equal(result.promptTokens,150);
+  assert.equal(result.completionTokens,35);
+  assert.equal(result.totalTokens,185);
+  assert.equal(result.reportedCalls,2);
+  assert.equal(result.unreportedCalls,1);
+  assert.equal(result.cost,null);
 });
