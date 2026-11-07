@@ -9,7 +9,7 @@ OIOL turns a software goal into a reviewable, structured engineering plan. Its p
 - Structured requirements, priorities, assumptions, unknowns, and clarifying questions.
 - Existing-repository context based on bounded, read-only scanning.
 - Architecture components, design decisions, alternatives, and rationale.
-- Small, scoped tasks with requirement/component links and explicit dependencies.
+- Small, scoped tasks with requirement/component links and explicit dependencies. Dependencies express ordering; consumed artifacts are declared separately through named task inputs and outputs.
 - Acceptance criteria that describe observable outcomes.
 - A dependency graph and suggested planning waves.
 - Risks, constraints, evidence references, and requirement-to-task traceability.
