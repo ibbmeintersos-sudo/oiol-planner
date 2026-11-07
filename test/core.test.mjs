@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validatePlan } from '../src/core/validator.mjs';
+import { safePath } from '../src/core/utils.mjs';
 import { topologicalWaves } from '../src/core/graph.mjs';
 import { comparePlans } from '../src/core/revision.mjs';
 import { buildTraceability } from '../src/core/traceability.mjs';
@@ -39,3 +40,13 @@ test('scanner stops discovery at configured file limit',async()=>{const root=awa
 test('revision impact propagates through transitive downstream dependencies',()=>{const previous={tasks:[{id:'a',dependencies:[]},{id:'b',dependencies:['a']},{id:'c',dependencies:['b']}]};const next=structuredClone(previous);next.tasks[0].title='Changed';const result=comparePlans(previous,next);assert.deepEqual(result.modified,['a']);assert.deepEqual(result.reverificationRequired,['a','b','c']);});
 test('evaluation marks unknown dependency references as invalid',()=>{const plan=structuredClone(base);plan.tasks[0].dependencies=['missing'];plan.dependencyGraph.edges=[{from:'missing',to:'t1',type:'finish_to_start'}];const result=evaluatePlan(plan);assert.equal(result.metrics.dependencyValidity,false);});
 test('evaluation marks unsafe write scopes as repository unsafe',()=>{const plan=structuredClone(base);plan.tasks[0].writeScope=['../outside'];const result=evaluatePlan(plan);assert.equal(result.metrics.repositorySafety,false);});
+
+test('safePath rejects single-backslash traversal and normalizes Windows separators',()=>{
+  assert.equal(safePath('..\\outside'),false);
+  assert.equal(safePath('src\\auth\\index.mjs'),true);
+});
+test('validator rejects single-backslash traversal in write scopes',()=>{
+  const p=structuredClone(base);
+  p.tasks[0].writeScope=['src\\..\\outside'];
+  assert.equal(validatePlan(p).valid,false);
+});

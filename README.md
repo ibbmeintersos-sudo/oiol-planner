@@ -1,6 +1,6 @@
 # OIOL Planner
 
-**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.2.1**
+**OpenCode Intelligence & Optimization Layer — Planner and execution preview v0.3.0**
 
 OIOL is a hybrid planning and human-gated execution layer intended to sit above OpenCode. It turns a software request into a structured plan, validates it deterministically, then can coordinate approved tasks through an injected runner.
 
@@ -17,7 +17,7 @@ OIOL is a hybrid planning and human-gated execution layer intended to sit above 
 
 ## Requirements
 
-- Node.js 20 or newer.
+- Node.js 22 or newer (the package engine requirement is `>=22`).
 - An LLM provider endpoint for plan generation. Ollama can be used locally.
 - No runtime npm dependencies in this preview.
 
@@ -73,7 +73,7 @@ The scanner does **not** run package scripts, tests, build commands, hooks, or a
 
 ## OpenCode adapter
 
-`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval, prompting, aborting and reading diffs. It validates the base URL, supports configurable Basic Auth, propagates cancellation, bounds request duration, encodes session IDs, and rejects malformed responses. `OpenCodeTaskRunner` uses this client to create one session per task and collect its response and diff.
+`src/adapters/opencode/client.mjs` exposes HTTP methods for health, session creation, session retrieval, prompting, aborting and reading diffs. It validates the base URL, supports configurable Basic Auth, propagates cancellation, bounds request duration, encodes session IDs, and rejects malformed responses. Configure the client with an absolute `directory` path to route every API request to the intended repository through OpenCode's `x-opencode-directory` header; omitting it falls back to the server's default working directory. `OpenCodeTaskRunner` uses this client to create one session per task and collect its response and diff.
 
 ## Validation and scheduling
 
@@ -87,16 +87,24 @@ Before execution, the engine requires:
 
 - A plan with status `ready_for_review` that passes deterministic validation.
 - An explicit approval object bound to the exact plan fingerprint, approver and timestamp.
-- An explicit event store. `JsonlEventStore` persists append-only events with restrictive file permissions; `InMemoryEventStore` is for tests and ephemeral use.
+- An explicit event store. `JsonlEventStore` persists append-only events with restrictive file permissions and validates the event schema plus strictly increasing per-run sequence numbers; `InMemoryEventStore` is for tests and ephemeral use. The JSONL implementation is a single-process, single-writer store, not a distributed lock or multi-process transaction coordinator. On initialization it discards an invalid, non-newline-terminated final fragment as a torn append, while malformed newline-terminated records remain hard errors; this is crash-tail repair, not tamper-proof audit storage.
 
-Execution uses validated dependency waves, bounded concurrency, dependency-scoped task outputs, verification gates, fail-fast as an option, cancellation signaling and stable per-task idempotency keys. Automatic retries default to **zero** because repeating a task can duplicate side effects; callers may enable retries only when their runner safely honors the idempotency key.
+Execution uses validated dependency waves, bounded concurrency, dependency-scoped task outputs, verification gates, fail-fast as an option, cancellation signaling and stable per-task idempotency keys. Automatic retries default to **zero** because repeating a task can duplicate side effects. Enabling execution retries requires `runner.idempotent === true`, and an error is retried only when the configured `retryOn(error, task, context)` policy returns `true` (default: `error.retryable === true`). A stable idempotency key is supplied, but the engine cannot prove that an external runner actually honors it.
 
-Recovery is deliberately not automatic. Reusing a run ID is rejected, and a process interruption after a side effect but before its completion event can leave the task outcome uncertain. The event log is not an exactly-once guarantee. A future recovery manager must reconcile uncertain tasks with the runner before retrying.
+The run-start event now records the exact planned task-ID ledger (in addition to its count); the recovery inspector checks that subsequent task events refer only to those IDs and rejects duplicate event IDs within a run. Older event logs without the optional `taskIds` field remain inspectable, but do not receive this stronger membership check. The JSONL store is intentionally single-process/single-writer: sharing one file between multiple Node processes is not safe.
+
+Recovery is deliberately not automatic. `engine.inspectRun(runId)` (also exported as `inspectExecutionRun()`) replays a validated event stream and reports completed, failed, blocked, skipped, not-started, and uncertain tasks without resuming anything. Reusing a run ID is rejected, and a process interruption after a side effect but before its completion event can leave the task outcome uncertain. The event log is not an exactly-once guarantee. A future recovery manager must reconcile uncertain tasks with the runner before retrying.
 
 The OpenCode runner is covered by fake-transport contract tests, but it has not yet been tested against a live OpenCode server.
 ### OpenCode runner
 
 `OpenCodeTaskRunner` is an adapter for the documented OpenCode server API. It creates one session per task, submits a typed text part, collects the assistant response and session diff, applies a configurable task timeout (10 minutes by default), aborts failed sessions when possible, and delegates acceptance verification to a separate `verifyTask` callback. The callback is mandatory: an assistant saying that work is complete is not sufficient verification.
+
+Live API smoke test (requires a running OpenCode server and an absolute project path):
+```bash
+OIOL_OPENCODE_DIRECTORY=/absolute/path/to/repository npm run smoke:opencode
+```
+Optional settings: `OIOL_OPENCODE_URL`, `OIOL_OPENCODE_USERNAME`, and `OIOL_OPENCODE_PASSWORD`. The smoke test checks server health, creates a temporary session, reads it back, and deletes it; it does not send a prompt or modify project files. This test must be run against the actual OpenCode server before claiming live integration.
 
 The OpenCode server operates against the project directory in which `opencode serve` is started. The server adapter follows the documented `/session` and `/session/:id/message` API shape; session creation sends a title, and prompts use typed `parts`. The runner currently does not isolate tasks in Git worktrees, so it declares itself non-concurrency-safe and the engine serializes its tasks. Do not enable parallel writes until a tested worktree adapter exists.
 ## Security notes

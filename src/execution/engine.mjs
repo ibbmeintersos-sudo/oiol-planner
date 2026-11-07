@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { id, isObject, redact } from '../core/utils.mjs';
 import { validatePlan } from '../core/validator.mjs';
 import { initialTaskStates, transitionTask, summarizeRun } from './state-machine.mjs';
+import { inspectExecutionRun } from './recovery-inspector.mjs';
 export function fingerprintPlan(plan){return crypto.createHash('sha256').update(JSON.stringify(plan)).digest('hex');}
 export function createExecutionApproval(plan,{approvedBy,approvedAt=new Date().toISOString()}={}){
   if(typeof approvedBy!=='string'||!approvedBy.trim())throw new Error('approvedBy is required');
@@ -9,12 +10,14 @@ export function createExecutionApproval(plan,{approvedBy,approvedAt=new Date().t
   return {approved:true,approvedBy:approvedBy.trim(),approvedAt,planId:plan.id,planFingerprint:fingerprintPlan(plan)};
 }
 export class ExecutionEngine {
-  constructor({runner,eventStore,maxConcurrency=2,maxRetries=0,failFast=false,clock=()=>new Date().toISOString()}={}){
+  constructor({runner,eventStore,maxConcurrency=2,maxRetries=0,failFast=false,retryOn=(error)=>error?.retryable===true,clock=()=>new Date().toISOString()}={}){
     if(!runner||typeof runner.execute!=='function'||typeof runner.verify!=='function')throw new Error('Runner must implement execute(task, context) and verify(task, result, context)');
     if(!Number.isInteger(maxConcurrency)||maxConcurrency<1||maxConcurrency>32)throw new Error('maxConcurrency must be an integer from 1 to 32');
     if(!Number.isInteger(maxRetries)||maxRetries<0||maxRetries>5)throw new Error('maxRetries must be an integer from 0 to 5');
+    if(maxRetries>0&&runner.idempotent!==true)throw new Error('Retries require a runner that explicitly guarantees idempotent execution');
+    if(typeof retryOn!=='function')throw new Error('retryOn must be a function');
     if(!eventStore||typeof eventStore.append!=='function'||typeof eventStore.read!=='function')throw new Error('Event store must implement append(event) and read(runId)');
-    Object.assign(this,{runner,eventStore,maxConcurrency,maxRetries,failFast,clock});
+    Object.assign(this,{runner,eventStore,maxConcurrency,maxRetries,failFast,retryOn,clock});
   }
   async run(plan,{approval,runId=id('run'),signal}={}){
     this.#assertApproval(plan,approval);
@@ -26,7 +29,7 @@ export class ExecutionEngine {
     const states=initialTaskStates(plan.tasks),results=new Map(),tasks=new Map(plan.tasks.map(task=>[task.id,task]));
     let sequence=0;
     const emit=async(type,payload={})=>this.eventStore.append({eventId:id('evt'),runId,sequence:++sequence,type,at:this.clock(),...payload});
-    await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,approvedAt:approval.approvedAt,taskCount:plan.tasks.length});
+    await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,approvedAt:approval.approvedAt,taskCount:plan.tasks.length,taskIds:plan.tasks.map(task=>task.id)});
     let stopped=false;
     const concurrency=this.runner.concurrentSafe===true?this.maxConcurrency:1;
     for(const wave of validation.graph.waves){
@@ -63,6 +66,12 @@ export class ExecutionEngine {
     await emit('run.finished',{status:summary.status,counts:summary.counts,total:summary.total});
     return {runId,planId:plan.id,...summary,tasks:Object.fromEntries(states),results:Object.fromEntries(results)};
   }
+  async inspectRun(runId,options={}) {
+    if(typeof runId!=='string'||!runId.trim()) throw new Error('runId is required');
+    const events=await this.eventStore.read(runId);
+    if(!events.length) throw new Error(`No execution events found for run ${runId}`);
+    return inspectExecutionRun(events,options);
+  }
   #assertApproval(plan,approval){
     if(!isObject(approval)||approval.approved!==true)throw new Error('Explicit human approval is required before execution');
     if(typeof approval.approvedBy!=='string'||!approval.approvedBy.trim())throw new Error('Approval must identify approvedBy');
@@ -90,7 +99,9 @@ export class ExecutionEngine {
           const updated=transitionTask(states,task.id,'skipped',{error:reason,completedAt:this.clock()});
           await emit('task.skipped',{taskId:task.id,attempt,reason,status:updated.status,outcome:'uncertain'});return;
         }
-        if(attempt<=this.maxRetries){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
+        let retryAllowed=false;
+        if(attempt<=this.maxRetries){try{retryAllowed=this.retryOn(error,task,{attempt,runId})===true;}catch{retryAllowed=false;}}
+        if(retryAllowed){await emit('task.attempt.failed',{taskId:task.id,attempt,error:redact(error.message).slice(0,2000),retrying:true});continue;}
         const safeError=redact(error.message).slice(0,2000);
         const updated=transitionTask(states,task.id,'failed',{error:safeError,completedAt:this.clock()});
         await emit('task.failed',{taskId:task.id,attempt,error:safeError,status:updated.status});return;

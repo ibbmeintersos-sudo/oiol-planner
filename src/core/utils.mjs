@@ -13,7 +13,7 @@ export function redact(value='') {
 }
 export function safePath(input='') {
   if(typeof input!=='string') return false;
-  const value=input.trim().replaceAll('\\\\','/');
+  const value=input.trim().replaceAll('\\','/');
   if(!value || value.includes('\0') || /[\x00-\x1f\x7f]/.test(value)) return false;
   if(value.startsWith('/') || value.startsWith('//') || /^[A-Za-z]:/.test(value)) return false;
   const parts=value.split('/');
