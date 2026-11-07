@@ -36,7 +36,10 @@ export function validatePlan(plan, project={}) {
   const schedule=topologicalWaves(tasks,expected);
   if(schedule.cycle) errors.push(`Dependency graph contains a cycle: ${schedule.remaining.join(', ')}`);
   if(schedule.error) errors.push(`Dependency scheduler error: ${schedule.error}`);
-  if((plan.clarifications||[]).some(x=>x?.blocking&&!x?.resolved)) warnings.push('Unresolved blocking clarifications remain');
+  for(const clarification of (Array.isArray(plan.clarifications)?plan.clarifications:[])) {
+    if(!isObject(clarification)) { errors.push('Clarification entry must be an object'); continue; }
+    if(clarification.blocking===true && clarification.resolved!==true) errors.push(`Unresolved blocking clarification: ${String(clarification.question||clarification.id||'unspecified')}`);
+  }
   if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; execution must preserve them');
   if(!tasks.length) errors.push('Plan contains no tasks');
   return result(errors,warnings,reqs.length?covered.size/reqs.length:1,tasks.length,schedule);
