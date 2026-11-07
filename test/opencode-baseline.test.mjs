@@ -14,7 +14,8 @@ test('baseline prompt explicitly prohibits implementation and embeds the identic
 
 test('baseline parser accepts strict JSON and fenced JSON but rejects invalid output',()=>{
  assert.deepEqual(parseBaselinePlan(JSON.stringify(validPlan)),validPlan);
- assert.deepEqual(parseBaselinePlan('\u0060\u0060\u0060json\\n'+JSON.stringify(validPlan)+'\\n\u0060\u0060\u0060'),validPlan);\n assert.throws(()=>parseBaselinePlan('not JSON'),/valid JSON plan/);
+ assert.deepEqual(parseBaselinePlan('```json\n'+JSON.stringify(validPlan)+'\n```'),validPlan);
+ assert.throws(()=>parseBaselinePlan('not JSON'),/valid JSON plan/);
 });
 
 test('OpenCode baseline creates a read-only planning session and always cleans it up',async()=>{
