@@ -22,9 +22,9 @@ const SYMBOL_TYPES = {
 
 const NAME_TYPES = new Set(['identifier', 'type_identifier', 'property_identifier', 'field_identifier', 'constant', 'name', 'simple_identifier', 'namespace_name']);
 const IMPORT_NODE_TYPES = {
-  javascript: new Set(['import_statement', 'export_statement']),
-  typescript: new Set(['import_statement', 'export_statement']),
-  tsx: new Set(['import_statement', 'export_statement']),
+  javascript: new Set(['import_statement', 'export_statement', 'call_expression']),
+  typescript: new Set(['import_statement', 'export_statement', 'call_expression']),
+  tsx: new Set(['import_statement', 'export_statement', 'call_expression']),
   python: new Set(['import_statement', 'import_from_statement']),
   go: new Set(['import_spec']),
   rust: new Set(['use_declaration', 'mod_item']),
@@ -54,6 +54,7 @@ function importsFromNode(node, language) {
     const source = node.childForFieldName?.('source');
     if (source) return [nodeText(source).replace(/^['"]|['"]$/g, '')];
     if (node.type === 'export_statement') match = text.match(/\bfrom\s*['"]([^'"]+)['"]/);
+    else if (node.type === 'call_expression') match = text.match(/^(?:import|require)\s*\(\s*['"]([^'"]+)['"]\s*\)/);
     else match = text.match(/(?:import\s*)['"]([^'"]+)['"]/);
   } else if (language === 'python') {
     match = text.match(/^from\s+([.\w]+)\s+import\b/) || text.match(/^import\s+([\w.]+)/);

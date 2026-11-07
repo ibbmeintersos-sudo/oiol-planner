@@ -272,7 +272,7 @@ test('scanner extracts languages, frameworks, entry points, symbols and local im
 test('scanner reports unresolved relative imports and heuristic limitations',async()=>{const root=await mkdtemp(path.join(os.tmpdir(),'oiol-unresolved-'));try{await mkdir(path.join(root,'src'));await writeFile(path.join(root,'src','index.ts'),"import { missing } from './not-found.js';\nexport class Api {}\n");const r=await scanRepository(root);assert.equal(r.structure.unresolvedLocalImportCount,1);assert.equal(r.structure.dependencyGraph.edgeCount,0);assert.ok(r.structure.limitations.some(x=>x.includes('not type checking')));}finally{await rm(root,{recursive:true,force:true});}});
 
  
-test('scanner resolves Python package-relative imports and identifies arrow-function symbols',async()=>{const root=await mkdtemp(path.join(os.tmpdir(),'oiol-polyglot-'));try{await mkdir(path.join(root,'pkg'),{recursive:true});await writeFile(path.join(root,'pkg','__init__.py'),'');await writeFile(path.join(root,'pkg','helpers.py'),'def helper():\n return True\n');await writeFile(path.join(root,'pkg','app.py'),'from .helpers import helper\n');await writeFile(path.join(root,'app.js'),'export const boot = () => true;\n');const r=await scanRepository(root);assert.equal(r.structure.unresolvedLocalImportCount,0);assert.ok(r.structure.imports.some(x=>x.from==='pkg/app.py'&&x.to==='pkg/helpers.py'));assert.ok(r.structure.symbols.some(x=>x.name==='boot'&&x.kind==='function'));}finally{await rm(root,{recursive:true,force:true});}});
+test('scanner resolves Python package-relative imports and identifies arrow-function symbols',async()=>{const root=await mkdtemp(path.join(os.tmpdir(),'oiol-polyglot-'));try{await mkdir(path.join(root,'pkg'),{recursive:true});await writeFile(path.join(root,'pkg','__init__.py'),'');await writeFile(path.join(root,'pkg','helpers.py'),'def helper():\n return True\n');await writeFile(path.join(root,'pkg','app.py'),'from .helpers import helper\n');await writeFile(path.join(root,'app.js'),'export const boot = () => true;\n');const r=await scanRepository(root);assert.equal(r.structure.unresolvedLocalImportCount,0);assert.ok(r.structure.imports.some(x=>x.from==='pkg/app.py'&&x.to==='pkg/helpers.py'));assert.ok(r.structure.symbols.some(x=>x.name==='boot'&&x.kind==='function'));assert.ok(r.structure.astAnalysis.files.some(x=>x.path==='pkg/app.py'&&x.parser==='tree_sitter_ast'));}finally{await rm(root,{recursive:true,force:true});}});
 
  
 test('Tree-sitter AST extracts declarations and imports without matching comments or string contents', async () => {
@@ -280,11 +280,15 @@ test('Tree-sitter AST extracts declarations and imports without matching comment
   try {
     await mkdir(path.join(root, 'src'), { recursive: true });
     await writeFile(path.join(root, 'src', 'dep.js'), 'export function realDependency() { return 1; }\n');
+    await writeFile(path.join(root, 'src', 'lazy.js'), 'export const lazyValue = 2;\n');
+    await writeFile(path.join(root, 'src', 'legacy.cjs'), 'module.exports = 3;\n');
     await writeFile(path.join(root, 'src', 'index.js'), [
       '// function fakeFromComment() {}',
       'const misleading = "class FakeFromString {}";',
       "import { realDependency } from './dep.js';",
       'export const start = () => realDependency();',
+      "const lazy = import('./lazy.js');",
+      "const legacy = require('./legacy.cjs');",
       ''
     ].join('\n'));
     const result = await scanRepository(root);
@@ -294,6 +298,8 @@ test('Tree-sitter AST extracts declarations and imports without matching comment
     assert.ok(structure.symbols.some(item => item.name === 'start' && item.kind === 'function' && item.source === 'tree_sitter_ast'));
     assert.ok(!structure.symbols.some(item => item.name === 'fakeFromComment' || item.name === 'FakeFromString'));
     assert.ok(structure.imports.some(item => item.from === 'src/index.js' && item.to === 'src/dep.js' && item.resolved));
+    assert.ok(structure.imports.some(item => item.from === 'src/index.js' && item.to === 'src/lazy.js' && item.resolved));
+    assert.ok(structure.imports.some(item => item.from === 'src/index.js' && item.to === 'src/legacy.cjs' && item.resolved));
     assert.ok(structure.astAnalysis.files.some(item => item.path === 'src/index.js' && item.parser === 'tree_sitter_ast'));
   } finally {
     await rm(root, { recursive: true, force: true });
