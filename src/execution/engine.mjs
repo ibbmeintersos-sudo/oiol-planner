@@ -29,7 +29,7 @@ export class ExecutionEngine {
     const states=initialTaskStates(plan.tasks),results=new Map(),tasks=new Map(plan.tasks.map(task=>[task.id,task]));
     let sequence=0;
     const emit=async(type,payload={})=>this.eventStore.append({eventId:id('evt'),runId,sequence:++sequence,type,at:this.clock(),...payload});
-    await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,approvedAt:approval.approvedAt,taskCount:plan.tasks.length});
+    await emit('run.started',{planId:plan.id,planFingerprint:fingerprintPlan(plan),approvedBy:approval.approvedBy,approvedAt:approval.approvedAt,taskCount:plan.tasks.length,taskIds:plan.tasks.map(task=>task.id)});
     let stopped=false;
     const concurrency=this.runner.concurrentSafe===true?this.maxConcurrency:1;
     for(const wave of validation.graph.waves){
