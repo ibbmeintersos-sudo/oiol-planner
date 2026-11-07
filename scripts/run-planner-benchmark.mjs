@@ -99,8 +99,8 @@ export async function main() {
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
-  const csv=['scenario_id,category,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,evidence_notes'];
-  for(const row of scores) csv.push([row.scenarioId,row.category,'','','','','','','','',''].join(','));
+  const csv=['scenario_id,category,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,critical_finding_yes_no,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
+  for(const row of scores) csv.push([row.scenarioId,row.category,'','','','','','','','','','','',''].join(','));
   const humanPath=out.replace(/\.json$/,'-human-review.csv');
   await fs.writeFile(humanPath,csv.join('\n')+'\n');
   console.log(JSON.stringify({summary,resultFile:out,humanReviewFile:humanPath},null,2));
