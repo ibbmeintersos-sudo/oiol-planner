@@ -23,7 +23,9 @@ export function selectScenarios(selection='all', catalog=scenarios) {
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
 function providerConfig(prefix='OIOL_') {
   const provider=process.env[prefix+'PROVIDER']||(prefix==='OIOL_'?'openai-compatible':undefined);
-  return {provider,model:process.env[prefix+'MODEL']||(prefix==='OIOL_'?'gpt-4o-mini':undefined),baseUrl:process.env[prefix+'BASE_URL']||(prefix==='OIOL_'?'https://api.openai.com/v1':undefined),apiKey:process.env[prefix+'API_KEY'],timeoutMs:Number(process.env[prefix+'TIMEOUT_MS']||60000),maxRetries:Number(process.env.OIOL_MAX_RETRIES||2)};
+  const defaults={'openai-compatible':'https://api.openai.com/v1',anthropic:'https://api.anthropic.com',gemini:'https://generativelanguage.googleapis.com/v1beta',ollama:'http://127.0.0.1:11434'};
+  const defaultModel=provider==='ollama'?'qwen2.5:7b':provider==='anthropic'?'claude-3-5-sonnet-latest':provider==='gemini'?'gemini-2.0-flash':'gpt-4o-mini';
+  return {provider,model:process.env[prefix+'MODEL']||defaultModel,baseUrl:process.env[prefix+'BASE_URL']||defaults[provider],apiKey:process.env[prefix+'API_KEY'],timeoutMs:Number(process.env[prefix+'TIMEOUT_MS']||60000),maxRetries:Number(process.env.OIOL_MAX_RETRIES||2)};
 }
 function publicConfig(config) {
   return {provider:config.provider,model:config.model,baseUrl:config.baseUrl,timeoutMs:config.timeoutMs,maxRetries:config.maxRetries,credentialConfigured:Boolean(config.apiKey)};
