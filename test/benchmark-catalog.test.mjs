@@ -4,12 +4,12 @@ import { scenarios } from '../benchmarks/scenarios.mjs';
 import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
-  assert.equal(scenarios.length,6);
+  assert.equal(scenarios.length,10);
   assert.equal(new Set(scenarios.map(x=>x.id)).size,scenarios.length);
   assert.deepEqual([...new Set(scenarios.map(x=>x.category))].sort(),['ambiguous','existing','greenfield']);
-  assert.equal(scenarios.filter(x=>x.category==='greenfield').length,2);
-  assert.equal(scenarios.filter(x=>x.category==='existing').length,2);
-  assert.equal(scenarios.filter(x=>x.category==='ambiguous').length,2);
+  assert.equal(scenarios.filter(x=>x.category==='greenfield').length,4);
+  assert.equal(scenarios.filter(x=>x.category==='existing').length,3);
+  assert.equal(scenarios.filter(x=>x.category==='ambiguous').length,3);
 });
 
 test('ambiguous cases require explicit blocking clarification signals',()=>{
