@@ -168,6 +168,10 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     routeFiles: normalized.filter(file => /(^|\/)(routes?|controllers?|api)(\/|$)|(^|\/)app\/api\//i.test(file)),
     testFiles: normalized.filter(file => /(^|\/)(__tests__|tests?|spec)(\/|\.|$)/i.test(file)),
     diagnostics: ast.diagnostics.slice(0, 500),
+    parserDiagnostics: [
+      ...ast.unsupportedFiles.map(item => ({ ...item, kind: 'grammar_unavailable', trustLevel: 'untrusted_repository_analysis' })),
+      ...ast.failedFiles.map(item => ({ ...item, kind: 'parse_failure', trustLevel: 'untrusted_repository_analysis' }))
+    ].slice(0, 500),
     limitations: [
       'Tree-sitter provides concrete syntax trees, not type checking, symbol resolution, or proof of runtime behavior.',
       'Only grammars bundled with the pinned WebAssembly language pack are parsed; unsupported languages use bounded lexical fallback.',

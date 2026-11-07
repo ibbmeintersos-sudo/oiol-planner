@@ -26,7 +26,7 @@ test('Tree-sitter AST extracts JavaScript declarations and ignores import-like c
 
     const result = await scanRepository(f.root);
     const structure = result.structure;
-    assert.equal(structure.astFileCount, 2);
+    assert.equal(structure.astFileCount, 2, JSON.stringify(structure.parserDiagnostics));
     assert.ok(structure.symbols.some(item => item.name === 'boot' && item.kind === 'function' && item.source === 'tree_sitter_ast'));
     assert.ok(structure.symbols.some(item => item.name === 'make' && item.kind === 'function'));
     assert.ok(structure.symbols.some(item => item.name === 'Engine' && item.kind === 'class'));
@@ -56,7 +56,7 @@ test('Tree-sitter AST resolves Python relative imports and extracts class/functi
 
     const result = await scanRepository(f.root);
     const structure = result.structure;
-    assert.ok(structure.astFileCount >= 2);
+    assert.ok(structure.astFileCount >= 2, JSON.stringify(structure.parserDiagnostics));
     assert.ok(structure.symbols.some(item => item.file === 'pkg/service.py' && item.name === 'Planner' && item.kind === 'class'));
     assert.ok(structure.symbols.some(item => item.file === 'pkg/service.py' && item.name === 'build_plan' && item.kind === 'function'));
     assert.ok(structure.imports.some(item => item.from === 'pkg/service.py' && item.specifier === '.helpers' && item.to === 'pkg/helpers.py'));
@@ -71,7 +71,7 @@ test('Tree-sitter syntax recovery is surfaced as evidence instead of crashing th
     await mkdir(path.join(f.root, 'src'), { recursive: true });
     await writeFile(path.join(f.root, 'src', 'broken.js'), 'export function broken( {\n');
     const result = await scanRepository(f.root);
-    assert.equal(result.structure.astFileCount, 1);
+    assert.equal(result.structure.astFileCount, 1, JSON.stringify(result.structure.parserDiagnostics));
     assert.equal(result.structure.syntaxErrorFileCount, 1);
     assert.ok(result.structure.diagnostics.some(item => item.file === 'src/broken.js'));
   } finally {
