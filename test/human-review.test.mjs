@@ -76,3 +76,29 @@ test('human review CLI aggregates the complete benchmark suite from reviewer CSV
     assert.equal(report.certificationReady,true);
   }finally{await rm(root,{recursive:true,force:true,maxRetries:10,retryDelay:100});}
 });
+
+
+test('human review aggregation requires two reviewers for each scenario in each repeated run', () => {
+  const multiRunHeader = header + ',run_id,plan_file';
+  const rows = [];
+  for (const runId of ['run-1', 'run-2']) {
+    for (const reviewer of ['Reviewer A', 'Reviewer B']) {
+      rows.push(row(reviewer, 4) + ',' + runId + ',plans/' + runId + '/T-1.json');
+    }
+  }
+  const report = aggregateHumanReviews(parseCsv(multiRunHeader + '\n' + rows.join('\n')), ['T-1']);
+  assert.equal(report.runCount, 2);
+  assert.equal(report.scenarioRunResults.length, 2);
+  assert.equal(report.scenarioRunsWithAtLeastTwoReviewers, 2);
+  assert.equal(report.completeReviewerCoverage, true);
+  assert.equal(report.certificationReady, true);
+});
+
+test('human review aggregation rejects duplicate reviewer submissions for the same scenario and run', () => {
+  const multiRunHeader = header + ',run_id,plan_file';
+  const rows = [row('Reviewer A', 4) + ',run-1,plan-1.json', row('Reviewer A', 5) + ',run-1,plan-1.json'];
+  assert.throws(
+    () => aggregateHumanReviews(parseCsv(multiRunHeader + '\n' + rows.join('\n')), ['T-1']),
+    /Duplicate review/
+  );
+});
