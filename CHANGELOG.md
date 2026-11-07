@@ -5,7 +5,7 @@
 ### Changed
 - Made graph derivation, task-interface projection, and plan evaluation fail safely on malformed task structures instead of throwing incidental runtime errors.
 - Added stable repository evidence IDs and distinct SHA-256 fingerprints for original source files and redacted excerpts.
-- Included evidence IDs directly in repository context so planner claims can cite the exact excerpt supplied to the model.
+- Included evidence IDs directly in repository context and aligned analyzer evidence records with those same IDs and fingerprints, so planner citations resolve to the exact excerpt supplied to the model.
 - Retired the legacy execution engine, state machine, event store, recovery inspector, OpenCode task runner, and execution-only tests from the product source.
 - Clarified the package description as planning-only.
 
@@ -17,7 +17,7 @@
 - Added these diagnostics to generated plans, validation output, and Markdown reports.
 - Added a schema-aware validator for the published contract's supported JSON Schema keywords. HybridPlanner now rejects schema-invalid plans before reviewer evaluation; the offline CLI validates the same contract without provider calls.
 - Kept the validator explicit about its supported keyword subset; external consumers should use a standards-compliant Draft 2020-12 implementation.
-- CI run 42346850007 passed on Node.js 22 and 24: 116 tests passed, 0 failed.
+- CI run 42347034663 passed on Node.js 22 and 24: 117 tests passed, 0 failed.
 
 ## 0.4.0 — planning-only contract and quality foundations
 
