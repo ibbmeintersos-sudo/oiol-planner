@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Added deterministic plan-quality metrics for measurable NFRs, test strategy completeness, rollback strategy completeness, reviewed unknowns, validated assumptions, and likelihood × impact risk exposure.
+- Added plan schema 1.1.0 with immutable version snapshots while retaining validation support for schema 1.0.0 plans.
+- Added optional GitHub Issues and Linear handoff adapters with local preview as the default and explicit publishing as an opt-in.
+- Added architecture, contribution, security, and release-process documentation.
+
+### Changed
+- Extended benchmark and blinded human-review rubrics with NFR, test strategy, rollback, unknown transparency, and risk-estimation dimensions.
+- Added CLI commands for local issue-payload previews and explicitly requested external publishing.
+
+
 ## 0.5.0 — Tree-sitter AST repository analysis
 
 ### Added
