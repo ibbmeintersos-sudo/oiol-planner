@@ -36,6 +36,42 @@ test('markdown report includes planning essentials and explicit planning-only di
   }
 });
 
+test('markdown report distinguishes direct candidates, affected tests, and static impact limitations', () => {
+  const impactPlan = {
+    ...plan,
+    project: {
+      ...plan.project,
+      changeImpact: {
+        status: 'analyzed',
+        summary: 'One direct candidate and two dependents were identified.',
+        scope: 'contained',
+        method: 'deterministic_static_impact_estimate',
+        confidence: { score: 0.84, level: 'high' },
+        directMatches: [{ path: 'src/auth/session.ts', score: 0.6, matchedTerms: ['auth'], evidenceId: 'REPO-123' }],
+        potentiallyAffectedFiles: [{ path: 'src/api/profile.ts', depth: 1, propagation: 'reverse_import_dependency', dependsOn: 'src/auth/session.ts' }],
+        affectedTests: [{ path: 'test/auth.test.ts', association: 'resolved_test_import_to_impacted_file', confidence: 'high' }],
+        affectedPackages: [{ path: 'packages/auth', name: '@app/auth', depth: 0, propagation: 'direct_file_or_request_match' }],
+        risks: ['unresolved_local_dependencies_may_hide_additional_impacts'],
+        limitations: ['The affected test list is not evidence that tests were executed.']
+      }
+    }
+  };
+  const markdown = renderPlanMarkdown(impactPlan);
+  for (const value of [
+    'Existing-repository change-impact estimate',
+    'Direct candidate files',
+    'src/auth/session.ts',
+    'Potentially affected files',
+    'src/api/profile.ts',
+    'Potentially affected tests (not executed)',
+    'test/auth.test.ts',
+    'Affected workspace packages',
+    'The affected test list is not evidence that tests were executed.'
+  ]) {
+    assert.ok(markdown.includes(value), 'missing change-impact report content: ' + value);
+  }
+});
+
 test('traceability is planning-only and exposes requirement-to-acceptance mapping', () => {
   const trace = buildTraceability(plan);
   assert.equal(trace.mappingCoverage, 1);

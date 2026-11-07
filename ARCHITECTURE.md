@@ -39,6 +39,7 @@ flowchart TD
 - The scanner records file-selection limits, parser mode, syntax diagnostics, evidence IDs, and source/excerpt fingerprints.
 - Tree-sitter is an optional parser dependency. When it or a language grammar is unavailable, bounded lexical analysis remains available.
 - Scanner output is evidence, not a complete semantic model. It does not perform type checking or establish runtime behavior.
+- For existing-project requests, Change Impact Analysis matches request terms to bounded paths/symbols, walks reverse import edges and workspace dependency edges, and links likely affected tests. It emits an evidence-backed estimate with confidence and coverage penalties; it does not run tests or modify project files.
 
 ### Prompt and trust boundary
 
@@ -49,6 +50,8 @@ The planner receives a structured JSON envelope that separates:
 3. prior model output and diagnostics supplied during repair/review.
 
 Repository files, comments, manifests, issue templates, and generated content are data, never higher-priority instructions. JSON encoding and prompt rules are defense-in-depth, not a model-isolation guarantee.
+
+Change-impact output is included as untrusted deterministic analysis evidence. The planner must distinguish direct matches from reverse-dependency estimates, respect reported coverage gaps, and never interpret an affected-test suggestion as a test result.
 
 ### Hybrid planner
 

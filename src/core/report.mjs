@@ -5,6 +5,48 @@ import { buildTraceability } from './traceability.mjs';
 const text = value => String(value && typeof value === 'object' ? (value.statement || value.description || value.question || JSON.stringify(value)) : value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ').trim();
 const list = values => Array.isArray(values) && values.length ? values.map(value => '- ' + text(value)).join('\n') : '- None recorded';
 
+function changeImpactSection(impact) {
+  if (!impact || typeof impact !== 'object' || impact.status === 'not_applicable') return [];
+  const direct = Array.isArray(impact.directMatches) ? impact.directMatches : [];
+  const files = Array.isArray(impact.potentiallyAffectedFiles) ? impact.potentiallyAffectedFiles : [];
+  const tests = Array.isArray(impact.affectedTests) ? impact.affectedTests : [];
+  const packages = Array.isArray(impact.affectedPackages) ? impact.affectedPackages : [];
+  const confidence = impact.confidence || {};
+  return [
+    '## Existing-repository change-impact estimate',
+    '',
+    text(impact.summary || 'No change-impact summary recorded.'),
+    '',
+    '- **Analysis status:** ' + text(impact.status || 'Not recorded'),
+    '- **Estimated scope:** ' + text(impact.scope || 'Not classified'),
+    '- **Confidence:** ' + text(confidence.level || 'Not recorded') + ' (' + (Number.isFinite(confidence.score) ? (confidence.score * 100).toFixed(1) + '%' : 'not scored') + ')',
+    '- **Method:** ' + text(impact.method || 'Not recorded'),
+    '',
+    '### Direct candidate files',
+    '',
+    ...(direct.length ? direct.slice(0, 30).map(item => '- **' + text(item.path) + '** — score ' + text(item.score) + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : '')) : ['- No direct candidate file was identified.']),
+    '',
+    '### Potentially affected files',
+    '',
+    ...(files.length ? files.slice(0, 100).map(item => '- **' + text(item.path) + '** — depth ' + text(item.depth) + '; ' + text(item.propagation || 'relationship not recorded') + (item.dependsOn ? '; depends on: ' + text(item.dependsOn) : '')) : ['- No dependent source files were identified.']),
+    '',
+    '### Potentially affected tests (not executed)',
+    '',
+    ...(tests.length ? tests.map(item => '- **' + text(item.path) + '** — ' + text(item.association) + '; confidence: ' + text(item.confidence)) : ['- No test file could be linked to the available impact evidence.']),
+    '',
+    '### Affected workspace packages',
+    '',
+    ...(packages.length ? packages.map(item => '- **' + text(item.name || item.path) + '** — ' + text(item.propagation) + '; depth ' + text(item.depth)) : ['- No workspace package impact was identified.']),
+    '',
+    '### Impact-analysis caveats',
+    '',
+    list([...(Array.isArray(impact.risks) ? impact.risks : []), ...(Array.isArray(impact.limitations) ? impact.limitations : [])]),
+    '',
+    '*This is a bounded static planning estimate. It does not prove runtime impact, and OIOL does not run or verify any test, build, script, or implementation task.*',
+    ''
+  ];
+}
+
 export function renderPlanMarkdown(plan = {}) {
   plan = plan && typeof plan === 'object' && !Array.isArray(plan) ? plan : {};
   const validation = plan.validation || {};
@@ -48,6 +90,7 @@ export function renderPlanMarkdown(plan = {}) {
     '- **Mean estimated risk exposure:** ' + (Number.isFinite(planQuality.risks?.meanExposure) ? planQuality.risks.meanExposure : 'Not recorded'),
     '- **High/critical estimated risks:** ' + (planQuality.risks?.highOrCriticalCount ?? 'Not recorded'), '',
     '*These metrics measure the completeness of planning evidence; they do not prove that implementation or verification has occurred.*', '',
+    ...changeImpactSection(plan.project?.changeImpact),
     '',
     '## Non-blocking quality review signals',
     '',

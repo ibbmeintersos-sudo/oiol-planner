@@ -12,6 +12,7 @@
 - Prevented repository snippet bodies from bypassing the bounded prompt context; snippets outside that context now carry provenance metadata only.
 - Added manually reviewed Monorepo fixtures and precision/recall/F1 coverage for manifest-declared workspace dependency edges.
 - Enforced the source-analysis file cap independently of test/config context selection; added JSONC parsing for TypeScript path maps, alias-config provenance, and diagnostics for unresolved declared workspace dependencies.
+- Added deterministic Change Impact Analysis for direct request matches, reverse import dependents, workspace consumer packages, and potentially affected tests, with evidence links, confidence penalties, and bounded traversal.
 
 ### Changed
 - Extended benchmark and blinded human-review rubrics with NFR, test strategy, rollback, unknown transparency, and risk-estimation dimensions.
