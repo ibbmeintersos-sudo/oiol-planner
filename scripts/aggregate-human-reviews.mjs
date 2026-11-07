@@ -122,6 +122,8 @@ export function aggregateHumanReviews(rows,expectedScenarioIds=scenarios.map(ite
     minimumScenarioScore,
     unresolvedDisagreements,
     criticalScenarios,
+    highSeverityScenarios,
+    blockingFindingScenarios,
     scenarioResults,
     certificationReady,
     decision:certificationReady?'human_review_gate_passed':'human_review_gate_not_met',
