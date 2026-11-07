@@ -6,7 +6,7 @@ import { topologicalWaves } from '../src/core/graph.mjs';
 import { comparePlans } from '../src/core/revision.mjs';
 import { buildTraceability } from '../src/core/traceability.mjs';
 import { evaluatePlan } from '../src/core/evaluate.mjs';
-const base={requirements:[{id:'r1',statement:'Login'}],architecture:{components:[{id:'c1',name:'Auth'}]},tasks:[{id:'t1',title:'Implement login',requirementIds:['r1'],componentIds:['c1'],dependencies:[],acceptanceCriteria:['User can login'],writeScope:['src/auth']}],dependencyGraph:{nodes:['t1'],edges:[]},clarifications:[],risks:[]};
+const base={requirements:[{id:'r1',statement:'Login'}],architecture:{components:[{id:'c1',name:'Auth'}]},tasks:[{id:'t1',title:'Implement login',description:'Add the login flow using the existing authentication component.',requirementIds:['r1'],componentIds:['c1'],dependencies:[],acceptanceCriteria:['User can login'],writeScope:['src/auth']}],dependencyGraph:{nodes:['t1'],edges:[]},clarifications:[],risks:[]};
 test('valid plan passes deterministic validation',()=>assert.equal(validatePlan(base).valid,true));
 test('unknown requirement reference fails',()=>{const p=structuredClone(base);p.tasks[0].requirementIds=['missing'];assert.equal(validatePlan(p).valid,false);});
 test('unsafe path fails',()=>{const p=structuredClone(base);p.tasks[0].writeScope=['../secrets'];assert.equal(validatePlan(p).valid,false);});
