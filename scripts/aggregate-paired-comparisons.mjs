@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { scenarios as benchmarkScenarios } from '../benchmarks/scenarios.mjs';
 
 const median=values=>{const a=[...values].sort((x,y)=>x-y);if(!a.length)return null;const m=Math.floor(a.length/2);return Number((a.length%2?a[m]:(a[m-1]+a[m])/2).toFixed(2));};
 const stats=values=>({count:values.length,median:median(values),min:values.length?Math.min(...values):null,max:values.length?Math.max(...values):null,spread:values.length?Number((Math.max(...values)-Math.min(...values)).toFixed(2)):null});
@@ -18,6 +19,8 @@ export function aggregatePairedComparisons(reports){
   const current=(report.scenarioResults||[]).map(x=>x.scenarioId).sort();
   if(current.length!==expected.length||current.some((x,i)=>x!==expected[i]))throw new Error('All paired reports must cover the same scenario IDs');
  }
+ const expectedFullSuite=benchmarkScenarios.map(x=>x.id).sort();
+ const completeSuiteCoverage=expected.length===expectedFullSuite.length&&expected.every((id,index)=>id===expectedFullSuite[index]);
  const scenarioResults=expected.map(id=>{
   const rows=reports.map(report=>report.scenarioResults.find(x=>x.scenarioId===id));
   const deltas=rows.map(x=>x.delta);
@@ -25,7 +28,7 @@ export function aggregatePairedComparisons(reports){
  });
  const runDeltas=reports.map(x=>x.averageScoreDelta).filter(Number.isFinite);
  const reviewerComparable=reports.every(x=>x.reviewerComparable===true);
- return {protocolVersion:'1.0',aggregatorVersion:'1.0.0',aggregatedAt:new Date().toISOString(),comparisonKey:reports[0].comparisonKey,budgetKey:reports[0].budgetKey,pairedRunCount:reports.length,minimumPairedRuns:3,repeatGateMet:reports.length>=3,reviewerComparable,averageDelta:stats(runDeltas),scenarioCount:expected.length,scenarioResults,positiveMedianScenarios:scenarioResults.filter(x=>x.median>0).length,negativeMedianScenarios:scenarioResults.filter(x=>x.median<0).length,zeroMedianScenarios:scenarioResults.filter(x=>x.median===0).length,readyForHumanAdjudication:reports.length>=3&&reviewerComparable,limitations:['The comparison and budget keys are operator attestations.','A repeated automated score difference is not a statistical proof of superiority.','Blinded human review and inspection of failure cases remain mandatory.']};
+ return {protocolVersion:'1.0',aggregatorVersion:'1.0.0',aggregatedAt:new Date().toISOString(),comparisonKey:reports[0].comparisonKey,budgetKey:reports[0].budgetKey,pairedRunCount:reports.length,minimumPairedRuns:3,repeatGateMet:reports.length>=3,reviewerComparable,averageDelta:stats(runDeltas),scenarioCount:expected.length,completeSuiteCoverage,scenarioResults,positiveMedianScenarios:scenarioResults.filter(x=>x.median>0).length,negativeMedianScenarios:scenarioResults.filter(x=>x.median<0).length,zeroMedianScenarios:scenarioResults.filter(x=>x.median===0).length,readyForHumanAdjudication:reports.length>=3&&completeSuiteCoverage&&reviewerComparable,limitations:['The comparison and budget keys are operator attestations.','A repeated automated score difference is not a statistical proof of superiority.','Blinded human review and inspection of failure cases remain mandatory.']};
 }
 export async function main(){
  const index=process.argv.indexOf('--inputs');
