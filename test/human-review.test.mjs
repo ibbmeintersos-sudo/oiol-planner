@@ -8,8 +8,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const header='scenario_id,category,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes';
-const row=(reviewer,overall,critical='none',adjudicated='',notes='')=>['T-1','greenfield',4,4,4,4,4,4,overall,reviewer,critical,'"Plan evidence: task boundaries and acceptance criteria are clear"',adjudicated,notes].join(',');
+const header='scenario_id,category,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,nfr_coverage_1_5,test_strategy_1_5,rollback_strategy_1_5,unknowns_transparency_1_5,risk_estimation_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes';
+const row=(reviewer,overall,critical='none',adjudicated='',notes='')=>['T-1','greenfield',4,4,4,4,4,4,4,4,4,4,4,overall,reviewer,critical,'"Plan evidence: task boundaries and acceptance criteria are clear"',adjudicated,notes].join(',');
 
 test('CSV parser supports quoted commas and escaped quotes',()=>{
   const rows=parseCsv('scenario_id,reviewer_id,evidence_notes\nT-1,R1,"Evidence includes, commas and ""quoted text"""\n');
@@ -63,7 +63,7 @@ test('human review CLI aggregates the complete benchmark suite from reviewer CSV
     const lines=[headerLine];
     for(const scenario of scenarios){
       for(const reviewer of ['Reviewer A','Reviewer B']){
-        lines.push([scenario.id,scenario.category,4,4,4,4,4,4,4,reviewer,'none','Plan evidence: requirements and task acceptance criteria are explicitly mapped','',''].join(','));
+        lines.push([scenario.id,scenario.category,4,4,4,4,4,4,4,4,4,4,4,4,reviewer,'none','Plan evidence: requirements and task acceptance criteria are explicitly mapped','',''].join(','));
       }
     }
     await writeFile(csvFile,lines.join('\n')+'\n');
@@ -106,10 +106,14 @@ test('human review aggregation rejects duplicate reviewer submissions for the sa
 
 test('empty human-review template rows preserve missing run coverage without inventing scores', () => {
   const multiRunHeader = header + ',run_id,plan_file';
-  const rows = [
-    ['T-1','greenfield','','','','','','','','','','','','','run-1','plans/run-1/T-1.json'].join(','),
-    ['T-1','greenfield','','','','','','','','','','','','','run-2','plans/run-2/T-1.json'].join(',')
-  ];
+  const makeBlank = runId => {
+    const values = Array(header.split(',').length + 2).fill('');
+    values[0] = 'T-1'; values[1] = 'greenfield';
+    values[values.length - 2] = runId;
+    values[values.length - 1] = 'plans/' + runId + '/T-1.json';
+    return values.join(',');
+  };
+  const rows = [makeBlank('run-1'), makeBlank('run-2')];
   const report = aggregateHumanReviews(parseCsv(multiRunHeader + '\n' + rows.join('\n')), ['T-1']);
   assert.equal(report.runCount, 2);
   assert.equal(report.completeReviewerCoverage, false);

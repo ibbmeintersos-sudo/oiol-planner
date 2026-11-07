@@ -8,7 +8,8 @@ import { SUPPORTED_SCHEMA_KEYWORDS, validateJsonSchema } from '../src/core/schem
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan.schema.json'), 'utf8'));
-const versionedSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan-1.0.0.schema.json'), 'utf8'));
+const versionedSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan-' + SCHEMA_VERSION + '.schema.json'), 'utf8'));
+const previousSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan-1.0.0.schema.json'), 'utf8'));
 const example = JSON.parse(await fs.readFile(path.join(ROOT, 'examples/plan.v1.json'), 'utf8'));
 
 function collectKeywords(node, found = new Set()) {
@@ -69,7 +70,23 @@ test('malformed schema declarations fail closed during schema inspection', () =>
   assert.throws(() => validateJsonSchema([], { type: 'array', items: true }), /items must be a schema object/);
 });
 
-test('versioned schema snapshot remains identical to the current 1.0.0 contract', () => {
+test('current schema snapshot matches the current contract and preserves the frozen 1.0.0 schema', () => {
   assert.deepEqual(versionedSchema, schema);
-  assert.equal(versionedSchema.properties.schemaVersion.const, '1.0.0');
+  assert.equal(versionedSchema.properties.schemaVersion.const, SCHEMA_VERSION);
+  assert.equal(previousSchema.properties.schemaVersion.const, '1.0.0');
+  assert.equal(previousSchema.properties.contractVersion.const, '1.0');
+});
+
+test('1.0.0 plans continue to validate against their immutable schema snapshot', async () => {
+  const legacy = structuredClone(example);
+  legacy.schemaVersion = '1.0.0';
+  legacy.contractVersion = '1.0';
+  const currentOnlyFields = ['testStrategy','rollbackPlan','unknownsReviewed'];
+  for (const key of currentOnlyFields) delete legacy[key];
+  legacy.requirements = legacy.requirements.filter(item => item.id !== 'REQ-NFR-1');
+  delete legacy.assumptions;
+  delete legacy.unknowns;
+  legacy.risks = legacy.risks.map(({likelihood,impact,confidence,...risk}) => risk);
+  const result = await validateJsonSchema(legacy, previousSchema);
+  assert.equal(result.valid, true, result.errors.join('\n'));
 });
