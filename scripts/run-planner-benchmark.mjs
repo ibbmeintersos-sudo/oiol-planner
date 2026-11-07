@@ -38,7 +38,9 @@ export async function resolveScenarioProject(scenario) {
   const fixturePath=scenario.project?.fixturePath;
   if(!fixturePath) return scenario.project;
   const repoPath=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',fixturePath);
-  return analyzeProject({mode:'existing',repo:repoPath,name:scenario.project.name,request:scenario.project.request});
+  const project=await analyzeProject({mode:'existing',repo:repoPath,name:scenario.project.name,request:scenario.project.request});
+  project.repository.root=fixturePath.replaceAll('\\\\','/');
+  return project;
 }
 
 export function aggregateUsage(records) {
