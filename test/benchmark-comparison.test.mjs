@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { compareBenchmarkModes } from '../scripts/compare-benchmark-modes.mjs';
 
-const oi={benchmarkMode:'oiol',runId:'oi-1',comparisonKey:'qwen-test',budgetKey:'budget-1',reviewer:{mode:'same'},summary:{averageScore:90,passCount:2},scores:[
+const oi={benchmarkMode:'oiol',runId:'oi-1',comparisonKey:'qwen-test',budgetKey:'budget-1',reviewer:{provider:'openai-compatible',model:'model-a',baseUrl:'https://api.example/v1'},summary:{averageScore:90,passCount:2},scores:[
  {scenarioId:'GF-API-001',score:95,blockers:[]},{scenarioId:'AMB-AUTH-005',score:85,blockers:[]}
 ]};
-const base={benchmarkMode:'opencode-baseline',runId:'base-1',comparisonKey:'qwen-test',budgetKey:'budget-1',reviewer:{mode:'same'},summary:{averageScore:80,passCount:1},scores:[
+const base={benchmarkMode:'opencode-baseline',runId:'base-1',comparisonKey:'qwen-test',budgetKey:'budget-1',reviewer:{provider:'openai-compatible',model:'model-a',baseUrl:'https://api.example/v1'},summary:{averageScore:80,passCount:1},scores:[
  {scenarioId:'GF-API-001',score:80,blockers:['missing criterion']},{scenarioId:'AMB-AUTH-005',score:80,blockers:[]}
 ]};
 

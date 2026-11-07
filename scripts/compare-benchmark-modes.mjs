@@ -23,7 +23,8 @@ export function compareBenchmarkModes(oiol,baseline){
  });
  const deltas=rows.map(x=>x.delta);
  const avg=values=>values.length?Number((values.reduce((s,x)=>s+x,0)/values.length).toFixed(2)):0;
- const reviewerComparable=JSON.stringify(oiol.reviewer??null)===JSON.stringify(baseline.reviewer??null);
+ const reviewerIdentity=value=>value?.provider?{provider:value.provider,model:value.model||null,baseUrl:value.baseUrl||null}:{mode:value?.mode||null};
+ const reviewerComparable=JSON.stringify(reviewerIdentity(oiol.reviewer))===JSON.stringify(reviewerIdentity(baseline.reviewer));
  return {
   protocolVersion:'1.0',comparedAt:new Date().toISOString(),oiolRunId:oiol.runId,baselineRunId:baseline.runId,
   comparisonKey:oiol.comparisonKey,budgetKey:oiol.budgetKey,scenarioCount:rows.length,
