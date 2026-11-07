@@ -79,6 +79,8 @@ export async function main() {
   if(reviewConfig&&!reviewConfig.apiKey&&reviewConfig.provider!=='ollama') throw new Error('OIOL_REVIEW_API_KEY is required when a separate remote reviewer is configured.');
   const provider=createProvider(planningConfig);
   const reviewer=reviewConfig?createProvider(reviewConfig):provider;
+  const maxRepairRounds=Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2);
+  if(!Number.isInteger(maxRepairRounds)||maxRepairRounds<0||maxRepairRounds>5) throw new Error('OIOL_MAX_REPAIR_ROUNDS must be an integer from 0 to 5');
   const records=[];
   for(const scenario of chosen){
     const started=Date.now();
@@ -96,7 +98,6 @@ export async function main() {
   const summary=summarizeBenchmark(scores);
   const comparisonKey=process.env.OIOL_BENCHMARK_COMPARISON_KEY||null,budgetKey=process.env.OIOL_BENCHMARK_BUDGET_KEY||null;
   const runId=createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16);
-  const maxRepairRounds=Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2);
   const output={protocolVersion:'1.2',runnerVersion:'1.2.0',benchmarkMode:'oiol',comparisonKey,budgetKey,runId,createdAt:new Date().toISOString(),maxRepairRounds,configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.2',benchmarkMode:'oiol',comparisonKey,budgetKey,maxRepairRounds,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
