@@ -166,7 +166,8 @@
       "description": "Map contract and domain rules to observable acceptance scenarios.",
       "requirementIds": [
         "REQ-001",
-        "REQ-002"
+        "REQ-002",
+        "REQ-NFR-1"
       ],
       "componentIds": [
         "CMP-API"
@@ -177,7 +178,8 @@
       ],
       "acceptanceCriteria": [
         "Scenarios cover known and unknown item lookup.",
-        "Scenarios cover valid and invalid stock adjustments."
+        "Scenarios cover valid and invalid stock adjustments.",
+        "The performance acceptance scenario measures p95 latency at the agreed reference load and checks the 250 ms target."
       ],
       "writeScope": [
         "docs/acceptance"
