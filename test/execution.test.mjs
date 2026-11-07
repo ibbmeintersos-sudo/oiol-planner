@@ -184,3 +184,12 @@ test('run start ledger rejects duplicate or incomplete task IDs',()=>{
   const events=[{eventId:'e1',runId:'bad-ledger',sequence:1,type:'run.started',at,planId:'p1',planFingerprint:'fp1',taskCount:2,taskIds:['t1','t1']}];
   assert.throws(()=>inspectExecutionRun(events),/invalid taskIds ledger/);
 });
+
+
+test('engine writes the exact planned task IDs into the run-start event',async()=>{
+  const plan=makePlan(),store=new InMemoryEventStore();
+  await makeEngine({runner:successRunner,eventStore:store}).run(plan,{approval:approved(plan),runId:'task-ledger'});
+  const started=(await store.read('task-ledger'))[0];
+  assert.deepEqual(started.taskIds,['t1','t2','t3']);
+  assert.equal(started.taskCount,started.taskIds.length);
+});
