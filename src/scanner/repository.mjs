@@ -117,7 +117,10 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
     'Frameworks: ' + (structure.frameworks.join(', ') || 'not detected'),
     'Entry points: ' + (structure.entryPoints.join(', ') || 'not detected'),
-    'AST-parsed source files: ' + structure.astFileCount,\n    'Lexical fallback source files: ' + structure.lexicalFallbackFileCount,\n    'Syntax-error files: ' + structure.syntaxErrorFileCount,\n    'Local import edges: ' + structure.dependencyGraph.edgeCount,
+    'AST-parsed source files: ' + structure.astFileCount,
+    'Lexical fallback source files: ' + structure.lexicalFallbackFileCount,
+    'Syntax-error files: ' + structure.syntaxErrorFileCount,
+    'Local import edges: ' + structure.dependencyGraph.edgeCount,
     'Unresolved relative imports: ' + structure.unresolvedLocalImportCount,
     'Route-like files: ' + structure.routeFiles.length,
     'Test-like files: ' + structure.testFiles.length
