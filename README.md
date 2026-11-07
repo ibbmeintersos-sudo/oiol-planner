@@ -60,7 +60,7 @@ Supported providers:
 | Google Gemini | gemini | generateContent API |
 | Ollama | ollama | Local /api/chat endpoint |
 
-Configuration is read from .env when supported by the Node runtime, or from shell environment variables. For a separate reviewer, configure OIOL_REVIEW_PROVIDER and optional reviewer model, base URL, API key, and timeout variables. A same-provider critique cannot certify readiness. A distinct reviewer approval can move a structurally valid plan to ready_for_review; this means ready for human review, not implementation authorization or evidence of implementation.
+Configuration is read from .env when supported by the Node runtime, or from shell environment variables. For a distinct reviewer configuration, configure OIOL_REVIEW_PROVIDER and optional reviewer model, base URL, API key, and timeout variables. A same-provider critique cannot certify readiness. A distinct reviewer approval can move a structurally valid plan to ready_for_review; this means ready for human review, not implementation authorization or evidence of implementation.
 
 ## Plan contract and validation
 
