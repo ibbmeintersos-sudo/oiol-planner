@@ -21,9 +21,40 @@ test('OpenCode adapter accepts empty 204 responses',async()=>{const client=new O
 test('OpenCode session creation sends only documented session fields',async()=>{let body;const client=new OpenCodeClient({fetchImpl:async(_url,options)=>{body=JSON.parse(options.body);return new Response('{"id":"s1"}',{status:200});}});await client.createSession('Task session');assert.deepEqual(body,{title:'Task session'});});
 test('OpenCode prompt requires typed parts and sends model/agent options',async()=>{let body;const client=new OpenCodeClient({fetchImpl:async(_url,options)=>{body=JSON.parse(options.body);return new Response('{"info":{"id":"m1"},"parts":[]}',{status:200});}});await client.prompt('s1',[{type:'text',text:'Do work'}],{agent:'build',model:{providerID:'openai',modelID:'test'}});assert.equal(body.parts[0].type,'text');assert.equal(body.agent,'build');assert.equal(body.model.modelID,'test');assert.throws(()=>client.prompt('s1',['plain text']),/typed parts/);});
 test('OpenCode client supports configured basic-auth username',async()=>{let auth;const client=new OpenCodeClient({username:'custom-user',password:'pw',fetchImpl:async(_url,options)=>{auth=options.headers.authorization;return new Response('{"healthy":true}',{status:200});}});await client.health();assert.equal(auth,'Basic '+Buffer.from('custom-user:pw').toString('base64'));});
-test('OpenCode task runner creates a session, prompts, collects diff and delegates verification',async()=>{const calls=[],client={async createSession(title){calls.push(['create',title]);return {id:'session-1'};},async prompt(id,parts,options){calls.push(['prompt',id,parts[0].text,options]);return {info:{id:'message-1',role:'assistant'},parts:[{type:'text',text:'Implemented task'}]};},async getSessionDiff(id){calls.push(['diff',id]);return [{file:'src/a.mjs'}];}};let verified=false;const runner=new OpenCodeTaskRunner({client,agent:'build',verifyTask:async(task,result)=>{verified=true;return {passed:result.diff.length===1,method:'diff-check'};}});const task={id:'t2',title:'Implement endpoint',description:'Add endpoint',acceptanceCriteria:['Endpoint returns JSON'],writeScope:['src/api']};const context={runId:'run-1',results:new Map([['t1',{result:{outputs:{contract:'v1'}}}]])};const result=await runner.execute(task,context);const verdict=await runner.verify(task,result,context);assert.equal(result.sessionId,'session-1');assert.equal(result.messageId,'message-1');assert.ok(calls[1][3].timeoutMs>0&&calls[1][3].timeoutMs<=600000,'prompt timeout must be the remaining task deadline');assert.match(result.assistantText,/Implemented task/);assert.match(calls[1][2],/contract/);assert.equal(verdict.passed,true);assert.equal(verified,true);assert.equal(runner.concurrentSafe,false);});
+test('OpenCode task runner creates a session, prompts, collects diff and delegates verification',async()=>{const calls=[],client={async createSession(title){calls.push(['create',title]);return {id:'session-1'};},async prompt(id,parts,options){calls.push(['prompt',id,parts[0].text,options]);return {info:{id:'message-1',role:'assistant'},parts:[{type:'text',text:'Implemented task'}]};},async getSessionDiff(id){calls.push(['diff',id]);return [{file:'src/api/endpoint.mjs',patch:'@@'}];}};let verified=false;const runner=new OpenCodeTaskRunner({client,agent:'build',verifyTask:async(task,result)=>{verified=true;return {passed:result.diff.length===1,method:'diff-check'};}});const task={id:'t2',title:'Implement endpoint',description:'Add endpoint',acceptanceCriteria:['Endpoint returns JSON'],writeScope:['src/api']};const context={runId:'run-1',results:new Map([['t1',{result:{outputs:{contract:'v1'}}}]])};const result=await runner.execute(task,context);const verdict=await runner.verify(task,result,context);assert.equal(result.sessionId,'session-1');assert.equal(result.messageId,'message-1');assert.ok(calls[1][3].timeoutMs>0&&calls[1][3].timeoutMs<=600000,'prompt timeout must be the remaining task deadline');assert.match(result.assistantText,/Implemented task/);assert.match(calls[1][2],/contract/);assert.equal(verdict.passed,true);assert.equal(verified,true);assert.equal(runner.concurrentSafe,false);});
 test('OpenCode task runner requires independent verification',()=>{const client={createSession(){},prompt(){},getSessionDiff(){}};assert.throws(()=>new OpenCodeTaskRunner({client}),/verifyTask callback/);});
 test('OpenCode task runner aborts its session when prompt is cancelled',async()=>{const controller=new AbortController();let aborted=false;const client={async createSession(){return {id:'session-2'};},async prompt(){controller.abort();throw new Error('cancelled');},async getSessionDiff(){return [];},async abortSession(){aborted=true;}};const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});await assert.rejects(()=>runner.execute({id:'t',title:'T',acceptanceCriteria:[],writeScope:[]},{runId:'r',results:new Map(),signal:controller.signal}),/cancelled/);assert.equal(aborted,true);});
 
 test('OpenCode client supports per-request timeout overrides',async()=>{const client=new OpenCodeClient({timeoutMs:1000,fetchImpl:(_url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError'))))});await assert.rejects(()=>client.request('/slow',{timeoutMs:5}),/timed out after 5ms/);});
 test('OpenCode task runner rejects non-assistant responses',async()=>{const client={async createSession(){return {id:'s'};},async prompt(){return {info:{role:'user'},parts:[]};},async getSessionDiff(){return [];}};const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});await assert.rejects(()=>runner.execute({id:'t',title:'T',acceptanceCriteria:[],writeScope:[]},{runId:'r',results:new Map()}),/invalid assistant message/);});
+
+
+test('OpenCode task runner rejects changes outside the declared write scope',async()=>{
+  const client={
+    async createSession(){return {id:'scope-session'};},
+    async prompt(){return {info:{id:'scope-message',role:'assistant'},parts:[{type:'text',text:'Done'}]};},
+    async getSessionDiff(){return [{file:'src/private/secrets.txt',patch:'@@'}];},
+    async abortSession(){}
+  };
+  const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});
+  await assert.rejects(()=>runner.execute(
+    {id:'scope-task',title:'Scoped change',acceptanceCriteria:['works'],writeScope:['src/api']},
+    {runId:'scope-run',results:new Map()}
+  ),/outside the task write scope/);
+});
+
+test('OpenCode task runner rejects traversal and absolute paths in diffs',async()=>{
+  for(const file of ['../outside.txt','/etc/passwd','src/api/../../outside.txt']) {
+    const client={
+      async createSession(){return {id:'scope-session'};},
+      async prompt(){return {info:{id:'scope-message',role:'assistant'},parts:[]};},
+      async getSessionDiff(){return [{file,patch:'@@'}];},
+      async abortSession(){}
+    };
+    const runner=new OpenCodeTaskRunner({client,verifyTask:async()=>true});
+    await assert.rejects(()=>runner.execute(
+      {id:'scope-task',title:'Scoped change',acceptanceCriteria:['works'],writeScope:['src/api']},
+      {runId:'scope-run',results:new Map()}
+    ),/outside the task write scope/);
+  }
+});
