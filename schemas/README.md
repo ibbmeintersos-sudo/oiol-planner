@@ -37,7 +37,7 @@ Any other keyword is rejected during schema inspection. In particular, keywords 
 1. **Patch version** (`1.0.x`): documentation corrections or validator bug fixes that do not intentionally change the contract's accepted data model or field meaning. Publish the change log and regression fixtures.
 2. **Minor version** (`1.x.0`): backward-compatible additions such as optional fields or new optional metadata. Existing 1.0 consumers must be able to ignore the new fields. Update `schemaVersion`, `$id`, `SCHEMA_VERSION`, examples, and contract tests together.
 3. **Major version** (`2.0.0`): a breaking shape or semantic change, removal/renaming of a field, a newly required field, or a changed interpretation. Bump `schemaVersion` and `contractVersion`; publish a version-specific schema and a documented migration guide. Do not silently reinterpret older plan files.
-4. Keep released versioned schemas immutable. `plan.schema.json` is the current convenience pointer; released copies should be retained as `plan-<schemaVersion>.schema.json`.
+4. Keep released versioned schemas immutable. `plan.schema.json` is the current convenience pointer; the `plan-1.0.0.schema.json` file is the frozen copy of the currently published contract. For future schema versions, add `plan-<schemaVersion>.schema.json` and never overwrite older snapshots.
 5. A validator must fail closed on an unsupported `schemaVersion`. A migration must be an explicit, separately tested conversion that states which source versions it accepts and which information may be lost.
 6. A software release version (for example OIOL `0.5.0`) is independent of the plan `schemaVersion`. Do not bump the schema version for implementation-only releases.
 

@@ -8,6 +8,7 @@ import { SUPPORTED_SCHEMA_KEYWORDS, validateJsonSchema } from '../src/core/schem
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan.schema.json'), 'utf8'));
+const versionedSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'schemas/plan-1.0.0.schema.json'), 'utf8'));
 const example = JSON.parse(await fs.readFile(path.join(ROOT, 'examples/plan.v1.json'), 'utf8'));
 
 function collectKeywords(node, found = new Set()) {
@@ -66,4 +67,9 @@ test('malformed schema declarations fail closed during schema inspection', () =>
   assert.throws(() => validateJsonSchema('x', { type: ['string', 'unknown'] }), /supported JSON Schema type/);
   assert.throws(() => validateJsonSchema({}, { type: 'object', required: 'id' }), /required must be an array/);
   assert.throws(() => validateJsonSchema([], { type: 'array', items: true }), /items must be a schema object/);
+});
+
+test('versioned schema snapshot remains identical to the current 1.0.0 contract', () => {
+  assert.deepEqual(versionedSchema, schema);
+  assert.equal(versionedSchema.properties.schemaVersion.const, '1.0.0');
 });
