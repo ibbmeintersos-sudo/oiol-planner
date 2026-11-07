@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { isObject } from './utils.mjs';
+import { SCHEMA_VERSION, PLAN_SCHEMA_CONTRACTS } from '../contracts/types.mjs';
 
 export const SUPPORTED_SCHEMA_KEYWORDS = Object.freeze([
   '$schema', '$id', '$defs', '$ref', 'title', 'description',
@@ -152,18 +153,25 @@ export function validateJsonSchema(value, schema) {
   return { valid: errors.length === 0, errors };
 }
 
-async function loadPublishedSchema() {
-  if (!schemaPromise) {
-    schemaPromise = fs.readFile(new URL('../../schemas/plan.schema.json', import.meta.url), 'utf8')
-      .then(JSON.parse)
-      .catch(error => {
-        schemaPromise = null;
-        throw error;
-      });
+const schemaPromises = new Map();
+async function loadPublishedSchema(version = SCHEMA_VERSION) {
+  if (!Object.hasOwn(PLAN_SCHEMA_CONTRACTS, version)) {
+    throw new Error('Unsupported plan schemaVersion: ' + version);
   }
-  return schemaPromise;
+  if (!schemaPromises.has(version)) {
+    const promise = fs.readFile(new URL('../../schemas/plan-' + version + '.schema.json', import.meta.url), 'utf8')
+      .then(JSON.parse)
+      .catch(error => { schemaPromises.delete(version); throw error; });
+    schemaPromises.set(version, promise);
+  }
+  return schemaPromises.get(version);
 }
 
 export async function validatePlanSchema(plan) {
-  return validateJsonSchema(plan, await loadPublishedSchema());
+  const version = typeof plan?.schemaVersion === 'string' ? plan.schemaVersion : SCHEMA_VERSION;
+  try {
+    return validateJsonSchema(plan, await loadPublishedSchema(version));
+  } catch (error) {
+    return { valid: false, errors: [error.message] };
+  }
 }

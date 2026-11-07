@@ -15,7 +15,12 @@ const plannerRules = [
   '- A dependencyGraph whose nodes and edges exactly match task dependencies.',
   '- Risks with likelihood/impact where possible, mitigation, assumptions, unknowns, and clarifications. Block decisions that cannot safely be assumed.',
   '- For existing systems, include compatibility constraints, migration sequencing, rollback considerations, security/privacy, observability, and a planned test strategy when relevant. These are design/planning recommendations only; do not claim that tests or migrations have been run.',
-  '- Identify non-functional requirements such as performance, reliability, accessibility, maintainability, security, privacy, and operability when relevant to the request.',
+  '- Identify relevant non-functional requirements using qualityAttribute values such as performance, reliability, security, privacy, accessibility, maintainability, observability, scalability, operability, and compatibility. Each NFR must state a measurable measurement object with metric, target, unit, and measurementMethod, plus acceptance criteria. Do not invent numeric targets; ask a blocking clarification when a target must be supplied by the user or business.',
+  '- Include a structured testStrategy with approach, levels, coverage, entryCriteria, exitCriteria, and testData. State what is proposed, not what has already passed.',
+  '- Include a structured rollbackPlan. When rollback is applicable, state strategy, triggerConditions, steps, verification, and dataCompatibility. If it is genuinely not applicable, set applicability to not_applicable and explain the rationale.',
+  '- Set unknownsReviewed to true only after explicitly reviewing unresolved unknowns. Represent each unknown with description, impact, resolutionApproach, and a blocking boolean. List assumptions with statement, confidence (low/medium/high), and validationApproach.',
+  '- Estimate each material risk with likelihood and impact on the documented 1-to-5 ordinal scales, provide mitigation, and do not fabricate precision. Omit estimates when evidence is insufficient and explain the uncertainty.'
+
   '',
   'Use concrete, bounded tasks and avoid broad rewrites. Every requirement must be mapped to one or more tasks. Do not include credentials, secrets, or destructive operations. Do not describe implementation as completed. Return the plan JSON object with requirements, architecture, tasks, dependencyGraph, risks, clarifications, evidence, and summary.'
 ].join('\n');
