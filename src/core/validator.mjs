@@ -40,7 +40,7 @@ export function validatePlan(plan, project={}) {
     if(!isObject(clarification)) { errors.push('Clarification entry must be an object'); continue; }
     if(clarification.blocking===true && clarification.resolved!==true) errors.push(`Unresolved blocking clarification: ${String(clarification.question||clarification.id||'unspecified')}`);
   }
-  if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; execution must preserve them');
+  if(project.repository?.git?.dirty) warnings.push('Repository has pre-existing uncommitted changes; the plan must explicitly account for them and avoid unrelated overwrites');
   if(!tasks.length) errors.push('Plan contains no tasks');
   return result(errors,warnings,reqs.length?covered.size/reqs.length:1,tasks.length,schedule);
 }
