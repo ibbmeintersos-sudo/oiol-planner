@@ -117,7 +117,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     if (SENSITIVE.test(relative)) throw new Error('Sensitive priority evidence path is not allowed: ' + relative);
   }
   if (!Array.isArray(priorityRanges) || priorityRanges.some(range => !range || typeof range.path !== 'string' || !range.path.trim() || !Number.isInteger(range.startLine) || !Number.isInteger(range.endLine) || range.startLine < 1 || range.endLine < range.startLine || range.endLine - range.startLine > 200)) throw new Error('priorityRanges must contain safe paths and 1-based line ranges of at most 201 lines');
-  const normalizedPriorityRanges = priorityRanges.map(range => ({ path: range.path.replaceAll('\\\\', '/'), startLine: range.startLine, endLine: range.endLine }));
+  const normalizedPriorityRanges = priorityRanges.map(range => ({ path: range.path.replaceAll('\\', '/'), startLine: range.startLine, endLine: range.endLine }));
   for (const range of normalizedPriorityRanges) {
     const normalized = path.posix.normalize(range.path);
     if (range.path.startsWith('/') || /^[a-z]:/i.test(range.path) || normalized !== range.path || normalized.split('/').includes('..')) throw new Error('Unsafe priority evidence range path: ' + range.path);
@@ -181,11 +181,11 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
       const redactedText = redact(sourceText);
       let content;
       if (fileRanges.length) {
-        const lines = redactedText.split(/\\r?\\n/);
+        const lines = redactedText.split(/\r?\n/);
         content = fileRanges.map(range => {
           const endLine = Math.min(range.endLine, lines.length);
-          return '[EVIDENCE RANGE: ' + file + ':' + range.startLine + '-' + endLine + ']\\n' + lines.slice(range.startLine - 1, endLine).join('\\n');
-        }).join('\\n\\n').slice(0, maxPriorityExcerptChars);
+          return '[EVIDENCE RANGE: ' + file + ':' + range.startLine + '-' + endLine + ']\n' + lines.slice(range.startLine - 1, endLine).join('\n');
+        }).join('\n\n').slice(0, maxPriorityExcerptChars);
       } else content = redactedText.slice(0, 5000);
       const id = evidenceId(file);
       if (context.length + content.length > maxContextChars) { contextTruncated = true; continue; }
