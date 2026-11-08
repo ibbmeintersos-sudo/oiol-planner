@@ -318,8 +318,8 @@ test('scanner parses Dart and Swift sources and extracts their import declaratio
     assert.equal(structure.unsupportedLanguageFileCount, 0);
     assert.equal(structure.parseCounts.dart, 1);
     assert.equal(structure.parseCounts.swift, 1);
-    assert.ok(structure.imports.some(item => item.file === 'mobile/lib/service.dart' && item.specifier === 'package:flutter/material.dart'));
-    assert.ok(structure.imports.some(item => item.file === 'native/Service.swift' && item.specifier === 'Foundation'));
+    assert.ok(structure.imports.some(item => item.from === 'mobile/lib/service.dart' && item.specifier === 'package:flutter/material.dart'));
+    assert.ok(structure.imports.some(item => item.from === 'native/Service.swift' && item.specifier === 'Foundation'));
   } finally {
     await f.cleanup();
   }
