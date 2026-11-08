@@ -106,7 +106,7 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
       ];
       for (const pattern of ormPatterns) for (const match of source.matchAll(pattern.re)) {
         ormFiles.add(file);
-        const className = source.slice(match.index + match[0].length).match(/^\\s*(?:export\\s+)?(?:abstract\\s+)?class\\s+(\\w+)/m)?.[1] || null;
+        const className = source.slice(match.index + match[0].length).match(/^\s*(?:export\s+)?(?:abstract\s+)?class\s+(\w+)/m)?.[1] || null;
         addObject(objects, { kind: 'table', name: match[1], model: className, path: file, line: lineAt(source, match.index), columns: [], sourceKind: pattern.kind, evidence: evidence.get(file) || null });
       }
     }
@@ -120,7 +120,16 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
     const source = contents[file];
     const names = new Set();
     for (const match of source.matchAll(/\b(?:from|join|into|update|references)\s+[\`"[]?([\w.]+)[\`"\]]?/gi)) names.add(tableKey(match[1]));
-    for (const match of source.matchAll(/\b(?:repository|manager)\.?(?:find|findOne|save|update|delete|insert)\w*\s*<\s*(\w+)/gi)) names.add(tableKey(match[1]));
+    for (const match of source.matchAll(/\b(?:repository|manager)\.?(?:find|findOne|save|update|delete|insert)\w*\s*<\s*(\w+)/gi)) names.add(modelToTable.get(match[1].toLowerCase()) || tableKey(match[1]));
+    for (const match of source.matchAll(/\bprisma\.(\w+)\s*\./g)) {
+      const mapped = modelToTable.get(match[1].toLowerCase());
+      if (mapped) names.add(mapped);
+    }
+    for (const match of source.matchAll(/\b(?:getRepository|createQueryBuilder)\s*(?:<\s*(\w+)\s*>|\(\s*(\w+))/g)) {
+      const model = match[1] || match[2];
+      const mapped = modelToTable.get(String(model || '').toLowerCase());
+      if (mapped) names.add(mapped);
+    }
     for (const name of names) if (tables.has(name)) {
       consumers.push({ table: name, path: file, relationship: 'static_table_name_reference', confidence: 'medium', proofLevel: 'textual_reference_not_runtime_binding', evidence: evidence.get(file) || null });
     }
