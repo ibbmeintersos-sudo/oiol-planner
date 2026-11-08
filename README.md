@@ -168,3 +168,18 @@ Review the preview and destination before publishing. External writes require th
 The deterministic Change Impact Analyzer has a separate offline regression benchmark at `npm run benchmark:change-impact`. It measures direct-file, reverse-dependency, test-association, workspace-package, and API-consumer predictions against manually curated synthetic goldens using precision, recall, and F1. It is deliberately separate from the LLM engineering-plan quality score: these are distinct capabilities and must not be combined into one score.
 
 The benchmark does not call an LLM provider and does not run any target-project commands. Its synthetic graph cases measure algorithm behavior against authored expected sets; they do not establish semantic or runtime completeness. See [benchmarks/README.md](benchmarks/README.md) for the protocol, limitations, and expansion requirements.
+
+
+## P12 real-world benchmark intake
+
+P12 adds a separate corpus protocol, pinned-snapshot fingerprinting, independent annotation requirements, and an offline runner for Scanner + Change Impact evaluation. The initial corpus manifest is deliberately empty: **no real-world accuracy result is claimed yet**. See [the corpus protocol](benchmarks/real-world/README.md).
+
+Validate a locally curated corpus:
+
+    npm run benchmark:real-world:validate -- --corpus-root /absolute/path/to/corpus
+
+Run the benchmark after at least two independent reviews have been frozen for every case:
+
+    npm run benchmark:real-world -- --corpus-root /absolute/path/to/corpus --out benchmarks/results/real-world-benchmark.json
+
+The runner performs bounded filesystem scanning only. It does not invoke Git, package managers, scripts, builds, tests, migrations, or application code in target snapshots. OIOL's own tests remain runnable in CI.
