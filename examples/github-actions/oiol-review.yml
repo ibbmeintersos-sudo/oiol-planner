@@ -1,0 +1,38 @@
+# Copy this file to .github/workflows/oiol-review.yml in the repository
+# you want to review, then add an OIOL_API_KEY repository secret.
+name: OIOL planning review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: oiol-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  oiol-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run OIOL planning review
+        uses: ibbmeintersos-sudo/oiol-planner/.github/actions/oiol-review@main
+        with:
+          request: |
+            Review this pull request as an engineering planning task. Identify
+            requirement gaps, architecture and dependency risks, missing
+            acceptance criteria, unstated assumptions, and the verification a
+            human must perform. Do not implement or execute any project task.
+          api-key: ${{ secrets.OIOL_API_KEY }}
+          provider: openai-compatible
+          model: gpt-4o-mini
+          comment: true
+          github-token: ${{ github.token }}
