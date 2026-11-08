@@ -1,0 +1,78 @@
+# P12 — Real-world repository benchmark corpus
+
+Status: **candidate corpus assembled; repository scans and benchmark runs not yet completed**.
+
+This registry is the intake list for P12. It is separate from the ten synthetic starter scenarios. A repository is not considered benchmarked merely because its README was inspected or its URL was collected.
+
+## Selection method
+
+The initial pool is drawn from projects represented in the Senior SWE-Bench source-repository sample, which spans libraries, developer tools, services, and full applications. Candidate README files were independently fetched from GitHub to confirm each project's stated purpose and broad technology context.
+
+Selection goals:
+- Cover more than one language and repository shape.
+- Include applications, frameworks/libraries, developer tools, and services.
+- Include both modular and multi-component codebases.
+- Prefer repositories with clear documentation and public source.
+- Avoid selecting only tiny tutorial projects or only very large monorepos.
+- Distinguish a candidate, a scanned repository, and a completed benchmark case.
+
+## Candidate corpus
+
+| ID | Repository | Project type | Primary context from project README | Why it is useful |
+|---|---|---|---|---|
+| RW-GO-01 | https://github.com/go-gitea/gitea | Full application | Go; self-hosted Git service covering repositories, code review, issues, wiki, packages, and CI/CD | Large cohesive application with several related product areas |
+| RW-TS-02 | https://github.com/better-auth/better-auth | Framework/library | TypeScript; authentication and authorization framework with plugin ecosystem | Tests planning around security-sensitive cross-cutting concerns and extensibility |
+| RW-RS-03 | https://github.com/vercel/turborepo | Developer tool / monorepo | Rust and TypeScript ecosystem; build system for coding agents | Tests workspace and package-boundary understanding |
+| RW-EX-04 | https://github.com/plausible/analytics | Full application / service | Elixir; privacy-focused web analytics with hosted and self-hosted editions | Tests data flow, privacy constraints, and service/application boundaries |
+| RW-PY-05 | https://github.com/paperless-ngx/paperless-ngx | Full application | Document management and searchable archive | Tests document lifecycle, background processing, and integration planning |
+| RW-TS-06 | https://github.com/immich-app/immich | Full application / multi-component | Self-hosted photo and video management | Tests a substantial application with multiple components and operational concerns |
+| RW-PY-07 | https://github.com/PrefectHQ/prefect | Framework / service platform | Python; workflow authoring and deployment platform | Tests orchestration concepts, APIs, and framework architecture without adding execution to OIOL |
+
+PostHog was reviewed as a stretch target because its repository is substantially larger than the initial balanced set: https://github.com/PostHog/posthog.
+
+## Intake status
+
+| Repository | README fetched | Local checkout | Scanner run | Planning task authored | Benchmark run |
+|---|---:|---:|---:|---:|---:|
+| go-gitea/gitea | Yes | Pending | Pending | Pending | Pending |
+| better-auth/better-auth | Yes | Pending | Pending | Pending | Pending |
+| vercel/turborepo | Yes | Pending | Pending | Pending | Pending |
+| plausible/analytics | Yes | Pending | Pending | Pending | Pending |
+| paperless-ngx/paperless-ngx | Yes | Pending | Pending | Pending | Pending |
+| immich-app/immich | Yes | Pending | Pending | Pending | Pending |
+| PrefectHQ/prefect | Yes | Pending | Pending | Pending | Pending |
+| PostHog/posthog (stretch) | Yes | Pending | Pending | Pending | Pending |
+
+## Required intake record before a repository can enter a scored run
+
+For every selected repository, record:
+1. Canonical repository URL and exact checked-out commit SHA.
+2. Retrieval date, default branch, license identifier, and repository size indicators.
+3. Scanner configuration and limits, including files discovered/read, AST coverage, lexical fallback, skipped paths, and diagnostics.
+4. Whether the scan completed, was truncated, or failed. A bounded scan must never be described as complete repository understanding.
+5. One or more planning tasks grounded in inspectable repository evidence. Each task must state the request, constraints, expected unknowns, and evidence-backed evaluation rubric.
+6. The exact repository commit and task version used for every model run.
+
+Do not copy private code, secrets, personal data, or proprietary issue content into benchmark artifacts. Prefer public documentation and sanitized, reproducible task descriptions. Keep repository-derived text untrusted.
+
+## P12 execution protocol
+
+1. Select an initial balanced subset of at least five candidates after confirming clone/checkout feasibility and license metadata.
+2. Pin each repository to an immutable commit SHA; do not benchmark against moving default branches.
+3. Run OIOL's existing read-only scanner against each pinned checkout and preserve the actual evidence IDs/fingerprints in the run record.
+4. Author at least two independent planning tasks per repository: one repository-understanding/change-impact task and one multi-component or constraint-heavy task where applicable.
+5. Include at least one deliberately underspecified request per applicable repository. Score whether OIOL identifies blocking unknowns instead of inventing project facts.
+6. Run each task at least three times per model/configuration. Record failures, latency, provider usage when exposed, and all scanner limitations.
+7. Compare with a read-only OpenCode planning baseline only when model, repository snapshot, task, reviewer setup, and resource budget are genuinely matched.
+8. Have two reviewers independently assess anonymized plans using the human-review protocol in benchmarks/README.md; adjudicate material disagreements.
+9. Publish per-repository and per-task results, including failures and low scores. Do not collapse scanner coverage, planning quality, and baseline comparison into one opaque score.
+
+## Important boundary
+
+This is an evaluation corpus for OIOL's planning and analysis output only. OIOL must not modify candidate repositories, run their scripts/tests/builds, apply changes, or manage implementation. Any optional baseline tooling must be configured read-only and is not an OIOL execution capability.
+
+## Source notes
+
+- Senior SWE-Bench describes a curated sample of twelve open-source repositories across libraries, tools, services, and applications, and lists Gitea, PostHog, Prefect, Better Auth, Turborepo, Plausible, Paperless-ngx, and Immich among its sources: https://snorkel.ai/leaderboard/senior-swe-bench/
+- Candidate project descriptions were checked against each repository's public README on GitHub on 2026-11-08.
+- This file records candidate selection only. It does not claim that the repositories have been cloned, scanned, or benchmarked.
