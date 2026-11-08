@@ -35,7 +35,7 @@ The source blob SHAs below identify the public README and root manifest versions
 - Human review focus: Does OIOL identify the mismatch between user-level sessions and organization-level policy? Does it ask for the policy scope and enforcement semantics before proposing migrations or revocation behavior?
 ## Paperless-ngx — `paperless-ngx/paperless-ngx`
 
-**Source basis:** README blob `f1e5141043dcb5e36b496c7ce71192d9e5e24aea`; root `pyproject.toml` blob `5eb0f59ed2c7f0b2d36d76d3446a16b10b639961`. Public description identifies a searchable document archive. The manifest declares a Python/Django application with Celery, Redis, and document-processing dependencies.
+**Source basis:** README blob `f1e5141043dcb5e36b496c7ce71192d9e5e24aea`; root `pyproject.toml` blob `5eb0f59ed2c7f0b2d36d76d3446a16b10b639961`. Public description identifies a searchable document archive. The manifest declares a Python/Django application with Celery, Redis, and document-processing dependencies. The pinned scan confirms the document model, task processing, permission, API/view, signal, and test layers. Relevant paths include `src/documents/models.py`, `src/documents/tasks.py`, `src/documents/permissions.py`, `src/documents/views.py`, `src/documents/serialisers.py`, `src/documents/signals/handlers.py`, `src/paperless/urls.py`, `src/documents/tests/test_document_model.py`, `src/documents/tests/test_tasks.py`, and `src/documents/tests/test_api_documents.py`. No retention-policy implementation was identified in the bounded scan/search; verify again against the full checkout before promoting the task.
 
 ### PN-01 — Document retention metadata and safe expiry workflow (candidate clear change)
 
