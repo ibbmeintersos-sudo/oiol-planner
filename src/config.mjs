@@ -18,64 +18,65 @@ export const DEFAULTS = {
 };
 
 export const PROVIDER_DEFAULTS = {
-  'anthropic': { baseUrl: 'https://api.anthropic.com' },
-  'gemini': { baseUrl: 'https://generativelanguage.googleapis.com/v1beta' },
-  'ollama': { baseUrl: 'http://127.0.0.1:11434' }
+  'openai-compatible': { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+  'anthropic': { baseUrl: 'https://api.anthropic.com', model: 'claude-sonnet-4-20250514' },
+  'gemini': { baseUrl: 'https://generativelanguage.googleapis.com/v1beta', model: 'gemini-2.0-flash' },
+  'ollama': { baseUrl: 'http://127.0.0.1:11434', model: 'llama3.1' }
 };
 
-const CONFIG_SCHEMA = {
+const PROFILE_PROPERTIES = {
+  provider: { type: 'string', enum: ['openai-compatible', 'anthropic', 'gemini', 'ollama'] },
+  model: { type: 'string', minLength: 1 },
+  baseUrl: { type: 'string', minLength: 1 },
+  apiKeyEnv: { type: 'string', minLength: 1 },
+  timeoutMs: { type: 'integer' },
+  maxRetries: { type: 'integer' },
+  reviewer: {
+    type: 'object',
+    additionalProperties: false,
+    required: ['provider', 'model'],
+    properties: {
+      provider: { type: 'string', enum: ['openai-compatible', 'anthropic', 'gemini', 'ollama'] },
+      model: { type: 'string', minLength: 1 },
+      baseUrl: { type: 'string', minLength: 1 },
+      apiKeyEnv: { type: 'string', minLength: 1 },
+      timeoutMs: { type: 'integer' }
+    }
+  }
+};
+
+const FALLBACK_SCHEMA = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'urn:oiol:schemas:config:1.0.0',
   type: 'object',
   additionalProperties: false,
   required: ['version'],
   properties: {
+    $schema: { type: 'string' },
     version: { type: 'integer', const: 1 },
     defaultProfile: { type: 'string', minLength: 1 },
     profiles: {
       type: 'object',
-      additionalProperties: false,
-      patternProperties: {
-        '^.+$': {
-          type: 'object',
-          additionalProperties: false,
-          required: ['provider', 'model'],
-          properties: {
-            provider: { type: 'string', enum: ['openai-compatible', 'anthropic', 'gemini', 'ollama'] },
-            model: { type: 'string', minLength: 1 },
-            baseUrl: { type: 'string', minLength: 1 },
-            apiKeyEnv: { type: 'string', minLength: 1 },
-            timeoutMs: { type: 'integer', minimum: 1000 },
-            maxRetries: { type: 'integer', minimum: 0, maximum: 5 },
-            reviewer: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                provider: { type: 'string', enum: ['openai-compatible', 'anthropic', 'gemini', 'ollama'] },
-                model: { type: 'string', minLength: 1 },
-                baseUrl: { type: 'string', minLength: 1 },
-                apiKeyEnv: { type: 'string', minLength: 1 },
-                timeoutMs: { type: 'integer', minimum: 1000 }
-              },
-              required: ['provider', 'model']
-            }
-          }
-        }
+      additionalProperties: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['provider', 'model'],
+        properties: PROFILE_PROPERTIES
       }
     },
     scan: {
       type: 'object',
       additionalProperties: false,
       properties: {
-        maxFiles: { type: 'integer', minimum: 1 },
-        maxFileBytes: { type: 'integer', minimum: 1 },
-        maxPriorityFileBytes: { type: 'integer', minimum: 1 },
-        maxContextChars: { type: 'integer', minimum: 1 },
-        maxPriorityExcerptChars: { type: 'integer', minimum: 1 },
-        maxDepth: { type: 'integer', minimum: 1 },
-        maxSourceFiles: { type: 'integer', minimum: 1 },
-        maxTestFiles: { type: 'integer', minimum: 1 },
-        maxConfigFiles: { type: 'integer', minimum: 1 }
+        maxFiles: { type: 'integer' },
+        maxFileBytes: { type: 'integer' },
+        maxPriorityFileBytes: { type: 'integer' },
+        maxContextChars: { type: 'integer' },
+        maxPriorityExcerptChars: { type: 'integer' },
+        maxDepth: { type: 'integer' },
+        maxSourceFiles: { type: 'integer' },
+        maxTestFiles: { type: 'integer' },
+        maxConfigFiles: { type: 'integer' }
       }
     },
     output: {
@@ -89,14 +90,38 @@ const CONFIG_SCHEMA = {
   }
 };
 
+let schemaPromise;
+
 async function loadSchema() {
-  const schemaPath = path.resolve(__dirname, '../../schemas/oiol-config.schema.json');
-  try {
-    const text = await fs.readFile(schemaPath, 'utf8');
-    return JSON.parse(text);
-  } catch {
-    return CONFIG_SCHEMA;
+  if (!schemaPromise) {
+    const schemaPath = path.resolve(__dirname, '..', 'schemas', 'oiol-config.schema.json');
+    schemaPromise = fs.readFile(schemaPath, 'utf8')
+      .then(text => JSON.parse(text))
+      .catch(() => FALLBACK_SCHEMA);
   }
+  return schemaPromise;
+}
+
+export async function validateConfig(value) {
+  const schema = await loadSchema();
+  const result = validateJsonSchema(value, schema);
+  const errors = [...result.errors];
+
+  const profiles = value?.profiles;
+  if (profiles && typeof profiles === 'object' && !Array.isArray(profiles)) {
+    if (Object.keys(profiles).length === 0) errors.push('$.profiles must contain at least one profile');
+    for (const [name, profile] of Object.entries(profiles)) {
+      if (!profile || typeof profile !== 'object') continue;
+      if (Number.isInteger(profile.timeoutMs) && profile.timeoutMs < 1000) errors.push(`$.profiles.${name}.timeoutMs must be at least 1000`);
+      if (Number.isInteger(profile.maxRetries) && (profile.maxRetries < 0 || profile.maxRetries > 5)) errors.push(`$.profiles.${name}.maxRetries must be between 0 and 5`);
+      if (Number.isInteger(profile.reviewer?.timeoutMs) && profile.reviewer.timeoutMs < 1000) errors.push(`$.profiles.${name}.reviewer.timeoutMs must be at least 1000`);
+    }
+    if (value.defaultProfile && !Object.hasOwn(profiles, value.defaultProfile)) {
+      errors.push(`$.defaultProfile references unknown profile "${value.defaultProfile}"`);
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
 }
 
 export async function loadConfig(configPath) {
@@ -104,20 +129,19 @@ export async function loadConfig(configPath) {
   let raw;
   try {
     raw = await fs.readFile(searchPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
   }
   let parsed;
   try {
-    parsed = JSON.parse(raw);
-  } catch (err) {
-    throw new Error('Invalid JSON in config file: ' + err.message);
+    parsed = JSON.parse(raw.replace(/^\uFEFF/, ''));
+  } catch (error) {
+    throw new Error('Invalid JSON in ' + searchPath + ': ' + error.message);
   }
-  const schema = await loadSchema();
-  const result = validateJsonSchema(parsed, schema);
+  const result = await validateConfig(parsed);
   if (!result.valid) {
-    throw new Error('Config validation failed: ' + result.errors.join('; '));
+    throw new Error('Config validation failed for ' + searchPath + ': ' + result.errors.join('; '));
   }
   return parsed;
 }
@@ -125,7 +149,10 @@ export async function loadConfig(configPath) {
 export function resolveProfile(config, explicitProfile) {
   if (explicitProfile) return explicitProfile;
   if (config?.defaultProfile) return config.defaultProfile;
-  if (config?.profiles) return Object.keys(config.profiles)[0];
+  if (config?.profiles) {
+    const names = Object.keys(config.profiles);
+    if (names.length > 0) return names[0];
+  }
   return 'default';
 }
 
@@ -134,42 +161,43 @@ export function getProfileConfig(config, profileName) {
   return config.profiles[profileName] || null;
 }
 
-export function applyConfigToEnv(config, profileName) {
+function mirrorSecret(env, sourceName, targetName) {
+  if (!sourceName || sourceName === targetName) return;
+  if (env[targetName] === undefined && env[sourceName] !== undefined) env[targetName] = env[sourceName];
+}
+
+export function applyConfigToEnv(config, profileName, env = process.env) {
   if (!config?.profiles) return;
   const profile = config.profiles[profileName];
   if (!profile) return;
 
   const providerDefaults = PROVIDER_DEFAULTS[profile.provider] || {};
-  const envMap = [
-    ['OIOL_PROVIDER', profile.provider],
-    ['OIOL_MODEL', profile.model],
-    ['OIOL_BASE_URL', profile.baseUrl || providerDefaults.baseUrl || DEFAULTS.baseUrl],
-    ['OIOL_API_KEY', profile.apiKeyEnv || DEFAULTS.apiKeyEnv],
-    ['OIOL_TIMEOUT_MS', String(profile.timeoutMs ?? DEFAULTS.timeoutMs)],
-    ['OIOL_MAX_RETRIES', String(profile.maxRetries ?? DEFAULTS.maxRetries)]
-  ];
+  const values = {
+    OIOL_PROVIDER: profile.provider,
+    OIOL_MODEL: profile.model,
+    OIOL_BASE_URL: profile.baseUrl || providerDefaults.baseUrl || DEFAULTS.baseUrl,
+    OIOL_TIMEOUT_MS: String(profile.timeoutMs ?? DEFAULTS.timeoutMs),
+    OIOL_MAX_RETRIES: String(profile.maxRetries ?? DEFAULTS.maxRetries)
+  };
 
-  for (const [key, value] of envMap) {
-    if (value !== undefined && value !== '' && !Object.hasOwn(process.env, key)) {
-      process.env[key] = value;
-    }
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== undefined && value !== '' && env[key] === undefined) env[key] = value;
   }
+  mirrorSecret(env, profile.apiKeyEnv || DEFAULTS.apiKeyEnv, 'OIOL_API_KEY');
 
   if (profile.reviewer) {
-    const r = profile.reviewer;
-    const rDefaults = PROVIDER_DEFAULTS[r.provider] || {};
-    const reviewMap = [
-      ['OIOL_REVIEW_PROVIDER', r.provider],
-      ['OIOL_REVIEW_MODEL', r.model],
-      ['OIOL_REVIEW_BASE_URL', r.baseUrl || rDefaults.baseUrl || ''],
-      ['OIOL_REVIEW_API_KEY', r.apiKeyEnv || ''],
-      ['OIOL_REVIEW_TIMEOUT_MS', String(r.timeoutMs ?? 60000)]
-    ];
-    for (const [key, value] of reviewMap) {
-      if (value !== undefined && value !== '' && !Object.hasOwn(process.env, key)) {
-        process.env[key] = value;
-      }
+    const reviewer = profile.reviewer;
+    const reviewerDefaults = PROVIDER_DEFAULTS[reviewer.provider] || {};
+    const reviewerValues = {
+      OIOL_REVIEW_PROVIDER: reviewer.provider,
+      OIOL_REVIEW_MODEL: reviewer.model,
+      OIOL_REVIEW_BASE_URL: reviewer.baseUrl || reviewerDefaults.baseUrl || '',
+      OIOL_REVIEW_TIMEOUT_MS: String(reviewer.timeoutMs ?? 60000)
+    };
+    for (const [key, value] of Object.entries(reviewerValues)) {
+      if (value !== undefined && value !== '' && env[key] === undefined) env[key] = value;
     }
+    mirrorSecret(env, reviewer.apiKeyEnv, 'OIOL_REVIEW_API_KEY');
   }
 }
 
