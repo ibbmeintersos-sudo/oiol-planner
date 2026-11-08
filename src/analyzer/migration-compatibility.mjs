@@ -96,7 +96,7 @@ export function analyzeMigrationCompatibility({ databaseSchema = null, maxMigrat
   const groups = new Map();
   for (const change of databaseSchema.changes || []) {
     const path = pathOf(change.path);
-    if (!path) continue;
+    if (!path || !/(^|\\/)(migrations?|schema|ddl)(\\/|$)|\\d{3,}[_-]/i.test(path)) continue;
     if (!groups.has(path)) groups.set(path, []);
     groups.get(path).push({ ...change });
   }
@@ -131,7 +131,8 @@ export function analyzeMigrationCompatibility({ databaseSchema = null, maxMigrat
         newName: item.newName || null,
         oldType: item.oldType || null,
         newType: item.newType || null,
-        line: item.line || null
+        line: item.line || null,
+        newNullable: item.newNullable ?? null
       })),
       phase: classifyPhase(orderedOps),
       evidenceId: operations.find(item => item.evidence?.id)?.evidence.id || null,
