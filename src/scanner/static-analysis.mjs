@@ -6,10 +6,6 @@ const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
   ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
   ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby']
-]);const EXT = new Map([
-  ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
-  ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
-  ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby']
 ]);
 const SOURCE_EXT = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
 const norm = value => value.replaceAll('\\','/').replace(/^\.\//,'');
