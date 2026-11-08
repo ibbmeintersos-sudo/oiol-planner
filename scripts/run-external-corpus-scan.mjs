@@ -30,7 +30,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
   const scannerEvidence = summarizeRepositoryEvidence(project);
   return {
     protocolVersion: '1.0',
-    scanRunnerVersion: '1.5.0',
+    scanRunnerVersion: '1.6.0',
     scannerVersion: repository.scannerVersion || SCANNER_VERSION,
     repositoryId,
     scannedAt: new Date().toISOString(),
@@ -74,6 +74,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
       parserDiagnostics: repository.structure.parserDiagnostics,
       limitations: repository.structure.limitations
     },
+    evidenceSelection: repository.evidenceSelection,
     evidence: project.evidence.map(item => ({
       id: item.id,
       type: item.type,
