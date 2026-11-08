@@ -147,6 +147,7 @@ export async function main() {
     return 0;
   }
   if(process.env.OIOL_BENCHMARK_ALLOW_LIVE!=='1') throw new Error('Set OIOL_BENCHMARK_ALLOW_LIVE=1 to confirm that this run may call configured LLM providers.');
+  if(repositoryRoot && process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE!=='1') throw new Error('Set OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 to confirm that bounded, redacted external repository excerpts may be sent to the configured model provider.');
   if(!planningConfig.apiKey && planningConfig.provider!=='ollama') throw new Error('OIOL_API_KEY is required for the configured remote planning provider.');
   if(reviewConfig&&!reviewConfig.apiKey&&reviewConfig.provider!=='ollama') throw new Error('OIOL_REVIEW_API_KEY is required when a separate remote reviewer is configured.');
   const provider=createProvider(planningConfig);
