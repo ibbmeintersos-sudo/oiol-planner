@@ -33,12 +33,22 @@ jobs:
         run: npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
       - name: Unit and regression tests
         run: npm test
+      - name: Run independent Change Impact benchmark
+        run: npm run benchmark:change-impact -- --out benchmarks/results/change-impact-benchmark.json
       - name: Upload scanner accuracy report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: scanner-accuracy-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: benchmarks/results/scanner-accuracy.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Upload Change Impact benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: change-impact-benchmark-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: benchmarks/results/change-impact-benchmark.json
           if-no-files-found: ignore
           retention-days: 30
 
