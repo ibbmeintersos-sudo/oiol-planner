@@ -94,7 +94,7 @@ test('Tree-sitter distinguishes exported and module-local TypeScript contract de
       'export type PublicUserId = string;',
       'interface InternalProfile { secret: boolean; }',
       ''
-    ].join('\\n'));
+    ].join('\n'));
 
     const result = await scanRepository(f.root);
     const symbols = result.structure.symbols.filter(item => item.file === 'src/contracts.ts');
