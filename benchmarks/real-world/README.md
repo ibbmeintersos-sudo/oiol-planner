@@ -101,3 +101,38 @@ Validate intake metadata with:
     npm run benchmark:real-world:validate -- --corpus-root /absolute/path/to/corpus
 
 Use --allow-empty only for CI protocol tests. It returns a not-ready status and never marks the corpus as complete.
+
+
+## Initial repository intake — batch 1
+
+The first candidate batch has been pinned to immutable historical pull-request base commits. Tracked-file counts below were measured from each exact base commit's recursive Git tree; all 12 tree responses were complete (not truncated).
+
+| Size class | Repository | Tracked files at base | Main language(s) | Historical change |
+|---|---|---:|---|---|
+| Small | [sindresorhus/ky](https://github.com/sindresorhus/ky) | 56 | TypeScript / JavaScript | [PR 757](https://github.com/sindresorhus/ky/pull/757) |
+| Small | [pallets/itsdangerous](https://github.com/pallets/itsdangerous) | 49 | Python | [PR 405](https://github.com/pallets/itsdangerous/pull/405) |
+| Small | [go-chi/chi](https://github.com/go-chi/chi) | 108 | Go | [PR 1220](https://github.com/go-chi/chi/pull/1220) |
+| Small | [BurntSushi/ripgrep](https://github.com/BurntSushi/ripgrep) | 226 | Rust | [PR 3561](https://github.com/BurntSushi/ripgrep/pull/3561) |
+| Medium | [pydantic/pydantic](https://github.com/pydantic/pydantic) | 3,579 | Python | [PR 14244](https://github.com/pydantic/pydantic/pull/14244) |
+| Medium | [nestjs/nest](https://github.com/nestjs/nest) | 2,748 | TypeScript | [PR 18439](https://github.com/nestjs/nest/pull/18439) |
+| Medium | [laravel/framework](https://github.com/laravel/framework) | 3,502 | PHP | [PR 62342](https://github.com/laravel/framework/pull/62342) |
+| Medium | [spring-projects/spring-boot](https://github.com/spring-projects/spring-boot) | 11,383 | Java | [PR 52557](https://github.com/spring-projects/spring-boot/pull/52557) |
+| Large | [microsoft/vscode](https://github.com/microsoft/vscode) | 19,119 | TypeScript | [PR 335016](https://github.com/microsoft/vscode/pull/335016) |
+| Large | [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes) | 31,452 | Go | [PR 143073](https://github.com/kubernetes/kubernetes/pull/143073) |
+| Large | [tensorflow/tensorflow](https://github.com/tensorflow/tensorflow) | 37,712 | C++ / Python | [PR 129352](https://github.com/tensorflow/tensorflow/pull/129352) |
+| Large | [grafana/grafana](https://github.com/grafana/grafana) | 24,718 | Go / TypeScript | [PR 137251](https://github.com/grafana/grafana/pull/137251) |
+
+The full machine-readable intake record, including exact 40-character base and merged-change commit IDs, license-file URLs, PR metadata, and historical changed paths, is [intake-candidates.json](./intake-candidates.json).
+
+### Intake status
+
+- 12/12 candidate repositories identified and pinned.
+- 4 small, 4 medium, and 4 large repositories.
+- 12/12 selected historical PRs confirmed merged; base and merged commit IDs recorded.
+- License texts checked at the pinned base revisions.
+- Historical changed paths recorded as evidence, **not** accepted as complete impact ground truth.
+- Snapshot archives and SHA-256 content fingerprints: pending.
+- Two independent blinded annotations per case: pending.
+- Additional cases required to reach the 30-case first-report gate: at least 18.
+
+The corpus manifest remains empty until snapshots and independent annotations are complete. These 12 entries are an intake shortlist, not completed benchmark cases. The large-repository size class is based on the measured base snapshot count; the 20,000-file threshold is a strict classification rule, so VS Code at 19,119 files is currently medium by that rule and must not be reported as large.
