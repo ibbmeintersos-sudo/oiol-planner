@@ -13,9 +13,6 @@ function arg(name, fallback = null) {
   return index >= 0 ? process.argv[index + 1] : fallback;
 }
 
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-
 const exec = promisify(execFile);
 
 // Benchmark intake is an operator-directed tool, not the read-only core scanner.
