@@ -114,3 +114,21 @@ test('scanner prioritizes root manifests and application source over metadata an
     await f.cleanup();
   }
 });
+
+test('AST analysis continues across bounded source files after prompt context is full', async () => {
+  const f = await fixture('oiol-ast-context-bound-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    for (let index = 0; index < 4; index++) {
+      await writeFile(path.join(f.root, 'src', 'module-' + index + '.js'),
+        'export function module' + index + '() { return "' + 'x'.repeat(700) + '"; }\n');
+    }
+    const result = await scanRepository(f.root, { maxContextChars: 1000 });
+    assert.equal(result.structure.astFileCount, 4);
+    assert.equal(result.contextTruncated, true);
+    assert.ok(result.snippets.length < 4);
+    assert.ok(result.structure.symbols.some(item => item.name === 'module3'));
+  } finally {
+    await f.cleanup();
+  }
+});
