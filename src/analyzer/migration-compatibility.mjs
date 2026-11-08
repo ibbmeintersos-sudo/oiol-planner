@@ -96,7 +96,7 @@ export function analyzeMigrationCompatibility({ databaseSchema = null, maxMigrat
   const groups = new Map();
   for (const change of databaseSchema.changes || []) {
     const path = pathOf(change.path);
-    if (!path || !/(^|\\/)(migrations?|schema|ddl)(\\/|$)|\\d{3,}[_-]/i.test(path)) continue;
+    if (!path || !/(^|\/)(migrations?|schema|ddl)(\/|$)|\d{3,}[_-]/i.test(path)) continue;
     if (!groups.has(path)) groups.set(path, []);
     groups.get(path).push({ ...change });
   }
