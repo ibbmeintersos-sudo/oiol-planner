@@ -92,7 +92,7 @@ function exportedDeclaration(language, node, sourceBytes) {
   if (!['javascript', 'typescript', 'tsx'].includes(language)) return null;
   const start = Math.max(0, node.startByte() - 160);
   const prefix = sourceBytes.subarray(start, node.startByte()).toString('utf8');
-  return /\\bexport\\s+(?:(?:default|declare|abstract|async)\\s+)*(?:(?:const|let|var)\\s+)?$/.test(prefix);
+  return /\bexport\s+(?:(?:default|declare|abstract|async)\s+)*(?:(?:const|let|var)\s+)?$/.test(prefix);
 }
 
 function classifySymbol(language, node, sourceBytes, lineStarts) {
