@@ -49,6 +49,7 @@ import { main as baselineMain, createBaselineWorkspace } from '../scripts/run-op
 import { resolveScenarioProject } from '../scripts/run-planner-benchmark.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 test('OpenCode baseline runner dry-run validates config without contacting OpenCode',async()=>{
