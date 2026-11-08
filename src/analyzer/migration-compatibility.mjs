@@ -1,12 +1,13 @@
 const pathOf = value => String(value || '').replaceAll('\\', '/').replace(/^\.\//, '');
 const basename = value => pathOf(value).split('/').at(-1) || '';
 const numericOrder = value => {
+  const name = basename(value);
   const timestamp = name.match(/^(20\d{2}[01]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d)/);
-  const timestamp = name.match(/^(20\\d{2}[01]\\d[0-3]\\d[0-2]\\d[0-5]\\d[0-5]\\d)/);
+  if (timestamp) return { kind: 'timestamp', value: timestamp[1] };
   const prefix = name.match(/^(\d{3,})/);
-  const prefix = name.match(/^(\\d{3,})/);
   if (prefix) return { kind: 'numeric_prefix', value: prefix[1].padStart(16, '0') };
   return { kind: 'unknown', value: null };
+};
 };
 const destructive = new Set(['drop_table', 'drop_column', 'rename_table', 'rename_column', 'alter_column_type', 'set_not_null', 'drop_constraint']);
 const additive = new Set(['create_table', 'add_column', 'add_constraint', 'add_index', 'drop_not_null']);
