@@ -1,0 +1,55 @@
+{
+  "scenarioId": "EX-MONOLITH-004",
+  "taskId": "RW-PF-01",
+  "taskVersion": "0.2.0-draft",
+  "projectName": "Prefect",
+  "request": "Plan an opt-in bounded retry policy for the existing CallWebhook automation action. Retry only transient network failures, timeouts, and HTTP 5xx responses; do not retry ordinary HTTP 4xx responses. Define a maximum attempt count, capped exponential backoff, and a stable idempotency identifier shared by all attempts for one triggered action. Preserve current behavior when retries are not configured, and do not block event ingestion while waiting for remote delivery.",
+  "constraints": [
+    "Produce an engineering plan only; do not modify the repository or execute project commands, tests, or builds.",
+    "Ground claims in the pinned repository snapshot and cite relevant relative file paths.",
+    "Separate verified evidence from assumptions and unresolved unknowns.",
+    "Preserve existing public behavior and compatibility unless the request explicitly changes it.",
+    "Reuse the existing automation action and event worker architecture rather than designing a parallel webhook integration.",
+    "Prevent unbounded retries and duplicate receiver-side effects.",
+    "Preserve secret-safe logging and event causal ordering."
+  ],
+  "expectedSignals": [
+    [
+      "CallWebhook",
+      "call-webhook"
+    ],
+    [
+      "transient failures",
+      "network failure",
+      "timeout",
+      "HTTP 5xx"
+    ],
+    [
+      "HTTP 4xx",
+      "do not retry"
+    ],
+    [
+      "maximum attempts",
+      "bounded retries"
+    ],
+    [
+      "exponential backoff",
+      "backoff cap"
+    ],
+    [
+      "idempotency key",
+      "stable event identity"
+    ],
+    [
+      "event worker",
+      "automation action"
+    ],
+    [
+      "tests",
+      "UI",
+      "API schema"
+    ]
+  ],
+  "mustClarify": false,
+  "clarificationSignals": []
+}
