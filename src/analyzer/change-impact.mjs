@@ -228,6 +228,120 @@ function reverseReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
   };
 }
 
+function hasApiContractIntent(requestText) {
+  return /\\b(?:api|apis|contract|interface|dto|schema|endpoint|request\\s*\\/\\s*response|public\\s+api|breaking\\s+change|backward\\s+compatib(?:le|ility))\\b|واجه(?:ة|ات)|عقد(?:\\s+ال)?واجه|مخطط(?:\\s+ال)?بيانات|نقط(?:ة|ه)\\s+نهاي/u.test(requestText);
+}
+
+function analyzeApiContractImpact({
+  requestText,
+  queryTokens,
+  structure,
+  directMatches,
+  reverseImports,
+  testPathSet,
+  maxDepth,
+  maxNodes
+}) {
+  const requested = hasApiContractIntent(requestText);
+  if (!requested) {
+    return {
+      status: 'not_requested',
+      method: 'ast_export_metadata_plus_reverse_import_graph',
+      contractSymbols: [],
+      potentiallyAffectedConsumers: [],
+      diagnostics: { exportedSymbolCount: 0, matchedContractSymbolCount: 0, exportMetadataFileCount: 0 }
+    };
+  }
+
+  const symbols = Array.isArray(structure.symbols) ? structure.symbols : [];
+  const exportMetadata = symbols.filter(item =>
+    ['javascript', 'typescript', 'tsx'].includes(String(item.file || '').split('.').at(-1) === 'tsx' ? 'tsx' :
+      String(item.file || '').endsWith('.ts') ? 'typescript' :
+      /\\.jsx?$/.test(String(item.file || '')) ? 'javascript' : '') &&
+    item.source === 'tree_sitter_ast' && typeof item.exported === 'boolean'
+  );
+  const exportMetadataFileCount = new Set(exportMetadata.map(item => normPath(item.file))).size;
+  const exportedSymbols = exportMetadata.filter(item => item.exported === true);
+  const directPaths = new Set(directMatches.map(item => normPath(item.path)));
+  const contractSymbols = exportedSymbols
+    .filter(item => directPaths.has(normPath(item.file)))
+    .map(item => {
+      const matchedTerms = sorted(tokenIntersection(queryTokens, tokenSet(item.name)));
+      return {
+        name: item.name,
+        kind: item.kind,
+        file: normPath(item.file),
+        line: Number.isInteger(item.line) ? item.line : null,
+        matchedTerms,
+        evidenceId: item.evidenceId || null,
+        sourceSha256: item.sourceSha256 || null,
+        exported: true,
+        source: item.source
+      };
+    })
+    .filter(item => item.matchedTerms.length >= 2)
+    .sort((a, b) => b.matchedTerms.length - a.matchedTerms.length || a.file.localeCompare(b.file) || a.name.localeCompare(b.name))
+    .slice(0, 100);
+
+  if (!exportMetadataFileCount) {
+    return {
+      status: 'unavailable',
+      method: 'ast_export_metadata_plus_reverse_import_graph',
+      contractSymbols: [],
+      potentiallyAffectedConsumers: [],
+      diagnostics: {
+        exportedSymbolCount: 0,
+        matchedContractSymbolCount: 0,
+        exportMetadataFileCount: 0,
+        reason: 'No AST-backed JavaScript/TypeScript export metadata was available; lexical declarations are not treated as proven public contracts.'
+      },
+      limitations: [
+        'API contract matching requires AST-backed JavaScript/TypeScript export metadata in the bounded scanner evidence.',
+        'A lack of export metadata is not evidence that the repository has no public API.'
+      ]
+    };
+  }
+
+  const contractFiles = sorted(new Set(contractSymbols.map(item => item.file)));
+  const reachability = reverseReachability(contractFiles, reverseImports, { maxDepth, maxNodes });
+  const potentiallyAffectedConsumers = [...reachability.reached.values()]
+    .filter(item => !testPathSet.has(normPath(item.path)))
+    .map(item => ({
+      path: normPath(item.path),
+      depth: item.depth,
+      dependsOn: item.dependsOn,
+      contractFile: item.origin,
+      relationship: 'imports_contract_candidate_file',
+      confidence: 'medium',
+      proofLevel: 'file_import_edge_not_symbol_binding'
+    }))
+    .sort((a, b) => a.depth - b.depth || a.path.localeCompare(b.path))
+    .slice(0, 250);
+
+  return {
+    status: contractSymbols.length ? 'analyzed' : 'insufficient_symbol_match',
+    method: 'ast_export_metadata_plus_reverse_import_graph',
+    contractSymbols,
+    potentiallyAffectedConsumers,
+    diagnostics: {
+      exportedSymbolCount: exportedSymbols.length,
+      matchedContractSymbolCount: contractSymbols.length,
+      exportMetadataFileCount,
+      contractSeedFileCount: contractFiles.length,
+      consumerCandidateCountBeforeLimit: reachability.reached.size,
+      depthLimitReached: reachability.depthLimitReached,
+      depthFrontierCount: reachability.depthFrontierCount,
+      nodeLimitReached: reachability.nodeLimitReached
+    },
+    limitations: [
+      'Export visibility is recorded only for AST-parsed JavaScript/TypeScript/TSX declarations; re-export lists and language-specific public visibility are not fully modeled.',
+      'A consumer import edge proves a file-level dependency, not that the consumer imports or calls the specific changed symbol.',
+      'Type resolution, overload resolution, package export maps, generated declarations, and runtime API registration are not analyzed.',
+      'Consumer candidates are planning leads and require human review; OIOL does not execute compatibility checks or tests.'
+    ]
+  };
+}
+
 function packageReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
   const reached = new Map();
   const seedSet = new Set(seeds);
@@ -426,6 +540,16 @@ export function analyzeChangeImpact({
   const fileReachability = reverseReachability(directSeedPaths, reverseImports, {
     maxDepth, maxNodes: maxImpactedFiles
   });
+  const apiContractImpact = analyzeApiContractImpact({
+    requestText,
+    queryTokens,
+    structure,
+    directMatches: directSeeds,
+    reverseImports,
+    testPathSet,
+    maxDepth,
+    maxNodes: maxImpactedFiles
+  });
   const impactedFileMap = new Map(directSeeds.map(item => [item.path, {
     path: item.path,
     depth: 0,
@@ -547,6 +671,7 @@ export function analyzeChangeImpact({
     requestSha256: requestHash,
     requestTerms: sorted(queryTokens),
     matchingDiagnostics,
+    apiContractImpact,
     summary: directSeeds.length || packageSeeds.length
       ? 'The bounded scanner evidence suggests ' + directSeeds.length + ' direct candidate file(s), ' +
         (potentiallyAffectedFiles.length - directSeeds.length) + ' reverse-dependency file(s), ' +
