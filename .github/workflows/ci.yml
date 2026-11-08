@@ -31,6 +31,8 @@ jobs:
         run: npm run release:check
       - name: Measure scanner fixture precision and recall
         run: npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
+      - name: Validate real-world benchmark intake protocol
+        run: npm run benchmark:real-world:validate -- --corpus-root benchmarks/real-world --allow-empty
       - name: Unit and regression tests
         run: npm test
       - name: Run independent Change Impact benchmark
