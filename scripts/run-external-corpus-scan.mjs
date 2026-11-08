@@ -11,7 +11,7 @@ function arg(name, fallback = null) {
   return index >= 0 ? process.argv[index + 1] : fallback;
 }
 
-export async function scanExternalRepository({ repositoryRoot, repositoryId = 'external-repository' }) {
+export async function scanExternalRepository({ repositoryRoot, repositoryId = 'external-repository', scanOptions = EXTERNAL_REPOSITORY_SCAN_OPTIONS }) {
   if (typeof repositoryRoot !== 'string' || !repositoryRoot.trim()) {
     throw new Error('--repo must point to a local repository checkout');
   }
@@ -22,7 +22,8 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
     mode: 'existing',
     repo: path.resolve(repositoryRoot),
     name: repositoryId,
-    request: 'Read-only repository intake scan for the OIOL P12 real-world planning benchmark.'
+    request: 'Read-only repository intake scan for the OIOL P12 real-world planning benchmark.',
+    scanOptions
   });
   assertExternalRepositorySnapshot(project);
   const repository = project.repository;
