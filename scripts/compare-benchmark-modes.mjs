@@ -37,7 +37,7 @@ export function compareBenchmarkModes(oiol,baseline){
  const reviewerComparable=JSON.stringify(reviewerIdentity(oiol.reviewer))===JSON.stringify(reviewerIdentity(baseline.reviewer));
  return {
   protocolVersion:'1.0',comparedAt:new Date().toISOString(),oiolRunId:oiol.runId,baselineRunId:baseline.runId,
-  comparisonKey:oiol.comparisonKey,budgetKey:oiol.budgetKey,sourceMode:oiol.sourceMode||'checked-in-fixtures',repositorySnapshot:oiolExternal?oiol.repositorySnapshot:null,scenarioCount:rows.length,
+  comparisonKey:oiol.comparisonKey,budgetKey:oiol.budgetKey,sourceMode:oiol.sourceMode||'checked-in-fixtures',repositorySnapshot:oiolExternal?oiol.repositorySnapshot:null,taskDefinition:oiolExternal?oiol.taskDefinition:null,runConfigFingerprints:{oiol:oiol.configFingerprint||null,baseline:baseline.configFingerprint||null},scenarioCount:rows.length,
   oiolAverageScore:oiol.summary?.averageScore??avg(rows.map(x=>x.oiolScore)),
   baselineAverageScore:baseline.summary?.averageScore??avg(rows.map(x=>x.baselineScore)),
   averageScoreDelta:avg(deltas),medianScoreDelta:median(deltas),
