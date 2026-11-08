@@ -229,7 +229,7 @@ function reverseReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
 }
 
 function hasApiContractIntent(requestText) {
-  return /\\b(?:api|apis|contract|interface|dto|schema|endpoint|request\\s*\\/\\s*response|public\\s+api|breaking\\s+change|backward\\s+compatib(?:le|ility))\\b|واجه(?:ة|ات)|عقد(?:\\s+ال)?واجه|مخطط(?:\\s+ال)?بيانات|نقط(?:ة|ه)\\s+نهاي/u.test(requestText);
+  return /\b(?:api|apis|contract|interface|dto|schema|endpoint|request\s*\/\s*response|public\s+api|breaking\s+change|backward\s+compatib(?:le|ility))\b|واجه(?:ة|ات)|عقد(?:\s+ال)?واجه|مخطط(?:\s+ال)?بيانات|نقط(?:ة|ه)\s+نهاي/u.test(requestText);
 }
 
 function analyzeApiContractImpact({
@@ -257,7 +257,7 @@ function analyzeApiContractImpact({
   const exportMetadata = symbols.filter(item =>
     ['javascript', 'typescript', 'tsx'].includes(String(item.file || '').split('.').at(-1) === 'tsx' ? 'tsx' :
       String(item.file || '').endsWith('.ts') ? 'typescript' :
-      /\\.jsx?$/.test(String(item.file || '')) ? 'javascript' : '') &&
+      /\.jsx?$/.test(String(item.file || '')) ? 'javascript' : '') &&
     item.source === 'tree_sitter_ast' && typeof item.exported === 'boolean'
   );
   const exportMetadataFileCount = new Set(exportMetadata.map(item => normPath(item.file))).size;
