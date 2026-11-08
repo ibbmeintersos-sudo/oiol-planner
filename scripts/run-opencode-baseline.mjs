@@ -16,11 +16,26 @@ import { selectScenarios, resolveScenarioProject, providerConfig, benchmarkConfi
 
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
 
-export async function createBaselineWorkspace(scenario) {
+export async function createBaselineWorkspace(scenario, { repositoryRoot = null, project = null } = {}) {
  const tempRoot=await fs.mkdtemp(path.join(os.tmpdir(),'oiol-opencode-baseline-'));
  const projectDirectory=path.join(tempRoot,'project');
  try {
-  if(scenario?.project?.fixturePath) {
+  if(repositoryRoot) {
+   if(scenario?.project?.kind!=='existing'||project?.repository?.root!=='external-repository') {
+    throw new Error('External baseline workspace requires a scanned Existing Project repository');
+   }
+   await fs.mkdir(projectDirectory,{recursive:true});
+   // Materialize only bounded, redacted scanner excerpts; never copy the operator's raw checkout.
+   for(const snippet of project.repository.snippets||[]) {
+    if(typeof snippet.path!=='string'||typeof snippet.content!=='string') continue;
+    const relative=snippet.path.replaceAll('\\\\','/');
+    if(relative.startsWith('/')||relative.split('/').some(part=>part==='..'||part==='.')) continue;
+    const destination=path.resolve(projectDirectory,...relative.split('/'));
+    if(!destination.startsWith(projectDirectory+path.sep)) continue;
+    await fs.mkdir(path.dirname(destination),{recursive:true});
+    await fs.writeFile(destination,snippet.content,'utf8');
+   }
+  } else if(scenario?.project?.fixturePath) {
    const fixtureSource=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',scenario.project.fixturePath);
    await fs.cp(fixtureSource,projectDirectory,{recursive:true});
   } else await fs.mkdir(projectDirectory,{recursive:true});
@@ -81,7 +96,7 @@ async function attachReviewer(plan,project,reviewer,reviewConfig,modelRef,usage)
 }
 
 export async function main(){
- const chosen=selectScenarios(arg('scenarios','all'));
+ const chosen=selectScenarios(arg('scenarios','all'));\n const repositoryRoot=arg('repo',process.env.OIOL_BENCHMARK_REPOSITORY||null);\n if(repositoryRoot && chosen.some(scenario=>scenario.project?.kind!=='existing')) throw new Error('--repo can only be used with Existing Project scenarios');
  if(process.argv.includes('--list')){for(const s of scenarios)console.log(s.id+' ['+s.category+'/'+s.difficulty+']');return 0;}
  const baseConfig={baseUrl:process.env.OIOL_OPENCODE_URL||'http://127.0.0.1:4096',username:process.env.OIOL_OPENCODE_USERNAME||'opencode',password:process.env.OIOL_OPENCODE_PASSWORD||'',agent:process.env.OIOL_OPENCODE_AGENT||'plan',modelRef:parseModelRef(process.env.OIOL_OPENCODE_MODEL),timeoutMs:Number(process.env.OIOL_OPENCODE_TIMEOUT_MS||600000)};
  const reviewConfig=process.env.OIOL_REVIEW_PROVIDER?providerConfig('OIOL_REVIEW_'):null;
@@ -121,7 +136,7 @@ export async function main(){
  const summary=summarizeBenchmark(scores);
  const publicReview=reviewConfig?{provider:reviewConfig.provider,model:reviewConfig.model,baseUrl:reviewConfig.baseUrl,timeoutMs:reviewConfig.timeoutMs,maxRetries:reviewConfig.maxRetries,credentialConfigured:Boolean(reviewConfig.apiKey)}:{mode:'no distinct reviewer configuration supplied'};
  const comparisonKey=process.env.OIOL_BENCHMARK_COMPARISON_KEY||null,budgetKey=process.env.OIOL_BENCHMARK_BUDGET_KEY||null;
- const output={protocolVersion:'1.1',runnerVersion:'1.0.0',benchmarkMode:'opencode-baseline',comparisonKey,budgetKey,runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|baseline|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.1',benchmarkMode:'opencode-baseline',comparisonKey,budgetKey,openCode:{baseUrl:baseConfig.baseUrl,agent:baseConfig.agent,model:baseConfig.modelRef},reviewer:publicReview,scenarioIds:chosen.map(x=>x.id).sort()}),provider:{name:'OpenCode',baseUrl:baseConfig.baseUrl,agent:baseConfig.agent,model:baseConfig.modelRef},reviewer:publicReview,usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['OpenCode baseline requires an explicitly selected read-only plan agent.','OpenCode token usage is included only if the message response exposes compatible usage metadata.','For a fair paired comparison, use the same scenario selection, repository fixtures, model, reviewer, and resource budget in both modes.','OpenCode model and agent configuration must be recorded; a default server model cannot be assumed equivalent to the OIOL provider model.']};
+ const output={protocolVersion:'1.1',runnerVersion:'1.1.0',benchmarkMode:'opencode-baseline',sourceMode:repositoryRoot?'external-local-checkout':'checked-in-fixtures',repositorySnapshot:repositoryRoot?{source:'operator-supplied local checkout',commitShas:[...new Set(records.map(x=>x.projectEvidence?.git?.commit).filter(Boolean))],allGitCommitsDetected:records.every(x=>Boolean(x.projectEvidence?.git?.commit)),workspaceProjection:'bounded redacted scanner excerpts'}:null,comparisonKey,budgetKey,runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|baseline|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.1',benchmarkMode:'opencode-baseline',comparisonKey,budgetKey,openCode:{baseUrl:baseConfig.baseUrl,agent:baseConfig.agent,model:baseConfig.modelRef},reviewer:publicReview,scenarioIds:chosen.map(x=>x.id).sort()}),provider:{name:'OpenCode',baseUrl:baseConfig.baseUrl,agent:baseConfig.agent,model:baseConfig.modelRef},reviewer:publicReview,usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['OpenCode baseline requires an explicitly selected read-only plan agent.','OpenCode token usage is included only if the message response exposes compatible usage metadata.','External repository mode materializes only bounded redacted scanner excerpts in the disposable baseline workspace; it does not copy the raw checkout.','For a fair paired comparison, use the same scenario selection, repository fixtures, model, reviewer, and resource budget in both modes.','OpenCode model and agent configuration must be recorded; a default server model cannot be assumed equivalent to the OIOL provider model.']};
  const out=path.resolve(arg('out','benchmarks/results/opencode-baseline-'+Date.now()+'.json'));
  await fs.mkdir(path.dirname(out),{recursive:true});
  await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
