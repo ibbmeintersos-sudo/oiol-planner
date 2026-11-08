@@ -45,6 +45,7 @@ export function validateCase(item, seen = new Set()) {
   for (const key of ['baseCommit', 'changeCommit']) if (!/^[0-9a-f]{40}$/.test(source[key] || '')) errors.push('source.' + key + ' must be a full commit SHA');
   if (source.baseCommit && source.baseCommit === source.changeCommit) errors.push('baseCommit and changeCommit must differ');
   if (typeof item.change?.request !== 'string' || item.change.request.trim().length < 8) errors.push('change.request is too short');
+  if (!['source_change','api_change','database_change','migration_change','test_change','cross_component','ambiguous'].includes(item.change?.category)) errors.push('change.category is invalid');
   const snapshot = item.snapshot || {};
   if (!snapshot.relativePath || path.isAbsolute(snapshot.relativePath) || snapshot.relativePath.split(/[\\/]/).includes('..')) errors.push('snapshot.relativePath must be safe and relative');
   if (!/^[0-9a-f]{64}$/.test(snapshot.sha256 || '')) errors.push('snapshot.sha256 must be a SHA-256 fingerprint');
@@ -58,6 +59,7 @@ export function validateCase(item, seen = new Set()) {
   if (new Set(ids).size !== ids.length) errors.push('reviewer IDs must be distinct');
   for (const reviewer of reviewers) {
     if (reviewer.independent !== true) errors.push('reviewer must attest independence');
+    if (!Number.isFinite(Date.parse(reviewer.reviewedAt || ''))) errors.push('reviewer reviewedAt must be a valid timestamp');
     if (!Array.isArray(reviewer.evidenceNotes) || !reviewer.evidenceNotes.length) errors.push('reviewer evidence notes are required');
   }
   const adjudication = item.annotation?.adjudication || {};
