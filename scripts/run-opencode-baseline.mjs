@@ -119,7 +119,7 @@ export async function main(){
   const started=Date.now();
   let project=null,workspace=null,record=null,workspaceCleanupWarning=null;
   try{
-   project=await resolveScenarioProject(scenario,{repositoryRoot,scanOptions:taskDefinition?.evidencePaths?{priorityPaths:taskDefinition.evidencePaths}:null});
+   project=await resolveScenarioProject(scenario,{repositoryRoot,scanOptions:taskDefinition?.evidencePaths?{priorityPaths:taskDefinition.evidencePaths,priorityRanges:taskDefinition.evidenceRanges}:null});
    if(repositoryRoot) assertExternalRepositorySnapshot(project);
    workspace=await createBaselineWorkspace(scenario,{repositoryRoot,project});
    const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:workspace.projectDirectory,timeoutMs:baseConfig.timeoutMs});
