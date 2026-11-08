@@ -75,7 +75,7 @@ External mode requires a Git checkout with a 40-character commit SHA and a clean
 
 The OIOL runner scans the supplied checkout using the existing bounded read-only scanner. The OpenCode baseline receives a disposable workspace containing only the scanner's bounded, redacted excerpts; it does not receive a raw copy of the checkout. This is intentionally conservative, but it means external baseline results are a comparison against the same sanitized evidence projection, not a full checkout mirror. Review scanner coverage and truncation diagnostics before interpreting any result.
 
-Only Existing Project scenarios are valid with --repo. Greenfield and ambiguous Greenfield scenarios remain unchanged. The existing-project task wording in the starter catalog is generic; adapt and version task prompts for each external repository before treating a result as a representative benchmark case. Do not score arbitrary task/repository pairings as if they were equivalent.
+Only Existing Project scenarios are valid with --repo, and external mode now requires a repository-specific --task-file. Exactly one Existing Project scenario is selected. The task file replaces the generic request and lexical scoring rubric; use the same exact file for OIOL and OpenCode. See [EXTERNAL_TASK_SCHEMA.md](EXTERNAL_TASK_SCHEMA.md) for the required fields, versioning, and reproducibility contract. Do not score arbitrary task/repository pairings as if they were equivalent.
 
 The local environment running the command must have access to the checkout. GitHub API access alone is not a local checkout and cannot be substituted for the scanner's filesystem input.
 
