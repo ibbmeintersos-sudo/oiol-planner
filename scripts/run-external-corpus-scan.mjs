@@ -35,6 +35,8 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
     git: repository.git,
     fileCount: repository.fileCount,
     includedFileCount: repository.includedFileCount,
+    includedPaths: repository.files.map(file => file.path),
+    sourcePaths: repository.files.map(file => file.path).filter(file => /\\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb)$/i.test(file)),
     fileCountIsLowerBound: repository.fileCountIsLowerBound,
     truncated: repository.truncated,
     depthTruncated: repository.depthTruncated,
