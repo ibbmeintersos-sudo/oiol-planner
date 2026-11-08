@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-API-003",
   "taskId": "RW-IM-02",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Immich",
   "request": "A product request says: “Make external libraries count toward user storage quotas.” Produce a planning response, but do not change quota enforcement until the accounting policy is clarified.",
   "constraints": [
@@ -22,11 +22,15 @@
       "libraryId is null"
     ],
     [
-      "logical bytes",
+      "logical bytes"
+    ],
+    [
       "physical bytes"
     ],
     [
-      "ownership",
+      "ownership"
+    ],
+    [
       "shared mount"
     ],
     [
@@ -34,11 +38,15 @@
       "duplicate assets"
     ],
     [
-      "custom mount points",
+      "custom mount points"
+    ],
+    [
       "symlinks"
     ],
     [
-      "existing over-quota users",
+      "existing over-quota users"
+    ],
+    [
       "grace period"
     ],
     [
@@ -49,10 +57,15 @@
   "mustClarify": true,
   "clarificationSignals": [
     [
-      "logical versus physical bytes"
+      "logical bytes"
     ],
     [
-      "ownership",
+      "physical bytes"
+    ],
+    [
+      "ownership"
+    ],
+    [
       "shared mount"
     ],
     [
@@ -60,7 +73,9 @@
       "duplicate assets"
     ],
     [
-      "custom mount points",
+      "custom mount points"
+    ],
+    [
       "symlinks"
     ],
     [
@@ -70,8 +85,12 @@
       "existing users over quota"
     ],
     [
-      "hard rejection",
-      "soft warning",
+      "hard rejection"
+    ],
+    [
+      "soft warning"
+    ],
+    [
       "grace period"
     ]
   ]
