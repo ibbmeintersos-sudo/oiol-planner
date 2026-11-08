@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Added `oiol report` for standalone HTML, Markdown, or JSON review reports from an existing plan.
+- Added a self-contained HTML report renderer with inline CSS, no scripts or external assets, and full HTML escaping.
+
 ## 0.5.0 — Tree-sitter AST repository analysis
 
 ### Added

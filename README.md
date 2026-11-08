@@ -73,6 +73,18 @@ OIOL can review pull requests as a planning-only GitHub Action. It scans the rep
 
 Copy [`examples/github-actions/oiol-review.yml`](examples/github-actions/oiol-review.yml) to `.github/workflows/`, add an `OIOL_API_KEY` repository secret, and adjust the planning request. See [`docs/GITHUB_ACTION.md`](docs/GITHUB_ACTION.md) for inputs, permissions, and the security model. Never use `pull_request_target` with a checkout of pull request code.
 
+## HTML review report
+
+Render an existing plan as a self-contained, print-ready HTML report:
+
+    npx oiol-planner report plan.json --out plan.html
+    npx oiol-planner report plan.json --format md
+    npx oiol-planner report plan.json --format json
+
+The HTML output is a single file with inline CSS, no scripts, and no external assets. It includes validation findings, non-blocking quality signals, requirements, architecture, tasks, planning waves, handoff interfaces, traceability, risks, and open questions. Every plan value is HTML-escaped.
+
+`report` performs local deterministic validation only and makes no provider calls. The exit code is `2` when the plan is invalid, but the report is still written so the findings can be reviewed.
+
 ## Configuration file
 
 \`oiol.config.json\` is optional; OIOL also works with environment variables only. Profiles keep provider settings in one place:
