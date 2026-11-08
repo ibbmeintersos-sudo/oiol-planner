@@ -42,7 +42,7 @@ The source blob SHAs below identify the public README and root manifest versions
 - Suggested scenario: `EX-MONOLITH-004`; task version: `0.2.0-draft`.
 - Request: Plan a document-retention capability that lets an authorized administrator assign a retention date to a document, view upcoming expirations, and preview the affected documents before an explicitly confirmed expiry operation. Do not schedule irreversible deletion automatically. Preserve document searchability and auditability.
 - Initial expected concepts: document metadata; retention date; authorization; expiry preview; background task/Celery; audit trail; API/UI consistency; migration; tests.
-- Evidence to confirm after scan: document model and lifecycle; ingestion/OCR processing; API serializers/views; permission model; task scheduling and retry patterns; UI routes/components; audit/history support.
+- Confirmed code evidence from the pinned scan: `src/documents/models.py` (document model and lifecycle); `src/documents/serialisers.py` and `src/documents/views.py` (API representation and endpoints); `src/documents/permissions.py` (authorization); `src/documents/tasks.py` and `src/documents/signals/handlers.py` (background processing and lifecycle hooks); `src/paperless/urls.py` (route registration); tests in `src/documents/tests/test_document_model.py`, `test_tasks.py`, and `test_api_documents.py`. The bounded scan did not identify an existing retention-policy model or audit workflow; verify the full checkout before promotion.
 - Human review focus: Are metadata, API, UI, background processing, permission checks, and migrations planned consistently? Does the plan separate preview from destructive action and preserve legal/audit records?
 
 ### PN-02 — “Automatically clean up old documents” (candidate clarification task)
@@ -50,7 +50,7 @@ The source blob SHAs below identify the public README and root manifest versions
 - Suggested scenario: `EX-API-003`; task version: `0.1.0-draft`; `mustClarify: true`.
 - Request: “Automatically clean up old documents to save storage.” Do not assume that age alone authorizes deletion.
 - Required clarification areas: retention duration and date semantics; scope (all documents, selected owners/tags/types); legal hold/exemptions; archive versus permanent deletion; approval/preview and recovery requirements; treatment of originals, thumbnails, OCR text, and backups.
-- Evidence to confirm after scan: document storage layers; archival/deletion workflows; task scheduling; permission and audit facilities; backup/restore assumptions.
+- Confirmed code evidence: the document model, task, permission, view, serializer, signal, URL, and test paths listed under PN-01. The scan confirms document lifecycle and background processing surfaces, but does not establish the semantics of archival, permanent deletion, legal holds, backups, or recoverability. Those remain explicit unknowns for the planner to raise rather than invent.
 - Human review focus: Does the plan block destructive design until policy and legal-hold semantics are defined? Does it distinguish logical deletion from physical storage reclamation?
 
 ## Prefect — `PrefectHQ/prefect`
