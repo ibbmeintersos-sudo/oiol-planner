@@ -1,0 +1,28 @@
+name: OIOL self review
+
+on:
+  workflow_dispatch:
+    inputs:
+      request:
+        description: Planning request for the manual self-review
+        required: false
+        default: Review this repository as an engineering planning task. Identify requirement gaps, architecture and dependency risks, missing acceptance criteria, and verification a human must perform. Do not implement or execute any project task.
+
+permissions:
+  contents: read
+
+jobs:
+  oiol-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run OIOL planning review
+        uses: ./.github/actions/oiol-review
+        with:
+          request: ${{ inputs.request }}
+          api-key: ${{ secrets.OIOL_API_KEY }}
+          comment: false
