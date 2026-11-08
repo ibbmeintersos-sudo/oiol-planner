@@ -6,7 +6,7 @@ const normalize = value => String(value || '').normalize('NFKC').toLowerCase()
   .replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
 const tokens = value => {
   const prepared = String(value || '').replace(/([a-z0-9])([A-Z])/g, '$1 $2');
-  return new Set((prepared.match(/[\p{L}\p{N}]+/gu) || []).map(normalize).filter(item => item.length > 1));
+  return new Set((prepared.match(/[\p{L}\p{N}]+/gu) || []).map(normalize).map(item => item.endsWith('ies') && item.length > 5 ? item.slice(0, -3) + 'y' : item.endsWith('s') && item.length > 4 ? item.slice(0, -1) : item).filter(item => item.length > 1));
 };
 const sorted = values => [...values].sort((a, b) => a.localeCompare(b));
 const overlap = (a, b) => sorted([...a].filter(item => b.has(item)));
