@@ -7,6 +7,7 @@ function makeRepository({ truncated = false } = {}) {
     'packages/auth-core/src/session-manager.ts',
     'apps/customer-api/src/profile-route.ts',
     'apps/admin-worker/src/admin-route.ts',
+    'apps/portal/src/portal-route.ts',
     'test/auth/session.test.ts',
     'test/profile/profile-route.test.ts',
     'packages/shared/src/logger.ts',
@@ -15,14 +16,16 @@ function makeRepository({ truncated = false } = {}) {
   const edges = [
     { from: 'apps/customer-api/src/profile-route.ts', to: 'packages/auth-core/src/session-manager.ts', kind: 'imports' },
     { from: 'apps/admin-worker/src/admin-route.ts', to: 'packages/auth-core/src/session-manager.ts', kind: 'imports' },
+    { from: 'apps/portal/src/portal-route.ts', to: 'apps/customer-api/src/profile-route.ts', kind: 'imports' },
     { from: 'test/auth/session.test.ts', to: 'packages/auth-core/src/session-manager.ts', kind: 'imports' },
     { from: 'test/profile/profile-route.test.ts', to: 'apps/customer-api/src/profile-route.ts', kind: 'imports' }
   ];
   const imports = [
     { from: edges[0].from, to: edges[0].to, specifier: '../../auth-core/src/session-manager.js', resolved: true },
     { from: edges[1].from, to: edges[1].to, specifier: '../../auth-core/src/session-manager.js', resolved: true },
-    { from: edges[2].from, to: edges[2].to, specifier: '../../auth-core/src/session-manager.js', resolved: true },
-    { from: edges[3].from, to: edges[3].to, specifier: '../../customer-api/src/profile-route.js', resolved: true }
+    { from: edges[2].from, to: edges[2].to, specifier: '../../customer-api/src/profile-route.js', resolved: true },
+    { from: edges[3].from, to: edges[3].to, specifier: '../../auth-core/src/session-manager.js', resolved: true },
+    { from: edges[4].from, to: edges[4].to, specifier: '../../customer-api/src/profile-route.js', resolved: true }
   ];
   const sourceEvidence = files.map((path, index) => ({
     id: 'REPO-' + String(index + 1).padStart(12, '0'),
@@ -60,11 +63,13 @@ function makeRepository({ truncated = false } = {}) {
           { name: '@app/auth-core', path: 'packages/auth-core', manifest: 'packages/auth-core/package.json' },
           { name: '@app/customer-api', path: 'apps/customer-api', manifest: 'apps/customer-api/package.json' },
           { name: '@app/admin-worker', path: 'apps/admin-worker', manifest: 'apps/admin-worker/package.json' },
+          { name: '@app/portal', path: 'apps/portal', manifest: 'apps/portal/package.json' },
           { name: '@app/shared', path: 'packages/shared', manifest: 'packages/shared/package.json' }
         ],
         dependencies: [
           { from: 'apps/customer-api', to: 'packages/auth-core', packageName: '@app/auth-core' },
-          { from: 'apps/admin-worker', to: 'apps/customer-api', packageName: '@app/customer-api' }
+          { from: 'apps/admin-worker', to: 'apps/customer-api', packageName: '@app/customer-api' },
+          { from: 'apps/portal', to: 'apps/customer-api', packageName: '@app/customer-api' }
         ]
       }
     }
@@ -179,3 +184,35 @@ test('direct-match cap is explicit and reports omitted candidate count', () => {
   assert.ok(result.confidence.penalties.includes('direct_match_result_limit_reached'));
 });
 
+test('depth-limit truncation is explicit for file and workspace propagation', () => {
+  const result = analyzeChangeImpact({
+    request: 'authentication user',
+    repository: makeRepository(),
+    maxDepth: 1
+  });
+
+  assert.equal(result.graph.traversalLimits.depthLimitReached, true);
+  assert.ok(result.graph.traversalLimits.fileDepthFrontierCount > 0);
+  assert.ok(result.graph.traversalLimits.packageDepthFrontierCount > 0);
+  assert.ok(result.confidence.penalties.includes('impact_graph_depth_limit_reached'));
+  assert.ok(result.risks.includes('impact_graph_depth_limit_reached'));
+});
+
+test('depth limit is not reported when the frontier has no unseen dependents', () => {
+  const repository = makeRepository();
+  repository.structure.workspaceGraph.dependencies = [
+    { from: 'apps/customer-api', to: 'packages/auth-core', packageName: '@app/auth-core' }
+  ];
+  repository.structure.dependencyGraph.edges = repository.structure.dependencyGraph.edges.filter(
+    edge => edge.from !== 'apps/portal/src/portal-route.ts'
+  );
+  const result = analyzeChangeImpact({
+    request: 'authentication user',
+    repository,
+    maxDepth: 6
+  });
+
+  assert.equal(result.graph.traversalLimits.depthLimitReached, false);
+  assert.equal(result.graph.traversalLimits.fileDepthFrontierCount, 0);
+  assert.equal(result.graph.traversalLimits.packageDepthFrontierCount, 0);
+});
