@@ -1,25 +1,17 @@
 import path from 'node:path';
 import { redact } from '../core/utils.mjs';
-<<<<<<< HEAD
-import { analyzeWithTreeSitter } from './tree-sitter-ast.mjs';
-import { scanDatabaseSchema } from './database-schema.mjs';
-=======
 import { analyzeWithTreeSitter, resolveLocalImport } from './tree-sitter-ast.mjs';
->>>>>>> origin/main
+import { scanDatabaseSchema } from './database-schema.mjs';
 
 const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
   ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
   ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby'],['.dart','dart'],['.swift','swift']
 ]);
-<<<<<<< HEAD
+const SOURCE_EXT = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
 const norm = value => path.posix.normalize(String(value || '').replaceAll('\\','/').replace(/^\.\//,''));
 const FILE_SUFFIXES = [...EXT.keys(), '.d.ts', '.json'];
 const INDEX_NAMES = ['index.js','index.jsx','index.mjs','index.cjs','index.ts','index.tsx','index.py','index.go','index.rs','__init__.py'];
-=======
-const SOURCE_EXT = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
-const norm = value => value.replaceAll('\\','/').replace(/^\.\//,'');
->>>>>>> origin/main
 
 function importsFor(source, language) {
   const out = [], add = value => { if (value && !out.includes(value)) out.push(value); };
@@ -83,7 +75,6 @@ function frameworksFor(text) {
   return defs.filter(([, needles]) => needles.some(needle => lower.includes(needle))).map(([name]) => name);
 }
 
-<<<<<<< HEAD
 function resolveFileCandidate(base, fileSet) {
   const normalized = norm(base);
   const candidates = [normalized];
@@ -363,9 +354,6 @@ export function analyzeRepositoryStructure({
   maxFileBytes = 16000, analysisMode = 'auto'
 } = {}) {
   if (!['auto', 'lexical'].includes(analysisMode)) throw new Error('analysisMode must be auto or lexical');
-=======
-export function analyzeRepositoryStructure({ files = [], contents = {}, manifests = [], maxFileBytes = 16000 } = {}) {
->>>>>>> origin/main
   const normalized = files.map(norm);
   const fileSet = new Set(normalized);
   const sources = normalized.filter(file => SOURCE_EXT.test(file));
@@ -379,7 +367,11 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     analyzed.push(file);
   }
 
-<<<<<<< HEAD
+  const goModFile = manifests.find(file => path.posix.basename(file) === 'go.mod');
+  const goModulePath = typeof contents[goModFile] === 'string'
+    ? contents[goModFile].match(/^\s*module\s+([^\s]+)\s*$/m)?.[1] || null
+    : null;
+  const pythonRoots = ['', 'src', 'lib', 'app'];
   const ast = analysisMode === 'lexical'
     ? {
         symbols: [], imports: [], diagnostics: [], parsedFiles: [], unsupportedFiles: [], failedFiles: [],
@@ -387,15 +379,7 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
         visitedNodeCount: 0, method: 'lexical_only', availableLanguages: [], runtimeAvailable: false,
         runtimeLoadError: 'AST disabled by scanner configuration'
       }
-    : analyzeWithTreeSitter({ files: analyzed, contents, maxFileBytes });
-=======
-  const goModFile = manifests.find(file => path.posix.basename(file) === 'go.mod');
-  const goModulePath = typeof contents[goModFile] === 'string'
-    ? contents[goModFile].match(/^\s*module\s+([^\s]+)\s*$/m)?.[1] || null
-    : null;
-  const pythonRoots = ['', 'src', 'lib', 'app'];
-  const ast = analyzeWithTreeSitter({ files: normalized, contents, maxFileBytes, goModulePath, pythonRoots });
->>>>>>> origin/main
+    : analyzeWithTreeSitter({ files: analyzed, contents, maxFileBytes, goModulePath, pythonRoots });
   const astFiles = new Set(ast.parsedFiles.map(item => item.file));
   const symbols = [...ast.symbols], imports = [...ast.imports];
   const lexicalFallbackFiles = [];
@@ -456,34 +440,31 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     const key = [item.from, item.specifier, item.to || ''].join('\0');
     if (!seenImports.has(key)) { seenImports.add(key); uniqueImports.push(item); }
   }
-<<<<<<< HEAD
   const evidencedSymbols = symbols.map(item => attachEvidence(item, item.file, evidenceByPath));
   const evidencedImports = uniqueImports.map(item => attachEvidence(item, item.from, evidenceByPath));
   const edges = evidencedImports.filter(item => item.resolved).map(item => ({
     from: item.from, to: item.to, kind: 'imports', specifier: item.specifier,
-    source: item.source, resolutionKind: item.resolutionKind || (item.specifier.startsWith('.') ? 'relative_path' : 'parser_resolved'),
+    source: item.source,
+    resolutionKind: item.resolutionKind || (item.specifier.startsWith('.') ? 'relative_path' : 'parser_resolved'),
+    resolution: item.resolution || (item.language === 'go' ? 'go-module-package-representative' : item.language === 'python' && !item.specifier.startsWith('.') ? 'python-module-root' : 'relative-path'),
     evidenceId: item.evidenceId, sourceSha256: item.sourceSha256, excerptSha256: item.excerptSha256
   }));
-  const unresolved = evidencedImports.filter(item => item.specifier.startsWith('.') && !item.resolved);
-  const unresolvedAliases = evidencedImports.filter(item => !item.resolved && aliasInfo.aliases.some(alias =>
-    (item.from === alias.configRoot || item.from.startsWith(alias.configRoot ? alias.configRoot + '/' : '')) &&
-    matchAlias(alias.pattern, item.specifier) !== null
-  ));
-=======
-  const edges = uniqueImports.filter(item => item.resolved).map(item => ({ from: item.from, to: item.to, kind: 'imports', resolution: item.resolution || (item.language === 'go' ? 'go-module-package-representative' : item.language === 'python' && !item.specifier.startsWith('.') ? 'python-module-root' : 'relative-path') }));
   const localPythonModules = new Set();
   for (const file of normalized) if (file.endsWith('.py')) {
     const parts = file.split('/');
     localPythonModules.add(parts[0] === 'src' && parts.length > 2 ? parts[1] : parts[0]);
   }
-  const unresolved = uniqueImports.filter(item => {
+  const unresolved = evidencedImports.filter(item => {
     if (item.resolved) return false;
     if (item.specifier.startsWith('.')) return true;
     if (item.language === 'go' && goModulePath && (item.specifier === goModulePath || item.specifier.startsWith(goModulePath + '/'))) return true;
     if (item.language === 'python' && localPythonModules.has(item.specifier.split('.')[0])) return true;
     return false;
   });
->>>>>>> origin/main
+  const unresolvedAliases = evidencedImports.filter(item => !item.resolved && aliasInfo.aliases.some(alias =>
+    (item.from === alias.configRoot || item.from.startsWith(alias.configRoot ? alias.configRoot + '/' : '')) &&
+    matchAlias(alias.pattern, item.specifier) !== null
+  ));
   const manifestTexts = manifests.map(file => contents[file]).filter(value => typeof value === 'string');
   const workspaceDependencies = workspace.dependencies.map(item => ({
     ...item,
@@ -521,12 +502,11 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     parseCounts: ast.parseCounts,
     availableGrammarLanguages: ast.availableLanguages,
     visitedAstNodeCount: ast.visitedNodeCount,
-<<<<<<< HEAD
     symbols: evidencedSymbols.slice(0, 4000),
     symbolCount: evidencedSymbols.length,
     imports: evidencedImports.slice(0, 6000),
     importCount: evidencedImports.length,
-    dependencyGraph: { nodes: analyzed, edges: edges.slice(0, 6000), edgeCount: edges.length },
+    dependencyGraph: { nodes: [...new Set([...analyzed, ...edges.map(edge => edge.to)])].sort(), edges: edges.slice(0, 6000), edgeCount: edges.length },
     workspaceGraph: {
       packageManager: workspace.packageManager,
       isMonorepo: workspace.isMonorepo,
@@ -552,13 +532,6 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
       fingerprintedAliasConfigCount,
       aliasConfigFingerprintRate: resolvedAliasCount ? Number((fingerprintedAliasConfigCount / resolvedAliasCount).toFixed(4)) : 1
     },
-=======
-    symbols: symbols.slice(0, 4000),
-    symbolCount: symbols.length,
-    imports: uniqueImports.slice(0, 6000),
-    importCount: uniqueImports.length,
-    dependencyGraph: { nodes: [...new Set([...analyzed, ...edges.map(edge => edge.to)])].sort(), edges: edges.slice(0, 6000), edgeCount: edges.length },
->>>>>>> origin/main
     unresolvedLocalImports: unresolved.slice(0, 1000),
     unresolvedLocalImportCount: unresolved.length,
     frameworks: frameworksFor(manifestTexts.join('\n')),
