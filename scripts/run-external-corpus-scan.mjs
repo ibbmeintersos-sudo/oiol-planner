@@ -89,12 +89,19 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
 
 export async function main() {
   if (process.argv.includes('--help') || process.argv.includes('-h')) {
-    console.log('Usage: node scripts/run-external-corpus-scan.mjs --repo /path/to/clean/checkout --id RW-REPO-01 [--out scan.json]');
+    console.log('Usage: node scripts/run-external-corpus-scan.mjs --repo /path/to/clean/checkout --id RW-REPO-01 [--task-file task.json] [--out scan.json]');
     return 0;
   }
   const repositoryRoot = arg('repo');
   const repositoryId = arg('id', 'external-repository');
-  const report = await scanExternalRepository({ repositoryRoot, repositoryId });
+  const taskFilePath = arg('task-file');
+  let priorityPaths = [];
+  if (taskFilePath) {
+    const task = JSON.parse(await fs.readFile(path.resolve(taskFilePath), 'utf8'));
+    if (!Array.isArray(task.evidencePaths) || !task.evidencePaths.length) throw new Error('--task-file must contain non-empty evidencePaths');
+    priorityPaths = task.evidencePaths;
+  }
+  const report = await scanExternalRepository({ repositoryRoot, repositoryId, scanOptions: { ...EXTERNAL_REPOSITORY_SCAN_OPTIONS, priorityPaths } });
   const output = arg('out');
   if (output) {
     const destination = path.resolve(output);
