@@ -19,7 +19,8 @@
     "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs",
     "benchmark:series": "node scripts/run-benchmark-series.mjs",
     "benchmark:scanner": "node scripts/run-scanner-accuracy-benchmark.mjs",
-    "release:check": "node scripts/check-release.mjs"
+    "release:check": "node scripts/check-release.mjs",
+    "benchmark:change-impact": "node scripts/run-change-impact-benchmark.mjs"
   },
   "license": "MIT",
   "optionalDependencies": {
