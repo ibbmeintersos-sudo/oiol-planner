@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-MONOLITH-004",
   "taskId": "RW-IM-01",
-  "taskVersion": "0.3.0-draft",
+  "taskVersion": "0.4.0-draft",
   "projectName": "Immich",
   "request": "Plan a separate per-user external-library storage-usage metric for administrator-facing user/server statistics. Keep it distinct from the existing upload quota and do not change quota enforcement. Use a clearly documented logical-size measurement based on indexed external-library assets; do not claim physical disk usage or deduplicated storage usage unless repository evidence supports it.",
   "constraints": [
@@ -53,5 +53,16 @@
     ]
   ],
   "mustClarify": false,
-  "clarificationSignals": []
+  "clarificationSignals": [],
+  "evidencePaths": [
+    "docs/docs/administration/server-stats.md",
+    "server/src/dtos/server.dto.ts",
+    "server/src/dtos/user.dto.ts",
+    "server/src/services/asset.service.ts",
+    "server/src/services/user.service.ts",
+    "server/src/repositories/user.repository.ts",
+    "server/src/services/library.service.ts",
+    "server/src/repositories/library.repository.ts",
+    "web/src/routes/admin/users/[id]/+layout.svelte"
+  ]
 }
