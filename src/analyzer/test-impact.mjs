@@ -16,6 +16,21 @@ export function analyzeTestImpact({ request = '', repository = null, changeImpac
   if (!Number.isInteger(maxCandidates) || maxCandidates < 1 || maxCandidates > 500) {
     throw new Error('maxCandidates must be an integer from 1 to 500');
   }
+  if (!repository?.structure) {
+    return {
+      status: 'unavailable',
+      method: 'deterministic_test_impact_and_verification_planning',
+      inventory: { discoveredTestFileCount: 0, linkedTestFileCount: 0, inventoryAvailable: false, selectedResultLimit: maxCandidates, resultLimitReached: false },
+      selectedTests: [],
+      recommendedTestLevels: [],
+      coverageAssessment: { status: 'not_measured', requirementAcceptanceCriteria: 'not_assessed', codeCoverage: 'not_available' },
+      gaps: ['Scanner structure evidence is unavailable; test discovery and impact-based selection cannot be assessed.'],
+      prerequisites: [],
+      verificationGates: [],
+      confidence: 'low',
+      limitations: ['No target-project tests or commands are executed by OIOL.']
+    };
+  }
   const structure = repository?.structure || {};
   const inventory = sorted([
     ...(Array.isArray(repository?.tests) ? repository.tests : []),
