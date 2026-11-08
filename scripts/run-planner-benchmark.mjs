@@ -129,7 +129,29 @@ export function summarizeRepositoryEvidence(project) {
       parserDiagnostics: structure.parserDiagnostics,
       limitations: structure.limitations
     },
-    evidence: project.evidence
+    evidence: project.evidence,
+    coverage: {
+      discoveredFileCount: repository.fileCount,
+      includedFileCount: repository.includedFileCount,
+      fileCountIsLowerBound: repository.fileCountIsLowerBound,
+      fileTruncated: repository.truncated,
+      depthTruncated: repository.depthTruncated,
+      sourceFileCount: structure.sourceFileCount || 0,
+      analyzedSourceFileCount: structure.analyzedSourceFileCount || 0,
+      sourceAnalysisRatio: structure.sourceFileCount ? (structure.analyzedSourceFileCount || 0) / structure.sourceFileCount : null,
+      astFileCount: structure.astFileCount || 0,
+      lexicalFallbackFileCount: structure.lexicalFallbackFileCount || 0,
+      unsupportedLanguageFileCount: structure.unsupportedLanguageFileCount || 0,
+      unsupportedLanguageRatio: structure.sourceFileCount ? (structure.unsupportedLanguageFileCount || 0) / structure.sourceFileCount : null,
+      syntaxErrorFileCount: structure.syntaxErrorFileCount || 0,
+      parseFailureFileCount: structure.parseFailureFileCount || 0,
+      manifestCount: (repository.manifests || []).length,
+      testFileCount: (repository.tests || []).length,
+      configFileCount: (repository.configs || []).length,
+      snippetCount: (repository.snippets || []).length,
+      contextTruncated: repository.contextTruncated,
+      skippedCounts: repository.skipped?.counts || {}
+    }
   };
 }
 
