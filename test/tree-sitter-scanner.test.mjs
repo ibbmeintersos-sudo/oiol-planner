@@ -20,6 +20,7 @@ test('Tree-sitter AST extracts JavaScript declarations and ignores import-like c
       "export function boot() { return helper(); }",
       "export const make = () => ({ ok: true });",
       "export class Engine {}",
+      "// export ",
       "function internalHelper() { return false; }",
       ""
     ].join('\n'));
