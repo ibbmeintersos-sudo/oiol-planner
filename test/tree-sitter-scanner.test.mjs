@@ -255,14 +255,14 @@ test('scanner source-file cap is configurable and evidence selection interleaves
     await writeFile(path.join(f.root, 'src', 'b.js'), 'export const b = 2;');
     await writeFile(path.join(f.root, 'src', 'c.js'), 'export const c = 3;');
     await writeFile(path.join(f.root, 'tests', 'a.test.js'), 'test("a", () => {});');
-    await writeFile(path.join(f.root, 'vite.config.js'), 'export default {};');
+    await writeFile(path.join(f.root, 'vite.config.json'), 'export default {};');
     const result = await scanRepository(f.root, { maxSourceFiles: 2, maxContextChars: 2000 });
     assert.equal(result.scanLimits.maxSourceFiles, 2);
     assert.equal(result.structure.analyzedSourceFileCount, 2);
     const snippetPaths = result.snippets.map(item => item.path);
     assert.ok(snippetPaths.includes('package.json'));
     assert.ok(snippetPaths.includes('tests/a.test.js'));
-    assert.ok(snippetPaths.includes('vite.config.js'));
+    assert.ok(snippetPaths.includes('vite.config.json'));
     assert.ok(snippetPaths.includes('src/a.js'));
     assert.ok(snippetPaths.includes('src/b.js'));
     assert.equal(snippetPaths.includes('src/c.js'), false);
