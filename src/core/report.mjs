@@ -29,6 +29,19 @@ function changeImpactSection(impact) {
     '- **Unseen package consumers beyond depth cap:** ' + (Number.isFinite(impact.graph?.traversalLimits?.packageDepthFrontierCount) ? impact.graph.traversalLimits.packageDepthFrontierCount : 'Not recorded'),
     '- **Node/output cap reached:** ' + (impact.graph?.traversalLimits ? (impact.graph.traversalLimits.nodeLimitReached || impact.graph.traversalLimits.affectedFilesOutputLimitReached || impact.graph.traversalLimits.affectedPackagesOutputLimitReached ? 'Yes' : 'No') : 'Not recorded'),
     '',
+    '### API and contract impact (static estimate)',
+    '',
+    '- **Contract analysis status:** ' + text(impact.apiContractImpact?.status || 'Not requested'),
+    '- **Exported contract symbols matched:** ' + (Number.isFinite(impact.apiContractImpact?.diagnostics?.matchedContractSymbolCount) ? impact.apiContractImpact.diagnostics.matchedContractSymbolCount : 'Not recorded'),
+    '- **Export-metadata files:** ' + (Number.isFinite(impact.apiContractImpact?.diagnostics?.exportMetadataFileCount) ? impact.apiContractImpact.diagnostics.exportMetadataFileCount : 'Not recorded'),
+    ...(Array.isArray(impact.apiContractImpact?.contractSymbols) && impact.apiContractImpact.contractSymbols.length
+      ? impact.apiContractImpact.contractSymbols.map(item => '- **' + text(item.name) + '** (' + text(item.kind) + ') — ' + text(item.file) + (item.line ? ':' + text(item.line) : '') + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : ''))
+      : ['- No AST-backed exported contract symbol was matched.']),
+    ...(Array.isArray(impact.apiContractImpact?.potentiallyAffectedConsumers) && impact.apiContractImpact.potentiallyAffectedConsumers.length
+      ? impact.apiContractImpact.potentiallyAffectedConsumers.map(item => '- **' + text(item.path) + '** — imports candidate contract file ' + text(item.contractFile) + '; depth ' + text(item.depth) + '; confidence: ' + text(item.confidence) + ' (file-level only)')
+      : ['- No consumer file could be linked to a matched contract candidate.']),
+    ...(Array.isArray(impact.apiContractImpact?.limitations) ? impact.apiContractImpact.limitations.map(item => '- Caveat: ' + text(item)) : []),
+    '',
     '### Direct candidate files',
     '',
     ...(direct.length ? direct.slice(0, 30).map(item => '- **' + text(item.path) + '** — score ' + text(item.score) + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : '')) : ['- No direct candidate file was identified.']),
