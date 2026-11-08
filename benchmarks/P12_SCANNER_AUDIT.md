@@ -77,7 +77,7 @@ Additional checks:
 6. **Turborepo:** file cap reached; AST/source 25.1%; graph edge count 3 for 437 nodes is a major anomaly. Do not use its graph as a reliable dependency map until independently checked.
 7. **Plausible:** Elixir dominates the unsupported-source count. The current scanner projection is inadequate for a task whose correctness depends on Plausible's Elixir application layer. It may only support a tracker/frontend-scoped task if those files are explicitly evidenced.
 
-## Task-prioritized evidence intake — scanner 1.6.0
+## Task-prioritized evidence intake — scanner 1.7.0
 
 The measured retrieval correction is now implemented and the five task-bearing repositories were rescanned using the `evidencePaths` in their task definitions. Workflow: [P12 task-specific evidence intake](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42505668870). All five scanner jobs completed successfully and uploaded artifacts.
 
@@ -121,6 +121,6 @@ No superiority claim is permitted from one pilot or from lexical scores alone.
 
 Do not promote the ten `0.4.0-draft` tasks yet. Immich IM-01 is the only current task whose required excerpt gate passed; the other four repository task families remain blocked. The current automated scorer is lexical and the current scan excerpt selector did not deliver the cited core implementation files to the model. A result from these inputs would conflate planner quality with a known evidence-retrieval failure and could reward keyword coverage rather than technical correctness.
 
-The task-specific priority selection and missing-evidence gate are implemented and measured. The next live step is one paired Immich IM-01 pilot, but it cannot start until an OIOL provider and OpenCode endpoint/model are configured. Preserve a separate end-to-end measure of default scanner retrieval quality; do not hide the current retrieval weakness by reporting only task-prioritized runs.
+The task-specific priority selection, line-ranged excerpts, and missing-evidence gate are implemented and measured. The latest Immich IM-01 evidence artifact confirms 9/9 paths and 12/12 line ranges delivered, with no missing or unexcerpted ranges. A separate blinded human rubric is ready at [IMMICH_IM01_HUMAN_REVIEW.md](external-tasks/IMMICH_IM01_HUMAN_REVIEW.md). The next live step is one paired Immich IM-01 pilot, but it cannot start until an OIOL provider and OpenCode endpoint/model are configured. Preserve a separate end-to-end measure of default scanner retrieval quality; do not hide the current retrieval weakness by reporting only task-prioritized runs.
 
 No live planning-quality score is claimed in this audit. The available environment has not yet supplied an authorized OIOL provider credential or an OpenCode endpoint/model configuration for live paired runs.
