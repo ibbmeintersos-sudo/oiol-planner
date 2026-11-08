@@ -11,7 +11,7 @@ const tokens = value => {
 };
 const sorted = values => [...values].sort((a, b) => a.localeCompare(b));
 const overlap = (a, b) => sorted([...a].filter(item => b.has(item)));
-const isRequested = request => /\\b(?:database|db|schema|table|column|migration|migrations|ddl|sql|orm|prisma|drizzle|typeorm|sequelize|django|sqlalchemy|foreign\\s+key|index|constraint|nullable|not\\s+null|rollout|rolling\\s+deploy(?:ment)?|backward\\s+compatibility|forward\\s+compatibility|zero\\s+downtime|expand.contract)\\b|قاعد(?:ة|ه)\\s+بيانات|مخطط\\s+البيانات|جدول|جداول|عمود|اعمده|أعمدة|ترحيل|ترحيلات|فهرس|فهارس|توافق\\s+(?:خلفي|امامي|الإصدارات)|نشر\\s+تدريجي/u.test(request);
+const isRequested = request => /\b(?:database|db|schema|table|column|migration|migrations|ddl|sql|orm|prisma|drizzle|typeorm|sequelize|django|sqlalchemy|foreign\s+key|index|constraint|nullable|not\s+null|rollout|rolling\s+deploy(?:ment)?|backward\s+compatibility|forward\s+compatibility|zero\s+downtime|expand.contract)\b|قاعد(?:ة|ه)\s+بيانات|مخطط\s+البيانات|جدول|جداول|عمود|اعمده|أعمدة|ترحيل|ترحيلات|فهرس|فهارس|توافق\s+(?:خلفي|امامي|الإصدارات)|نشر\s+تدريجي/u.test(request);
 const evidenceFields = evidence => evidence ? {
   evidenceId: evidence.id || null,
   sourceSha256: evidence.sourceSha256 || null,
