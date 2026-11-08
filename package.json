@@ -20,7 +20,8 @@
     "benchmark:series": "node scripts/run-benchmark-series.mjs",
     "benchmark:scanner": "node scripts/run-scanner-accuracy-benchmark.mjs",
     "release:check": "node scripts/check-release.mjs",
-    "benchmark:change-impact": "node scripts/run-change-impact-benchmark.mjs"
+    "benchmark:change-impact": "node scripts/run-change-impact-benchmark.mjs",
+    "benchmark:real-world:validate": "node scripts/validate-real-world-corpus.mjs"
   },
   "license": "MIT",
   "optionalDependencies": {
