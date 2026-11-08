@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { validateAnnotationWorklist } from '../scripts/validate-annotation-worklist.mjs';
 
@@ -18,6 +19,13 @@ async function fixture() {
   ]);
   return { intake, primaryReport, additionalReport, batch, worklist };
 }
+
+test('worklist validation CLI succeeds on the checked-in evidence set', () => {
+  const scriptPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/validate-annotation-worklist.mjs');
+  const result = spawnSync(process.execPath, [scriptPath], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(JSON.parse(result.stdout).ready, true);
+});
 
 test('annotation worklist maps all 36 candidates to 34 verified snapshots', async () => {
   const result = validateAnnotationWorklist(await fixture());
