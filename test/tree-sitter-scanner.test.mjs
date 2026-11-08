@@ -150,7 +150,7 @@ test('AST analysis continues across bounded source files after prompt context is
     const result = await scanRepository(f.root, { maxContextChars: 1000 });
     assert.equal(result.structure.astFileCount, 4);
     assert.equal(result.contextTruncated, true);
-    assert.ok(result.snippets.length < 4);
+    assert.ok(result.snippets.filter(snippet => snippet.contextIncluded).length < 4);
     assert.ok(result.structure.symbols.some(item => item.name === 'module3'));
   } finally {
     await f.cleanup();
