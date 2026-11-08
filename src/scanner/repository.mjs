@@ -170,6 +170,9 @@ export async function scanRepository(repoPath, {
     'Syntax-error files: ' + structure.syntaxErrorFileCount,
     'Path-alias imports resolved: ' + structure.pathAliases.resolvedImportCount,
     'Local import edges: ' + structure.dependencyGraph.edgeCount,
+    'Database schema objects: ' + (structure.databaseSchema?.tables?.length || 0),
+    'Database DDL change candidates: ' + (structure.databaseSchema?.changes?.length || 0),
+    'Database schema consumer candidates: ' + (structure.databaseSchema?.consumers?.length || 0),
     'Unresolved local imports: ' + structure.unresolvedLocalImportCount,
     'Fingerprint coverage of structural findings: ' + structure.evidenceCoverage.fingerprintedFindingRate
   ].join('\n');
