@@ -136,7 +136,7 @@ test('AST analysis continues across bounded source files after prompt context is
 test('scanner balances high-value server and web roots before mobile and OpenAPI trees', async () => {
   const f = await fixture('oiol-scan-multi-root-');
   try {
-    for (const directory of ['server/src', 'web/src', 'mobile/lib', 'open-api/specs']) {
+    for (const directory of ['server/src', 'web/src', 'mobile/lib', 'open-api/specs', 'i18n']) {
       await mkdir(path.join(f.root, directory), { recursive: true });
     }
     await writeFile(path.join(f.root, 'package.json'), JSON.stringify({ name: 'multi-root-fixture' }));
@@ -151,6 +151,7 @@ test('scanner balances high-value server and web roots before mobile and OpenAPI
     assert.ok(paths.some(file => file.startsWith('server/src/')));
     assert.ok(paths.some(file => file.startsWith('web/src/')));
     assert.equal(paths.some(file => file.startsWith('open-api/')), false);
+    assert.equal(paths.some(file => file.startsWith('i18n/')), false);
   } finally {
     await f.cleanup();
   }
