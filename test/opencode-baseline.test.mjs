@@ -46,7 +46,10 @@ test('OpenCode baseline deletes a session even when the model returns invalid JS
 });
 
 import { main as baselineMain, createBaselineWorkspace } from '../scripts/run-opencode-baseline.mjs';
+import { resolveScenarioProject } from '../scripts/run-planner-benchmark.mjs';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 test('OpenCode baseline runner dry-run validates config without contacting OpenCode',async()=>{
  const previousArgv=process.argv,previousOptIn=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
@@ -95,5 +98,19 @@ test('greenfield baseline receives an isolated empty workspace',async()=>{
  const workspace=await createBaselineWorkspace({id:'GF-API-001',project:{kind:'greenfield'}});
  try {
   assert.deepEqual(await fs.readdir(workspace.projectDirectory),[]);
+ } finally { await workspace.cleanup(); }
+});
+
+test('external baseline workspace contains only bounded redacted scanner excerpts', async () => {
+ const scenario={id:'EX-API-003',project:{kind:'existing',name:'External Customer API',request:'Review this project'}};
+ const repositoryRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../benchmarks/fixtures/customer-api');
+ const project=await resolveScenarioProject(scenario,{repositoryRoot});
+ const workspace=await createBaselineWorkspace(scenario,{repositoryRoot,project});
+ try {
+  assert.ok((await fs.readdir(workspace.projectDirectory)).length>0);
+  await fs.access(path.join(workspace.projectDirectory,'src/routes/customers.mjs'));
+  await assert.rejects(()=>fs.access(path.join(workspace.projectDirectory,'.git')));
+  const source=await fs.readFile(path.join(workspace.projectDirectory,'src/routes/customers.mjs'),'utf8');
+  assert.ok(source.length<=5000);
  } finally { await workspace.cleanup(); }
 });
