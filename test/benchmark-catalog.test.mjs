@@ -215,7 +215,7 @@ test('external benchmark dry-run requires and fingerprints the repository-specif
   try {
     delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;
     process.argv = ['node', 'run-planner-benchmark.mjs', '--repo', '/unused/checkout', '--scenarios', 'EX-API-003'];
-    await assert.rejects(() => main(), /requires --task-file/);
+    await assert.rejects(() => main(), /require --task-file/);
     await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
     process.argv = ['node', 'run-planner-benchmark.mjs', '--repo', '/unused/checkout', '--task-file', taskPath, '--scenarios', 'EX-API-003', '--dry-run'];
     console.log = value => lines.push(String(value));
