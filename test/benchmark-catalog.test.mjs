@@ -126,7 +126,7 @@ test('external repository input uses the actual scanner and does not leak the op
   assert.equal(project.kind, 'existing');
   assert.equal(project.repository.root, 'external-repository');
   const scannerSummary = summarizeRepositoryEvidence(project);
-  assert.equal(scannerSummary.scannerVersion, '1.3.0');
+  assert.equal(scannerSummary.scannerVersion, '1.4.0');
   assert.equal(scannerSummary.scanLimits.maxFiles, 5000);
   assert.equal(scannerSummary.scanLimits.maxSourceFiles, 500);
   assert.equal(scannerSummary.scanLimits.maxTestFiles, 25);
@@ -255,7 +255,7 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.ok(report.evidence.length > 0);
   assert.equal(JSON.stringify(report).includes(repositoryRoot), false);
   assert.equal(report.root, 'external-repository');
-  assert.equal(report.scannerVersion, '1.3.0');
+  assert.equal(report.scannerVersion, '1.4.0');
   assert.ok(report.skipped.counts);
   assert.ok(report.coverage.sourceAnalysisRatio > 0);
   assert.equal(report.coverage.includedFileCount, report.includedFileCount);
