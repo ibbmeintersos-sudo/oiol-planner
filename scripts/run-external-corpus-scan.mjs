@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
+import { SCANNER_VERSION } from '../src/scanner/repository.mjs';
 import { assertExternalRepositorySnapshot } from './run-planner-benchmark.mjs';
 
 function arg(name, fallback = null) {
@@ -27,7 +28,8 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
   const repository = project.repository;
   return {
     protocolVersion: '1.0',
-    scanRunnerVersion: '1.0.0',
+    scanRunnerVersion: '1.1.0',
+    scannerVersion: repository.scannerVersion || SCANNER_VERSION,
     repositoryId,
     scannedAt: new Date().toISOString(),
     sourceMode: 'operator-supplied-local-checkout',
