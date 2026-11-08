@@ -1,4 +1,5 @@
 import * as TreeSitter from '@xberg-io/tree-sitter-language-pack-wasm';
+import path from 'node:path';
 import { redact } from '../core/utils.mjs';
 
 const EXTENSION_LANGUAGE = new Map([
@@ -196,7 +197,14 @@ const IMPORT_NODES = {
   ruby: new Set(['call'])
 };
 
-function resolveLocalImport(file, language, specifier, fileSet) {
+export function resolveLocalImport(file, language, specifier, fileSet, { goModulePath = null, pythonRoots = ['', 'src', 'lib', 'app'] } = {}) {
+  if (language === 'go' && goModulePath && (specifier === goModulePath || specifier.startsWith(goModulePath + '/'))) {
+    const packagePath = specifier === goModulePath ? '' : specifier.slice(goModulePath.length + 1);
+    const candidates = [...fileSet]
+      .filter(candidate => candidate.endsWith('.go') && path.posix.dirname(candidate) === (packagePath || '.'))
+      .sort();
+    return candidates.find(candidate => path.posix.basename(candidate) === 'doc.go') || candidates[0] || null;
+  }
   if (language === 'python' && /^\.+/.test(specifier)) {
     const dots = specifier.match(/^\.+/)[0].length;
     const rest = specifier.slice(dots).replaceAll('.', '/');
@@ -204,6 +212,14 @@ function resolveLocalImport(file, language, specifier, fileSet) {
     for (let i = 1; i < dots; i++) baseDir = baseDir.split('/').slice(0, -1).join('/');
     const base = [baseDir, rest].filter(Boolean).join('/');
     return [base + '.py', base + '/__init__.py'].find(candidate => fileSet.has(candidate)) || null;
+  }
+  if (language === 'python' && !specifier.startsWith('.')) {
+    const modulePath = specifier.replaceAll('.', '/');
+    for (const root of pythonRoots) {
+      const base = root ? root + '/' + modulePath : modulePath;
+      const target = [base + '.py', base + '/__init__.py'].find(candidate => fileSet.has(candidate));
+      if (target) return target;
+    }
   }
   if (specifier.startsWith('.')) {
     const base = file.split('/').slice(0, -1).concat(specifier).join('/').replace(/\/+/g, '/');
@@ -223,7 +239,7 @@ function resolveLocalImport(file, language, specifier, fileSet) {
   return null;
 }
 
-export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes = 16000 } = {}) {
+export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes = 16000, goModulePath = null, pythonRoots = ['', 'src', 'lib', 'app'] } = {}) {
   const fileSet = new Set(files.map(file => file.replaceAll('\\', '/').replace(/^\.\//, '')));
   const symbols = [], imports = [], diagnostics = [];
   const parsedFiles = [], unsupportedFiles = [], failedFiles = [];
@@ -271,9 +287,9 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
             const text = nodeText(node, sourceBytes);
             for (const specifier of importSpecifiers(language, kind, text)) {
               const safeSpecifier = redact(specifier.split(/[?#]/, 1)[0]).slice(0, 200);
-              const target = resolveLocalImport(file, language, safeSpecifier, fileSet);
+              const target = resolveLocalImport(file, language, safeSpecifier, fileSet, { goModulePath, pythonRoots });
               imports.push({
-                from: file, to: target, specifier: safeSpecifier,
+                from: file, to: target, specifier: safeSpecifier, language,
                 line: byteLine(lineStarts, node.startByte()),
                 resolved: Boolean(target), trustLevel: 'untrusted_repository_metadata',
                 source: 'tree_sitter_ast'
