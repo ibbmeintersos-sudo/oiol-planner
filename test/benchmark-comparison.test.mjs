@@ -27,3 +27,26 @@ test('paired comparison rejects different scenario sets and wrong benchmark mode
  assert.throws(()=>compareBenchmarkModes(oi,{...base,scores:base.scores.slice(0,1)}),/exactly the same scenario IDs/);
  assert.throws(()=>compareBenchmarkModes(base,oi),/First input must be an OIOL/);
 });
+
+test('external paired comparison rejects different repository commits',()=>{
+ const externalO={...oi,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['a'.repeat(40)]}};
+ const externalB={...base,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['b'.repeat(40)]}};
+ assert.throws(()=>compareBenchmarkModes(externalO,externalB),/exact same repository commit SHA set/);
+});
+
+test('external paired comparison accepts the same clean pinned commit',()=>{
+ const snapshot={allGitCommitsDetected:true,commitShas:['c'.repeat(40)]};
+ const result=compareBenchmarkModes(
+  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot}
+ );
+ assert.equal(result.sourceMode,'external-local-checkout');
+ assert.deepEqual(result.repositorySnapshot,snapshot);
+});
+
+test('paired comparison rejects mixing fixture and external repository modes',()=>{
+ assert.throws(()=>compareBenchmarkModes(
+  {...oi,sourceMode:'checked-in-fixtures'},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['d'.repeat(40)]}}
+ ),/same repository source mode/);
+});
