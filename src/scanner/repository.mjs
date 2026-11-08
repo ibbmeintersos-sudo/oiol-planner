@@ -170,6 +170,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   let context = '', contextTruncated = false;
   const snippets = [];
   const sourceContents = Object.create(null);
+  const excerptedRangeKeys = new Set();
+  const rangeKey = range => range.path + ':' + range.startLine + '-' + range.endLine;
   for (const file of selected) {
     try {
       const buffer = await fs.readFile(path.join(root, file));
@@ -182,10 +184,19 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
       let content;
       if (fileRanges.length) {
         const lines = redactedText.split(/\r?\n/);
-        content = fileRanges.map(range => {
+        const segments = [];
+        let remainingChars = maxPriorityExcerptChars;
+        for (const range of fileRanges) {
+          if (range.startLine > lines.length) continue;
           const endLine = Math.min(range.endLine, lines.length);
-          return '[EVIDENCE RANGE: ' + file + ':' + range.startLine + '-' + endLine + ']\n' + lines.slice(range.startLine - 1, endLine).join('\n');
-        }).join('\n\n').slice(0, maxPriorityExcerptChars);
+          const segment = '[EVIDENCE RANGE: ' + file + ':' + range.startLine + '-' + endLine + ']\n' + lines.slice(range.startLine - 1, endLine).join('\n');
+          const separator = segments.length ? '\n\n' : '';
+          if (segment.length + separator.length > remainingChars) continue;
+          segments.push(segment);
+          remainingChars -= segment.length + separator.length;
+          excerptedRangeKeys.add(rangeKey(range));
+        }
+        content = segments.join('\n\n');
       } else content = redactedText.slice(0, 5000);
       const id = evidenceId(file);
       if (context.length + content.length > maxContextChars) { contextTruncated = true; continue; }
@@ -210,7 +221,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
 
   const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests, maxFileBytes });
   const excerptedPriorityPaths = matchedPriorityPaths.filter(file => snippets.some(snippet => snippet.path === file));
-  const excerptedRanges = normalizedPriorityRanges.filter(range => excerptedPriorityPaths.includes(range.path));
+  const excerptedRanges = normalizedPriorityRanges.filter(range => excerptedRangeKeys.has(rangeKey(range)));
   const evidenceSelection = {
     requestedPaths: normalizedPriorityPaths,
     matchedPaths: matchedPriorityPaths,
@@ -219,8 +230,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     unexcerptedPaths: matchedPriorityPaths.filter(file => !excerptedPriorityPaths.includes(file)),
     requestedRanges: normalizedPriorityRanges,
     excerptedRanges,
-    missingRanges: normalizedPriorityRanges.filter(range => !files.includes(range.path)),
-    unexcerptedRanges: normalizedPriorityRanges.filter(range => !excerptedPriorityPaths.includes(range.path))
+    missingRanges: normalizedPriorityRanges.filter(range => !files.includes(range.path) || (excerptedPriorityPaths.includes(range.path) && !excerptedRangeKeys.has(rangeKey(range)) && !sourceContents[range.path])),
+    unexcerptedRanges: normalizedPriorityRanges.filter(range => files.includes(range.path) && !excerptedRangeKeys.has(rangeKey(range)))
   };
   const structureSummary = [
     'Repository structure analysis (Tree-sitter AST where bundled grammars are available; bounded lexical fallback otherwise; evidence, not certainty):',
