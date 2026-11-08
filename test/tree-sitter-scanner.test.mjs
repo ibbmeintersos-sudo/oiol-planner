@@ -156,3 +156,22 @@ test('scanner balances high-value server and web roots before mobile and OpenAPI
     await f.cleanup();
   }
 });
+
+test('scanner reports source files in unsupported languages instead of silently omitting them', async () => {
+  const f = await fixture('oiol-unsupported-languages-');
+  try {
+    await mkdir(path.join(f.root, 'server', 'src'), { recursive: true });
+    await mkdir(path.join(f.root, 'mobile', 'lib'), { recursive: true });
+    await mkdir(path.join(f.root, 'native'), { recursive: true });
+    await writeFile(path.join(f.root, 'server', 'src', 'main.ts'), 'export function main() { return true; }\n');
+    await writeFile(path.join(f.root, 'mobile', 'lib', 'main.dart'), 'class MainScreen {}\n');
+    await writeFile(path.join(f.root, 'native', 'main.swift'), 'struct NativeApp {}\n');
+    const result = await scanRepository(f.root);
+    assert.equal(result.structure.sourceFileCount, 3);
+    assert.equal(result.structure.analyzedSourceFileCount, 1);
+    assert.equal(result.structure.unsupportedLanguageFileCount, 2);
+    assert.deepEqual(result.structure.unsupportedLanguageFiles.sort(), ['mobile/lib/main.dart', 'native/main.swift']);
+  } finally {
+    await f.cleanup();
+  }
+});
