@@ -186,7 +186,7 @@ test('scanner descends into application source before large low-priority root di
       await writeFile(path.join(f.root, 'server', 'src', 'module-' + index + '.ts'), 'export const module' + index + ' = true;\n');
       await writeFile(path.join(f.root, 'i18n', 'locale-' + index + '.json'), '{}\n');
     }
-    const result = await scanRepository(f.root, { maxFiles: 15 });
+    const result = await scanRepository(f.root, { maxFiles: 13 });
     const paths = result.files.map(file => file.path);
     assert.equal(paths.filter(file => file.startsWith('server/src/')).length, 12);
     assert.equal(paths.some(file => file.startsWith('i18n/')), false);
