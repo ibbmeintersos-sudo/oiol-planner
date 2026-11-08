@@ -26,9 +26,7 @@ Use Node.js 22 or 24. Configure planning and reviewer providers using the `OIOL_
 The benchmark can incur provider charges. Explicitly opt in before live calls:
 
 ```sh
-OIOL_BENCHMARK_ALLOW_LIVE=1 \
-OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 \
-node scripts/run-planner-benchmark.mjs
+OIOL_BENCHMARK_ALLOW_LIVE=1 node scripts/run-planner-benchmark.mjs
 ```
 
 Run a subset or choose an output path:
@@ -69,7 +67,9 @@ The benchmark runners accept an operator-supplied **local Git checkout** for Exi
 First, obtain a public repository checkout outside OIOL and ensure its working tree is clean. Then run one or more Existing Project scenarios against it:
 
 ```sh
-OIOL_BENCHMARK_ALLOW_LIVE=1 node scripts/run-planner-benchmark.mjs \
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 \
+node scripts/run-planner-benchmark.mjs \
   --repo /absolute/path/to/clean/checkout \
   --task-file /absolute/path/to/repository-task.json \
   --scenarios EX-API-003 \
