@@ -102,6 +102,7 @@ test('change impact includes database schema analysis while preserving planning-
 
   assert.equal(result.status, 'analyzed');
   assert.equal(result.databaseSchemaImpact.status, 'analyzed');
+  assert.equal(result.apiContractImpact.status, 'not_requested');
   assert.ok(result.databaseSchemaImpact.schemaChanges.some(item => item.operation === 'drop_column'));
   assert.match(result.limitations.join(' '), /does not edit repository files or execute commands/i);
 });
