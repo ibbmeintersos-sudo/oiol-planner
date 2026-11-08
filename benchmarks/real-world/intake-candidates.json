@@ -7,7 +7,8 @@
     "Change commit is the merged PR commit. Historical changed paths are evidence only and are not treated as the complete impact ground truth.",
     "No target repository code has been executed. Snapshot archives and content fingerprints have not yet been collected.",
     "Each case requires two independent blinded reviewers and adjudication where needed before it can enter manifest.json.",
-    "The first large-project candidate batch was adjusted after exact base-tree counting: VS Code has 19,119 tracked files and is therefore medium under the strict >20,000 large threshold; Home Assistant Core (30,403 tracked files at its PR base) replaces it in the large cohort."
+    "The first large-project candidate batch was adjusted after exact base-tree counting: VS Code has 19,119 tracked files and is therefore medium under the strict >20,000 large threshold; Home Assistant Core (30,403 tracked files at its PR base) replaces it in the large cohort.",
+    "VS Code is retained as a medium-size reserve candidate (19,119 tracked files) and is excluded from the 12-repository first batch so the required 4/4/4 strata remain balanced."
   ],
   "targetDistribution": {
     "small": 4,
@@ -276,84 +277,6 @@
       }
     },
     {
-      "caseId": "vscode-agent-host-shell-output",
-      "source": {
-        "repository": "microsoft/vscode",
-        "repositoryUrl": "https://github.com/microsoft/vscode",
-        "license": "MIT",
-        "licenseFile": "LICENSE.txt",
-        "licenseFileUrl": "https://github.com/microsoft/vscode/blob/eb47bf7592b0412fb056dbe631cdaa9bfeed9d17/LICENSE.txt",
-        "baseCommit": "eb47bf7592b0412fb056dbe631cdaa9bfeed9d17",
-        "changeCommit": "95dce80d5e39707263b26d7c3b6884a57582fd48",
-        "sizeClass": "medium",
-        "trackedFileCountAtBase": 19119,
-        "primaryLanguages": [
-          "TypeScript"
-        ],
-        "repositoryKind": "workspace"
-      },
-      "change": {
-        "pullRequest": 335016,
-        "url": "https://github.com/microsoft/vscode/pull/335016",
-        "mergedAt": "2026-09-23T23:06:02Z",
-        "title": "Retain full Copilot shell output through terminal subscriptions",
-        "category": "cross_component",
-        "candidateRequest": "Preserve complete non-PTY agent shell output through subscription-backed terminal resources so users can inspect the full command output.",
-        "historicalChangedPaths": [
-          "src/vs/base/common/network.ts",
-          "src/vs/platform/agentHost/common/agentHostSubscriptionService.ts",
-          "src/vs/platform/agentHost/common/nonPtyShellTerminalUri.ts",
-          "src/vs/platform/agentHost/common/sessionDataService.ts",
-          "src/vs/platform/agentHost/common/state/protocol/.ahp-version",
-          "src/vs/platform/agentHost/common/state/protocol/channels-chat/state.ts",
-          "src/vs/platform/agentHost/node/agentHostTerminalManager.ts",
-          "src/vs/platform/agentHost/node/agentService.ts",
-          "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts",
-          "src/vs/platform/agentHost/node/copilot/copilotNonPtyShellTerminals.ts",
-          "src/vs/platform/agentHost/node/copilot/mapSessionEvents.ts",
-          "src/vs/platform/agentHost/node/sessionDatabase.ts",
-          "src/vs/platform/agentHost/test/common/agentSubscription.test.ts",
-          "src/vs/platform/agentHost/test/common/nonPtyShellTerminalUri.test.ts",
-          "src/vs/platform/agentHost/test/common/sessionTestHelpers.ts",
-          "src/vs/platform/agentHost/test/node/agentHostTerminalManager.test.ts",
-          "src/vs/platform/agentHost/test/node/agentService.test.ts",
-          "src/vs/platform/agentHost/test/node/agentSessionResidency.test.ts",
-          "src/vs/platform/agentHost/test/node/copilotAgent.test.ts",
-          "src/vs/platform/agentHost/test/node/copilotAgentSession.test.ts",
-          "src/vs/platform/agentHost/test/node/copilotNonPtyShellTerminals.test.ts",
-          "src/vs/platform/agentHost/test/node/copilotShellTools.test.ts",
-          "src/vs/platform/agentHost/test/node/e2e/captures/copilotcli-shell-full-output-is-readable-through-its-historical-terminal-resource.yaml",
-          "src/vs/platform/agentHost/test/node/e2e/suites/copilotCoverageSuite.ts",
-          "src/vs/platform/agentHost/test/node/mapSessionEvents.test.ts",
-          "src/vs/platform/agentHost/test/node/sessionDataService.test.ts",
-          "src/vs/platform/agentHost/test/node/sessionDatabase.test.ts",
-          "src/vs/platform/agentHost/test/node/testAgentHostTerminalManager.ts",
-          "src/vs/workbench/contrib/chat/browser/accessibility/chatTerminalOutputAccessibleView.ts",
-          "src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts",
-          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts",
-          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/chatTerminalOutputTextModelContentProvider.ts",
-          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts",
-          "src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts",
-          "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatTerminalToolProgressPart.css",
-          "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/toolInvocationParts/chatTerminalToolProgressPart.ts",
-          "src/vs/workbench/contrib/chat/common/chatService/chatService.ts",
-          "src/vs/workbench/contrib/chat/common/model/chatModel.ts",
-          "src/vs/workbench/contrib/chat/common/widget/chatResponseResourceFileSystemProvider.ts",
-          "src/vs/workbench/contrib/chat/test/browser/accessibility/chatAccessibilityHelp.test.ts",
-          "src/vs/workbench/contrib/chat/test/browser/accessibility/chatTerminalOutputAccessibleView.test.ts",
-          "src/vs/workbench/contrib/chat/test/browser/agentSessions/agentHostChatContribution.test.ts",
-          "src/vs/workbench/contrib/chat/test/browser/agentSessions/chatTerminalOutputTextModelContentProvider.test.ts",
-          "src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts",
-          "src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatTerminalToolProgressPart.test.ts",
-          "src/vs/workbench/contrib/chat/test/common/model/chatModel.test.ts",
-          "src/vs/workbench/contrib/chat/test/common/widget/chatResponseResourceFileSystemProvider.test.ts",
-          "src/vs/workbench/contrib/terminal/browser/terminal.ts",
-          "src/vs/workbench/test/browser/componentFixtures/chat/chatTerminalFullOutput.fixture.ts"
-        ],
-        "changedFileCount": 49
-      }
-    },
-    {
       "caseId": "kubernetes-spdy-upgrade-failure-close",
       "source": {
         "repository": "kubernetes/kubernetes",
@@ -482,6 +405,86 @@
           "tests/components/unifi/test_init.py"
         ],
         "changedFileCount": 5
+      }
+    }
+  ],
+  "reserveCandidates": [
+    {
+      "caseId": "vscode-agent-host-shell-output",
+      "source": {
+        "repository": "microsoft/vscode",
+        "repositoryUrl": "https://github.com/microsoft/vscode",
+        "license": "MIT",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/microsoft/vscode/blob/eb47bf7592b0412fb056dbe631cdaa9bfeed9d17/LICENSE.txt",
+        "baseCommit": "eb47bf7592b0412fb056dbe631cdaa9bfeed9d17",
+        "changeCommit": "95dce80d5e39707263b26d7c3b6884a57582fd48",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 19119,
+        "primaryLanguages": [
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 335016,
+        "url": "https://github.com/microsoft/vscode/pull/335016",
+        "mergedAt": "2026-09-23T23:06:02Z",
+        "title": "Retain full Copilot shell output through terminal subscriptions",
+        "category": "cross_component",
+        "candidateRequest": "Preserve complete non-PTY agent shell output through subscription-backed terminal resources so users can inspect the full command output.",
+        "historicalChangedPaths": [
+          "src/vs/base/common/network.ts",
+          "src/vs/platform/agentHost/common/agentHostSubscriptionService.ts",
+          "src/vs/platform/agentHost/common/nonPtyShellTerminalUri.ts",
+          "src/vs/platform/agentHost/common/sessionDataService.ts",
+          "src/vs/platform/agentHost/common/state/protocol/.ahp-version",
+          "src/vs/platform/agentHost/common/state/protocol/channels-chat/state.ts",
+          "src/vs/platform/agentHost/node/agentHostTerminalManager.ts",
+          "src/vs/platform/agentHost/node/agentService.ts",
+          "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts",
+          "src/vs/platform/agentHost/node/copilot/copilotNonPtyShellTerminals.ts",
+          "src/vs/platform/agentHost/node/copilot/mapSessionEvents.ts",
+          "src/vs/platform/agentHost/node/sessionDatabase.ts",
+          "src/vs/platform/agentHost/test/common/agentSubscription.test.ts",
+          "src/vs/platform/agentHost/test/common/nonPtyShellTerminalUri.test.ts",
+          "src/vs/platform/agentHost/test/common/sessionTestHelpers.ts",
+          "src/vs/platform/agentHost/test/node/agentHostTerminalManager.test.ts",
+          "src/vs/platform/agentHost/test/node/agentService.test.ts",
+          "src/vs/platform/agentHost/test/node/agentSessionResidency.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotAgent.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotAgentSession.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotNonPtyShellTerminals.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotShellTools.test.ts",
+          "src/vs/platform/agentHost/test/node/e2e/captures/copilotcli-shell-full-output-is-readable-through-its-historical-terminal-resource.yaml",
+          "src/vs/platform/agentHost/test/node/e2e/suites/copilotCoverageSuite.ts",
+          "src/vs/platform/agentHost/test/node/mapSessionEvents.test.ts",
+          "src/vs/platform/agentHost/test/node/sessionDataService.test.ts",
+          "src/vs/platform/agentHost/test/node/sessionDatabase.test.ts",
+          "src/vs/platform/agentHost/test/node/testAgentHostTerminalManager.ts",
+          "src/vs/workbench/contrib/chat/browser/accessibility/chatTerminalOutputAccessibleView.ts",
+          "src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts",
+          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts",
+          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/chatTerminalOutputTextModelContentProvider.ts",
+          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts",
+          "src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts",
+          "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatTerminalToolProgressPart.css",
+          "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/toolInvocationParts/chatTerminalToolProgressPart.ts",
+          "src/vs/workbench/contrib/chat/common/chatService/chatService.ts",
+          "src/vs/workbench/contrib/chat/common/model/chatModel.ts",
+          "src/vs/workbench/contrib/chat/common/widget/chatResponseResourceFileSystemProvider.ts",
+          "src/vs/workbench/contrib/chat/test/browser/accessibility/chatAccessibilityHelp.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/accessibility/chatTerminalOutputAccessibleView.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/agentSessions/agentHostChatContribution.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/agentSessions/chatTerminalOutputTextModelContentProvider.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatTerminalToolProgressPart.test.ts",
+          "src/vs/workbench/contrib/chat/test/common/model/chatModel.test.ts",
+          "src/vs/workbench/contrib/chat/test/common/widget/chatResponseResourceFileSystemProvider.test.ts",
+          "src/vs/workbench/contrib/terminal/browser/terminal.ts",
+          "src/vs/workbench/test/browser/componentFixtures/chat/chatTerminalFullOutput.fixture.ts"
+        ],
+        "changedFileCount": 49
       }
     }
   ]
