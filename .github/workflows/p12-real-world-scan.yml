@@ -35,6 +35,12 @@ jobs:
           - id: RW-GO-01
             repository: go-gitea/gitea
             ref: edebfaa12516a140d7ee3fcbaf25a6a1cc2cdb76
+          - id: RW-RS-03
+            repository: vercel/turborepo
+            ref: 17691acd9bc80171e5ef4b3532ff0748ba231813
+          - id: RW-EX-04
+            repository: plausible/analytics
+            ref: 31fc1910fe9be0362b27dacbd2886f16442da20f
     steps:
       - name: Check out OIOL planner
         uses: actions/checkout@v4
