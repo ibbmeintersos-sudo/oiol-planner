@@ -34,7 +34,21 @@ export function benchmarkConfigFingerprint(config) {
   return createHash('sha256').update(JSON.stringify(config)).digest('hex');
 }
 
-export async function resolveScenarioProject(scenario) {
+export async function resolveScenarioProject(scenario, { repositoryRoot = null } = {}) {
+  if (repositoryRoot) {
+    if (scenario.project?.kind !== 'existing') {
+      throw new Error('An external repository can only be used with Existing Project scenarios');
+    }
+    const project = await analyzeProject({
+      mode: 'existing',
+      repo: path.resolve(repositoryRoot),
+      name: scenario.project.name,
+      request: scenario.project.request
+    });
+    // Do not expose the operator's absolute local path in plans or benchmark artifacts.
+    project.repository.root = 'external-repository';
+    return project;
+  }
   const fixturePath=scenario.project?.fixturePath;
   if(!fixturePath) return scenario.project;
   const repoPath=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..',fixturePath);
@@ -62,7 +76,7 @@ export function aggregateUsage(records) {
 
 export async function main() {
   const selected=arg('scenarios','all');
-  const chosen=selectScenarios(selected);
+  const chosen=selectScenarios(selected);\n  const repositoryRoot=arg('repo',process.env.OIOL_BENCHMARK_REPOSITORY||null);\n  if(repositoryRoot && chosen.some(scenario=>scenario.project?.kind!=='existing')) throw new Error('--repo can only be used with Existing Project scenarios');
   if(process.argv.includes('--list')) {
     for(const s of scenarios) console.log(s.id+' ['+s.category+'/'+s.difficulty+']'+(s.mustClarify?' blocking clarification required':''));
     return 0;
@@ -83,7 +97,7 @@ export async function main() {
   for(const scenario of chosen){
     const started=Date.now();
     try{
-      const project=await resolveScenarioProject(scenario);
+      const project=await resolveScenarioProject(scenario,{repositoryRoot});
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan});
       console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
