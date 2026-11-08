@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-MONOLITH-004",
   "taskId": "RW-BA-01",
-  "taskVersion": "0.3.0-draft",
+  "taskVersion": "0.4.0-draft",
   "projectName": "Better Auth",
   "request": "Plan an opt-in organization-plugin option that revokes all active authentication sessions belonging to a user after that user is successfully removed from an organization. This is explicitly user-wide: sessions used with the user's other organizations are also ended. Keep default behavior unchanged. Do not revoke API keys, OAuth grants, or unrelated credentials. Preserve the existing member-removal hook and failure semantics.",
   "constraints": [
@@ -53,5 +53,14 @@
     ]
   ],
   "mustClarify": false,
-  "clarificationSignals": []
+  "clarificationSignals": [],
+  "evidencePaths": [
+    "packages/better-auth/src/plugins/organization/routes/crud-members.ts",
+    "packages/better-auth/src/plugins/organization/types.ts",
+    "packages/better-auth/src/plugins/multi-session/index.ts",
+    "packages/better-auth/src/api/routes/session.ts",
+    "packages/core/src/db/schema/session.ts",
+    "packages/better-auth/src/plugins/organization/organization.test.ts",
+    "packages/better-auth/src/plugins/multi-session/multi-session.test.ts"
+  ]
 }
