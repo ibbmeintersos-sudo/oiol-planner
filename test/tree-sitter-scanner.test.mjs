@@ -326,3 +326,39 @@ test('scanner parses Dart and Swift sources and extracts their import declaratio
     await f.cleanup();
   }
 });
+
+
+test('scanner prioritizes task evidence paths and reports missing or unexcerpted paths', async () => {
+  const f = await fixture('oiol-task-evidence-priority-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    await mkdir(path.join(f.root, 'tests'), { recursive: true });
+    await writeFile(path.join(f.root, 'package.json'), JSON.stringify({ name: 'task-evidence-fixture' }));
+    await writeFile(path.join(f.root, 'src', 'a.js'), 'export const a = 1;\n');
+    await writeFile(path.join(f.root, 'src', 'z-critical.js'), 'export function critical() { return "critical evidence"; }\n');
+    await writeFile(path.join(f.root, 'tests', 'z-critical.test.js'), 'test("critical", () => {});\n');
+    const result = await scanRepository(f.root, {
+      maxContextChars: 5000,
+      maxSourceFiles: 1,
+      priorityPaths: ['src/z-critical.js', 'tests/z-critical.test.js', 'src/missing.js']
+    });
+    const snippetPaths = result.snippets.map(item => item.path);
+    assert.deepEqual(snippetPaths.slice(0, 2), ['src/z-critical.js', 'tests/z-critical.test.js']);
+    assert.deepEqual(result.evidenceSelection.requestedPaths, ['src/z-critical.js', 'tests/z-critical.test.js', 'src/missing.js']);
+    assert.deepEqual(result.evidenceSelection.excerptedPaths, ['src/z-critical.js', 'tests/z-critical.test.js']);
+    assert.deepEqual(result.evidenceSelection.missingPaths, ['src/missing.js']);
+    assert.deepEqual(result.evidenceSelection.unexcerptedPaths, []);
+  } finally {
+    await f.cleanup();
+  }
+});
+
+test('scanner rejects unsafe task evidence paths', async () => {
+  const f = await fixture('oiol-task-evidence-unsafe-');
+  try {
+    await assert.rejects(() => scanRepository(f.root, { priorityPaths: ['../outside.js'] }), /Unsafe priority evidence path/);
+    await assert.rejects(() => scanRepository(f.root, { priorityPaths: ['.env'] }), /Sensitive priority evidence path/);
+  } finally {
+    await f.cleanup();
+  }
+});
