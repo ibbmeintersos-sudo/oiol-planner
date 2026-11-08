@@ -276,12 +276,12 @@ test('scanner resolves Go module imports and Python absolute package imports', a
   try {
     await mkdir(path.join(f.root, 'pkg'), { recursive: true });
     await mkdir(path.join(f.root, 'src', 'pypkg'), { recursive: true });
-    await writeFile(path.join(f.root, 'go.mod'), 'module example.com/oiol\\n\\ngo 1.22\\n');
-    await writeFile(path.join(f.root, 'pkg', 'a.go'), 'package pkg\\nimport "example.com/oiol/pkg/b"\\nfunc A() { b.B() }\\n');
-    await writeFile(path.join(f.root, 'pkg', 'b.go'), 'package b\\nfunc B() {}\\n');
+    await writeFile(path.join(f.root, 'go.mod'), 'module example.com/oiol\n\ngo 1.22\n');
+    await writeFile(path.join(f.root, 'pkg', 'a.go'), 'package pkg\nimport "example.com/oiol/pkg/b"\nfunc A() { b.B() }\n');
+    await writeFile(path.join(f.root, 'pkg', 'b.go'), 'package b\nfunc B() {}\n');
     await writeFile(path.join(f.root, 'src', 'pypkg', '__init__.py'), '');
-    await writeFile(path.join(f.root, 'src', 'pypkg', 'a.py'), 'from pypkg.b import B\\ndef a(): return B()\\n');
-    await writeFile(path.join(f.root, 'src', 'pypkg', 'b.py'), 'def B(): return True\\n');
+    await writeFile(path.join(f.root, 'src', 'pypkg', 'a.py'), 'from pypkg.b import B\ndef a(): return B()\n');
+    await writeFile(path.join(f.root, 'src', 'pypkg', 'b.py'), 'def B(): return True\n');
     const result = await scanRepository(f.root, { maxSourceFiles: 50 });
     const edges = result.structure.dependencyGraph.edges;
     assert.ok(edges.some(edge => edge.from === 'pkg/a.go' && edge.to === 'pkg/b.go' && edge.resolution === 'go-module-package-representative'));
