@@ -1,5 +1,5 @@
 const sorted = values => [...new Set(values)].sort((a, b) => a.localeCompare(b));
-const isTestPath = value => /(^|\\/)(?:__tests__|tests?|spec)(\\/|$)|\\.(?:test|spec)\\.[^.]+$/i.test(String(value || '').replaceAll('\\\\', '/'));
+const isTestPath = value => { const normalized = String(value || '').split(String.fromCharCode(92)).join('/'); const segments = normalized.split('/'); return segments.some(segment => ['__tests__', 'test', 'tests', 'spec'].includes(segment.toLowerCase())) || /\\.(?:test|spec)\\.[^.]+$/i.test(segments.at(-1) || ''); };
 
 function addCandidate(map, level, rationale, evidence = []) {
   if (!map.has(level)) map.set(level, { level, rationale: [], evidence: [] });
