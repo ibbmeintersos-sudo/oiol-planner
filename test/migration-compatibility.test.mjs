@@ -91,7 +91,7 @@ test('database impact exposes migration compatibility as part of the static esti
 
   assert.equal(result.status, 'analyzed');
   assert.equal(result.migrationCompatibility.status, 'analyzed');
-  assert.equal(result.migrationCompatibility.compatibilityFindings.length, 3);
+  assert.equal(result.migrationCompatibility.compatibilityFindings.length, 4);
 });
 
 test('migration compatibility reports unavailable evidence rather than claiming no migrations', () => {
