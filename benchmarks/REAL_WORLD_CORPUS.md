@@ -1,6 +1,6 @@
 # P12 — Real-world repository benchmark corpus
 
-Status: **candidate corpus assembled; scanner intake completed for five prioritized repositories; live planning benchmarks and independent human adjudication remain pending**.
+Status: **seven pinned real-world repositories have successful scanner-only intake artifacts; per-report coverage/diagnostic audit, repository-specific task approval, live planning benchmarks, and independent human adjudication remain pending**.
 
 This registry is the intake list for P12. It is separate from the ten synthetic starter scenarios. A repository is not considered benchmarked merely because its README was inspected or its URL was collected.
 
@@ -36,8 +36,8 @@ PostHog was reviewed as a stretch target because its repository is substantially
 |---|---:|---:|---:|---:|---:|
 | go-gitea/gitea | Yes | Yes | Expanded scan complete (truncated) | Draft JSON (pending human approval) | Pending |
 | better-auth/better-auth | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
-| vercel/turborepo | Yes | Pending | Pending | Pending | Pending |
-| plausible/analytics | Yes | Pending | Pending | Pending | Pending |
+| vercel/turborepo | Yes | Yes | Report generated; audit pending | Not drafted | Pending |
+| plausible/analytics | Yes | Yes | Report generated; audit pending | Not drafted | Pending |
 | paperless-ngx/paperless-ngx | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
 | immich-app/immich | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
 | PrefectHQ/prefect | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
@@ -61,7 +61,7 @@ The following values were retrieved from GitHub repository metadata on 2026-11-0
 
 The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size and unresolved GitHub license metadata.
 
-A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path, and the first-pass scanner-only intake completed for the five prioritized repositories. No live model benchmark is claimed yet.
+A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path. The original five-repository intake and the expanded seven-repository scanner-only workflow have completed; the newest two reports still require coverage and diagnostics review. No live model benchmark is claimed.
 
 ## Observed remote default-branch tips
 
@@ -157,6 +157,13 @@ A subsequent scanner intake completed successfully for all five pinned repositor
 
 The follow-up run's per-repository artifacts are the authoritative reports for the updated scanner behavior. The quantitative table above describes the earlier expanded profile run and must not be reused as if it were the new run's coverage numbers. Refresh the table only after inspecting and comparing all five follow-up artifacts.
 
+
+## Seven-repository scanner intake — 2026-11-08
+
+The expanded scanner workflow completed successfully for all seven pinned checkouts in [P12 run 39](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42503950232). GitHub Actions reports seven successful jobs and seven uploaded artifacts. The two added candidates are Turborepo (Rust/TypeScript developer tooling) and Plausible (Elixir analytics application). This establishes checkout and scanner-run feasibility only; it does not establish adequate evidence coverage.
+
+Before either new repository is used in a scored planning run, inspect its artifact for file-count bounds, truncation, AST-versus-lexical coverage, unsupported languages, parse/syntax diagnostics, discovered tests/configuration, and evidence fingerprints. Do not author or promote repository-specific tasks until their paths and claims are checked against the pinned scan evidence. The existing five repositories' prior quantitative table remains tied to the earlier five-repository follow-up run and must not be extrapolated to this seven-repository run.
+
 ## Required intake record before a repository can enter a scored run
 
 For every selected repository, record:
@@ -189,7 +196,7 @@ The earlier fixture-only input gap has been addressed in the benchmark harness:
 
 The local environment used for this development could not clone GitHub after three attempts because DNS resolution failed. GitHub Actions was used instead to check out five public repositories at pinned commits and run OIOL's scanner. The first pass completed but hit the 250-file bound on all five; the expanded second pass is being prepared. No live model benchmark is claimed yet.
 
-**Current P12 state:** external-repository input plumbing is implemented and committed; five pinned first-pass scanner runs have completed, but all hit the original file bound. The expanded second pass, repository-specific task promotion, repeated model runs, and blinded human reviews remain. The candidate corpus is not a completed benchmark. Five repositories now have two draft task blueprints each; none has passed the scanner-evidence promotion gate.
+**Current P12 state (2026-11-08):** external-repository input plumbing is implemented and committed. Seven pinned scanner-only jobs completed successfully in [P12 seven-repository intake run](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42503950232), producing seven per-repository artifacts. The two newly added repositories (Turborepo and Plausible) have not yet had their report coverage/diagnostics audited and have no repository-specific task drafts. Five repositories have two task drafts each; all ten remain drafts pending independent human approval and promotion. No live model benchmark or blinded human score is claimed. The candidate corpus is not a completed benchmark.
 
 ## Harness validation snapshot (2026-11-08)
 
