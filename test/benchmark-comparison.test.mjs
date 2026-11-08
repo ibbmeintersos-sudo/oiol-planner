@@ -50,3 +50,13 @@ test('paired comparison rejects mixing fixture and external repository modes',()
   {...base,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['d'.repeat(40)]}}
  ),/same repository source mode/);
 });
+
+test('external paired comparison rejects different task definition hashes',()=>{
+ const snapshot={allGitCommitsDetected:true,commitShas:['e'.repeat(40)]};
+ const taskA={id:'RW-A',version:'1.0.0',sha256:'1'.repeat(64)};
+ const taskB={id:'RW-B',version:'1.0.0',sha256:'2'.repeat(64)};
+ assert.throws(()=>compareBenchmarkModes(
+  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition:taskA},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition:taskB}
+ ),/same versioned task definition/);
+});
