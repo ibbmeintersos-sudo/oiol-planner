@@ -67,6 +67,12 @@ Supported providers:
 
 Configuration is read from .env when supported by the Node runtime, or from shell environment variables. For a distinct reviewer configuration, configure OIOL_REVIEW_PROVIDER and optional reviewer model, base URL, API key, and timeout variables. A critique using the same provider configuration cannot certify readiness. A distinct reviewer approval can move a structurally valid plan to ready_for_review; this means ready for human review, not implementation authorization or evidence of implementation.
 
+## GitHub Action
+
+OIOL can review pull requests as a planning-only GitHub Action. It scans the repository, generates a plan, uploads `plan.json` and `plan.md` as artifacts, and optionally posts a short summary comment. It does not run the target project's tests, builds, or scripts.
+
+Copy [`examples/github-actions/oiol-review.yml`](examples/github-actions/oiol-review.yml) to `.github/workflows/`, add an `OIOL_API_KEY` repository secret, and adjust the planning request. See [`docs/GITHUB_ACTION.md`](docs/GITHUB_ACTION.md) for inputs, permissions, and the security model. Never use `pull_request_target` with a checkout of pull request code.
+
 ## Configuration file
 
 \`oiol.config.json\` is optional; OIOL also works with environment variables only. Profiles keep provider settings in one place:
