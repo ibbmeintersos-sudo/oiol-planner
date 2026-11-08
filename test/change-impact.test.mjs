@@ -152,3 +152,30 @@ test('impact traversal is bounded by configured result limits', () => {
   assert.ok(result.affectedPackages.length <= 1);
   assert.ok(result.risks.includes('impact_graph_truncated_by_result_limit'));
 });
+
+test('long natural-language requests do not dilute strong path and symbol matches below the threshold', () => {
+  const result = analyzeChangeImpact({
+    request: 'Please add authentication for user accounts and ensure the profile route validates the session before reading customer information',
+    repository: makeRepository()
+  });
+
+  assert.equal(result.status, 'analyzed');
+  assert.ok(result.directMatches.some(item => item.path === 'packages/auth-core/src/session-manager.ts'));
+  assert.ok(result.matchingDiagnostics.matchedRequestTerms.includes('auth'));
+  assert.ok(result.matchingDiagnostics.matchedRequestTerms.includes('user'));
+  assert.ok(result.matchingDiagnostics.requestTermCount > 4);
+});
+
+test('direct-match cap is explicit and reports omitted candidate count', () => {
+  const result = analyzeChangeImpact({
+    request: 'authentication user',
+    repository: makeRepository(),
+    maxDirectMatches: 1
+  });
+
+  assert.equal(result.matchingDiagnostics.directMatchLimitReached, true);
+  assert.equal(result.matchingDiagnostics.directMatchLimit, 1);
+  assert.ok(result.matchingDiagnostics.directMatchCountBeforeLimit > result.directMatches.length);
+  assert.ok(result.confidence.penalties.includes('direct_match_result_limit_reached'));
+});
+
