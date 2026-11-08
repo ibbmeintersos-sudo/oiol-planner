@@ -7,7 +7,6 @@ import { initCommand } from './commands/init.mjs';
 import { doctorCommand } from './commands/doctor.mjs';
 
 const cliPath = resolve(dirname(fileURLToPath(import.meta.url)), 'cli.mjs');
-const SUBCOMMANDS = new Set(['init', 'doctor', 'plan', 'validate']);
 
 function printHelp() {
   console.log(`Usage: oiol <command> [options]
@@ -49,6 +48,7 @@ function parseGlobalFlags(args) {
 }
 
 async function prepareEnv(configPath, profileName) {
+  try { process.loadEnvFile?.(); } catch { /* .env is optional */ }
   const explicitConfig = Boolean(configPath || process.env.OIOL_CONFIG);
   const config = await loadConfig(configPath || process.env.OIOL_CONFIG || CONFIG_FILE);
   if (!config) {
@@ -88,7 +88,7 @@ async function main() {
     return 0;
   }
 
-  if (command === 'init') return initCommand(rest.slice(1));
+  if (command === 'init') return initCommand(rest.slice(1), { profileName });
 
   if (command === 'doctor') {
     await prepareEnv(configPath, profileName);
@@ -107,11 +107,6 @@ async function main() {
       return 1;
     }
     return delegate(['--validate', file, ...rest.slice(2)]);
-  }
-
-  if (SUBCOMMANDS.has(command)) {
-    console.error('Unsupported command: ' + command);
-    return 1;
   }
 
   // Backward compatibility: flags and positional arguments are passed to cli.mjs unchanged.
