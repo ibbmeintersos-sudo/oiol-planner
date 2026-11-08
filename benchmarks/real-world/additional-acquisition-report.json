@@ -6,7 +6,7 @@
     "url": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221",
     "headSha": "5d243572eaa22fbbfd1125ed3406071d09553ca9",
     "conclusion": "success",
-    "completedAt": "2026-11-08T06:37:10Z"
+    "completedAt": "2026-11-08T06:36:45Z"
   },
   "summary": {
     "additionalChangeCases": 24,
@@ -70,7 +70,11 @@
       "artifactId": 13606583405,
       "artifactSizeBytes": 345115,
       "artifactDigest": "sha256:c319f88bc3ad7217635964ad4ac8a12cb19cf591344e76dd7ada2a016d84c56d",
-      "jobId": 128652182492
+      "jobId": 128652182492,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 13,
@@ -86,7 +90,11 @@
       "artifactId": 13606468687,
       "artifactSizeBytes": 342310,
       "artifactDigest": "sha256:a12a633e3625e74cb019d488e8ea29f06ddbbcf24b8167972d79a8daff1f971c",
-      "jobId": 128652182366
+      "jobId": 128652182366,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 14,
@@ -102,7 +110,11 @@
       "artifactId": 13607521508,
       "artifactSizeBytes": 71738,
       "artifactDigest": "sha256:4c212828425db19b514a229917fa8dd443a7847bc493119e8e8aaf62a4a76a9f",
-      "jobId": 128652182427
+      "jobId": 128652182427,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 15,
@@ -118,7 +130,11 @@
       "artifactId": 13607277576,
       "artifactSizeBytes": 116555,
       "artifactDigest": "sha256:b8f30ea8b5c3c2eb6e7ebec6f0ae607fc3788f89be3a3853148a7e57b3e69d77",
-      "jobId": 128652182403
+      "jobId": 128652182403,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 16,
@@ -134,7 +150,11 @@
       "artifactId": 13607540710,
       "artifactSizeBytes": 167073,
       "artifactDigest": "sha256:ef40d4205af7c5b8c0978f518eb8b52c6e0dbbe2e82bead459a58512342f16f7",
-      "jobId": 128652182424
+      "jobId": 128652182424,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 17,
@@ -150,7 +170,11 @@
       "artifactId": 13607470906,
       "artifactSizeBytes": 173417,
       "artifactDigest": "sha256:4af37c725f9c2754d95dbcc15d0ba55b8cfec7ddeeba6e18670e7347642cb466",
-      "jobId": 128652182469
+      "jobId": 128652182469,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 18,
@@ -170,7 +194,11 @@
       "sharedCaseIndices": [
         18,
         19
-      ]
+      ],
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 20,
@@ -186,7 +214,11 @@
       "artifactId": 13607561147,
       "artifactSizeBytes": 7307031,
       "artifactDigest": "sha256:4a2e51d2592bcfab67dac2d7c522ec5988337d8ded204b475e9749ee8ce14f9e",
-      "jobId": 128652182429
+      "jobId": 128652182429,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 22,
@@ -202,7 +234,11 @@
       "artifactId": 13607201964,
       "artifactSizeBytes": 3396463,
       "artifactDigest": "sha256:373990c0defd1b1789e6f25bb6db1824fe9043c762fde5559487cd6bcc8795e2",
-      "jobId": 128652182353
+      "jobId": 128652182353,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 23,
@@ -218,7 +254,11 @@
       "artifactId": 13606668211,
       "artifactSizeBytes": 3431119,
       "artifactDigest": "sha256:e207d8c55afdfb5a3dbbb65187fe2e7b8e85622fdc179fb05b71e4bdcbcf80e5",
-      "jobId": 128652182253
+      "jobId": 128652182253,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 24,
@@ -235,7 +275,10 @@
       "artifactSizeBytes": 9945832,
       "artifactDigest": "sha256:7d39e53636bdf4c7ddeaf1f72fdf323aa1d5260d1b8e3e8ee0caab1b5fc7e5e7",
       "jobId": 128652182455,
-      "archiveMissingFileCountRestored": 1557
+      "archiveMissingFileCountRestored": 1557,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 25,
@@ -252,7 +295,10 @@
       "artifactSizeBytes": 10035785,
       "artifactDigest": "sha256:d374601e30e0e912b8143b35c5715df246afb97d1f14724f8873a410a7535f0c",
       "jobId": 128652182470,
-      "archiveMissingFileCountRestored": 1559
+      "archiveMissingFileCountRestored": 1559,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 26,
@@ -268,7 +314,11 @@
       "artifactId": 13607526782,
       "artifactSizeBytes": 15748232,
       "artifactDigest": "sha256:3bf86985af402c028e7092af1bf2d97b330977908924989103cc082f02484ddc",
-      "jobId": 128652183621
+      "jobId": 128652183621,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 27,
@@ -284,7 +334,11 @@
       "artifactId": 13607521764,
       "artifactSizeBytes": 14938986,
       "artifactDigest": "sha256:c54cdb2df8517b07359df0c3ac7683ddca59e66c19daa5f16b791dd02039b5fb",
-      "jobId": 128652183674
+      "jobId": 128652183674,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 28,
@@ -300,7 +354,11 @@
       "artifactId": 13606749931,
       "artifactSizeBytes": 79618391,
       "artifactDigest": "sha256:d0f0c4a09119ebad02c29bed5bcc9c226f5d74302be4d4c135a4c85a79a4dfa7",
-      "jobId": 128652183783
+      "jobId": 128652183783,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 29,
@@ -316,7 +374,11 @@
       "artifactId": 13607492016,
       "artifactSizeBytes": 78402995,
       "artifactDigest": "sha256:2d207bddc85cc6c88dadf56f2e9cedcff5ab3aba24f0279ffc1d56d652a3fee8",
-      "jobId": 128652183659
+      "jobId": 128652183659,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 30,
@@ -328,7 +390,11 @@
       "gitTreeFileCount": 37712,
       "snapshotFileCount": 37708,
       "snapshotSha256": "772e0ee49036dde6085596c1972bec258c09e8d7e6f7b4b4f41c6574face857e",
-      "licenseFileSha256": "71c6915d04265772a033a9e4d7d?"
+      "licenseFileSha256": "71c6915d04265772a0339bed47276942c678b45cc01534210ebe6984fd1aec65",
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 31,
@@ -344,7 +410,11 @@
       "artifactId": 13606924641,
       "artifactSizeBytes": 165646135,
       "artifactDigest": "sha256:90db899a178e7e81172bf2966458f70fb8df875514dc07d12754d65ba06f3661",
-      "jobId": 128652183760
+      "jobId": 128652183760,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 32,
@@ -360,7 +430,11 @@
       "artifactId": 13607103896,
       "artifactSizeBytes": 73440471,
       "artifactDigest": "sha256:ae322edb8a5cb6922504ddb250e31a421f70d001bc35d2616b46de6cafc4db5b",
-      "jobId": 128652183680
+      "jobId": 128652183680,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 33,
@@ -376,7 +450,11 @@
       "artifactId": 13606439247,
       "artifactSizeBytes": 72928366,
       "artifactDigest": "sha256:a26606557afe3f13dff738f454c2d5e82630755d9fe3b3e562190b3c88e5d7fe",
-      "jobId": 128652183672
+      "jobId": 128652183672,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 34,
@@ -392,7 +470,11 @@
       "artifactId": 13606903217,
       "artifactSizeBytes": 57516094,
       "artifactDigest": "sha256:937ccab8acd5710270af9c0c56e2a616a14c928018edc60c0b27923b539cec38",
-      "jobId": 128652183752
+      "jobId": 128652183752,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     },
     {
       "index": 35,
@@ -408,7 +490,11 @@
       "artifactId": 13606344811,
       "artifactSizeBytes": 57394547,
       "artifactDigest": "sha256:6d9a2ea99cfe2c9eaf48a7ae313368eec5a3e6b7745a0189d732e33164ac3ba8",
-      "jobId": 128652183799
+      "jobId": 128652183799,
+      "trackedFileCountDelta": 0,
+      "archiveExtraFileCount": 0,
+      "archiveMissingFileCountRestored": 0,
+      "artifactUploadDigestVerified": true
     }
   ]
 }
