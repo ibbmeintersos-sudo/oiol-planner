@@ -382,5 +382,5 @@ test('external benchmark rejects missing task-specific source excerpts', () => {
       }
     }
   };
-  assert.throws(() => assertExternalRepositorySnapshot(project), /Required task evidence paths were not supplied as excerpts/);
+  assert.throws(() => assertExternalRepositorySnapshot(project), /Required task evidence was not supplied as excerpts/);
 });
