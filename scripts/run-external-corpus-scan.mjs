@@ -41,6 +41,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
     truncated: repository.truncated,
     depthTruncated: repository.depthTruncated,
     scanLimits: repository.scanLimits,
+    skipped: repository.skipped,
     manifests: repository.manifests,
     scriptsDiscovered: repository.scripts,
     testsDiscovered: repository.tests,
