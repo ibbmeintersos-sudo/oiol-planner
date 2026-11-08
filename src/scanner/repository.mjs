@@ -41,28 +41,27 @@ const evidenceId = file => 'REPO-' + sha256(file).slice(0, 12);
 
 async function walkBounded(root, { maxFiles, maxDepth }) {
   const files = [];
+  const queue = [{ rel: '', depth: 0 }];
   let discovered = 0, truncated = false, depthTruncated = false;
-  async function visit(rel = '', depth = 0) {
-    if (truncated || depth > maxDepth) return;
+  while (queue.length && !truncated) {
+    const current = queue.shift();
     let entries;
-    try { entries = await fs.readdir(path.join(root, rel), { withFileTypes: true }); } catch { return; }
-    entries.sort((a, b) => entryPriority(a, depth) - entryPriority(b, depth) || a.name.localeCompare(b.name));
+    try { entries = await fs.readdir(path.join(root, current.rel), { withFileTypes: true }); } catch { continue; }
+    entries.sort((a, b) => entryPriority(a, current.depth) - entryPriority(b, current.depth) || a.name.localeCompare(b.name));
     for (const entry of entries) {
       if (truncated) break;
-      const relative = path.posix.join(rel.replaceAll('\\', '/'), entry.name);
+      const relative = path.posix.join(current.rel.replaceAll('\\\\', '/'), entry.name);
       if (IGNORE.has(entry.name) || SENSITIVE.test(relative) || entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
-        if (depth >= maxDepth) depthTruncated = true;
-        else await visit(relative, depth + 1);
-      }
-      else if (entry.isFile()) {
+        if (current.depth >= maxDepth) depthTruncated = true;
+        else queue.push({ rel: relative, depth: current.depth + 1 });
+      } else if (entry.isFile()) {
         discovered++;
         if (files.length < maxFiles) files.push(relative);
         else truncated = true;
       }
     }
   }
-  await visit();
   return { files, discovered, truncated, depthTruncated };
 }
 
