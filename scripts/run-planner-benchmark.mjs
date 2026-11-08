@@ -50,7 +50,7 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
   if (!Array.isArray(task.expectedSignals) || !task.expectedSignals.length || task.expectedSignals.some(group => !Array.isArray(group) || !group.length || group.some(value => typeof value !== 'string'))) {
     throw new Error('--task-file expectedSignals must be a non-empty array of non-empty string groups');
   }
-  if (!Array.isArray(task.evidencePaths) || !task.evidencePaths.length || task.evidencePaths.some(value => typeof value !== 'string' || !value.trim() || value.startsWith('/') || value.split(/[\\\\/]/).includes('..'))) throw new Error('--task-file requires non-empty safe relative evidencePaths');
+  if (!Array.isArray(task.evidencePaths) || !task.evidencePaths.length || task.evidencePaths.some(value => typeof value !== 'string' || !value.trim() || value.startsWith('/') || value.includes('..') || value.includes('\\\\'))) throw new Error('--task-file requires non-empty safe relative evidencePaths');
   if (typeof task.mustClarify !== 'boolean') throw new Error('--task-file mustClarify must be a boolean');
   if (task.mustClarify && (!Array.isArray(task.clarificationSignals) || !task.clarificationSignals.length || task.clarificationSignals.some(group => !Array.isArray(group) || !group.length || group.some(value => typeof value !== 'string')))) {
     throw new Error('--task-file requires clarificationSignals for blocking-clarification tasks');
