@@ -53,7 +53,7 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
         let op;
         if (/^add\s+(?:column\s+)?/i.test(body)) {
           const col = body.replace(/^add\s+(?:column\s+)?/i, '').match(/^([\`"[]?[\w$-]+[\`"\]]?)\s+([\w]+(?:\s*\([^)]*\))?)/);
-          op = col ? { operation: 'add_column', column: cleanIdentifier(col[1]), newType: col[2] } : { operation: 'add_constraint' };
+          op = col ? { operation: 'add_column', column: cleanIdentifier(col[1]), newType: col[2], newNullable: !/\\bnot\\s+null\\b/i.test(body) } : { operation: 'add_constraint' };
         } else if (/^drop\s+(?:column\s+)?/i.test(body)) {
           op = { operation: 'drop_column', column: cleanIdentifier(body.replace(/^drop\s+(?:column\s+)?/i, '').split(/\s/)[0]) };
         } else if (/^rename\s+column\s+/i.test(body)) {
