@@ -65,6 +65,30 @@ function changeImpactSection(impact) {
     ...(Array.isArray(impact.databaseSchemaImpact?.riskSignals) ? impact.databaseSchemaImpact.riskSignals.map(item => '- Risk signal: ' + text(item)) : []),
     ...(Array.isArray(impact.databaseSchemaImpact?.limitations) ? impact.databaseSchemaImpact.limitations.map(item => '- Caveat: ' + text(item)) : []),
     '',
+    '#### Migration ordering and rollout compatibility (static estimate)',
+    '- **Sequencing status:** ' + text(impact.databaseSchemaImpact?.migrationCompatibility?.status || 'Not available'),
+    '- **Ordered migration candidates:** ' + (impact.databaseSchemaImpact?.migrationCompatibility?.diagnostics?.orderedMigrationCount ?? 'Not recorded'),
+    '- **Unordered/ambiguous migrations:** ' + (impact.databaseSchemaImpact?.migrationCompatibility?.diagnostics?.unorderedMigrationCount ?? 'Not recorded'),
+    '- **Potential expand/contract pairs:** ' + (impact.databaseSchemaImpact?.migrationCompatibility?.diagnostics?.expandContractPairCount ?? 0),
+    ...(Array.isArray(impact.databaseSchemaImpact?.migrationCompatibility?.orderedMigrations)
+      ? impact.databaseSchemaImpact.migrationCompatibility.orderedMigrations.map(item => '- **' + text(item.phase) + '** — ' + text(item.path) + '; order key: ' + text(item.orderKey || 'unknown') + '; operations: ' + text((item.operations || []).map(op => op.operation + (op.table ? ' ' + op.table : '') + (op.column ? '.' + op.column : '')).join(', ')))
+      : []),
+    ...(Array.isArray(impact.databaseSchemaImpact?.migrationCompatibility?.sequenceRisks)
+      ? impact.databaseSchemaImpact.migrationCompatibility.sequenceRisks.map(item => '- **Sequence risk: ' + text(item.kind) + '** — ' + text(item.message))
+      : []),
+    ...(Array.isArray(impact.databaseSchemaImpact?.migrationCompatibility?.possibleExpandContractPairs)
+      ? impact.databaseSchemaImpact.migrationCompatibility.possibleExpandContractPairs.map(item => '- **Possible expand/contract:** ' + text(item.table) + ' — add ' + text(item.addedColumn) + ' in ' + text(item.earlierMigration) + ', remove ' + text(item.removedColumn) + ' in ' + text(item.laterMigration) + '; backfill/compatibility not proven.')
+      : []),
+    ...(Array.isArray(impact.databaseSchemaImpact?.migrationCompatibility?.compatibilityFindings)
+      ? impact.databaseSchemaImpact.migrationCompatibility.compatibilityFindings.map(item => '- **Compatibility: ' + text(item.operation) + ' ' + text(item.table || '') + '** — old app/new schema: ' + text(item.compatibility?.oldApplicationWithNewSchema) + '; new app/old schema: ' + text(item.compatibility?.newApplicationWithOldSchema) + '; guidance: ' + text(item.compatibility?.rolloutGuidance))
+      : []),
+    ...(Array.isArray(impact.databaseSchemaImpact?.migrationCompatibility?.rolloutSequence)
+      ? impact.databaseSchemaImpact.migrationCompatibility.rolloutSequence.map(item => '- **' + text(item.stage) + '** — ' + text(item.purpose) + ' Gates: ' + text((item.gates || []).join(' ')))
+      : []),
+    ...(Array.isArray(impact.databaseSchemaImpact?.migrationCompatibility?.limitations)
+      ? impact.databaseSchemaImpact.migrationCompatibility.limitations.map(item => '- Migration caveat: ' + text(item))
+      : []),
+    '',
     '### Direct candidate files',
     '',
     ...(direct.length ? direct.slice(0, 30).map(item => '- **' + text(item.path) + '** — score ' + text(item.score) + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : '')) : ['- No direct candidate file was identified.']),
