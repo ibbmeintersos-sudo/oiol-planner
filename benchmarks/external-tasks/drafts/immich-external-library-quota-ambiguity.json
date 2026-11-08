@@ -1,0 +1,78 @@
+{
+  "scenarioId": "EX-API-003",
+  "taskId": "RW-IM-02",
+  "taskVersion": "0.2.0-draft",
+  "projectName": "Immich",
+  "request": "A product request says: “Make external libraries count toward user storage quotas.” Produce a planning response, but do not change quota enforcement until the accounting policy is clarified.",
+  "constraints": [
+    "Produce an engineering plan only; do not modify the repository or execute project commands, tests, or builds.",
+    "Ground claims in the pinned repository snapshot and cite relevant relative file paths.",
+    "Separate verified evidence from assumptions and unresolved unknowns.",
+    "Preserve existing public behavior and compatibility unless the request explicitly changes it.",
+    "Recognize that the current quota calculation excludes assets with a non-null libraryId and that the documentation cites custom mount points as the reason.",
+    "Do not assume physical storage ownership from an indexed asset record."
+  ],
+  "expectedSignals": [
+    [
+      "external libraries",
+      "libraryId"
+    ],
+    [
+      "current quota calculation",
+      "libraryId is null"
+    ],
+    [
+      "logical bytes",
+      "physical bytes"
+    ],
+    [
+      "ownership",
+      "shared mount"
+    ],
+    [
+      "deduplication",
+      "duplicate assets"
+    ],
+    [
+      "custom mount points",
+      "symlinks"
+    ],
+    [
+      "existing over-quota users",
+      "grace period"
+    ],
+    [
+      "clarification",
+      "unknowns"
+    ]
+  ],
+  "mustClarify": true,
+  "clarificationSignals": [
+    [
+      "logical versus physical bytes"
+    ],
+    [
+      "ownership",
+      "shared mount"
+    ],
+    [
+      "deduplication",
+      "duplicate assets"
+    ],
+    [
+      "custom mount points",
+      "symlinks"
+    ],
+    [
+      "imported assets versus external assets"
+    ],
+    [
+      "existing users over quota"
+    ],
+    [
+      "hard rejection",
+      "soft warning",
+      "grace period"
+    ]
+  ]
+}
