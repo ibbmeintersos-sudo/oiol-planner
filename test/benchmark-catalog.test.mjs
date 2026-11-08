@@ -354,3 +354,23 @@ test('all P12 task drafts support credential-free external dry-run manifests', a
     if (previousKey === undefined) delete process.env.OIOL_API_KEY; else process.env.OIOL_API_KEY = previousKey;
   }
 });
+
+
+test('external benchmark rejects missing task-specific source excerpts', () => {
+  const project = {
+    repository: {
+      fileCount: 2,
+      snippets: [{ path: 'src/critical.ts' }],
+      git: { isRepo: true, commit: 'a'.repeat(40), dirty: false },
+      structure: { analyzedSourceFileCount: 1 },
+      evidenceSelection: {
+        requestedPaths: ['src/critical.ts', 'src/missing.ts'],
+        matchedPaths: ['src/critical.ts'],
+        excerptedPaths: ['src/critical.ts'],
+        missingPaths: ['src/missing.ts'],
+        unexcerptedPaths: []
+      }
+    }
+  };
+  assert.throws(() => assertExternalRepositorySnapshot(project), /Required task evidence paths were not supplied as excerpts/);
+});
