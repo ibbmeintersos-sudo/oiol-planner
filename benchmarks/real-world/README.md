@@ -19,6 +19,8 @@ The change commit / pull request is provenance for the historical change. It is 
 
 ## Independence and blinding
 
+The operational field-by-field protocol is in [ANNOTATION_GUIDE.md](./ANNOTATION_GUIDE.md). Use it for every case; the JSON schema alone does not define annotation judgment.
+
 1. Corpus curators select changes before running the candidate OIOL version.
 2. Annotators do not see OIOL output, scores, confidence, or diagnostics.
 3. Two reviewers independently annotate each case. Use stable, non-identifying reviewer IDs.
