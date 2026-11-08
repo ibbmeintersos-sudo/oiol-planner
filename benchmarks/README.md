@@ -56,6 +56,7 @@ First, obtain a public repository checkout outside OIOL and ensure its working t
 ```sh
 OIOL_BENCHMARK_ALLOW_LIVE=1 node scripts/run-planner-benchmark.mjs \
   --repo /absolute/path/to/clean/checkout \
+  --task-file /absolute/path/to/repository-task.json \
   --scenarios EX-API-003 \
   --out benchmarks/results/external-oiol.json
 ```
@@ -67,6 +68,7 @@ OIOL_OPENCODE_MODEL=providerID/modelID \
 OIOL_OPENCODE_AGENT=plan \
 OIOL_BENCHMARK_ALLOW_LIVE=1 \
 npm run benchmark:opencode -- --repo /absolute/path/to/clean/checkout \
+  --task-file /absolute/path/to/repository-task.json \
   --scenarios EX-API-003 \
   --out benchmarks/results/external-opencode.json
 ```
