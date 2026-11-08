@@ -108,10 +108,10 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
   }
   if (!Array.isArray(priorityPaths) || priorityPaths.some(value => typeof value !== 'string' || !value.trim())) throw new Error('priorityPaths must be an array of non-empty relative paths');
-  const normalizedPriorityPaths = [...new Set(priorityPaths.map(value => value.replaceAll('\\\\', '/')))];
+  const normalizedPriorityPaths = [...new Set(priorityPaths.map(value => value.replaceAll('\\', '/')))];
   for (const relative of normalizedPriorityPaths) {
     const normalized = path.posix.normalize(relative);
-    if (relative.startsWith('/') || /^[a-z]:\\//i.test(relative) || normalized !== relative || normalized === '.' || normalized.split('/').includes('..')) {
+    if (relative.startsWith('/') || /^[a-z]:/i.test(relative) || normalized !== relative || normalized === '.' || normalized.split('/').includes('..')) {
       throw new Error('Unsafe priority evidence path: ' + relative);
     }
     if (SENSITIVE.test(relative)) throw new Error('Sensitive priority evidence path is not allowed: ' + relative);
