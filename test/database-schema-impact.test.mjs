@@ -123,3 +123,28 @@ test('database schema analysis stays inactive for unrelated requests', () => {
   });
   assert.equal(result.status, 'not_requested');
 });
+
+test('database schema scanner recognizes Prisma models and ORM model consumers', () => {
+  const schemaPath = 'prisma/schema.prisma';
+  const appPath = 'src/customer-service.ts';
+  const prismaSchema = `
+model Customer {
+  id    Int    @id
+  email String?
+  @@map("customers")
+}
+`;
+  const appSource = `
+export async function loadCustomer(prisma) {
+  return prisma.customer.findMany();
+}
+`;
+  const result = scanDatabaseSchema({
+    files: [schemaPath, appPath],
+    contents: { [schemaPath]: prismaSchema, [appPath]: appSource },
+    sourceEvidence: []
+  });
+
+  assert.ok(result.tables.some(item => item.name === 'customers' && item.model === 'Customer' && item.sourceKind === 'prisma_model'));
+  assert.ok(result.consumers.some(item => item.table === 'customers' && item.path === appPath));
+});
