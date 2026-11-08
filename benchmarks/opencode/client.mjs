@@ -97,8 +97,9 @@ export class OpenCodeClient {
     const messages=[];
     let cursor=null;
     for(let page=0;page<100;page++) {
-      const query=new URLSearchParams({limit:'100',order:'asc'});
+      const query=new URLSearchParams({limit:'100'});
       if(cursor) query.set('cursor',cursor);
+      else query.set('order','asc');
       const response=await this.request('/api/session/'+encodeURIComponent(sessionId)+'/message?'+query.toString(),{signal,timeoutMs});
       const data=Array.isArray(response?.data)?response.data:(Array.isArray(response)?response:null);
       if(!data) throw new Error('OpenCode V2 returned an invalid session messages response');
