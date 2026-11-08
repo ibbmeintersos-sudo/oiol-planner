@@ -113,7 +113,7 @@ All five first-pass scans reached the original 250-file limit. The discovered fi
 
 The first-pass reports did not record parser failures. Better Auth and Immich did report Tree-sitter syntax-error files requiring review. Paperless-ngx and Immich reported source files in languages without a bundled grammar; the scanner surfaced these as unsupported rather than silently claiming AST coverage.
 
-### Expanded second-pass profile
+### Final expanded scanner profile
 
 The scanner now supports a separate bounded profile for external repositories:
 
@@ -125,7 +125,31 @@ The scanner now supports a separate bounded profile for external repositories:
 - Evidence selection interleaves manifests, implementation source, tests, and configuration rather than filling the context with source files first.
 - Scanner version and exact scan limits are included in the report and benchmark configuration fingerprint.
 
-The five repositories are being rescanned with this wider profile before the draft task prompts are promoted to runnable task definitions. The first-pass reports remain useful as an initial coverage baseline, but are not the final scan evidence.
+The five repositories have been rescanned with this wider profile. The results below are the current evidence baseline; they remain bounded scans, not exhaustive source-code understanding.
+
+## Expanded pinned scanner results
+
+The final expanded scan completed successfully for all five pinned repositories in [P12 scanner run](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42459958922). All checkouts were clean and the report commit SHAs match the observed remote tips recorded above.
+
+| Repository | Included files | Source files in scan | AST analyzed | Tests discovered | Unsupported source files | Syntax-error files | File-limit reached |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Gitea | 5,000 | 3,357 | 505 | 1,412 | 35 | 2 | Yes |
+| Better Auth | 2,419 | 1,748 | 450 | 596 | 4 | 15 | No |
+| Paperless-ngx | 1,565 | 866 | 463 | 466 | 7 | 1 | No |
+| Immich | 3,626 | 2,605 | 483 | 542 | 1,353 | 6 | No |
+| Prefect | 5,000 | 3,715 | 474 | 1,236 | 68 | 0 | Yes |
+
+Interpretation and limitations:
+
+- Paperless-ngx, Better Auth, and Immich completed within the 5,000-file bound. Gitea and Prefect remain truncated at 5,000 discovered files; their file counts are lower bounds.
+- AST analysis is bounded to the selected source/test/config files and files under the 32 KiB per-file limit. It is not a full type-check or semantic analysis.
+- Immich has a substantial unsupported-language gap, including mobile/native source files outside the bundled Tree-sitter grammar set. The plan must not treat those components as understood.
+- Better Auth, Immich, Paperless-ngx, and Gitea report syntax-error nodes from Tree-sitter recovery. These are diagnostics, not necessarily build failures; human review is required.
+- The Go dependency graph is under-resolved because module-path imports are not currently mapped to local package nodes. Workspace aliases and package-manager resolution also remain incomplete for several repositories.
+- The scanner reports ignored, sensitive, symbolic-link, depth-limit, and file-limit exclusions separately. No excluded file contents are included in benchmark evidence.
+- A completed scan is not a completed planning benchmark. No live model runs or human scores have been claimed.
+
+The expanded reports are scanner-only artifacts. They do not contain raw source excerpts; they retain bounded paths, hashes, manifest metadata, AST/lexical coverage, diagnostics, and scan limits.
 
 ## Required intake record before a repository can enter a scored run
 
