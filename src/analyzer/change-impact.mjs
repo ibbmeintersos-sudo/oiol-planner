@@ -182,21 +182,30 @@ function buildFileFeatures(structure, sourceFiles, queryTokens, evidenceByPath, 
 
 function reverseReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
   const reached = new Map();
+  const seedSet = new Set(seeds);
   const queue = seeds.map(path => ({ path, depth: 0, origin: path }));
   const seenAtDepth = new Map(seeds.map(path => [path, 0]));
-  let truncated = false;
+  const depthFrontier = new Set();
+  let nodeLimitReached = false;
 
-  while (queue.length) {
-    const current = queue.shift();
-    if (current.depth >= maxDepth) continue;
-    for (const dependent of sorted(reverseEdges.get(current.path) || [])) {
-      if (seeds.includes(dependent)) continue;
+  // Cursor-based breadth-first traversal avoids repeated Array.shift() costs on large graphs.
+  for (let cursor = 0; cursor < queue.length; cursor += 1) {
+    const current = queue[cursor];
+    const dependents = sorted(reverseEdges.get(current.path) || []);
+    if (current.depth >= maxDepth) {
+      for (const dependent of dependents) {
+        if (!seedSet.has(dependent) && !seenAtDepth.has(dependent)) depthFrontier.add(dependent);
+      }
+      continue;
+    }
+    for (const dependent of dependents) {
+      if (seedSet.has(dependent)) continue;
       const nextDepth = current.depth + 1;
       const knownDepth = seenAtDepth.get(dependent);
       if (knownDepth !== undefined && knownDepth <= nextDepth) continue;
       if (!reached.has(dependent) && reached.size >= maxNodes) {
-        truncated = true;
-        queue.length = 0;
+        nodeLimitReached = true;
+        queue.length = cursor + 1;
         break;
       }
       seenAtDepth.set(dependent, nextDepth);
@@ -210,25 +219,39 @@ function reverseReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
       queue.push({ path: dependent, depth: nextDepth, origin: current.origin });
     }
   }
-  return { reached, truncated };
+  return {
+    reached,
+    nodeLimitReached,
+    depthLimitReached: depthFrontier.size > 0,
+    depthFrontierCount: depthFrontier.size,
+    truncated: nodeLimitReached || depthFrontier.size > 0
+  };
 }
 
 function packageReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
   const reached = new Map();
+  const seedSet = new Set(seeds);
   const queue = seeds.map(path => ({ path, depth: 0, origin: path }));
   const seen = new Map(seeds.map(path => [path, 0]));
-  let truncated = false;
+  const depthFrontier = new Set();
+  let nodeLimitReached = false;
 
-  while (queue.length) {
-    const current = queue.shift();
-    if (current.depth >= maxDepth) continue;
-    for (const dependent of sorted(reverseEdges.get(current.path) || [])) {
-      if (seeds.includes(dependent)) continue;
+  for (let cursor = 0; cursor < queue.length; cursor += 1) {
+    const current = queue[cursor];
+    const dependents = sorted(reverseEdges.get(current.path) || []);
+    if (current.depth >= maxDepth) {
+      for (const dependent of dependents) {
+        if (!seedSet.has(dependent) && !seen.has(dependent)) depthFrontier.add(dependent);
+      }
+      continue;
+    }
+    for (const dependent of dependents) {
+      if (seedSet.has(dependent)) continue;
       const depth = current.depth + 1;
       if (seen.has(dependent) && seen.get(dependent) <= depth) continue;
       if (!reached.has(dependent) && reached.size >= maxNodes) {
-        truncated = true;
-        queue.length = 0;
+        nodeLimitReached = true;
+        queue.length = cursor + 1;
         break;
       }
       seen.set(dependent, depth);
@@ -242,7 +265,13 @@ function packageReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
       queue.push({ path: dependent, depth, origin: current.origin });
     }
   }
-  return { reached, truncated };
+  return {
+    reached,
+    nodeLimitReached,
+    depthLimitReached: depthFrontier.size > 0,
+    depthFrontierCount: depthFrontier.size,
+    truncated: nodeLimitReached || depthFrontier.size > 0
+  };
 }
 
 function impactedTests(repository, structure, impactedPaths, directMatches, maxTests) {
@@ -470,6 +499,8 @@ export function analyzeChangeImpact({
     repository, structure, affectedPaths, directSeeds, maxTests
   );
   const reverseTruncated = fileReachability.truncated || packageReachabilityResult.truncated || affectedFilesTruncated || affectedPackagesTruncated;
+  const depthLimitReached = fileReachability.depthLimitReached || packageReachabilityResult.depthLimitReached;
+  const nodeLimitReached = fileReachability.nodeLimitReached || packageReachabilityResult.nodeLimitReached;
   const directMatchConfidence = directSeeds.length
     ? round(directSeeds.reduce((sum, item) => sum + item.score, 0) / directSeeds.length)
     : packageSeeds.length ? 0.4 : 0;
@@ -478,6 +509,8 @@ export function analyzeChangeImpact({
     penalties: [
       ...coverageConfidence.penalties,
       ...(reverseTruncated ? ['impact_graph_result_limit_reached'] : []),
+      ...(depthLimitReached ? ['impact_graph_depth_limit_reached'] : []),
+      ...(nodeLimitReached || affectedFilesTruncated || affectedPackagesTruncated ? ['impact_graph_node_or_output_limit_reached'] : []),
       ...(directMatches.length > maxDirectMatches ? ['direct_match_result_limit_reached'] : [])
     ],
     score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0)))
@@ -494,6 +527,8 @@ export function analyzeChangeImpact({
   if ((structure.unresolvedLocalImportCount || 0) > 0) risks.push('unresolved_local_dependencies_may_hide_additional_impacts');
   if ((structure.pathAliases?.unresolvedImportCount || 0) > 0) risks.push('unresolved_path_aliases_may_hide_additional_impacts');
   if (reverseTruncated) risks.push('impact_graph_truncated_by_result_limit');
+  if (depthLimitReached) risks.push('impact_graph_depth_limit_reached');
+  if (nodeLimitReached || affectedFilesTruncated || affectedPackagesTruncated) risks.push('impact_graph_node_or_output_limit_reached');
   if (potentiallyAffectedFiles.length >= 20 || affectedPackages.length >= 6) risks.push('broad_change_impact_scope');
   if (affectedTests.length === 0 && (repository.tests?.length || structure.testFiles?.length)) risks.push('no_test_file_could_be_linked_to_the_current_impact_evidence');
 
@@ -526,7 +561,17 @@ export function analyzeChangeImpact({
       unresolvedLocalImportCount: structure.unresolvedLocalImportCount || 0,
       traversedReverseDependencyCount: fileReachability.reached.size,
       traversedWorkspaceDependencyCount: packageReachabilityResult.reached.size,
-      maxDepth
+      maxDepth,
+      traversalLimits: {
+        depthLimitReached,
+        fileDepthFrontierCount: fileReachability.depthFrontierCount,
+        packageDepthFrontierCount: packageReachabilityResult.depthFrontierCount,
+        nodeLimitReached,
+        fileNodeLimitReached: fileReachability.nodeLimitReached,
+        packageNodeLimitReached: packageReachabilityResult.nodeLimitReached,
+        affectedFilesOutputLimitReached: affectedFilesTruncated,
+        affectedPackagesOutputLimitReached: affectedPackagesTruncated
+      }
     },
     directMatches: directSeeds,
     potentiallyAffectedFiles,
