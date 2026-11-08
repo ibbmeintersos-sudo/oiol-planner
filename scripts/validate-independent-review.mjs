@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const dimensions = ['directFiles','affectedFiles','tests','packages','apiConsumers','databaseConsumers','migrationFiles','scannerSymbols','dependencyEdges','unknowns','risks'];
 const pathDimensions = ['directFiles','affectedFiles','tests','migrationFiles'];
 const safePath = value => typeof value === 'string' && value.length > 0 &&
   !value.startsWith('/') && !/^[A-Za-z]:[\\\\/]/.test(value) &&
-  !value.split(/[\\\\/]/).includes('..') && !value.includes('\\0');
+  !value.split(/[\\\\/]/).includes('..') && !value.includes('\0');
 
 export function validateReview(review, worklist, otherReview = null) {
   const errors = [];
@@ -64,7 +64,7 @@ function option(name) {
 export async function main() {
   const reviewFile = option('review');
   if (!reviewFile) throw new Error('Pass --review <review.json>');
-  const scriptRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+  const scriptRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const worklistFile = option('worklist') || path.join(scriptRoot, 'benchmarks/real-world/annotation-worklist.json');
   const review = JSON.parse(await fs.readFile(path.resolve(reviewFile), 'utf8'));
   const worklist = JSON.parse(await fs.readFile(path.resolve(worklistFile), 'utf8'));
