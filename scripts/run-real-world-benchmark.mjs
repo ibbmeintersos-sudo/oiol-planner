@@ -39,7 +39,7 @@ export function scoreRealWorldCase(item, repositoryScan, impact) {
     packages: pathValues(impact.affectedPackages),
     apiConsumers: pathValues(api.potentiallyAffectedConsumers),
     databaseConsumers: pathValues(database.potentiallyAffectedConsumers),
-    migrationFiles: pathValues(migration.orderedMigrations),
+    migrationFiles: pathValues([...(migration.orderedMigrations || []), ...(migration.compatibilityFindings || [])]),
     scannerSymbols: symbolValues(repositoryScan.structure?.symbols),
     dependencyEdges: edgeValues(repositoryScan.structure?.dependencyGraph?.edges)
   };
@@ -65,9 +65,15 @@ export function scoreRealWorldCase(item, repositoryScan, impact) {
     apiStatus: api.status || 'unavailable',
     databaseStatus: database.status || 'unavailable',
     migrationStatus: migration.status || 'unavailable',
-    observedUnknowns: impact.risks || [],
+    observedUnknowns: impact.unknowns || impact.diagnostics?.unknowns || [],
     observedRisks: impact.risks || [],
-    planningOnlyVerification: impact.testImpactAnalysis || null
+    planningOnlyVerification: impact.testImpactAnalysis || null,
+    reviewOnlyDimensions: {
+      unknowns: 'Requires independent human scoring; the deterministic analyzer does not emit an adjudicated unknowns list.',
+      risks: 'Raw risk signals are reported; severity and rationale quality require independent human scoring.',
+      confidenceCalibration: 'Raw confidence is reported; calibration is not scored until adjudicated correctness labels are available.',
+      verificationLevelQuality: 'Recommendations are retained; their adequacy requires independent human review.'
+    }
   };
 }
 
