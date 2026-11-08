@@ -1,0 +1,75 @@
+name: P12 external repository scanner intake
+
+on:
+  push:
+    branches:
+      - "p12-scan/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Scan ${{ matrix.id }} at pinned commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - id: RW-GO-01
+            repository: go-gitea/gitea
+            ref: edebfaa12516a140d7ee3fcbaf25a6a1cc2cdb76
+          - id: RW-TS-02
+            repository: better-auth/better-auth
+            ref: de6ef28b86c002c3a3683861d803daf482ec603f
+          - id: RW-PY-05
+            repository: paperless-ngx/paperless-ngx
+            ref: 32bc5522e914f1e5f3a36eb60de6988611ca310f
+          - id: RW-TS-06
+            repository: immich-app/immich
+            ref: 87ef895041e160aef4f61f2d7af1ad3f8e38827d
+          - id: RW-PY-07
+            repository: PrefectHQ/prefect
+            ref: b0479c0c26045b06321191bbad0cdfbb334d7380
+    steps:
+      - name: Checkout OIOL planner
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install OIOL scanner dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Checkout pinned public candidate
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: external-repository
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Run read-only OIOL scanner
+        run: >
+          npm run benchmark:scan-external --
+          --repo external-repository
+          --id ${{ matrix.id }}
+          --out benchmarks/results/${{ matrix.id }}-scan.json
+
+      - name: Upload scanner-only intake report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-scan-${{ matrix.id }}
+          path: benchmarks/results/${{ matrix.id }}-scan.json
+          if-no-files-found: ignore
+          retention-days: 14
