@@ -34,6 +34,7 @@ jobs:
           sparse-checkout: |
             benchmarks/real-world/intake-candidates.json
             scripts/acquire-real-world-snapshot.py
+            test/p12_snapshot_acquisition_test.py
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
