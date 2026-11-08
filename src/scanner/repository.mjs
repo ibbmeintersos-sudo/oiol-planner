@@ -7,7 +7,7 @@ import { redact } from '../core/utils.mjs';
 import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
 const exec = promisify(execFile);
-export const SCANNER_VERSION = '1.5.0';
+export const SCANNER_VERSION = '1.6.0';
 export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 5000, maxFileBytes: 32000, maxContextChars: 150000, maxDepth: 16, maxSourceFiles: 500, maxTestFiles: 25, maxConfigFiles: 25 });
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.(?:pem|key|p12|pfx|jks|keystore)|(?:credentials|secrets)\.(?:json|ya?ml)|\.npmrc|\.pypirc|\.netrc)$/i;
@@ -103,9 +103,18 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
   return { files, discovered, truncated, depthTruncated, skipped };
 }
 
-export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, maxSourceFiles = 100, maxTestFiles = 15, maxConfigFiles = 15 } = {}) {
+export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, maxSourceFiles = 100, maxTestFiles = 15, maxConfigFiles = 15, priorityPaths = [] } = {}) {
   for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles })) {
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
+  }
+  if (!Array.isArray(priorityPaths) || priorityPaths.some(value => typeof value !== 'string' || !value.trim())) throw new Error('priorityPaths must be an array of non-empty relative paths');
+  const normalizedPriorityPaths = [...new Set(priorityPaths.map(value => value.replaceAll('\\\\', '/')))];
+  for (const relative of normalizedPriorityPaths) {
+    const normalized = path.posix.normalize(relative);
+    if (relative.startsWith('/') || /^[a-z]:\\//i.test(relative) || normalized !== relative || normalized === '.' || normalized.split('/').includes('..')) {
+      throw new Error('Unsafe priority evidence path: ' + relative);
+    }
+    if (SENSITIVE.test(relative)) throw new Error('Sensitive priority evidence path is not allowed: ' + relative);
   }
   const root = await fs.realpath(path.resolve(repoPath));
   const stat = await fs.stat(root);
@@ -136,13 +145,18 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     }
   }
 
-  const sourceFiles = files.filter(file => SUPPORTED_SOURCE_FILE.test(file)).slice(0, maxSourceFiles);
-  const selected = [...new Set(interleaveGroups([
-    manifests,
-    sourceFiles,
-    tests.slice(0, maxTestFiles),
-    configs.slice(0, maxConfigFiles)
-  ]))];
+  const matchedPriorityPaths = normalizedPriorityPaths.filter(file => files.includes(file));
+  const prioritySourceFiles = matchedPriorityPaths.filter(file => SUPPORTED_SOURCE_FILE.test(file));
+  const sourceFiles = [...new Set([...prioritySourceFiles, ...files.filter(file => SUPPORTED_SOURCE_FILE.test(file)).slice(0, maxSourceFiles)])];
+  const selected = [...new Set([
+    ...matchedPriorityPaths,
+    ...interleaveGroups([
+      manifests,
+      sourceFiles,
+      tests.slice(0, maxTestFiles),
+      configs.slice(0, maxConfigFiles)
+    ])
+  ])];
   let context = '', contextTruncated = false;
   const snippets = [];
   const sourceContents = Object.create(null);
@@ -176,6 +190,14 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   }
 
   const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests, maxFileBytes });
+  const excerptedPriorityPaths = matchedPriorityPaths.filter(file => snippets.some(snippet => snippet.path === file));
+  const evidenceSelection = {
+    requestedPaths: normalizedPriorityPaths,
+    matchedPaths: matchedPriorityPaths,
+    excerptedPaths: excerptedPriorityPaths,
+    missingPaths: normalizedPriorityPaths.filter(file => !files.includes(file)),
+    unexcerptedPaths: matchedPriorityPaths.filter(file => !excerptedPriorityPaths.includes(file))
+  };
   const structureSummary = [
     'Repository structure analysis (Tree-sitter AST where bundled grammars are available; bounded lexical fallback otherwise; evidence, not certainty):',
     'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
@@ -210,6 +232,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     context: boundedContext,
     structure: { ...structure, sourceEvidence: snippets.map(({id,path,sourceSha256,excerptSha256}) => ({id,path,sourceSha256,excerptSha256,trustLevel:'untrusted_repository_content'})) },
     snippets,
+    evidenceSelection,
     contextTruncated,
     scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles }
   };
