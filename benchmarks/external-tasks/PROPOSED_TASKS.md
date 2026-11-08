@@ -113,7 +113,7 @@ The source blob SHAs below identify the public README and root manifest versions
 - Human review focus: Does OIOL identify why external libraries are currently excluded? Does it ask about ownership and storage measurement before proposing a schema or enforcement change?
 ## Draft JSON task files
 
-Ten draft task-definition JSON files are stored under [`drafts/`](drafts/). They use task version `0.4.0-draft`, map to the existing Existing Project benchmark scenarios, and are intended for contract validation only. In this revision, rubric groups that had combined distinct concepts (for example, tests/migration/documentation) were split because each group is interpreted as a single concept with lexical alternatives. They are not yet included in any benchmark run.
+Ten draft task-definition JSON files are stored under [`drafts/`](drafts/). Nine use task version `0.4.0-draft`; Immich IM-01 uses `0.5.0-draft` with explicit line-ranged evidence. They map to existing Existing Project benchmark scenarios and remain intended for contract validation only. In this revision, rubric groups that had combined distinct concepts (for example, tests/migration/documentation) were split because each group is interpreted as a single concept with lexical alternatives. They are not yet included in any benchmark run.
 
 The test suite validates that all ten files parse through `applyScenarioTaskFile`, have valid task IDs/versions/hashes, and use the expected clarification metadata. Passing schema validation does not equal reviewer approval or benchmark readiness.
 
