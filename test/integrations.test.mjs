@@ -119,6 +119,6 @@ test('OpenCode client deletes only the requested session ID',async()=>{
   let call;
   const client=new OpenCodeClient({fetchImpl:async(url,options)=>{call={url,options};return new Response('true',{status:200});}});
   assert.equal(await client.deleteSession('session/a'),true);
-  assert.equal(call.url,'http://127.0.0.1:4096/session/session%2Fa');
+  assert.equal(call.url,'http://127.0.0.1:4096/api/session/session%2Fa');
   assert.equal(call.options.method,'DELETE');
 });
