@@ -137,7 +137,7 @@ Aggregate three or more paired comparison reports:
 npm run benchmark:compare:aggregate -- --inputs benchmarks/results/pair-1.json,benchmarks/results/pair-2.json,benchmarks/results/pair-3.json
 ```
 
-The paired aggregator reports median/min/max/spread for each scenario and blocks human-adjudication readiness unless at least three paired runs exist and reviewer configurations match.
+The paired aggregator reports median/min/max/spread for each scenario. For external repositories it also rejects repeat sets that drift across repository commit SHAs, task-definition hashes, or either runner's configuration fingerprint. It blocks human-adjudication readiness unless at least three paired runs exist and reviewer configurations match.
 
 Do not commit API keys or private benchmark results containing sensitive repository details.
 
