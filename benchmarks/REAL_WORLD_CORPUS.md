@@ -151,9 +151,9 @@ Interpretation and limitations:
 
 The expanded reports are scanner-only artifacts. They do not contain raw source excerpts; they retain bounded paths, hashes, manifest metadata, AST/lexical coverage, diagnostics, and scan limits.
 
-### Scanner follow-up after language coverage improvements
+### Scanner follow-up after language coverage improvements (scanner 1.5.0)
 
-A subsequent scanner intake completed successfully for all five pinned repositories in [P12 scanner follow-up](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461012821). This run included the Dart/Swift selection changes: Swift files are parsed with the bundled Tree-sitter grammar; Dart files are read and analyzed through bounded lexical fallback because the pinned WASM grammar pack does not expose a Dart parser. These are different evidence levels and must remain distinguishable in any plan or review.
+A subsequent scanner intake completed successfully for all five pinned repositories in [P12 scanner follow-up](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461297388). This run included the Dart/Swift selection changes: Swift files are parsed with the bundled Tree-sitter grammar; Dart files are read and analyzed through bounded lexical fallback because the pinned WASM grammar pack does not expose a Dart parser. These are different evidence levels and must remain distinguishable in any plan or review.
 
 The follow-up run's per-repository artifacts are the authoritative reports for the updated scanner behavior. The quantitative table above describes the earlier expanded profile run and must not be reused as if it were the new run's coverage numbers. Refresh the table only after inspecting and comparing all five follow-up artifacts.
 
