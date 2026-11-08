@@ -4,6 +4,24 @@
   "private": false,
   "type": "module",
   "description": "Planning-only intelligent engineering system with deterministic plan validation and portable handoff",
+  "keywords": [
+    "planning",
+    "engineering-plan",
+    "architecture-review",
+    "static-analysis",
+    "code-review",
+    "llm",
+    "cli"
+  ],
+  "author": "Mohammed Shahrah",
+  "homepage": "https://github.com/ibbmeintersos-sudo/oiol-planner#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibbmeintersos-sudo/oiol-planner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ibbmeintersos-sudo/oiol-planner/issues"
+  },
   "engines": {
     "node": ">=22"
   },
@@ -15,7 +33,8 @@
     "schemas/",
     "examples/",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --test",
