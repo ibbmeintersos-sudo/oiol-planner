@@ -77,15 +77,50 @@ Additional checks:
 6. **Turborepo:** file cap reached; AST/source 25.1%; graph edge count 3 for 437 nodes is a major anomaly. Do not use its graph as a reliable dependency map until independently checked.
 7. **Plausible:** Elixir dominates the unsupported-source count. The current scanner projection is inadequate for a task whose correctness depends on Plausible's Elixir application layer. It may only support a tracker/frontend-scoped task if those files are explicitly evidenced.
 
+## Task-prioritized evidence intake — scanner 1.6.0
+
+The measured retrieval correction is now implemented and the five task-bearing repositories were rescanned using the `evidencePaths` in their task definitions. Workflow: [P12 task-specific evidence intake](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42505668870). All five scanner jobs completed successfully and uploaded artifacts.
+
+| Repository / task family | Required paths | Found in bounded file inventory | Delivered as excerpts | Missing / unexcerpted | Task gate |
+|---|---:|---:|---:|---|---|
+| Better Auth BA | 7 | 7 | 6 | 1 oversized test file | Blocked |
+| Paperless PN | 10 | 10 | 4 | 6 oversized implementation/test files | Blocked |
+| Prefect PF | 7 | 7 | 5 | 2 oversized implementation/test files | Blocked |
+| Gitea GT | 5 | 4 | 4 | 1 preview template beyond the 5,000-file cap | Blocked |
+| Immich IM | 9 | 9 | 9 | None | **Evidence gate passed** |
+
+All five task-specific reports still indicate general context truncation. That flag means lower-priority general evidence was omitted; it does not invalidate the Immich pilot because all nine explicitly required task paths were excerpted before the context filled. Conversely, the other four tasks are rejected by the benchmark runner because at least one required path was not delivered.
+
+The failures have concrete causes:
+- **Better Auth:** `packages/better-auth/src/plugins/organization/organization.test.ts` exceeds the 32 KiB per-file cap.
+- **Paperless:** `models.py`, `tasks.py`, `views.py`, `serialisers.py`, `signals/handlers.py`, and `test_api_documents.py` exceed the per-file cap.
+- **Prefect:** `src/prefect/server/events/actions.py` and `tests/events/server/test_automations_api.py` exceed the per-file cap.
+- **Gitea:** `templates/package/shared/cleanup_rules/preview.tmpl` is outside the 5,000-file inventory bound.
+- **Immich:** all nine paths are present as bounded, redacted excerpts with source/excerpt fingerprints.
+
+### Pilot selection
+
+Select **Immich IM-01 — separate per-user external-library usage reporting** as the first real planning-quality pilot. Its nine required source/documentation paths were all delivered at pinned commit `87ef895041e160aef4f61f2d7af1ad3f8e38827d`. The task is scoped to the server DTO/service/repository and administrator UI paths; the scanner's wider unsupported-language ratio and sparse import graph remain explicit limitations and must not be used to claim whole-repository understanding.
+
+The runner now rejects a task before provider calls if any required path is absent or has no excerpt. This prevents a score from being reported for a plan generated without the task's declared evidence.
+
+## Planning-quality execution status
+
+The Immich IM-01 task is evidence-ready, but **no live OIOL or OpenCode plan has yet been generated**. The benchmark runner requires a configured OIOL provider endpoint/model and an OpenCode server endpoint/model. No provider credentials or reachable OpenCode server configuration are available to this connected execution context. Dry-run and CI success are not planning-quality results.
+
+The next live pilot must:
+1. Use the exact Immich commit and the same task JSON bytes for both systems.
+2. Record the task SHA-256, scanner version/configuration, excerpt source/excerpt hashes, model IDs, reviewer IDs, timeouts, retry counts, and token usage.
+3. Use identical planning model and reviewer configuration where possible; if not, label the comparison non-equivalent.
+4. Run one paired pilot first; inspect both complete plans and the evidence citations before authorizing repeated runs.
+5. Score technical correctness, requirement coverage, architecture fit, evidence-grounding, task decomposition, acceptance-criteria testability, risk/rollback, NFRs, and clarification discipline using blinded human review. The lexical scorer remains only a screening signal.
+
+No superiority claim is permitted from one pilot or from lexical scores alone.
+
 ## Decision for the planning-quality benchmark
 
-Do not promote the ten `0.3.0-draft` tasks yet. The current automated scorer is lexical and the current scan excerpt selector did not deliver the cited core implementation files to the model. A result from these inputs would conflate planner quality with a known evidence-retrieval failure and could reward keyword coverage rather than technical correctness.
+Do not promote the ten `0.4.0-draft` tasks yet. Immich IM-01 is the only current task whose required excerpt gate passed; the other four repository task families remain blocked. The current automated scorer is lexical and the current scan excerpt selector did not deliver the cited core implementation files to the model. A result from these inputs would conflate planner quality with a known evidence-retrieval failure and could reward keyword coverage rather than technical correctness.
 
-The next measured step is narrow and testable:
-- Make the task's explicitly reviewed evidence paths available to the existing read-only scanner as first-priority excerpt candidates (without running repository code or changing the target checkout).
-- Verify each requested path is actually emitted as a redacted excerpt with source and excerpt SHA-256 fingerprints.
-- Reject a scored run if required evidence paths are missing, over-size, redacted to unusability, or excluded by context limits; record the reason instead of silently proceeding.
-- Then run one pilot task on Paperless-ngx, compare OIOL and OpenCode using the same pinned commit and exact task bytes, inspect the full plans, and only then expand to three repeated paired runs.
-- Preserve a separate end-to-end measure of default scanner retrieval quality; do not hide the current retrieval weakness by reporting only task-prioritized runs.
+The task-specific priority selection and missing-evidence gate are implemented and measured. The next live step is one paired Immich IM-01 pilot, but it cannot start until an OIOL provider and OpenCode endpoint/model are configured. Preserve a separate end-to-end measure of default scanner retrieval quality; do not hide the current retrieval weakness by reporting only task-prioritized runs.
 
 No live planning-quality score is claimed in this audit. The available environment has not yet supplied an authorized OIOL provider credential or an OpenCode endpoint/model configuration for live paired runs.
