@@ -362,3 +362,46 @@ test('scanner rejects unsafe task evidence paths', async () => {
     await f.cleanup();
   }
 });
+
+
+test('scanner emits bounded line-ranged excerpts from oversized task evidence files', async () => {
+  const f = await fixture('oiol-task-evidence-ranges-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    const lines = Array.from({ length: 260 }, (_, index) => 'const line' + (index + 1) + ' = ' + index + ';');
+    lines[219] = 'export function criticalQuotaRule() { return "external library"; }';
+    await writeFile(path.join(f.root, 'src', 'large.ts'), lines.join('\n') + '\n');
+    const result = await scanRepository(f.root, {
+      maxFileBytes: 100,
+      maxPriorityFileBytes: 20000,
+      maxPriorityExcerptChars: 2000,
+      maxContextChars: 5000,
+      priorityPaths: ['src/large.ts'],
+      priorityRanges: [{ path: 'src/large.ts', startLine: 218, endLine: 222 }]
+    });
+    const snippet = result.snippets.find(item => item.path === 'src/large.ts');
+    assert.ok(snippet);
+    assert.match(snippet.content, /criticalQuotaRule/);
+    assert.doesNotMatch(snippet.content, /const line1 =/);
+    assert.deepEqual(result.evidenceSelection.excerptedRanges, [{ path: 'src/large.ts', startLine: 218, endLine: 222 }]);
+    assert.deepEqual(result.evidenceSelection.unexcerptedRanges, []);
+  } finally {
+    await f.cleanup();
+  }
+});
+
+test('scanner reports line ranges that cannot be supplied', async () => {
+  const f = await fixture('oiol-task-evidence-range-missing-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    await writeFile(path.join(f.root, 'src', 'short.ts'), 'export const present = true;\n');
+    const result = await scanRepository(f.root, {
+      priorityPaths: ['src/short.ts'],
+      priorityRanges: [{ path: 'src/short.ts', startLine: 99, endLine: 101 }]
+    });
+    assert.deepEqual(result.evidenceSelection.excerptedRanges, []);
+    assert.deepEqual(result.evidenceSelection.unexcerptedRanges, [{ path: 'src/short.ts', startLine: 99, endLine: 101 }]);
+  } finally {
+    await f.cleanup();
+  }
+});
