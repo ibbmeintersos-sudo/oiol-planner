@@ -8,7 +8,6 @@ const numericOrder = value => {
   if (prefix) return { kind: 'numeric_prefix', value: prefix[1].padStart(16, '0') };
   return { kind: 'unknown', value: null };
 };
-};
 const destructive = new Set(['drop_table', 'drop_column', 'rename_table', 'rename_column', 'alter_column_type', 'set_not_null', 'drop_constraint']);
 const additive = new Set(['create_table', 'add_column', 'add_constraint', 'add_index', 'drop_not_null']);
 
