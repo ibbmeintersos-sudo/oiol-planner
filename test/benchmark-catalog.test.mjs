@@ -132,6 +132,8 @@ test('external repository input uses the actual scanner and does not leak the op
   assert.equal(scannerSummary.scanLimits.maxTestFiles, 25);
   assert.equal(scannerSummary.scanLimits.maxConfigFiles, 25);
   assert.ok(scannerSummary.skipped.counts);
+  assert.ok(scannerSummary.coverage.sourceAnalysisRatio > 0);
+  assert.equal(scannerSummary.coverage.includedFileCount, scannerSummary.includedFileCount);
   assert.ok(scannerSummary.structure.astFileCount + scannerSummary.structure.lexicalFallbackFileCount > 0);
   assert.ok(scannerSummary.includedPaths.includes('src/routes/customers.mjs'));
   assert.ok(project.repository.files.some(file => file.path === 'src/routes/customers.mjs'));
@@ -255,6 +257,8 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.equal(report.root, 'external-repository');
   assert.equal(report.scannerVersion, '1.3.0');
   assert.ok(report.skipped.counts);
+  assert.ok(report.coverage.sourceAnalysisRatio > 0);
+  assert.equal(report.coverage.includedFileCount, report.includedFileCount);
   assert.equal(report.scanLimits.maxFiles, 5000);
   assert.equal(report.scanLimits.maxSourceFiles, 500);
   assert.equal(report.scanLimits.maxTestFiles, 25);
