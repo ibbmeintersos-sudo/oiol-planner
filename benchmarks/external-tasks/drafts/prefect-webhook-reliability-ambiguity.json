@@ -1,0 +1,105 @@
+{
+  "scenarioId": "EX-API-003",
+  "taskId": "RW-PF-02",
+  "taskVersion": "0.4.0-draft",
+  "projectName": "Prefect",
+  "request": "A product request says: “Make webhook delivery more reliable.” Produce a planning response, but do not select delivery guarantees or retry behavior until the blocking requirements are clarified.",
+  "constraints": [
+    "Produce an engineering plan only; do not modify the repository or execute project commands, tests, or builds.",
+    "Ground claims in the pinned repository snapshot and cite relevant relative file paths.",
+    "Separate verified evidence from assumptions and unresolved unknowns.",
+    "Preserve existing public behavior and compatibility unless the request explicitly changes it.",
+    "Recognize that CallWebhook already exists; frame the work around its delivery semantics rather than proposing a duplicate integration.",
+    "Do not assume receiver support for idempotency or replay."
+  ],
+  "expectedSignals": [
+    [
+      "CallWebhook",
+      "existing webhook action"
+    ],
+    [
+      "delivery guarantee",
+      "at least once",
+      "at most once"
+    ],
+    [
+      "retryable failures",
+      "HTTP status codes"
+    ],
+    [
+      "attempt budget",
+      "retry duration"
+    ],
+    [
+      "idempotency",
+      "duplicate delivery"
+    ],
+    [
+      "timeout",
+      "ordering"
+    ],
+    [
+      "dead letter",
+      "manual replay"
+    ],
+    [
+      "clarification",
+      "unknowns"
+    ]
+  ],
+  "mustClarify": true,
+  "clarificationSignals": [
+    [
+      "at-most-once"
+    ],
+    [
+      "at-least-once"
+    ],
+    [
+      "retryable status codes"
+    ],
+    [
+      "network failures"
+    ],
+    [
+      "maximum attempts",
+      "time budget"
+    ],
+    [
+      "idempotency"
+    ],
+    [
+      "receiver support"
+    ],
+    [
+      "timeout"
+    ],
+    [
+      "payload size"
+    ],
+    [
+      "ordering"
+    ],
+    [
+      "dead-letter"
+    ],
+    [
+      "manual replay"
+    ],
+    [
+      "secret rotation"
+    ],
+    [
+      "audit visibility"
+    ]
+  ],
+  "evidencePaths": [
+    "src/prefect/server/events/actions.py",
+    "src/prefect/events/actions.py",
+    "src/prefect/server/events/clients.py",
+    "src/prefect/events/worker.py",
+    "ui-v2/src/components/automations/automations-wizard/actions-step/call-webhook-fields.tsx",
+    "tests/events/server/test_automation_events.py",
+    "tests/events/server/test_automations_api.py"
+  ]
+}

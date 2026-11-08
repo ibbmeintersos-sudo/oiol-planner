@@ -14,6 +14,16 @@ export function compareBenchmarkModes(oiol,baseline){
  if(baseline?.benchmarkMode!=='opencode-baseline')throw new Error('Second input must be an OpenCode baseline run');
  if(!oiol.comparisonKey||oiol.comparisonKey!==baseline.comparisonKey)throw new Error('Runs must have the same non-empty OIOL_BENCHMARK_COMPARISON_KEY');
  if(!oiol.budgetKey||oiol.budgetKey!==baseline.budgetKey)throw new Error('Runs must have the same non-empty OIOL_BENCHMARK_BUDGET_KEY');
+ const oiolExternal=oiol.sourceMode==='external-local-checkout';
+ const baselineExternal=baseline.sourceMode==='external-local-checkout';
+ if(oiolExternal!==baselineExternal)throw new Error('OIOL and OpenCode runs must use the same repository source mode');
+ if(oiolExternal){
+  if(!oiol.taskDefinition?.sha256||oiol.taskDefinition.sha256!==baseline.taskDefinition?.sha256)throw new Error('External paired runs must use the exact same versioned task definition');
+  const a=oiol.repositorySnapshot,b=baseline.repositorySnapshot;
+  if(!a?.allGitCommitsDetected||!b?.allGitCommitsDetected)throw new Error('External paired runs require detected Git commit SHAs in both results');
+  const commitsA=[...(a.commitShas||[])].sort(),commitsB=[...(b.commitShas||[])].sort();
+  if(!commitsA.length||commitsA.length!==commitsB.length||commitsA.some((sha,index)=>sha!==commitsB[index]))throw new Error('External paired runs must use the exact same repository commit SHA set');
+ }
  const a=indexScores(oiol),b=indexScores(baseline);
  const ids=[...a.keys()].sort(),other=[...b.keys()].sort();
  if(ids.length!==other.length||ids.some((id,i)=>id!==other[i]))throw new Error('OIOL and OpenCode runs must contain exactly the same scenario IDs');
@@ -27,7 +37,7 @@ export function compareBenchmarkModes(oiol,baseline){
  const reviewerComparable=JSON.stringify(reviewerIdentity(oiol.reviewer))===JSON.stringify(reviewerIdentity(baseline.reviewer));
  return {
   protocolVersion:'1.0',comparedAt:new Date().toISOString(),oiolRunId:oiol.runId,baselineRunId:baseline.runId,
-  comparisonKey:oiol.comparisonKey,budgetKey:oiol.budgetKey,scenarioCount:rows.length,
+  comparisonKey:oiol.comparisonKey,budgetKey:oiol.budgetKey,sourceMode:oiol.sourceMode||'checked-in-fixtures',repositorySnapshot:oiolExternal?oiol.repositorySnapshot:null,taskDefinition:oiolExternal?oiol.taskDefinition:null,runConfigFingerprints:{oiol:oiol.configFingerprint||null,baseline:baseline.configFingerprint||null},scenarioCount:rows.length,
   oiolAverageScore:oiol.summary?.averageScore??avg(rows.map(x=>x.oiolScore)),
   baselineAverageScore:baseline.summary?.averageScore??avg(rows.map(x=>x.baselineScore)),
   averageScoreDelta:avg(deltas),medianScoreDelta:median(deltas),

@@ -1,0 +1,130 @@
+{
+  "scenarioId": "EX-MONOLITH-004",
+  "taskId": "RW-IM-01",
+  "taskVersion": "0.5.0-draft",
+  "projectName": "Immich",
+  "request": "Plan a separate per-user external-library storage-usage metric for administrator-facing user/server statistics. Keep it distinct from the existing upload quota and do not change quota enforcement. Use a clearly documented logical-size measurement based on indexed external-library assets; do not claim physical disk usage or deduplicated storage usage unless repository evidence supports it.",
+  "constraints": [
+    "Produce an engineering plan only; do not modify the repository or execute project commands, tests, or builds.",
+    "Ground claims in the pinned repository snapshot and cite relevant relative file paths.",
+    "Separate verified evidence from assumptions and unresolved unknowns.",
+    "Preserve existing public behavior and compatibility unless the request explicitly changes it.",
+    "Preserve the current upload quota calculation, which excludes assets with a non-null libraryId.",
+    "Account for custom mount points and clearly label logical indexed bytes rather than physical disk consumption.",
+    "Avoid double counting assets."
+  ],
+  "expectedSignals": [
+    [
+      "external library",
+      "libraryId"
+    ],
+    [
+      "logical size",
+      "fileSizeInByte"
+    ],
+    [
+      "per-user usage",
+      "ownerId"
+    ],
+    [
+      "separate metric",
+      "separate from upload quota"
+    ],
+    [
+      "server stats"
+    ],
+    [
+      "admin UI"
+    ],
+    [
+      "DTO"
+    ],
+    [
+      "custom mount points"
+    ],
+    [
+      "no quota enforcement change"
+    ],
+    [
+      "tests"
+    ],
+    [
+      "documentation"
+    ]
+  ],
+  "mustClarify": false,
+  "clarificationSignals": [],
+  "evidencePaths": [
+    "docs/docs/administration/server-stats.md",
+    "server/src/dtos/server.dto.ts",
+    "server/src/dtos/user.dto.ts",
+    "server/src/services/asset.service.ts",
+    "server/src/services/user.service.ts",
+    "server/src/repositories/user.repository.ts",
+    "server/src/services/library.service.ts",
+    "server/src/repositories/library.repository.ts",
+    "web/src/routes/admin/users/[id]/+layout.svelte"
+  ],
+  "evidenceRanges": [
+    {
+      "path": "docs/docs/administration/server-stats.md",
+      "startLine": 1,
+      "endLine": 10
+    },
+    {
+      "path": "server/src/dtos/server.dto.ts",
+      "startLine": 88,
+      "endLine": 110
+    },
+    {
+      "path": "server/src/dtos/user.dto.ts",
+      "startLine": 118,
+      "endLine": 157
+    },
+    {
+      "path": "server/src/services/asset.service.ts",
+      "startLine": 330,
+      "endLine": 345
+    },
+    {
+      "path": "server/src/services/user.service.ts",
+      "startLine": 230,
+      "endLine": 250
+    },
+    {
+      "path": "server/src/repositories/user.repository.ts",
+      "startLine": 225,
+      "endLine": 285
+    },
+    {
+      "path": "server/src/repositories/user.repository.ts",
+      "startLine": 310,
+      "endLine": 325
+    },
+    {
+      "path": "server/src/services/library.service.ts",
+      "startLine": 260,
+      "endLine": 295
+    },
+    {
+      "path": "server/src/services/library.service.ts",
+      "startLine": 400,
+      "endLine": 425
+    },
+    {
+      "path": "server/src/repositories/library.repository.ts",
+      "startLine": 85,
+      "endLine": 105
+    },
+    {
+      "path": "web/src/routes/admin/users/[id]/+layout.svelte",
+      "startLine": 65,
+      "endLine": 90
+    },
+    {
+      "path": "web/src/routes/admin/users/[id]/+layout.svelte",
+      "startLine": 165,
+      "endLine": 190
+    }
+  ]
+}

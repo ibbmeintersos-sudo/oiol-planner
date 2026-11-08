@@ -46,7 +46,11 @@ test('OpenCode baseline deletes a session even when the model returns invalid JS
 });
 
 import { main as baselineMain, createBaselineWorkspace } from '../scripts/run-opencode-baseline.mjs';
+import { resolveScenarioProject } from '../scripts/run-planner-benchmark.mjs';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 
 test('OpenCode baseline runner dry-run validates config without contacting OpenCode',async()=>{
  const previousArgv=process.argv,previousOptIn=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
@@ -96,4 +100,44 @@ test('greenfield baseline receives an isolated empty workspace',async()=>{
  try {
   assert.deepEqual(await fs.readdir(workspace.projectDirectory),[]);
  } finally { await workspace.cleanup(); }
+});
+
+test('external baseline workspace contains only bounded redacted scanner excerpts', async () => {
+ const scenario={id:'EX-API-003',project:{kind:'existing',name:'External Customer API',request:'Review this project'}};
+ const repositoryRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../benchmarks/fixtures/customer-api');
+ const project=await resolveScenarioProject(scenario,{repositoryRoot});
+ const workspace=await createBaselineWorkspace(scenario,{repositoryRoot,project});
+ try {
+  assert.ok((await fs.readdir(workspace.projectDirectory)).length>0);
+  await fs.access(path.join(workspace.projectDirectory,'src/routes/customers.mjs'));
+  await assert.rejects(()=>fs.access(path.join(workspace.projectDirectory,'.git')));
+  const source=await fs.readFile(path.join(workspace.projectDirectory,'src/routes/customers.mjs'),'utf8');
+  assert.ok(source.length<=5000);
+ } finally { await workspace.cleanup(); }
+});
+
+test('external OpenCode baseline requires explicit consent before sending repository excerpts', async () => {
+ const directory=await fs.mkdtemp(path.join(os.tmpdir(),'oiol-baseline-consent-'));
+ const taskPath=path.join(directory,'task.json');
+ const task={
+  scenarioId:'EX-API-003',taskId:'RW-BASELINE-CONSENT-001',taskVersion:'1.0.0',
+  projectName:'Consent Test',request:'Plan a repository change.',
+  constraints:['Do not invent project facts'],
+  expectedSignals:[['architecture']],evidencePaths:['src/service.ts'],mustClarify:false
+ };
+ const previousArgv=process.argv;
+ const previousLive=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+ const previousSource=process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE;
+ try {
+  await fs.writeFile(taskPath,JSON.stringify(task),'utf8');
+  process.env.OIOL_BENCHMARK_ALLOW_LIVE='1';
+  delete process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE;
+  process.argv=['node','run-opencode-baseline.mjs','--repo','/unused/checkout','--task-file',taskPath,'--scenarios','EX-API-003'];
+  await assert.rejects(()=>baselineMain(),/ALLOW_EXTERNAL_SOURCE=1/);
+ } finally {
+  process.argv=previousArgv;
+  if(previousLive===undefined)delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;else process.env.OIOL_BENCHMARK_ALLOW_LIVE=previousLive;
+  if(previousSource===undefined)delete process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE;else process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=previousSource;
+  await fs.rm(directory,{recursive:true,force:true});
+ }
 });

@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:oiol:schemas:config:1.0.0",
+  "title": "OIOL configuration file",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "defaultProfile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "model"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "openai-compatible",
+              "anthropic",
+              "gemini",
+              "ollama"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "baseUrl": {
+            "type": "string",
+            "minLength": 1
+          },
+          "apiKeyEnv": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timeoutMs": {
+            "type": "integer"
+          },
+          "maxRetries": {
+            "type": "integer"
+          },
+          "reviewer": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provider",
+              "model"
+            ],
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "openai-compatible",
+                  "anthropic",
+                  "gemini",
+                  "ollama"
+                ]
+              },
+              "model": {
+                "type": "string",
+                "minLength": 1
+              },
+              "baseUrl": {
+                "type": "string",
+                "minLength": 1
+              },
+              "apiKeyEnv": {
+                "type": "string",
+                "minLength": 1
+              },
+              "timeoutMs": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "scan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxFiles": {
+          "type": "integer"
+        },
+        "maxFileBytes": {
+          "type": "integer"
+        },
+        "maxPriorityFileBytes": {
+          "type": "integer"
+        },
+        "maxContextChars": {
+          "type": "integer"
+        },
+        "maxPriorityExcerptChars": {
+          "type": "integer"
+        },
+        "maxDepth": {
+          "type": "integer"
+        },
+        "maxSourceFiles": {
+          "type": "integer"
+        },
+        "maxTestFiles": {
+          "type": "integer"
+        },
+        "maxConfigFiles": {
+          "type": "integer"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": [
+            "json",
+            "md"
+          ]
+        },
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

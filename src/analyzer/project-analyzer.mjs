@@ -5,10 +5,14 @@ import { analyzeChangeImpact } from './change-impact.mjs';
 export async function analyzeProject(input) {
   if (input.mode === 'existing') {
     if (!input.repo) throw new Error('Existing-project mode requires --repo');
+<<<<<<< HEAD
     const repo = await scanRepository(input.repo);
     const changeImpact = analyzeChangeImpact({ request: input.request || '', repository: repo });
     const changeImpactEvidenceId = id('ev');
     changeImpact.evidenceId = changeImpactEvidenceId;
+=======
+    const repo = await scanRepository(input.repo, input.scanOptions || {});
+>>>>>>> origin/main
     const evidence = [{
       id: id('ev'),
       type: 'repository_scan',

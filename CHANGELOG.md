@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Added
+- Added `oiol report` for standalone HTML, Markdown, or JSON review reports from an existing plan.
+- Added a self-contained HTML report renderer with inline CSS, no scripts or external assets, and full HTML escaping.
 - Added deterministic plan-quality metrics for measurable NFRs, test strategy completeness, rollback strategy completeness, reviewed unknowns, validated assumptions, and likelihood × impact risk exposure.
 - Added plan schema 1.1.0 with immutable version snapshots while retaining validation support for schema 1.0.0 plans.
 - Added optional GitHub Issues and Linear handoff adapters with local preview as the default and explicit publishing as an opt-in.

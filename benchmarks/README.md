@@ -47,6 +47,58 @@ npm run benchmark:aggregate -- --inputs benchmarks/results/run-a.json,benchmarks
 
 The aggregator rejects mixed configuration fingerprints and duplicate run IDs, reports per-scenario median/min/max/spread and failure rate, and only marks the automated gate ready for human review when at least three runs cover every scenario without automated failures. It does not itself certify quality.
 
+## Scanner-only corpus intake
+
+Before spending model calls, produce a scanner-only intake report for a clean local checkout:
+
+```sh
+npm run benchmark:scan-external -- \
+  --repo /absolute/path/to/clean/checkout \
+  --id RW-REPO-01 \
+  --out benchmarks/results/RW-REPO-01-scan.json
+```
+
+This command uses the existing `analyzeProject` and `scanRepository` implementation. It records the pinned Git commit, bounded file coverage, manifests, discovered tests/configuration, AST-versus-lexical coverage, import-graph statistics, diagnostics, and evidence fingerprints. It does not include source excerpts or the operator's absolute local path in the report. It does not execute project commands, tests, builds, package scripts, or modify the checkout. Reject or investigate reports with missing evidence, parser failures, truncation, or unexpectedly low AST coverage before creating scored planning tasks.
+
+P12 completed scanner-only intake for seven pinned real-world repositories in [workflow run 42503950232](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42503950232). All seven artifacts have now been downloaded and audited; see [P12 scanner audit](P12_SCANNER_AUDIT.md). The audit found that all seven default scans are context-truncated and that the original task-specific source files were not selected as model-context excerpts. Scanner 1.7.0 prioritizes task-specific evidence paths and exact line ranges; the benchmark runner rejects runs when required excerpts are missing. A second pinned intake passed the evidence gate for Immich IM-01 (9/9 paths); Better Auth, Paperless, Prefect, and Gitea remain blocked by oversized or undiscovered required files. Nine task definitions are `0.4.0-draft`; Immich IM-01 is `0.5.0-draft` with 12 pinned line ranges. All ten remain unapproved pending independent review and live planning evaluation. No live model benchmark or human score is claimed. The first paired pilot is Immich IM-01; live execution still requires an OIOL provider configuration and an OpenCode server/model configuration.
+
+## External real-repository mode
+
+The benchmark runners accept an operator-supplied **local Git checkout** for Existing Project scenarios. OIOL does not clone repositories, install dependencies, execute project scripts, run tests, build artifacts, or modify the target checkout.
+
+First, obtain a public repository checkout outside OIOL and ensure its working tree is clean. Then run one or more Existing Project scenarios against it:
+
+```sh
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 \
+node scripts/run-planner-benchmark.mjs \
+  --repo /absolute/path/to/clean/checkout \
+  --task-file /absolute/path/to/repository-task.json \
+  --scenarios EX-API-003 \
+  --out benchmarks/results/external-oiol.json
+```
+
+Run the OpenCode planning baseline against the same checkout and scenario:
+
+```sh
+OIOL_OPENCODE_MODEL=providerID/modelID \
+OIOL_OPENCODE_AGENT=plan \
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 \
+npm run benchmark:opencode -- --repo /absolute/path/to/clean/checkout \
+  --task-file /absolute/path/to/repository-task.json \
+  --scenarios EX-API-003 \
+  --out benchmarks/results/external-opencode.json
+```
+
+External mode requires a Git checkout with a 40-character commit SHA and a clean working tree. The scanner records the commit SHA; dirty or non-Git directories are rejected so results are tied to a reproducible snapshot. The absolute local path is not written to the plan or result artifact.
+
+The OIOL runner scans the supplied checkout using the existing bounded read-only scanner. The OpenCode baseline receives a disposable workspace containing only the scanner's bounded, redacted excerpts; it does not receive a raw copy of the checkout. External runs additionally require `OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1` as a separate consent gate, because bounded source excerpts are included in prompts sent to the configured model provider. Redaction is best-effort, not a guarantee: inspect the scan report and your source-handling obligations before enabling this flag. This is intentionally conservative, but it means external baseline results are a comparison against the same sanitized evidence projection, not a full checkout mirror. Review scanner coverage and truncation diagnostics before interpreting any result.
+
+Only Existing Project scenarios are valid with --repo, and external mode now requires a repository-specific --task-file. Exactly one Existing Project scenario is selected. The task file replaces the generic request and lexical scoring rubric; use the same exact file for OIOL and OpenCode. See [EXTERNAL_TASK_SCHEMA.md](EXTERNAL_TASK_SCHEMA.md) for the required fields, versioning, and reproducibility contract. Do not score arbitrary task/repository pairings as if they were equivalent. The five initial real-world candidates have two draft prompts each and ten schema-valid JSON task drafts under [external-tasks/drafts/](external-tasks/drafts/), documented in [external-tasks/PROPOSED_TASKS.md](external-tasks/PROPOSED_TASKS.md). They remain blocked from scored runs until required task-specific source content is present in the actual model context, task wording/evidence/rubrics receive two independent human approvals, and definitions are promoted to version 1.0.0.
+
+The local environment running the command must have access to the checkout. GitHub API access alone is not a local checkout and cannot be substituted for the scanner's filesystem input.
+
 ## OpenCode baseline and paired comparison
 
 Run the OpenCode-only baseline against the same scenario set. Configure an explicit model reference and use the OpenCode `plan` agent (or another agent whose permissions are verified as read-only):
@@ -87,7 +139,7 @@ Aggregate three or more paired comparison reports:
 npm run benchmark:compare:aggregate -- --inputs benchmarks/results/pair-1.json,benchmarks/results/pair-2.json,benchmarks/results/pair-3.json
 ```
 
-The paired aggregator reports median/min/max/spread for each scenario and blocks human-adjudication readiness unless at least three paired runs exist and reviewer configurations match.
+The paired aggregator reports median/min/max/spread for each scenario. For external repositories it also rejects repeat sets that drift across repository commit SHAs, task-definition hashes, or either runner's configuration fingerprint. It blocks human-adjudication readiness unless at least three paired runs exist and reviewer configurations match.
 
 Do not commit API keys or private benchmark results containing sensitive repository details.
 

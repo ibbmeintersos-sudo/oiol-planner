@@ -1,0 +1,212 @@
+name: OIOL planning review
+description: >-
+  Generate a planning-only engineering review for a pull request. Scans the
+  repository, produces a plan and Markdown report, and uploads them as
+  artifacts. It never runs the target project's builds, tests, or scripts.
+author: OIOL
+
+inputs:
+  request:
+    description: Planning request describing what the reviewer should analyze.
+    required: true
+  mode:
+    description: Planning mode. Only "existing" and "greenfield" are supported.
+    required: false
+    default: existing
+  path:
+    description: Repository path to scan, relative to the workflow workspace.
+    required: false
+    default: .
+  api-key:
+    description: Model provider API key. Pass a repository secret, never a literal value.
+    required: true
+  provider:
+    description: Provider name (openai-compatible, anthropic, gemini, ollama). Empty uses oiol.config.json or the default.
+    required: false
+    default: ''
+  model:
+    description: Provider model name. Empty uses oiol.config.json or the provider default.
+    required: false
+    default: ''
+  base-url:
+    description: Provider base URL. Empty uses oiol.config.json or the provider default.
+    required: false
+    default: ''
+  review-provider:
+    description: Optional independent reviewer provider.
+    required: false
+    default: ''
+  review-model:
+    description: Optional independent reviewer model.
+    required: false
+    default: ''
+  review-base-url:
+    description: Optional independent reviewer base URL.
+    required: false
+    default: ''
+  review-api-key:
+    description: Optional independent reviewer API key.
+    required: false
+    default: ''
+  config:
+    description: Optional path to an oiol.config.json file, relative to the workspace. The target checkout's own config is never loaded.
+    required: false
+    default: ''
+  output-dir:
+    description: Directory for plan.json, plan.md, and comment.md, relative to the workspace.
+    required: false
+    default: oiol-plan
+  artifact-name:
+    description: Name of the uploaded artifact.
+    required: false
+    default: oiol-plan
+  comment:
+    description: Post a short summary comment on the pull request. Requires pull-requests write permission.
+    required: false
+    default: 'false'
+  github-token:
+    description: Token used only for the optional pull-request comment.
+    required: false
+    default: ''
+  node-version:
+    description: Node.js version used to run the planner.
+    required: false
+    default: '22'
+
+outputs:
+  plan-path:
+    description: Absolute path to the generated plan JSON.
+    value: ${{ steps.plan.outputs.plan-path }}
+  report-path:
+    description: Absolute path to the generated Markdown report.
+    value: ${{ steps.plan.outputs.report-path }}
+  status:
+    description: Plan status (ready_for_review, needs_revision, or blocked).
+    value: ${{ steps.plan.outputs.status }}
+  exit-code:
+    description: CLI exit code (0 valid, 2 blocked or invalid, 1 error).
+    value: ${{ steps.plan.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install OIOL dependencies
+      shell: bash
+      working-directory: ${{ github.action_path }}/../../..
+      run: npm ci --ignore-scripts --no-audit --no-fund
+
+    - name: Generate planning review
+      id: plan
+      shell: bash
+      working-directory: ${{ github.action_path }}/../../..
+      env:
+        OIOL_API_KEY: ${{ inputs.api-key }}
+        OIOL_REVIEW_API_KEY: ${{ inputs.review-api-key }}
+        INPUT_MODE: ${{ inputs.mode }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_REQUEST: ${{ inputs.request }}
+        INPUT_PROVIDER: ${{ inputs.provider }}
+        INPUT_MODEL: ${{ inputs.model }}
+        INPUT_BASE_URL: ${{ inputs.base-url }}
+        INPUT_REVIEW_PROVIDER: ${{ inputs.review-provider }}
+        INPUT_REVIEW_MODEL: ${{ inputs.review-model }}
+        INPUT_REVIEW_BASE_URL: ${{ inputs.review-base-url }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_ARTIFACT_NAME: ${{ inputs.artifact-name }}
+      run: |
+        set -u
+        OIOL_ROOT="$GITHUB_ACTION_PATH/../../.."
+        case "${INPUT_MODE:-existing}" in
+          existing|greenfield) ;;
+          *) echo "::error::mode must be 'existing' or 'greenfield'"; exit 1 ;;
+        esac
+        if [ -z "${OIOL_API_KEY:-}" ] && [ "${INPUT_PROVIDER:-openai-compatible}" != "ollama" ]; then
+          echo "::error::api-key is required for provider '${INPUT_PROVIDER:-openai-compatible}'"
+          exit 1
+        fi
+        case "${INPUT_PATH:-.}" in
+          /*) TARGET="$INPUT_PATH" ;;
+          *) TARGET="$GITHUB_WORKSPACE/${INPUT_PATH:-.}" ;;
+        esac
+        if [ ! -d "$TARGET" ]; then
+          echo "::error::path does not exist: $TARGET"
+          exit 1
+        fi
+        OUTPUT="$GITHUB_WORKSPACE/${INPUT_OUTPUT_DIR:-oiol-plan}"
+        mkdir -p "$OUTPUT"
+        PLAN_FILE="$OUTPUT/plan.json"
+        REPORT_FILE="$OUTPUT/plan.md"
+        COMMENT_FILE="$OUTPUT/comment.md"
+        ARGS=(plan --mode "$INPUT_MODE" --repo "$TARGET" --request "$INPUT_REQUEST" --out "$PLAN_FILE")
+        if [ -n "${INPUT_CONFIG:-}" ]; then
+          case "$INPUT_CONFIG" in
+            /*) ARGS+=(--config "$INPUT_CONFIG") ;;
+            *) ARGS+=(--config "$GITHUB_WORKSPACE/$INPUT_CONFIG") ;;
+          esac
+        fi
+        if [ -n "${INPUT_PROVIDER:-}" ]; then export OIOL_PROVIDER="$INPUT_PROVIDER"; fi
+        if [ -n "${INPUT_MODEL:-}" ]; then export OIOL_MODEL="$INPUT_MODEL"; fi
+        if [ -n "${INPUT_BASE_URL:-}" ]; then export OIOL_BASE_URL="$INPUT_BASE_URL"; fi
+        if [ -n "${INPUT_REVIEW_PROVIDER:-}" ]; then export OIOL_REVIEW_PROVIDER="$INPUT_REVIEW_PROVIDER"; fi
+        if [ -n "${INPUT_REVIEW_MODEL:-}" ]; then export OIOL_REVIEW_MODEL="$INPUT_REVIEW_MODEL"; fi
+        if [ -n "${INPUT_REVIEW_BASE_URL:-}" ]; then export OIOL_REVIEW_BASE_URL="$INPUT_REVIEW_BASE_URL"; fi
+        set +e
+        node "$OIOL_ROOT/src/bin.mjs" "${ARGS[@]}"
+        CODE=$?
+        set -e
+        if [ -f "$PLAN_FILE" ]; then
+          STATUS=$(node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));process.stdout.write(String(p.status??'unknown'))" "$PLAN_FILE")
+          node "$OIOL_ROOT/scripts/oiol-pr-summary.mjs" \
+            --plan "$PLAN_FILE" \
+            --report-out "$REPORT_FILE" \
+            --comment-out "$COMMENT_FILE" \
+            --summary-out "$GITHUB_STEP_SUMMARY" \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --artifact-name "${INPUT_ARTIFACT_NAME:-oiol-plan}"
+          echo "plan-path=$PLAN_FILE" >> "$GITHUB_OUTPUT"
+          echo "report-path=$REPORT_FILE" >> "$GITHUB_OUTPUT"
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+        else
+          echo "::warning::OIOL did not produce a plan file."
+          echo "plan-path=" >> "$GITHUB_OUTPUT"
+          echo "report-path=" >> "$GITHUB_OUTPUT"
+          echo "status=unknown" >> "$GITHUB_OUTPUT"
+        fi
+        echo "exit-code=$CODE" >> "$GITHUB_OUTPUT"
+        exit "$CODE"
+
+    - name: Upload plan artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.output-dir }}
+        if-no-files-found: warn
+
+    - name: Comment on pull request
+      if: always() && inputs.comment == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        COMMENT_FILE: ${{ github.workspace }}/${{ inputs.output-dir }}/comment.md
+      run: |
+        if [ -z "${GH_TOKEN:-}" ]; then
+          echo "::warning::comment is enabled but github-token is empty."
+          exit 0
+        fi
+        if [ ! -f "$COMMENT_FILE" ]; then
+          echo "::warning::No comment file was generated."
+          exit 0
+        fi
+        PR_NUMBER=$(node -e "const fs=require('fs');const e=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));process.stdout.write(String(e.pull_request?.number??''))")
+        if [ -z "$PR_NUMBER" ]; then
+          echo "::notice::Not a pull_request event; skipping comment."
+          exit 0
+        fi
+        gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"

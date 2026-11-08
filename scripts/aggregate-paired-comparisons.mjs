@@ -10,6 +10,22 @@ export function aggregatePairedComparisons(reports){
  if(!Array.isArray(reports)||reports.length===0)throw new Error('At least one paired comparison report is required');
  const ids=reports.map(x=>x.oiolRunId+'|'+x.baselineRunId);
  if(ids.some(x=>x.startsWith('undefined')||x.endsWith('undefined'))||new Set(ids).size!==ids.length)throw new Error('Every paired report must contain unique OIOL and baseline run IDs');
+ const sourceModes=new Set(reports.map(x=>x.sourceMode||'checked-in-fixtures'));
+ if(sourceModes.size!==1)throw new Error('Paired reports must use the same repository source mode');
+ const sourceMode=[...sourceModes][0];
+ if(sourceMode==='external-local-checkout'){
+  const first=reports[0],snapshot=first.repositorySnapshot,task=first.taskDefinition,fingerprints=first.runConfigFingerprints;
+  if(!snapshot?.allGitCommitsDetected||!Array.isArray(snapshot.commitShas)||!snapshot.commitShas.length)throw new Error('External paired aggregation requires pinned repository commit SHAs');
+  if(!task?.id||!task?.version||!task?.sha256)throw new Error('External paired aggregation requires a versioned task definition');
+  if(!fingerprints?.oiol||!fingerprints?.baseline)throw new Error('External paired aggregation requires both run configuration fingerprints');
+  const commitKey=[...snapshot.commitShas].sort().join(',');
+  for(const report of reports){
+   const current=report.repositorySnapshot;
+   if(!current?.allGitCommitsDetected||[...(current.commitShas||[])].sort().join(',')!==commitKey)throw new Error('External paired reports must use the same repository commit SHA set');
+   if(report.taskDefinition?.id!==task.id||report.taskDefinition?.version!==task.version||report.taskDefinition?.sha256!==task.sha256)throw new Error('External paired reports must use the same versioned task definition');
+   if(report.runConfigFingerprints?.oiol!==fingerprints.oiol||report.runConfigFingerprints?.baseline!==fingerprints.baseline)throw new Error('External paired reports must use the same OIOL and OpenCode run configuration fingerprints');
+  }
+ }
  const comparisonKeys=new Set(reports.map(x=>x.comparisonKey)),budgetKeys=new Set(reports.map(x=>x.budgetKey));
  if(comparisonKeys.size!==1||!reports[0].comparisonKey)throw new Error('Paired reports must share a non-empty comparison key');
  if(budgetKeys.size!==1||!reports[0].budgetKey)throw new Error('Paired reports must share a non-empty budget key');
@@ -28,7 +44,7 @@ export function aggregatePairedComparisons(reports){
  });
  const runDeltas=reports.map(x=>x.averageScoreDelta).filter(Number.isFinite);
  const reviewerComparable=reports.every(x=>x.reviewerComparable===true);
- return {protocolVersion:'1.0',aggregatorVersion:'1.0.0',aggregatedAt:new Date().toISOString(),comparisonKey:reports[0].comparisonKey,budgetKey:reports[0].budgetKey,pairedRunCount:reports.length,minimumPairedRuns:3,repeatGateMet:reports.length>=3,reviewerComparable,averageDelta:stats(runDeltas),scenarioCount:expected.length,completeSuiteCoverage,scenarioResults,positiveMedianScenarios:scenarioResults.filter(x=>x.median>0).length,negativeMedianScenarios:scenarioResults.filter(x=>x.median<0).length,zeroMedianScenarios:scenarioResults.filter(x=>x.median===0).length,readyForHumanAdjudication:reports.length>=3&&completeSuiteCoverage&&reviewerComparable,limitations:['The comparison and budget keys are operator attestations.','A repeated automated score difference is not a statistical proof of superiority.','Blinded human review and inspection of failure cases remain mandatory.']};
+ return {protocolVersion:'1.0',aggregatorVersion:'1.1.0',aggregatedAt:new Date().toISOString(),comparisonKey:reports[0].comparisonKey,budgetKey:reports[0].budgetKey,sourceMode,repositorySnapshot:sourceMode==='external-local-checkout'?reports[0].repositorySnapshot:null,taskDefinition:sourceMode==='external-local-checkout'?reports[0].taskDefinition:null,runConfigFingerprints:sourceMode==='external-local-checkout'?reports[0].runConfigFingerprints:null,pairedRunCount:reports.length,minimumPairedRuns:3,repeatGateMet:reports.length>=3,reviewerComparable,averageDelta:stats(runDeltas),scenarioCount:expected.length,completeSuiteCoverage,scenarioResults,positiveMedianScenarios:scenarioResults.filter(x=>x.median>0).length,negativeMedianScenarios:scenarioResults.filter(x=>x.median<0).length,zeroMedianScenarios:scenarioResults.filter(x=>x.median===0).length,readyForHumanAdjudication:reports.length>=3&&completeSuiteCoverage&&reviewerComparable,limitations:['The comparison and budget keys are operator attestations.','A repeated automated score difference is not a statistical proof of superiority.','Blinded human review and inspection of failure cases remain mandatory.']};
 }
 export async function main(){
  const index=process.argv.indexOf('--inputs');

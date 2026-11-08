@@ -1,16 +1,25 @@
 import path from 'node:path';
 import { redact } from '../core/utils.mjs';
+<<<<<<< HEAD
 import { analyzeWithTreeSitter } from './tree-sitter-ast.mjs';
 import { scanDatabaseSchema } from './database-schema.mjs';
+=======
+import { analyzeWithTreeSitter, resolveLocalImport } from './tree-sitter-ast.mjs';
+>>>>>>> origin/main
 
 const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
   ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
-  ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby']
+  ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby'],['.dart','dart'],['.swift','swift']
 ]);
+<<<<<<< HEAD
 const norm = value => path.posix.normalize(String(value || '').replaceAll('\\','/').replace(/^\.\//,''));
 const FILE_SUFFIXES = [...EXT.keys(), '.d.ts', '.json'];
 const INDEX_NAMES = ['index.js','index.jsx','index.mjs','index.cjs','index.ts','index.tsx','index.py','index.go','index.rs','__init__.py'];
+=======
+const SOURCE_EXT = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
+const norm = value => value.replaceAll('\\','/').replace(/^\.\//,'');
+>>>>>>> origin/main
 
 function importsFor(source, language) {
   const out = [], add = value => { if (value && !out.includes(value)) out.push(value); };
@@ -32,6 +41,10 @@ function importsFor(source, language) {
     for (const m of source.matchAll(/\b(?:require|include)(?:_once)?\s*\(?\s*['"]([^'"]+)['"]/g)) add(m[1]);
   } else if (language === 'ruby') {
     for (const m of source.matchAll(/^\s*require(?:_relative)?\s+['"]([^'"]+)['"]/gm)) add(m[1]);
+  } else if (language === 'dart') {
+    for (const m of source.matchAll(/^\s*(?:import|export)\s+['"]([^'"]+)['"]/gm)) add(m[1]);
+  } else if (language === 'swift') {
+    for (const m of source.matchAll(/^\s*import\s+(?:typealias|struct|class|enum|protocol|let|var|func)?\s*([\w.]+)/gm)) add(m[1]);
   }
   return out;
 }
@@ -46,7 +59,9 @@ function symbolsFor(source, language) {
     java:[['type',/^\s*(?:(?:public|protected|private|abstract|final|static)\s+)*(?:class|interface|enum|record)\s+([\w]+)/gm]],
     kotlin:[['class',/^\s*(?:(?:data|sealed|open)\s+)?class\s+([\w]+)/gm],['function',/^\s*fun\s+([\w]+)/gm]],
     php:[['class',/^\s*(?:abstract\s+|final\s+)?class\s+([\w]+)/gm],['function',/^\s*(?:public|protected|private|static|\s)*function\s+([\w]+)/gm]],
-    ruby:[['class',/^\s*class\s+([\w]+)/gm],['module',/^\s*module\s+([\w]+)/gm],['function',/^\s*def\s+([\w]+)/gm]]
+    ruby:[['class',/^\s*class\s+([\w]+)/gm],['module',/^\s*module\s+([\w]+)/gm],['function',/^\s*def\s+([\w]+)/gm]],
+    dart:[['class',/^\s*class\s+([\w]+)/gm],['mixin',/^\s*mixin\s+([\w]+)/gm],['enum',/^\s*enum\s+([\w]+)/gm],['function',/^\s*(?:Future<[^>]+>|[\w<>?]+)\s+([\w]+)\s*\(/gm]],
+    swift:[['class',/^\s*(?:open\s+|public\s+|final\s+)*class\s+([\w]+)/gm],['struct',/^\s*(?:public\s+)?struct\s+([\w]+)/gm],['enum',/^\s*(?:public\s+)?enum\s+([\w]+)/gm],['protocol',/^\s*(?:public\s+)?protocol\s+([\w]+)/gm],['function',/^\s*(?:public\s+|private\s+|internal\s+|static\s+|override\s+)*func\s+([\w]+)/gm]]
   };
   const out = [];
   for (const [kind, re] of rules[language] || []) for (const match of source.matchAll(re)) out.push({ name: match[1], kind, line: source.slice(0, match.index).split('\n').length, source: 'bounded_lexical_heuristic' });
@@ -68,6 +83,7 @@ function frameworksFor(text) {
   return defs.filter(([, needles]) => needles.some(needle => lower.includes(needle))).map(([name]) => name);
 }
 
+<<<<<<< HEAD
 function resolveFileCandidate(base, fileSet) {
   const normalized = norm(base);
   const candidates = [normalized];
@@ -347,17 +363,23 @@ export function analyzeRepositoryStructure({
   maxFileBytes = 16000, analysisMode = 'auto'
 } = {}) {
   if (!['auto', 'lexical'].includes(analysisMode)) throw new Error('analysisMode must be auto or lexical');
+=======
+export function analyzeRepositoryStructure({ files = [], contents = {}, manifests = [], maxFileBytes = 16000 } = {}) {
+>>>>>>> origin/main
   const normalized = files.map(norm);
   const fileSet = new Set(normalized);
-  const sources = normalized.filter(file => EXT.has(path.posix.extname(file).toLowerCase()));
+  const sources = normalized.filter(file => SOURCE_EXT.test(file));
+  const supportedSources = sources.filter(file => EXT.has(path.posix.extname(file).toLowerCase()));
+  const unsupportedSources = sources.filter(file => !EXT.has(path.posix.extname(file).toLowerCase()));
   const languages = {}, analyzed = [];
-  for (const file of sources) {
+  for (const file of supportedSources) {
     if (typeof contents[file] !== 'string') continue;
     const language = EXT.get(path.posix.extname(file).toLowerCase());
     languages[language] = (languages[language] || 0) + 1;
     analyzed.push(file);
   }
 
+<<<<<<< HEAD
   const ast = analysisMode === 'lexical'
     ? {
         symbols: [], imports: [], diagnostics: [], parsedFiles: [], unsupportedFiles: [], failedFiles: [],
@@ -366,6 +388,14 @@ export function analyzeRepositoryStructure({
         runtimeLoadError: 'AST disabled by scanner configuration'
       }
     : analyzeWithTreeSitter({ files: analyzed, contents, maxFileBytes });
+=======
+  const goModFile = manifests.find(file => path.posix.basename(file) === 'go.mod');
+  const goModulePath = typeof contents[goModFile] === 'string'
+    ? contents[goModFile].match(/^\s*module\s+([^\s]+)\s*$/m)?.[1] || null
+    : null;
+  const pythonRoots = ['', 'src', 'lib', 'app'];
+  const ast = analyzeWithTreeSitter({ files: normalized, contents, maxFileBytes, goModulePath, pythonRoots });
+>>>>>>> origin/main
   const astFiles = new Set(ast.parsedFiles.map(item => item.file));
   const symbols = [...ast.symbols], imports = [...ast.imports];
   const lexicalFallbackFiles = [];
@@ -378,10 +408,10 @@ export function analyzeRepositoryStructure({
     for (const symbol of symbolsFor(source, language)) symbols.push({ file, ...symbol, trustLevel: 'untrusted_repository_metadata' });
     for (const specifier of importsFor(source, language)) {
       const safeSpecifier = redact(specifier.split(/[?#]/, 1)[0]).slice(0, 200);
-      const target = resolveRelativeImport(file, language, safeSpecifier, fileSet);
+      const target = resolveLocalImport(file, language, safeSpecifier, fileSet, { goModulePath, pythonRoots });
       imports.push({
-        from: file, to: target, specifier: safeSpecifier, resolved: Boolean(target),
-        trustLevel: 'untrusted_repository_metadata', source: 'bounded_lexical_heuristic'
+        from: file, to: target, specifier: safeSpecifier, language, resolved: Boolean(target),
+        trustLevel: 'untrusted_repository_metadata', source: 'bounded_lexical_heuristic', resolution: target ? (language === 'go' ? 'go-module-package-representative' : language === 'python' && !safeSpecifier.startsWith('.') ? 'python-module-root' : 'relative-path') : null
       });
     }
   }
@@ -426,6 +456,7 @@ export function analyzeRepositoryStructure({
     const key = [item.from, item.specifier, item.to || ''].join('\0');
     if (!seenImports.has(key)) { seenImports.add(key); uniqueImports.push(item); }
   }
+<<<<<<< HEAD
   const evidencedSymbols = symbols.map(item => attachEvidence(item, item.file, evidenceByPath));
   const evidencedImports = uniqueImports.map(item => attachEvidence(item, item.from, evidenceByPath));
   const edges = evidencedImports.filter(item => item.resolved).map(item => ({
@@ -438,6 +469,21 @@ export function analyzeRepositoryStructure({
     (item.from === alias.configRoot || item.from.startsWith(alias.configRoot ? alias.configRoot + '/' : '')) &&
     matchAlias(alias.pattern, item.specifier) !== null
   ));
+=======
+  const edges = uniqueImports.filter(item => item.resolved).map(item => ({ from: item.from, to: item.to, kind: 'imports', resolution: item.resolution || (item.language === 'go' ? 'go-module-package-representative' : item.language === 'python' && !item.specifier.startsWith('.') ? 'python-module-root' : 'relative-path') }));
+  const localPythonModules = new Set();
+  for (const file of normalized) if (file.endsWith('.py')) {
+    const parts = file.split('/');
+    localPythonModules.add(parts[0] === 'src' && parts.length > 2 ? parts[1] : parts[0]);
+  }
+  const unresolved = uniqueImports.filter(item => {
+    if (item.resolved) return false;
+    if (item.specifier.startsWith('.')) return true;
+    if (item.language === 'go' && goModulePath && (item.specifier === goModulePath || item.specifier.startsWith(goModulePath + '/'))) return true;
+    if (item.language === 'python' && localPythonModules.has(item.specifier.split('.')[0])) return true;
+    return false;
+  });
+>>>>>>> origin/main
   const manifestTexts = manifests.map(file => contents[file]).filter(value => typeof value === 'string');
   const workspaceDependencies = workspace.dependencies.map(item => ({
     ...item,
@@ -466,7 +512,8 @@ export function analyzeRepositoryStructure({
     analyzedSourceFileCount: analyzed.length,
     astFileCount: ast.parsedFileCount,
     lexicalFallbackFileCount: lexicalFallbackFiles.length,
-    unsupportedLanguageFileCount: ast.unsupportedFileCount,
+    unsupportedLanguageFileCount: ast.unsupportedFileCount + unsupportedSources.length,
+    unsupportedLanguageFiles: [...ast.unsupportedFiles.map(item => item.file), ...unsupportedSources].slice(0, 500),
     parseFailureFileCount: ast.failedFileCount,
     syntaxErrorFileCount: ast.parsedFiles.filter(item => item.hasError).length,
     nodeLimitFileCount: ast.parsedFiles.filter(item => item.nodeLimitReached).length,
@@ -474,6 +521,7 @@ export function analyzeRepositoryStructure({
     parseCounts: ast.parseCounts,
     availableGrammarLanguages: ast.availableLanguages,
     visitedAstNodeCount: ast.visitedNodeCount,
+<<<<<<< HEAD
     symbols: evidencedSymbols.slice(0, 4000),
     symbolCount: evidencedSymbols.length,
     imports: evidencedImports.slice(0, 6000),
@@ -504,6 +552,13 @@ export function analyzeRepositoryStructure({
       fingerprintedAliasConfigCount,
       aliasConfigFingerprintRate: resolvedAliasCount ? Number((fingerprintedAliasConfigCount / resolvedAliasCount).toFixed(4)) : 1
     },
+=======
+    symbols: symbols.slice(0, 4000),
+    symbolCount: symbols.length,
+    imports: uniqueImports.slice(0, 6000),
+    importCount: uniqueImports.length,
+    dependencyGraph: { nodes: [...new Set([...analyzed, ...edges.map(edge => edge.to)])].sort(), edges: edges.slice(0, 6000), edgeCount: edges.length },
+>>>>>>> origin/main
     unresolvedLocalImports: unresolved.slice(0, 1000),
     unresolvedLocalImportCount: unresolved.length,
     frameworks: frameworksFor(manifestTexts.join('\n')),

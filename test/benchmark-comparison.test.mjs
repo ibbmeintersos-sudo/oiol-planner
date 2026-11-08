@@ -27,3 +27,40 @@ test('paired comparison rejects different scenario sets and wrong benchmark mode
  assert.throws(()=>compareBenchmarkModes(oi,{...base,scores:base.scores.slice(0,1)}),/exactly the same scenario IDs/);
  assert.throws(()=>compareBenchmarkModes(base,oi),/First input must be an OIOL/);
 });
+
+test('external paired comparison rejects different repository commits',()=>{
+ const taskDefinition={id:'RW-COMPARE',version:'1.0.0',sha256:'f'.repeat(64)};
+ const externalO={...oi,sourceMode:'external-local-checkout',taskDefinition,repositorySnapshot:{allGitCommitsDetected:true,commitShas:['a'.repeat(40)]}};
+ const externalB={...base,sourceMode:'external-local-checkout',taskDefinition,repositorySnapshot:{allGitCommitsDetected:true,commitShas:['b'.repeat(40)]}};
+ assert.throws(()=>compareBenchmarkModes(externalO,externalB),/exact same repository commit SHA set/);
+});
+
+test('external paired comparison accepts the same clean pinned commit',()=>{
+ const snapshot={allGitCommitsDetected:true,commitShas:['c'.repeat(40)]};
+ const taskDefinition={id:'RW-COMPARE',version:'1.0.0',sha256:'f'.repeat(64)};
+ const result=compareBenchmarkModes(
+  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition,configFingerprint:'oiol-config'},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition,configFingerprint:'baseline-config'}
+ );
+ assert.equal(result.sourceMode,'external-local-checkout');
+ assert.deepEqual(result.repositorySnapshot,snapshot);
+ assert.deepEqual(result.taskDefinition,taskDefinition);
+ assert.deepEqual(result.runConfigFingerprints,{oiol:'oiol-config',baseline:'baseline-config'});
+});
+
+test('paired comparison rejects mixing fixture and external repository modes',()=>{
+ assert.throws(()=>compareBenchmarkModes(
+  {...oi,sourceMode:'checked-in-fixtures'},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['d'.repeat(40)]}}
+ ),/same repository source mode/);
+});
+
+test('external paired comparison rejects different task definition hashes',()=>{
+ const snapshot={allGitCommitsDetected:true,commitShas:['e'.repeat(40)]};
+ const taskA={id:'RW-A',version:'1.0.0',sha256:'1'.repeat(64)};
+ const taskB={id:'RW-B',version:'1.0.0',sha256:'2'.repeat(64)};
+ assert.throws(()=>compareBenchmarkModes(
+  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition:taskA},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition:taskB}
+ ),/same versioned task definition/);
+});
