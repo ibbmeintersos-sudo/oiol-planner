@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-API-003",
   "taskId": "RW-GT-02",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Gitea",
   "request": "A product request says: “Make package cleanup more granular.” Produce a planning response, but do not assume the intended scope, precedence, or deletion policy.",
   "constraints": [
@@ -18,10 +18,18 @@
       "PackageCleanupRule"
     ],
     [
-      "scope",
-      "owner",
-      "repository",
-      "package",
+      "scope"
+    ],
+    [
+      "owner"
+    ],
+    [
+      "repository"
+    ],
+    [
+      "package"
+    ],
+    [
       "version"
     ],
     [
@@ -29,8 +37,12 @@
       "overlapping rules"
     ],
     [
-      "age",
-      "count",
+      "age"
+    ],
+    [
+      "count"
+    ],
+    [
       "pattern"
     ],
     [
@@ -38,11 +50,15 @@
       "tags"
     ],
     [
-      "preview",
+      "preview"
+    ],
+    [
       "approval"
     ],
     [
-      "schedule",
+      "schedule"
+    ],
+    [
       "rollback"
     ],
     [
@@ -53,10 +69,18 @@
   "mustClarify": true,
   "clarificationSignals": [
     [
-      "scope",
-      "owner",
-      "repository",
-      "package",
+      "scope"
+    ],
+    [
+      "owner"
+    ],
+    [
+      "repository"
+    ],
+    [
+      "package"
+    ],
+    [
       "version"
     ],
     [
@@ -64,8 +88,12 @@
       "overlapping rules"
     ],
     [
-      "retention by age",
-      "keep count",
+      "retention by age"
+    ],
+    [
+      "keep count"
+    ],
+    [
       "pattern"
     ],
     [
@@ -73,12 +101,18 @@
       "tags"
     ],
     [
-      "preview",
+      "preview"
+    ],
+    [
       "approval"
     ],
     [
-      "schedule",
-      "rollback",
+      "schedule"
+    ],
+    [
+      "rollback"
+    ],
+    [
       "recovery"
     ]
   ]
