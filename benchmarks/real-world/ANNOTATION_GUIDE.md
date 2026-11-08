@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Create a defensible expected-impact record for one historical change against its exact pinned **base** snapshot. The annotation is a human ground-truth artifact; it is not a transcription of the pull request's changed-file list and must never be seeded from OIOL output.
+Create a defensible expected-impact record for one historical change against its exact pinned **base** snapshot. The current 36-case queue is in [annotation-worklist.json](./annotation-worklist.json); it is a reviewer worklist, not a validated corpus or source of ground-truth labels. The annotation is a human ground-truth artifact; it is not a transcription of the pull request's changed-file list and must never be seeded from OIOL output.
 
 ## Blinding and reviewer independence
 
