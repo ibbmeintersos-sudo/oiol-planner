@@ -28,7 +28,7 @@ Selection goals:
 | RW-TS-06 | https://github.com/immich-app/immich | Full application / multi-component | Self-hosted photo and video management | Tests a substantial application with multiple components and operational concerns |
 | RW-PY-07 | https://github.com/PrefectHQ/prefect | Framework / service platform | Python; workflow authoring and deployment platform | Tests orchestration concepts, APIs, and framework architecture without adding execution to OIOL |
 
-PostHog was reviewed as a stretch target because its repository is substantially larger than the initial balanced set: https://github.com/PostHog/posthog.
+PostHog was reviewed as a stretch target because its repository is substantially larger than the initial balanced set and GitHub currently reports its license as `NOASSERTION`; verify licensing before any source excerpt is sent to a model provider: https://github.com/PostHog/posthog.
 
 ## Intake status
 
@@ -59,7 +59,7 @@ The following values were retrieved from GitHub repository metadata on 2026-11-0
 | PrefectHQ/prefect | main | Apache-2.0 | 253254 | Yes | No |
 | PostHog/posthog (stretch) | master | NOASSERTION (Other) | 9056955 | Yes | No |
 
-The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size.
+The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size and unresolved GitHub license metadata.
 
 A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. Consequently, no local scanner run or live benchmark is claimed here.
 
