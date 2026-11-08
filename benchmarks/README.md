@@ -47,6 +47,19 @@ npm run benchmark:aggregate -- --inputs benchmarks/results/run-a.json,benchmarks
 
 The aggregator rejects mixed configuration fingerprints and duplicate run IDs, reports per-scenario median/min/max/spread and failure rate, and only marks the automated gate ready for human review when at least three runs cover every scenario without automated failures. It does not itself certify quality.
 
+## Scanner-only corpus intake
+
+Before spending model calls, produce a scanner-only intake report for a clean local checkout:
+
+```sh
+npm run benchmark:scan-external -- \
+  --repo /absolute/path/to/clean/checkout \
+  --id RW-REPO-01 \
+  --out benchmarks/results/RW-REPO-01-scan.json
+```
+
+This command uses the existing `analyzeProject` and `scanRepository` implementation. It records the pinned Git commit, bounded file coverage, manifests, discovered tests/configuration, AST-versus-lexical coverage, import-graph statistics, diagnostics, and evidence fingerprints. It does not include source excerpts or the operator's absolute local path in the report. It does not execute project commands, tests, builds, package scripts, or modify the checkout. Reject or investigate reports with missing evidence, parser failures, truncation, or unexpectedly low AST coverage before creating scored planning tasks.
+
 ## External real-repository mode
 
 The benchmark runners accept an operator-supplied **local Git checkout** for Existing Project scenarios. OIOL does not clone repositories, install dependencies, execute project scripts, run tests, build artifacts, or modify the target checkout.
