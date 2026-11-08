@@ -118,7 +118,7 @@ test('scanner redaction covers application secrets, database credentials, JWTs, 
     'const clientSecret = "client-secret-value";',
     'DATABASE_URL=postgres://appuser:db-password-value@db.example.internal/app',
     'Authorization: Basic dXNlcjpwYXNzd29yZA==',
-    'const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signaturevalue12345";',
+    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signaturevalue12345',
     '-----BEGIN DSA PRIVATE KEY-----',
     'private-key-material',
     '-----END DSA PRIVATE KEY-----'
