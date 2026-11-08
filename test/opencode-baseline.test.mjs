@@ -123,7 +123,7 @@ test('external OpenCode baseline requires explicit consent before sending reposi
   scenarioId:'EX-API-003',taskId:'RW-BASELINE-CONSENT-001',taskVersion:'1.0.0',
   projectName:'Consent Test',request:'Plan a repository change.',
   constraints:['Do not invent project facts'],
-  expectedSignals:[['architecture']],mustClarify:false
+  expectedSignals:[['architecture']],evidencePaths:['src/service.ts'],mustClarify:false
  };
  const previousArgv=process.argv;
  const previousLive=process.env.OIOL_BENCHMARK_ALLOW_LIVE;
