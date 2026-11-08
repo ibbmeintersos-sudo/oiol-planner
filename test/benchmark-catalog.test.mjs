@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scenarios } from '../benchmarks/scenarios.mjs';
-import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig, assertExternalRepositorySnapshot } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig, assertExternalRepositorySnapshot, applyScenarioTaskFile } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,10);
@@ -143,4 +145,53 @@ test('external repository benchmark requires a clean pinned Git commit', () => {
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{git:{isRepo:false,commit:null,dirty:null}}}),/Git checkout/);
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{git:{isRepo:true,commit:'b'.repeat(40),dirty:true}}}),/clean working tree/);
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{git:{isRepo:true,commit:'short',dirty:false}}}),/commit SHA/);
+});
+
+test('repository-specific task files override request and rubric with a stable content fingerprint', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'oiol-task-test-'));
+  const taskPath = path.join(directory, 'task.json');
+  const task = {
+    scenarioId: 'EX-API-003',
+    taskId: 'RW-TEST-CHANGE-001',
+    taskVersion: '1.0.0',
+    projectName: 'External Test Repository',
+    request: 'Plan a safe change grounded in the scanned repository architecture.',
+    constraints: ['Preserve public interfaces', 'Do not invent repository behavior'],
+    expectedSignals: [['architecture', 'module boundaries'], ['acceptance criteria', 'verification']],
+    mustClarify: false
+  };
+  try {
+    await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
+    const selected = selectScenarios('EX-API-003');
+    const result = await applyScenarioTaskFile(selected, taskPath);
+    assert.equal(result.scenarios.length, 1);
+    assert.equal(result.scenarios[0].project.request, task.request);
+    assert.deepEqual(result.scenarios[0].expectedSignals, task.expectedSignals);
+    assert.equal(result.taskDefinition.id, task.taskId);
+    assert.equal(result.taskDefinition.version, task.taskVersion);
+    assert.match(result.taskDefinition.sha256, /^[a-f0-9]{64}$/);
+  } finally {
+    await fs.rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('task files reject scenario mismatches and invalid scoring rubrics', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'oiol-task-invalid-'));
+  const taskPath = path.join(directory, 'task.json');
+  const task = {
+    scenarioId: 'GF-API-001', taskId: 'RW-TEST-001', taskVersion: '1.0.0',
+    projectName: 'Example', request: 'Plan a change', constraints: [],
+    expectedSignals: [['signal']], mustClarify: false
+  };
+  try {
+    await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
+    await assert.rejects(() => applyScenarioTaskFile(selectScenarios('EX-API-003'), taskPath), /scenarioId must match/);
+    task.scenarioId = 'EX-API-003';
+    task.expectedSignals = [];
+    await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
+    await assert.rejects(() => applyScenarioTaskFile(selectScenarios('EX-API-003'), taskPath), /expectedSignals/);
+    await assert.rejects(() => applyScenarioTaskFile(selectScenarios('EX-API-003,EX-SEC-009'), taskPath), /exactly one selected scenario/);
+  } finally {
+    await fs.rm(directory, { recursive: true, force: true });
+  }
 });
