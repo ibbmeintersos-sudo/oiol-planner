@@ -12,7 +12,7 @@ import { validatePlan } from '../src/core/validator.mjs';
 import { validatePlanSchema } from '../src/core/schema-validator.mjs';
 import { scenarios } from '../benchmarks/scenarios.mjs';
 import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
-import { selectScenarios, resolveScenarioProject, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
+import { selectScenarios, resolveScenarioProject, assertExternalRepositorySnapshot, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
 
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
 
