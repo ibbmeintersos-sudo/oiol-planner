@@ -73,12 +73,12 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
   };
 }
 
-export function assertExternalRepositorySnapshot(project) {
+export function assertExternalRepositorySnapshot(project, { requireRequestedEvidence = true } = {}) {
   if (!Number.isInteger(project?.repository?.fileCount) || project.repository.fileCount < 1 || !Array.isArray(project.repository.snippets) || project.repository.snippets.length < 1) {
     throw new Error('External benchmark repository scan produced no usable file evidence');
   }
   const evidenceSelection = project?.repository?.evidenceSelection;
-  if (Array.isArray(evidenceSelection?.requestedPaths) && evidenceSelection.requestedPaths.length) {
+  if (requireRequestedEvidence && Array.isArray(evidenceSelection?.requestedPaths) && evidenceSelection.requestedPaths.length) {
     const missing = [...(evidenceSelection.missingPaths || []), ...(evidenceSelection.unexcerptedPaths || [])];
     if (missing.length) throw new Error('Required task evidence paths were not supplied as excerpts: ' + [...new Set(missing)].join(', '));
   }
