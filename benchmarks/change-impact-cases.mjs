@@ -46,7 +46,7 @@ export const changeImpactCases = [
   {
     id: 'CIA-AUTH-002',
     category: 'existing_repository',
-    description: 'Authentication request identifies a source and dependent login route with test impact.',
+    description: 'Authentication intent identifies both the session module and login route as direct candidates, plus a profile consumer and test impact.',
     request: 'update authentication session',
     repository: base({
       nodes: ['src/auth/session.mjs','src/routes/login.mjs','src/routes/profile.mjs','test/session.test.mjs'],
@@ -56,7 +56,7 @@ export const changeImpactCases = [
     }),
     expected: {
       status: 'analyzed',
-      directFiles: ['src/auth/session.mjs'],
+      directFiles: ['src/auth/session.mjs','src/routes/login.mjs'],
       affectedFiles: ['src/auth/session.mjs','src/routes/login.mjs','src/routes/profile.mjs'],
       testFiles: ['test/session.test.mjs'],
       packagePaths: []
