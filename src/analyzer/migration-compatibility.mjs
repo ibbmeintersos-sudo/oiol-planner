@@ -147,8 +147,10 @@ export function analyzeMigrationCompatibility({ databaseSchema = null, maxMigrat
   const keyCounts = new Map();
   for (const item of migrations) if (item.orderKey) keyCounts.set(item.orderKind + ':' + item.orderKey, (keyCounts.get(item.orderKind + ':' + item.orderKey) || 0) + 1);
   const duplicateOrderKeys = [...keyCounts].filter(([, count]) => count > 1).map(([key]) => key);
-  const ordered = migrations.filter(item => item.orderKind !== 'unknown' && !duplicateOrderKeys.includes(item.orderKind + ':' + item.orderKey));
-  const unordered = migrations.filter(item => item.orderKind === 'unknown' || duplicateOrderKeys.includes(item.orderKind + ':' + item.orderKey));
+  const recognizedKinds = new Set(migrations.filter(item => item.orderKind !== 'unknown').map(item => item.orderKind));
+  const mixedOrderSchemes = recognizedKinds.size > 1;
+  const ordered = mixedOrderSchemes ? [] : migrations.filter(item => item.orderKind !== 'unknown' && !duplicateOrderKeys.includes(item.orderKind + ':' + item.orderKey));
+  const unordered = mixedOrderSchemes ? migrations : migrations.filter(item => item.orderKind === 'unknown' || duplicateOrderKeys.includes(item.orderKind + ':' + item.orderKey));
 
   const consumerByTable = new Map();
   for (const consumer of databaseSchema.consumers || []) {
@@ -179,6 +181,12 @@ export function analyzeMigrationCompatibility({ databaseSchema = null, maxMigrat
     severity: 'high',
     paths: unordered.map(item => item.path),
     message: 'Some migration filenames do not provide a unique recognized numeric or timestamp order. Lexical path order is not proof of execution order.'
+  });
+  if (mixedOrderSchemes) sequenceRisks.push({
+    kind: 'mixed_migration_order_schemes',
+    severity: 'high',
+    paths: migrations.map(item => item.path),
+    message: 'Migration files mix timestamp and numeric-prefix schemes; this analyzer does not compare unlike order-key formats.'
   });
   if (duplicateOrderKeys.length) sequenceRisks.push({
     kind: 'duplicate_migration_order_keys',
