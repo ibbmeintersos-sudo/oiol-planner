@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { scenarios } from '../benchmarks/scenarios.mjs';
-import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig, assertExternalRepositorySnapshot } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,10);
@@ -134,4 +134,13 @@ test('external repository input is rejected for greenfield scenarios', async () 
     () => resolveScenarioProject(scenario, { repositoryRoot: process.cwd() }),
     /only be used with Existing Project scenarios/
   );
+});
+
+test('external repository benchmark requires a clean pinned Git commit', () => {
+  assert.deepEqual(assertExternalRepositorySnapshot({repository:{git:{isRepo:true,commit:'a'.repeat(40),branch:'main',dirty:false}}}), {
+    commit:'a'.repeat(40),branch:'main',dirty:false
+  });
+  assert.throws(()=>assertExternalRepositorySnapshot({repository:{git:{isRepo:false,commit:null,dirty:null}}}),/Git checkout/);
+  assert.throws(()=>assertExternalRepositorySnapshot({repository:{git:{isRepo:true,commit:'b'.repeat(40),dirty:true}}}),/clean working tree/);
+  assert.throws(()=>assertExternalRepositorySnapshot({repository:{git:{isRepo:true,commit:'short',dirty:false}}}),/commit SHA/);
 });
