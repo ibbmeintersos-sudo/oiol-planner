@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { analyzeDatabaseSchemaImpact } from './database-schema-impact.mjs';
 
 const STOP_WORDS = new Set([
   'a','an','and','are','as','at','be','by','for','from','in','into','is','it','of','on','or','our',
@@ -553,6 +554,12 @@ export function analyzeChangeImpact({
     maxDepth,
     maxNodes: maxImpactedFiles
   });
+  const databaseSchemaImpact = analyzeDatabaseSchemaImpact({
+    request: requestText,
+    queryTokens,
+    databaseSchema: structure.databaseSchema,
+    maxResults: maxImpactedFiles
+  });
   const impactedFileMap = new Map(directSeeds.map(item => [item.path, {
     path: item.path,
     depth: 0,
@@ -641,6 +648,9 @@ export function analyzeChangeImpact({
       ...(directMatches.length > maxDirectMatches ? ['direct_match_result_limit_reached'] : []),
       ...(apiContractImpact.status === 'unavailable' ? ['api_contract_export_metadata_unavailable'] : []),
       ...(apiContractImpact.status === 'insufficient_symbol_match' ? ['api_contract_symbol_match_not_found'] : []),
+      ...(databaseSchemaImpact.status === 'unavailable' ? ['database_schema_metadata_unavailable'] : []),
+      ...(databaseSchemaImpact.status === 'insufficient_schema_match' ? ['database_schema_match_not_found'] : []),
+      ...(databaseSchemaImpact.diagnostics?.tableResultLimitReached || databaseSchemaImpact.diagnostics?.changeResultLimitReached || databaseSchemaImpact.diagnostics?.consumerResultLimitReached ? ['database_schema_results_truncated'] : []),
       ...(apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? ['api_contract_consumer_graph_truncated'] : [])
     ],
     score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0) - (apiContractImpact.status === 'unavailable' ? 0.06 : apiContractImpact.status === 'insufficient_symbol_match' ? 0.04 : 0) - (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? 0.04 : 0)))
@@ -661,6 +671,9 @@ export function analyzeChangeImpact({
   if (nodeLimitReached || affectedFilesTruncated || affectedPackagesTruncated) risks.push('impact_graph_node_or_output_limit_reached');
   if (apiContractImpact.status === 'unavailable') risks.push('api_contract_analysis_unavailable');
   if (apiContractImpact.status === 'insufficient_symbol_match') risks.push('api_contract_symbol_match_not_found');
+  if (databaseSchemaImpact.status === 'unavailable') risks.push('database_schema_analysis_unavailable');
+  if (databaseSchemaImpact.status === 'insufficient_schema_match') risks.push('database_schema_match_not_found');
+  if (databaseSchemaImpact.diagnostics?.tableResultLimitReached || databaseSchemaImpact.diagnostics?.changeResultLimitReached || databaseSchemaImpact.diagnostics?.consumerResultLimitReached) risks.push('database_schema_analysis_truncated');
   if (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached) risks.push('api_contract_consumer_graph_truncated');
   if (potentiallyAffectedFiles.length >= 20 || affectedPackages.length >= 6) risks.push('broad_change_impact_scope');
   if (affectedTests.length === 0 && (repository.tests?.length || structure.testFiles?.length)) risks.push('no_test_file_could_be_linked_to_the_current_impact_evidence');
@@ -681,6 +694,7 @@ export function analyzeChangeImpact({
     requestTerms: sorted(queryTokens),
     matchingDiagnostics,
     apiContractImpact,
+    databaseSchemaImpact,
     summary: directSeeds.length || packageSeeds.length
       ? 'The bounded scanner evidence suggests ' + directSeeds.length + ' direct candidate file(s), ' +
         (potentiallyAffectedFiles.length - directSeeds.length) + ' reverse-dependency file(s), ' +
