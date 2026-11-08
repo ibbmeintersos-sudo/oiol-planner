@@ -4,7 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
-import { SCANNER_VERSION } from '../src/scanner/repository.mjs';
+import { SCANNER_VERSION, EXTERNAL_REPOSITORY_SCAN_OPTIONS } from '../src/scanner/repository.mjs';
 import { createProvider } from '../src/providers/index.mjs';
 import { HybridPlanner } from '../src/core/planner.mjs';
 import { scenarios } from '../benchmarks/scenarios.mjs';
@@ -133,7 +133,7 @@ export function summarizeRepositoryEvidence(project) {
   };
 }
 
-export async function resolveScenarioProject(scenario, { repositoryRoot = null } = {}) {
+export async function resolveScenarioProject(scenario, { repositoryRoot = null, scanOptions = null } = {}) {
   if (repositoryRoot) {
     if (scenario.project?.kind !== 'existing') {
       throw new Error('An external repository can only be used with Existing Project scenarios');
@@ -142,7 +142,8 @@ export async function resolveScenarioProject(scenario, { repositoryRoot = null }
       mode: 'existing',
       repo: path.resolve(repositoryRoot),
       name: scenario.project.name,
-      request: scenario.project.request
+      request: scenario.project.request,
+      scanOptions: scanOptions || EXTERNAL_REPOSITORY_SCAN_OPTIONS
     });
     // Do not expose the operator's absolute local path in plans or benchmark artifacts.
     project.repository.root = 'external-repository';
