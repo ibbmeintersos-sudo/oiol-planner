@@ -41,7 +41,7 @@ const safeRelativePath = value =>
   !path.posix.isAbsolute(value) &&
   !path.win32.isAbsolute(value) &&
   !value.split(/[\\/]/).includes('..') &&
-  !value.includes('\\0');
+  !value.includes(String.fromCharCode(0));
 
 export function validateCase(item, seen = new Set()) {
   const errors = [];
