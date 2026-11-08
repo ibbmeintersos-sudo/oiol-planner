@@ -34,7 +34,7 @@ PostHog was reviewed as a stretch target because its repository is substantially
 
 | Repository | README fetched | Pinned CI checkout | Scanner run | Planning task authored | Benchmark run |
 |---|---:|---:|---:|---:|---:|
-| go-gitea/gitea | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
+| go-gitea/gitea | Yes | Yes | Expanded scan complete (truncated) | Draft JSON (pending human approval) | Pending |
 | better-auth/better-auth | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
 | vercel/turborepo | Yes | Pending | Pending | Pending | Pending |
 | plausible/analytics | Yes | Pending | Pending | Pending | Pending |
@@ -165,9 +165,9 @@ Do not copy private code, secrets, personal data, or proprietary issue content i
 
 ## Repository-specific task drafting
 
-Ten product-level task blueprints have been drafted for the five initially prioritized repositories (two per repository: one specified change and one deliberately underspecified request). They are stored in [PROPOSED_TASKS.md](external-tasks/PROPOSED_TASKS.md).
+Ten product-level task blueprints and ten schema-valid draft JSON task definitions have been created for the five prioritized repositories (two per repository: one specified change and one deliberately underspecified request). They are documented in [PROPOSED_TASKS.md](external-tasks/PROPOSED_TASKS.md) and stored under [external-tasks/drafts/](external-tasks/drafts/).
 
-These are explicitly **drafts, not runnable or scored tasks**. They are based on public README and root-manifest evidence. They must be reconciled with the actual scanner output, updated to cite concrete code paths/symbols, and promoted to versioned task JSON before any model evaluation. This avoids inventing internal architecture from product descriptions.
+These are explicitly **drafts, not approved or scored tasks**. They have been reconciled with the pinned scanner output and targeted code-file inspection, and the test suite validates their JSON contract. They still require independent human approval and promotion to version 1.0.0 before any model evaluation. This avoids inventing internal architecture from product descriptions.
 
 ## External input capability status
 
