@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "all_candidate_snapshots_acquired_and_tree_verified",
+  "corpusReadiness": "annotation_pending",
+  "summary": {
+    "historicalChangeCases": 36,
+    "uniqueRepositoryBaseSnapshots": 34,
+    "uniqueRepositories": 12,
+    "repositoriesBySize": {
+      "small": 4,
+      "medium": 4,
+      "large": 4
+    },
+    "primarySnapshotJobsSucceeded": 12,
+    "primaryArtifactsAvailable": 12,
+    "additionalSnapshotJobsSucceeded": 22,
+    "additionalArtifactsAvailable": 22,
+    "totalArtifactsAvailable": 34,
+    "artifactUploadDigestsMatched": 34,
+    "trackedFileCountDeltaNonZero": 0,
+    "archiveExtraFileCountNonZero": 0,
+    "archiveMissingFilesRestored": 4675,
+    "independentAnnotationsCompleted": 0,
+    "adjudicatedCases": 0
+  },
+  "runs": [
+    {
+      "batch": "primary",
+      "runId": 42454488457,
+      "url": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457",
+      "headSha": "8c3e434e231bdd1d86c98e0f32f4ce8dc1e4218f",
+      "jobs": 12,
+      "artifacts": 12,
+      "conclusion": "success"
+    },
+    {
+      "batch": "additional",
+      "runId": 42455004221,
+      "url": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221",
+      "headSha": "5d243572eaa22fbbfd1125ed3406071d09553ca9",
+      "jobs": 22,
+      "artifacts": 22,
+      "conclusion": "success"
+    }
+  ],
+  "deduplicatedCases": [
+    {
+      "repository": "BurntSushi/ripgrep",
+      "baseCommit": "6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30",
+      "snapshotIndex": 18,
+      "changeCaseIndices": [
+        18,
+        19
+      ]
+    },
+    {
+      "repository": "pydantic/pydantic",
+      "baseCommit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+      "snapshotIndex": 4,
+      "changeCaseIndices": [
+        4,
+        21
+      ]
+    }
+  ],
+  "verification": [
+    "All 34 unique snapshots were acquired at immutable 40-character base commit SHAs.",
+    "Each final snapshot's complete tracked file/symlink path set was compared with the recursive Git tree at its exact base commit.",
+    "Every Git tree blob count matched the intake inventory; all tracked-file-count deltas are zero and all archive-extra counts are zero.",
+    "All 34 declared license files were found and SHA-256 hashed at the pinned base revisions.",
+    "All 34 artifact upload-step SHA-256 digests match the GitHub Actions Artifacts API digests.",
+    "Snapshot fingerprints follow the OIOL corpus validator's sorted relative path + NUL + bytes + NUL policy, excluding configured ignored path components and symlinks."
+  ],
+  "limitations": [
+    "Acquisition is complete for the 36 candidate change cases, but no independent ground-truth annotation has been completed.",
+    "The 34 artifact ZIPs have not been independently downloaded and re-hashed outside GitHub Actions; the digest comparison is between GitHub's upload log and Artifacts API.",
+    "The corpus manifest remains intentionally empty. No OIOL accuracy, superiority, or production-readiness claim is supported yet."
+  ]
+}

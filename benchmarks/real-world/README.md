@@ -151,8 +151,8 @@ The 24 additional historical changes are distributed evenly across the same 12 r
 - 36/36 license files retrieved at each exact pinned base revision.
 - Three candidate changes per repository are identified; the 30-case numerical threshold is met at the candidate-intake stage.
 - Historical changed paths are provenance evidence only, **not** accepted as complete impact ground truth.
-- Snapshot archives and SHA-256 content fingerprints: pending.
+- 36/36 candidate changes now have pinned source snapshots; 34 unique repository/base-commit trees were acquired and verified (two pairs of cases share identical base trees). All 34 artifact upload digests match GitHub's Artifacts API.
 - Two independent blinded annotations per case: pending.
 - Cases may be excluded during independent review; collect a reserve set before freezing the final 30+ adjudicated cases.
 
-The corpus manifest remains empty until snapshots and independent annotations are complete. These entries are an intake shortlist, not completed benchmark cases.
+The corpus manifest remains empty until independent annotations and adjudication are complete. Snapshot acquisition is complete, but these entries remain candidate cases, not completed benchmark cases. See [acquisition-status.json](./acquisition-status.json) for the consolidated integrity record.
