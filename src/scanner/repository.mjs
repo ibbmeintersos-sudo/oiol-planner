@@ -13,10 +13,13 @@ const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.
 const SOURCE_FILE = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb)$/i;
 const TEST_FILE = /(^|\/)(?:__tests__|tests?|spec)(\/|$)|\.(?:test|spec)\.[^.]+$|(?:^|\/)[^/]+_test\.[^.]+$/i;
 const CONFIG_FILE = /(^|\/)(?:config|configs|configuration)(\/|$)|(^|\/)(?:[^/]+\.)?(?:config|conf|settings|tsconfig)\.[^/]+$/i;
-const PRIORITY_DIRS = new Set([
-  'src','app','apps','packages','server','web','mobile','client','cmd','internal','pkg','lib','crates',
-  'modules','routers','routes','services','api','core','engine','backend','frontend','models','controllers',
-  'documents','open-api','cli'
+const PRIORITY_DIRS = new Map([
+  ['src', -24], ['src-ui', -24], ['server', -22], ['web', -22], ['cmd', -22], ['internal', -22],
+  ['pkg', -20], ['lib', -20], ['crates', -20], ['packages', -18], ['apps', -18], ['app', -18],
+  ['routers', -16], ['routes', -16], ['services', -16], ['models', -16], ['controllers', -16],
+  ['core', -16], ['engine', -16], ['backend', -16], ['frontend', -16], ['api', -16],
+  ['client', -14], ['modules', -14], ['documents', -14], ['cli', -12],
+  ['mobile', -5], ['native', -5], ['open-api', -3]
 ]);
 const LOW_PRIORITY_DIRS = new Set([
   '.github','.gitlab','.changeset','.mise','docs','doc','documentation','demo','demos','examples','example',
@@ -27,7 +30,7 @@ function entryPriority(entry, depth) {
   const name = entry.name.toLowerCase();
   if (entry.isFile() && MANIFESTS.includes(name)) return depth === 0 ? -30 : -12;
   if (entry.isFile() && ['readme.md','license','license.md'].includes(name)) return depth === 0 ? -20 : 8;
-  if (entry.isDirectory() && PRIORITY_DIRS.has(name)) return -10;
+  if (entry.isDirectory() && PRIORITY_DIRS.has(name)) return PRIORITY_DIRS.get(name);
   if (entry.isFile() && SOURCE_FILE.test(name)) return 0;
   if (entry.isFile() && TEST_FILE.test(name)) return 3;
   if (entry.isDirectory() && LOW_PRIORITY_DIRS.has(name)) return 12;
