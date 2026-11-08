@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { OpenCodeClient } from '../benchmarks/opencode/client.mjs';
 import { buildBaselinePrompt, parseBaselinePlan, runOpenCodeBaselineScenario } from '../benchmarks/opencode/baseline.mjs';
 
 const scenario={id:'GF-API-001',project:{kind:'greenfield',name:'Test API',request:'Create an API'}};
