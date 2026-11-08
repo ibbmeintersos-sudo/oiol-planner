@@ -85,8 +85,9 @@ export function assertExternalRepositorySnapshot(project) {
   const sourceEvidence = project.repository.snippets.some(snippet =>
     /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift)$/i.test(snippet.path || '')
   );
-  if (!sourceEvidence) {
-    throw new Error('External benchmark repository scan produced no implementation source excerpts; README or manifest evidence alone is insufficient');
+  const analyzedSourceCount = project.repository.structure?.analyzedSourceFileCount || 0;
+  if (!sourceEvidence && analyzedSourceCount < 1) {
+    throw new Error('External benchmark repository scan produced no implementation source evidence; README or manifest evidence alone is insufficient');
   }
   return { commit: git.commit, branch: git.branch || null, dirty: false };
 }
