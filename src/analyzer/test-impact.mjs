@@ -51,7 +51,7 @@ export function analyzeTestImpact({ request = '', repository = null, changeImpac
       ...affected, ...(api.potentiallyAffectedConsumers || []).map(item => item.path), ...(db.potentiallyAffectedConsumers || []).map(item => item.path)
     ].slice(0, 30));
   }
-  if (api.status === 'analyzed' || /\\b(api|contract|endpoint|response|request)\\b/.test(requestText)) {
+  if (api.status === 'analyzed' || hasAnyTerm('api', 'contract', 'endpoint', 'response', 'request')) {
     addCandidate(candidates, 'contract', 'Check request/response compatibility, validation, serialization, and consumer expectations for the identified contract candidates.', (api.contractSymbols || []).map(item => item.file));
   }
   if (schemaChanges.length || migrations.status === 'analyzed') {
