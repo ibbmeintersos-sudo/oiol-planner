@@ -47,6 +47,38 @@ npm run benchmark:aggregate -- --inputs benchmarks/results/run-a.json,benchmarks
 
 The aggregator rejects mixed configuration fingerprints and duplicate run IDs, reports per-scenario median/min/max/spread and failure rate, and only marks the automated gate ready for human review when at least three runs cover every scenario without automated failures. It does not itself certify quality.
 
+## External real-repository mode
+
+The benchmark runners accept an operator-supplied **local Git checkout** for Existing Project scenarios. OIOL does not clone repositories, install dependencies, execute project scripts, run tests, build artifacts, or modify the target checkout.
+
+First, obtain a public repository checkout outside OIOL and ensure its working tree is clean. Then run one or more Existing Project scenarios against it:
+
+```sh
+OIOL_BENCHMARK_ALLOW_LIVE=1 node scripts/run-planner-benchmark.mjs \
+  --repo /absolute/path/to/clean/checkout \
+  --scenarios EX-API-003 \
+  --out benchmarks/results/external-oiol.json
+```
+
+Run the OpenCode planning baseline against the same checkout and scenario:
+
+```sh
+OIOL_OPENCODE_MODEL=providerID/modelID \
+OIOL_OPENCODE_AGENT=plan \
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+npm run benchmark:opencode -- --repo /absolute/path/to/clean/checkout \
+  --scenarios EX-API-003 \
+  --out benchmarks/results/external-opencode.json
+```
+
+External mode requires a Git checkout with a 40-character commit SHA and a clean working tree. The scanner records the commit SHA; dirty or non-Git directories are rejected so results are tied to a reproducible snapshot. The absolute local path is not written to the plan or result artifact.
+
+The OIOL runner scans the supplied checkout using the existing bounded read-only scanner. The OpenCode baseline receives a disposable workspace containing only the scanner's bounded, redacted excerpts; it does not receive a raw copy of the checkout. This is intentionally conservative, but it means external baseline results are a comparison against the same sanitized evidence projection, not a full checkout mirror. Review scanner coverage and truncation diagnostics before interpreting any result.
+
+Only Existing Project scenarios are valid with --repo. Greenfield and ambiguous Greenfield scenarios remain unchanged. The existing-project task wording in the starter catalog is generic; adapt and version task prompts for each external repository before treating a result as a representative benchmark case. Do not score arbitrary task/repository pairings as if they were equivalent.
+
+The local environment running the command must have access to the checkout. GitHub API access alone is not a local checkout and cannot be substituted for the scanner's filesystem input.
+
 ## OpenCode baseline and paired comparison
 
 Run the OpenCode-only baseline against the same scenario set. Configure an explicit model reference and use the OpenCode `plan` agent (or another agent whose permissions are verified as read-only):
