@@ -68,12 +68,12 @@ jobs:
           node scripts/run-external-corpus-scan.mjs \
             --repo ../candidate \
             --id "${{ matrix.id }}" \
-            --out "../scan-results/${{ matrix.id }}.json"
+            --out "scan-results/${{ matrix.id }}.json"
 
       - name: Upload scanner evidence report
         uses: actions/upload-artifact@v4
         with:
           name: p12-scan-${{ matrix.id }}
-          path: scan-results/${{ matrix.id }}.json
+          path: planner/scan-results/${{ matrix.id }}.json
           if-no-files-found: error
           retention-days: 30
