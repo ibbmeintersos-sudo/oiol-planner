@@ -32,15 +32,15 @@ PostHog was reviewed as a stretch target because its repository is substantially
 
 ## Intake status
 
-| Repository | README fetched | Local checkout | Scanner run | Planning task authored | Benchmark run |
+| Repository | README fetched | Pinned CI checkout | Scanner run | Planning task authored | Benchmark run |
 |---|---:|---:|---:|---:|---:|
-| go-gitea/gitea | Yes | Pending | Pending | Drafts (pending scan) | Pending |
-| better-auth/better-auth | Yes | Pending | Pending | Drafts (pending scan) | Pending |
+| go-gitea/gitea | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
+| better-auth/better-auth | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
 | vercel/turborepo | Yes | Pending | Pending | Pending | Pending |
 | plausible/analytics | Yes | Pending | Pending | Pending | Pending |
-| paperless-ngx/paperless-ngx | Yes | Pending | Pending | Drafts (pending scan) | Pending |
-| immich-app/immich | Yes | Pending | Pending | Drafts (pending scan) | Pending |
-| PrefectHQ/prefect | Yes | Pending | Pending | Drafts (pending scan) | Pending |
+| paperless-ngx/paperless-ngx | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
+| immich-app/immich | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
+| PrefectHQ/prefect | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
 | PostHog/posthog (stretch) | Yes | Pending | Pending | Pending | Pending |
 
 
@@ -61,7 +61,7 @@ The following values were retrieved from GitHub repository metadata on 2026-11-0
 
 The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size and unresolved GitHub license metadata.
 
-A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. Consequently, no local scanner run or live benchmark is claimed here.
+A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path, and the first-pass scanner-only intake completed for the five prioritized repositories. No live model benchmark is claimed yet.
 
 ## Observed remote default-branch tips
 
@@ -95,6 +95,38 @@ Root manifest/configuration files were also fetched from GitHub. These are direc
 
 Blob SHAs identify the fetched manifest contents, not the repository commit SHA. Exact repository commit SHAs still must be captured from pinned checkouts before any scored run.
 
+## First-pass real-repository scanner results
+
+The first external scanner-only intake workflow completed successfully for all five prioritized repositories. The run used pinned commits and the existing OIOL scanner; no repository scripts, tests, builds, or model-provider calls were executed.
+
+Workflow: [P12 first-pass scanner intake](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42459270734). The five reports were uploaded as per-repository workflow artifacts.
+
+| Repository | Included files | Source files discovered | AST analyzed | Tests discovered | Unsupported languages | Syntax-error files | Truncated |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Gitea | 250 | 210 | 95 | 58 | 0 | 0 | Yes |
+| Better Auth | 250 | 133 | 88 | 27 | 0 | 4 | Yes |
+| Paperless-ngx | 250 | 155 | 90 | 7 | 1 | 0 | Yes |
+| Immich | 250 | 192 | 95 | 79 | 3 | 1 | Yes |
+| Prefect | 250 | 128 | 76 | 0 | 0 | 0 | Yes |
+
+All five first-pass scans reached the original 250-file limit. The discovered file counts are lower bounds; these results must not be treated as complete repository understanding. The initial profile also limited primary source selection to 100 files, which explains why the AST-analyzed counts are below the discovered source counts. Prefect's zero discovered tests is a coverage warning, not evidence that the repository has no tests.
+
+The first-pass reports did not record parser failures. Better Auth and Immich did report Tree-sitter syntax-error files requiring review. Paperless-ngx and Immich reported source files in languages without a bundled grammar; the scanner surfaced these as unsupported rather than silently claiming AST coverage.
+
+### Expanded second-pass profile
+
+The scanner now supports a separate bounded profile for external repositories:
+
+- Maximum discovered files: 2,000.
+- Maximum selected source files: 250.
+- Maximum bytes per file: 32 KiB.
+- Maximum model context: 100,000 characters.
+- Maximum directory depth: 14.
+- Evidence selection interleaves manifests, implementation source, tests, and configuration rather than filling the context with source files first.
+- Scanner version and exact scan limits are included in the report and benchmark configuration fingerprint.
+
+The five repositories will be rescanned with this profile before the draft task prompts are promoted to runnable task definitions. The first-pass reports remain useful as an initial coverage baseline, but are not the final scan evidence.
+
 ## Required intake record before a repository can enter a scored run
 
 For every selected repository, record:
@@ -125,9 +157,9 @@ The earlier fixture-only input gap has been addressed in the benchmark harness:
 - Paired comparisons reject different repository commit sets, task-definition hashes, or source modes. Repeated paired aggregation also rejects drift in repository commit sets, task hashes, or either runner's configuration fingerprint.
 - External live runs require the separate `OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1` consent flag because bounded source excerpts are sent to the configured model provider. Scanner redaction and sensitive-file exclusion are best-effort safeguards, not a guarantee that every secret is detected.
 
-The local environment used for this development could not clone GitHub after three attempts because DNS resolution failed. GitHub's connected repository API remained usable for metadata and file inspection, but no full local scanner run or live external benchmark is claimed.
+The local environment used for this development could not clone GitHub after three attempts because DNS resolution failed. GitHub Actions was used instead to check out five public repositories at pinned commits and run OIOL's scanner. The first pass completed but hit the 250-file bound on all five; the expanded second pass is being prepared. No live model benchmark is claimed yet.
 
-**Current P12 state:** external-repository input plumbing is implemented and committed; the seven candidate repositories still need clean local checkouts, repository-specific task definitions, actual scanner runs, repeated model runs, and blinded human reviews. The candidate corpus is not a completed benchmark. Five repositories now have two draft task blueprints each; none has passed the scanner-evidence promotion gate.
+**Current P12 state:** external-repository input plumbing is implemented and committed; five pinned first-pass scanner runs have completed, but all hit the original file bound. The expanded second pass, repository-specific task promotion, repeated model runs, and blinded human reviews remain. The candidate corpus is not a completed benchmark. Five repositories now have two draft task blueprints each; none has passed the scanner-evidence promotion gate.
 
 ## Harness validation snapshot (2026-11-08)
 
