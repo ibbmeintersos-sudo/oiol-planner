@@ -1,6 +1,6 @@
 # P12 — Real-world repository benchmark corpus
 
-Status: **seven pinned real-world repositories have successful scanner-only intake artifacts; per-report coverage/diagnostic audit, repository-specific task approval, live planning benchmarks, and independent human adjudication remain pending**.
+Status: **seven pinned real-world repositories have successful scanner-only intake artifacts; all seven reports have been audited. The current scan projection is not score-ready because every report is context-truncated and none of the five existing task families' cited core files appears in selected model-context excerpts. Live planning benchmarks and independent human adjudication remain pending. See [P12 scanner audit](P12_SCANNER_AUDIT.md).**
 
 This registry is the intake list for P12. It is separate from the ten synthetic starter scenarios. A repository is not considered benchmarked merely because its README was inspected or its URL was collected.
 
@@ -35,12 +35,12 @@ PostHog was reviewed as a stretch target because its repository is substantially
 | Repository | README fetched | Pinned CI checkout | Scanner run | Planning task authored | Benchmark run |
 |---|---:|---:|---:|---:|---:|
 | go-gitea/gitea | Yes | Yes | Expanded scan complete (truncated) | Draft JSON (pending human approval) | Pending |
-| better-auth/better-auth | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
-| vercel/turborepo | Yes | Yes | Report generated; audit pending | Not drafted | Pending |
-| plausible/analytics | Yes | Yes | Report generated; audit pending | Not drafted | Pending |
-| paperless-ngx/paperless-ngx | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
-| immich-app/immich | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
-| PrefectHQ/prefect | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
+| better-auth/better-auth | Yes | Yes | Audited; context truncated | Drafts; cited code not in selected excerpts | Blocked |
+| vercel/turborepo | Yes | Yes | Audited; file-limit truncated; sparse graph | Not drafted | Blocked pending evidence review |
+| plausible/analytics | Yes | Yes | Audited; 81.3% unsupported source ratio | Not drafted | Blocked for Elixir-dependent tasks |
+| paperless-ngx/paperless-ngx | Yes | Yes | Audited; best AST coverage, context truncated | Drafts; cited code not in selected excerpts | Blocked pending evidence selection |
+| immich-app/immich | Yes | Yes | Audited; unsupported-language and graph anomaly | Drafts; cited code not in selected excerpts | Blocked pending evidence review |
+| PrefectHQ/prefect | Yes | Yes | Audited; file-limit truncated; low AST coverage | Drafts; cited code not in selected excerpts | Blocked pending evidence selection |
 | PostHog/posthog (stretch) | Yes | Pending | Pending | Pending | Pending |
 
 
@@ -61,7 +61,7 @@ The following values were retrieved from GitHub repository metadata on 2026-11-0
 
 The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size and unresolved GitHub license metadata.
 
-A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path. The original five-repository intake and the expanded seven-repository scanner-only workflow have completed; the newest two reports still require coverage and diagnostics review. No live model benchmark is claimed.
+A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path. The expanded seven-repository scanner-only workflow completed, and all seven artifacts were downloaded and audited. The detailed coverage, parser diagnostics, task-path coverage, and benchmark gate are recorded in [P12_SCANNER_AUDIT.md](P12_SCANNER_AUDIT.md). No live model benchmark is claimed.
 
 ## Observed remote default-branch tips
 
@@ -162,7 +162,7 @@ The follow-up run's per-repository artifacts are the authoritative reports for t
 
 The expanded scanner workflow completed successfully for all seven pinned checkouts in [P12 run 39](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42503950232). GitHub Actions reports seven successful jobs and seven uploaded artifacts. The two added candidates are Turborepo (Rust/TypeScript developer tooling) and Plausible (Elixir analytics application). This establishes checkout and scanner-run feasibility only; it does not establish adequate evidence coverage.
 
-Before either new repository is used in a scored planning run, inspect its artifact for file-count bounds, truncation, AST-versus-lexical coverage, unsupported languages, parse/syntax diagnostics, discovered tests/configuration, and evidence fingerprints. Do not author or promote repository-specific tasks until their paths and claims are checked against the pinned scan evidence. The existing five repositories' prior quantitative table remains tied to the earlier five-repository follow-up run and must not be extrapolated to this seven-repository run.
+Before either new repository is used in a scored planning run, inspect its artifact for file-count bounds, truncation, AST-versus-lexical coverage, unsupported languages, parse/syntax diagnostics, discovered tests/configuration, and evidence fingerprints. Do not author or promote repository-specific tasks until their paths and claims are checked against the pinned scan evidence. The seven-repository audit is based on the exact artifacts from this run. The prior five-repository quantitative table remains tied to the earlier five-repository follow-up run and must not be extrapolated to this seven-repository run.
 
 ## Required intake record before a repository can enter a scored run
 
