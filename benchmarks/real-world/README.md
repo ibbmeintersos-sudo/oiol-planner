@@ -55,7 +55,7 @@ Select changes with traceable merged commits / pull requests and enough evidence
 
 OIOL's scanner reads files and performs bounded static analysis only. The benchmark must not run commands, scripts, builds, tests, migrations, package managers, or application code from a target repository. It must not write to target snapshots.
 
-The scanner currently probes Git metadata by invoking Git read-only commands. P12 must disable that probe in the benchmark path; repository identity and commit provenance come from the pinned corpus manifest. CI may run OIOL's own tests and benchmark harness, but never target-project commands. This boundary is a required P12 implementation item, not an optional convention.
+The Scanner is filesystem-read-only and does not invoke Git or any other target-project command. Repository identity and commit provenance come from the pinned corpus manifest. CI may run OIOL's own tests and benchmark harness, but never target-project commands. This boundary is enforced by the Scanner implementation and regression tests.
 
 ## Metrics
 
@@ -100,7 +100,7 @@ Validate intake metadata with:
 
     npm run benchmark:real-world:validate -- --corpus-root /absolute/path/to/corpus
 
-Use --allow-empty only for CI protocol tests. It returns a not-ready status and never marks the corpus as complete.
+Use --allow-empty only for CI protocol tests. It returns a not-ready status and never marks the corpus as complete. The validator enforces the first-report minimums by default: at least 30 cases, 12 unique repositories, and at least four repositories in each size stratum. Every case must have two distinct reviewers attesting both independence and blinding, evidence notes, and a reasoned adjudication outcome. Reduced thresholds are available only through the validator's programmatic test options, not the production CLI.
 
 
 ## Initial repository intake — batch 1
