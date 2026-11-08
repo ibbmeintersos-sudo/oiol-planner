@@ -51,6 +51,13 @@ test('markdown report distinguishes direct candidates, affected tests, and stati
         potentiallyAffectedFiles: [{ path: 'src/api/profile.ts', depth: 1, propagation: 'reverse_import_dependency', dependsOn: 'src/auth/session.ts' }],
         affectedTests: [{ path: 'test/auth.test.ts', association: 'resolved_test_import_to_impacted_file', confidence: 'high' }],
         affectedPackages: [{ path: 'packages/auth', name: '@app/auth', depth: 0, propagation: 'direct_file_or_request_match' }],
+        apiContractImpact: {
+          status: 'analyzed',
+          diagnostics: { matchedContractSymbolCount: 1, exportMetadataFileCount: 3 },
+          contractSymbols: [{ name: 'UserProfileResponse', kind: 'interface', file: 'src/api/profile.ts', line: 12, matchedTerms: ['user', 'profile'], evidenceId: 'REPO-456' }],
+          potentiallyAffectedConsumers: [{ path: 'apps/web/profile-client.ts', contractFile: 'src/api/profile.ts', depth: 1, confidence: 'medium' }],
+          limitations: ['A file-level import does not prove symbol-level use.']
+        },
         risks: ['unresolved_local_dependencies_may_hide_additional_impacts'],
         limitations: ['The affected test list is not evidence that tests were executed.']
       }
@@ -66,6 +73,10 @@ test('markdown report distinguishes direct candidates, affected tests, and stati
     'Potentially affected tests (not executed)',
     'test/auth.test.ts',
     'Affected workspace packages',
+    'API and contract impact (static estimate)',
+    'UserProfileResponse',
+    'apps/web/profile-client.ts',
+    'A file-level import does not prove symbol-level use.',
     'The affected test list is not evidence that tests were executed.'
   ]) {
     assert.ok(markdown.includes(value), 'missing change-impact report content: ' + value);
