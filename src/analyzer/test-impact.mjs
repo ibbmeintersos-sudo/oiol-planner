@@ -40,6 +40,8 @@ export function analyzeTestImpact({ request = '', repository = null, changeImpac
   const migrations = db.migrationCompatibility || {};
   const schemaChanges = db.schemaChanges || [];
   const requestText = String(request).toLowerCase();
+  const requestTerms = new Set(requestText.match(/[a-z0-9]+/g) || []);
+  const hasAnyTerm = (...terms) => terms.some(term => requestTerms.has(term));
 
   if (direct.length || affected.length) {
     addCandidate(candidates, 'unit', 'Add or update focused unit checks for directly matched and transitively affected components.', [...direct, ...affected].slice(0, 20));
@@ -78,7 +80,7 @@ export function analyzeTestImpact({ request = '', repository = null, changeImpac
   if (scanIncomplete) gaps.push('Repository scan coverage is incomplete or bounded; additional tests and dependencies may be outside the analyzed evidence.');
   if (changeImpact?.graph?.traversalLimits?.depthLimitReached || changeImpact?.graph?.traversalLimits?.nodeLimitReached) gaps.push('Impact graph traversal reached a configured limit; test selection may omit downstream consumers.');
   if (api.status === 'unavailable') gaps.push('API export metadata is unavailable; contract-focused test selection may be incomplete.');
-  if (db.status === 'unavailable' && /database|schema|migration|sql/i.test(requestText)) gaps.push('Database schema evidence is unavailable; database and migration verification needs manual discovery.');
+  if (db.status === 'unavailable' && hasAnyTerm('database', 'schema', 'migration', 'sql')) gaps.push('Database schema evidence is unavailable; database and migration verification needs manual discovery.');
   if (!Array.isArray(changeImpact?.directMatches) || !changeImpact.directMatches.length) gaps.push('No direct source-file match was established; proposed test levels are broad planning prompts, not targeted selections.');
 
   const prerequisites = [];
