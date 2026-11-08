@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { analyzeDatabaseSchemaImpact } from './database-schema-impact.mjs';
+import { analyzeTestImpact } from './test-impact.mjs';
 
 const STOP_WORDS = new Set([
   'a','an','and','are','as','at','be','by','for','from','in','into','is','it','of','on','or','our',
@@ -632,6 +633,19 @@ export function analyzeChangeImpact({
   const affectedTests = impactedTests(
     repository, structure, affectedPaths, directSeeds, maxTests
   );
+  const testImpactAnalysis = analyzeTestImpact({
+    request: requestText,
+    repository,
+    changeImpact: {
+      directMatches: directSeeds,
+      potentiallyAffectedFiles,
+      affectedTests,
+      apiContractImpact,
+      databaseSchemaImpact,
+      graph: { traversalLimits: { depthLimitReached: fileReachability.depthLimitReached || packageReachabilityResult.depthLimitReached, nodeLimitReached: fileReachability.nodeLimitReached || packageReachabilityResult.nodeLimitReached } }
+    },
+    maxCandidates: maxTests
+  });
   const reverseTruncated = fileReachability.truncated || packageReachabilityResult.truncated || affectedFilesTruncated || affectedPackagesTruncated;
   const depthLimitReached = fileReachability.depthLimitReached || packageReachabilityResult.depthLimitReached;
   const nodeLimitReached = fileReachability.nodeLimitReached || packageReachabilityResult.nodeLimitReached;
@@ -699,6 +713,7 @@ export function analyzeChangeImpact({
     matchingDiagnostics,
     apiContractImpact,
     databaseSchemaImpact,
+    testImpactAnalysis,
     summary: directSeeds.length || packageSeeds.length || databaseSchemaImpact.status === 'analyzed'
       ? 'The bounded scanner evidence suggests ' + directSeeds.length + ' direct candidate file(s), ' +
         (potentiallyAffectedFiles.length - directSeeds.length) + ' reverse-dependency file(s), ' +
