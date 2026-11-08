@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { redact } from '../core/utils.mjs';
 import { analyzeWithTreeSitter } from './tree-sitter-ast.mjs';
+import { scanDatabaseSchema } from './database-schema.mjs';
 
 const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
@@ -452,6 +453,8 @@ export function analyzeRepositoryStructure({
   const resolvedAliasCount = evidencedImports.filter(item => item.resolutionKind === 'tsconfig_path_alias').length;
   const fingerprintedAliasConfigCount = evidencedImports.filter(item => item.resolutionKind === 'tsconfig_path_alias' && item.resolutionConfigEvidenceId).length;
 
+  const databaseSchema = scanDatabaseSchema({ files: normalized, contents, sourceEvidence });
+
   return {
     method: ast.parsedFileCount ? 'tree_sitter_ast_with_lexical_fallback' : 'bounded_static_heuristics',
     analysisMode,
@@ -506,6 +509,7 @@ export function analyzeRepositoryStructure({
     frameworks: frameworksFor(manifestTexts.join('\n')),
     entryPoints: [...entries].filter(file => fileSet.has(file)).sort(),
     routeFiles: normalized.filter(file => /(^|\/)(routes?|controllers?|api)(\/|$)|(^|\/)app\/api\//i.test(file)),
+    databaseSchema,
     testFiles: normalized.filter(file => /(^|\/)(__tests__|tests?|spec)(\/|\.|$)/i.test(file)),
     diagnostics: [...ast.diagnostics, ...aliasInfo.diagnostics, ...workspace.diagnostics].slice(0, 500),
     parserDiagnostics: [
