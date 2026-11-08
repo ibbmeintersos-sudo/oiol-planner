@@ -7,6 +7,7 @@ import { redact } from '../core/utils.mjs';
 import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
 const exec = promisify(execFile);
+export const SCANNER_VERSION = '1.1.0';
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.(?:pem|key|p12|pfx|jks|keystore)|(?:credentials|secrets)\.(?:json|ya?ml)|\.npmrc|\.pypirc|\.netrc)$/i;
 const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'composer.json'];
@@ -181,6 +182,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   const boundedContext = context.length + structureSummary.length <= maxContextChars ? context + '\\n\\n' + structureSummary : context;
   return {
     kind: 'existing',
+    scannerVersion: SCANNER_VERSION,
     root,
     git,
     files: files.map(file => ({ path: file })),
