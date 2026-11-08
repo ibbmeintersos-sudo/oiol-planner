@@ -157,7 +157,8 @@ test('external repository benchmark requires a clean pinned Git commit', () => {
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{fileCount:1,snippets:[{path:'README.md'}],git:{isRepo:false,commit:null,dirty:null}}}),/Git checkout/);
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{fileCount:1,snippets:[{path:'README.md'}],git:{isRepo:true,commit:'b'.repeat(40),dirty:true}}}),/clean working tree/);
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{fileCount:1,snippets:[{path:'README.md'}],git:{isRepo:true,commit:'short',dirty:false}}}),/commit SHA/);
-  assert.throws(()=>assertExternalRepositorySnapshot({repository:{fileCount:1,snippets:[{path:'README.md'}],git:{isRepo:true,commit:'c'.repeat(40),dirty:false}}}),/no implementation source excerpts/);
+  assert.throws(()=>assertExternalRepositorySnapshot({repository:{fileCount:1,snippets:[{path:'README.md'}],git:{isRepo:true,commit:'c'.repeat(40),dirty:false}}}),/no implementation source evidence/);
+  assert.deepEqual(assertExternalRepositorySnapshot({repository:{fileCount:2,snippets:[{path:'README.md'}],structure:{analyzedSourceFileCount:1},git:{isRepo:true,commit:'d'.repeat(40),dirty:false}}}),{commit:'d'.repeat(40),branch:null,dirty:false});
   assert.throws(()=>assertExternalRepositorySnapshot({repository:{fileCount:0,snippets:[],git:{isRepo:true,commit:'a'.repeat(40),dirty:false}}}),/no usable file evidence/);
 });
 
