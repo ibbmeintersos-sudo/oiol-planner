@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-API-003",
   "taskId": "RW-BA-02",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Better Auth",
   "request": "A product request says: “Allow each organization to control how many active sessions its members can have.” Produce a planning response, but do not choose a data model or enforcement rule until the blocking policy decisions are clarified.",
   "constraints": [
@@ -19,8 +19,12 @@
       "session limit"
     ],
     [
-      "organization scope",
-      "per organization",
+      "organization scope"
+    ],
+    [
+      "per organization"
+    ],
+    [
       "per user"
     ],
     [
@@ -28,8 +32,12 @@
       "cross-organization"
     ],
     [
-      "existing sessions",
-      "revocation",
+      "existing sessions"
+    ],
+    [
+      "revocation"
+    ],
+    [
       "deny new sessions"
     ],
     [
