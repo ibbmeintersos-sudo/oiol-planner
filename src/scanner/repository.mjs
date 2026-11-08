@@ -14,7 +14,7 @@ const MANIFESTS = [
   'pom.xml', 'build.gradle', 'composer.json', 'pnpm-workspace.yaml', 'lerna.json',
   'nx.json', 'turbo.json', 'tsconfig.json', 'jsconfig.json', 'angular.json'
 ];
-const SOURCE_EXTENSIONS = /\.(mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb)$/i;
+const SOURCE_EXTENSIONS = /\.(mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|sql|prisma)$/i;
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const evidenceId = file => 'REPO-' + sha256(file).slice(0, 12);
 
