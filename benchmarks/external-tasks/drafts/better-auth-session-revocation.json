@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-MONOLITH-004",
   "taskId": "RW-BA-01",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Better Auth",
   "request": "Plan an opt-in organization-plugin option that revokes all active authentication sessions belonging to a user after that user is successfully removed from an organization. This is explicitly user-wide: sessions used with the user's other organizations are also ended. Keep default behavior unchanged. Do not revoke API keys, OAuth grants, or unrelated credentials. Preserve the existing member-removal hook and failure semantics.",
   "constraints": [
@@ -43,8 +43,12 @@
       "failure handling"
     ],
     [
-      "tests",
-      "migration",
+      "tests"
+    ],
+    [
+      "migration"
+    ],
+    [
       "documentation"
     ]
   ],
