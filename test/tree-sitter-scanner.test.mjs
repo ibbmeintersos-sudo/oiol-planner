@@ -81,3 +81,36 @@ test('Tree-sitter syntax recovery is surfaced as evidence instead of crashing th
     await f.cleanup();
   }
 });
+
+test('scanner prioritizes root manifests and application source over metadata and documentation', async () => {
+  const f = await fixture('oiol-scan-priority-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    await mkdir(path.join(f.root, 'tests'), { recursive: true });
+    await mkdir(path.join(f.root, '.github', 'workflows'), { recursive: true });
+    await mkdir(path.join(f.root, 'docs'), { recursive: true });
+    await writeFile(path.join(f.root, 'package.json'), JSON.stringify({ name: 'priority-fixture' }));
+    await writeFile(path.join(f.root, 'README.md'), '# Priority fixture\n');
+    await writeFile(path.join(f.root, 'src', 'app.js'), 'export function app() { return true; }\n');
+    await writeFile(path.join(f.root, 'src', 'helper.js'), 'export function helper() { return true; }\n');
+    await writeFile(path.join(f.root, 'tests', 'app.test.js'), 'test("app", () => {});\n');
+    await writeFile(path.join(f.root, '.github', 'workflows', 'pull-db-tests.yml'), 'name: test\n');
+    await writeFile(path.join(f.root, '.github', 'ISSUE_TEMPLATE', 'config.yml').replace('/ISSUE_TEMPLATE/', '/'), 'blank_issues_enabled: true\n').catch(() => {});
+    for (let index = 0; index < 30; index++) {
+      await writeFile(path.join(f.root, 'docs', 'page-' + index + '.md'), '# Documentation ' + index + '\n');
+    }
+
+    const result = await scanRepository(f.root, { maxFiles: 5 });
+    const paths = result.files.map(file => file.path);
+    assert.ok(paths.includes('package.json'));
+    assert.ok(paths.includes('src/app.js'));
+    assert.ok(paths.includes('src/helper.js'));
+    assert.ok(paths.includes('tests/app.test.js'));
+    assert.equal(paths.some(file => file.startsWith('.github/')), false);
+    assert.equal(result.tests.includes('tests/app.test.js'), true);
+    assert.equal(result.tests.includes('.github/workflows/pull-db-tests.yml'), false);
+    assert.equal(result.truncated, true);
+  } finally {
+    await f.cleanup();
+  }
+});
