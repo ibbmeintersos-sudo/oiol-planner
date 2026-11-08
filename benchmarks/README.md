@@ -193,3 +193,27 @@ The report evaluates named function symbols, import specifiers, and manifest-dec
 ### P2 human review gate
 
 Each completed review CSV includes five additional 1–5 dimensions: NFR coverage, test strategy, rollback strategy, unknowns transparency, and risk estimation. The human aggregator requires the median for each of these five dimensions to be at least 3 for every scenario/run, in addition to the existing overall score, coverage, reviewer independence, disagreement adjudication, and severity gates. Blank template rows are not counted as submitted reviews.
+
+
+## Change Impact Analysis benchmark
+
+P11 adds a separate, offline benchmark for the deterministic Change Impact Analyzer. It is intentionally distinct from the LLM plan-quality benchmark above: the two measure different product capabilities and their scores must not be combined into one headline score.
+
+Run without provider credentials or live model calls:
+
+```sh
+npm run benchmark:change-impact -- --out benchmarks/results/change-impact-benchmark.json
+```
+
+The curated suite covers:
+- Existing-project direct file matching and reverse dependency propagation.
+- Test-file association through resolved imports.
+- Multi-component workspace dependency propagation.
+- API contract export and consumer evidence.
+- Ambiguous/unmatched requests where the analyzer must not invent a target.
+
+For direct files, affected files, tests, and packages, the report includes TP/FP/FN, precision, recall, and F1. API contract cases additionally score whether export metadata and consumer evidence were correctly identified. Category-level and dimension-level aggregates are reported; every case remains visible.
+
+The goldens are manually curated synthetic dependency graphs. They are deterministic regression fixtures, not an unbiased external benchmark and not evidence of runtime behavior. Before using results to claim general accuracy, expand the corpus with independently authored and adjudicated real-world repository snapshots, include multiple languages/frameworks and intentionally incomplete scans, and blind the expected impact sets from benchmark implementers.
+
+A passing result means the analyzer matched this small golden suite; it does not certify complete semantic impact analysis, test assertion coverage, or safe implementation. The benchmark runner only analyzes in-memory scanner-shaped evidence and does not execute target-project commands, tests, builds, scripts, or migrations.
