@@ -29,16 +29,18 @@ test('paired comparison rejects different scenario sets and wrong benchmark mode
 });
 
 test('external paired comparison rejects different repository commits',()=>{
- const externalO={...oi,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['a'.repeat(40)]}};
- const externalB={...base,sourceMode:'external-local-checkout',repositorySnapshot:{allGitCommitsDetected:true,commitShas:['b'.repeat(40)]}};
+ const taskDefinition={id:'RW-COMPARE',version:'1.0.0',sha256:'f'.repeat(64)};
+ const externalO={...oi,sourceMode:'external-local-checkout',taskDefinition,repositorySnapshot:{allGitCommitsDetected:true,commitShas:['a'.repeat(40)]}};
+ const externalB={...base,sourceMode:'external-local-checkout',taskDefinition,repositorySnapshot:{allGitCommitsDetected:true,commitShas:['b'.repeat(40)]}};
  assert.throws(()=>compareBenchmarkModes(externalO,externalB),/exact same repository commit SHA set/);
 });
 
 test('external paired comparison accepts the same clean pinned commit',()=>{
  const snapshot={allGitCommitsDetected:true,commitShas:['c'.repeat(40)]};
+ const taskDefinition={id:'RW-COMPARE',version:'1.0.0',sha256:'f'.repeat(64)};
  const result=compareBenchmarkModes(
-  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot},
-  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot}
+  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition}
  );
  assert.equal(result.sourceMode,'external-local-checkout');
  assert.deepEqual(result.repositorySnapshot,snapshot);
