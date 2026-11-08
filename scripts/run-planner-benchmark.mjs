@@ -50,6 +50,7 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
   if (!Array.isArray(task.expectedSignals) || !task.expectedSignals.length || task.expectedSignals.some(group => !Array.isArray(group) || !group.length || group.some(value => typeof value !== 'string'))) {
     throw new Error('--task-file expectedSignals must be a non-empty array of non-empty string groups');
   }
+  if (!Array.isArray(task.evidencePaths) || !task.evidencePaths.length || task.evidencePaths.some(value => typeof value !== 'string' || !value.trim() || value.startsWith('/') || value.split(/[\\\\/]/).includes('..'))) throw new Error('--task-file requires non-empty safe relative evidencePaths');
   if (typeof task.mustClarify !== 'boolean') throw new Error('--task-file mustClarify must be a boolean');
   if (task.mustClarify && (!Array.isArray(task.clarificationSignals) || !task.clarificationSignals.length || task.clarificationSignals.some(group => !Array.isArray(group) || !group.length || group.some(value => typeof value !== 'string')))) {
     throw new Error('--task-file requires clarificationSignals for blocking-clarification tasks');
@@ -66,7 +67,8 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
     taskDefinition: {
       id: task.taskId,
       version: task.taskVersion,
-      sha256: createHash('sha256').update(raw).digest('hex')
+      sha256: createHash('sha256').update(raw).digest('hex'),
+      evidencePaths: [...task.evidencePaths]
     }
   };
 }
@@ -74,6 +76,11 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
 export function assertExternalRepositorySnapshot(project) {
   if (!Number.isInteger(project?.repository?.fileCount) || project.repository.fileCount < 1 || !Array.isArray(project.repository.snippets) || project.repository.snippets.length < 1) {
     throw new Error('External benchmark repository scan produced no usable file evidence');
+  }
+  const evidenceSelection = project?.repository?.evidenceSelection;
+  if (Array.isArray(evidenceSelection?.requestedPaths) && evidenceSelection.requestedPaths.length) {
+    const missing = [...(evidenceSelection.missingPaths || []), ...(evidenceSelection.unexcerptedPaths || [])];
+    if (missing.length) throw new Error('Required task evidence paths were not supplied as excerpts: ' + [...new Set(missing)].join(', '));
   }
   const git = project?.repository?.git;
   if (!git?.isRepo || !/^[a-f0-9]{40}$/i.test(git.commit || '')) {
@@ -113,6 +120,7 @@ export function summarizeRepositoryEvidence(project) {
     configs: repository.configs,
     includedPaths: (repository.files || []).map(file => file.path),
     contextTruncated: repository.contextTruncated,
+    evidenceSelection: repository.evidenceSelection || null,
     snippetCount: (repository.snippets || []).length,
     snippetPaths: (repository.snippets || []).map(snippet => snippet.path),
     structure: {
@@ -172,7 +180,7 @@ export async function resolveScenarioProject(scenario, { repositoryRoot = null, 
       repo: path.resolve(repositoryRoot),
       name: scenario.project.name,
       request: scenario.project.request,
-      scanOptions: scanOptions || EXTERNAL_REPOSITORY_SCAN_OPTIONS
+      scanOptions: { ...EXTERNAL_REPOSITORY_SCAN_OPTIONS, ...(scanOptions || {}) }
     });
     // Do not expose the operator's absolute local path in plans or benchmark artifacts.
     project.repository.root = 'external-repository';
@@ -235,7 +243,7 @@ export async function main() {
   for(const scenario of chosen){
     const started=Date.now();
     try{
-      const project=await resolveScenarioProject(scenario,{repositoryRoot});
+      const project=await resolveScenarioProject(scenario,{repositoryRoot,scanOptions:taskDefinition?.evidencePaths?{priorityPaths:taskDefinition.evidencePaths}:null});
       if(repositoryRoot) assertExternalRepositorySnapshot(project);
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:summarizeRepositoryEvidence(project),plan});
