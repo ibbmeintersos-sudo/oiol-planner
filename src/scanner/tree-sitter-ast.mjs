@@ -88,6 +88,13 @@ function byteLine(lineStarts, byteOffset) {
   return low;
 }
 
+function exportedDeclaration(language, node, sourceBytes) {
+  if (!['javascript', 'typescript', 'tsx'].includes(language)) return null;
+  const start = Math.max(0, node.startByte() - 160);
+  const prefix = sourceBytes.subarray(start, node.startByte()).toString('utf8');
+  return /\\bexport\\s+(?:(?:default|declare|abstract|async)\\s+)*(?:(?:const|let|var)\\s+)?$/.test(prefix);
+}
+
 function classifySymbol(language, node, sourceBytes, lineStarts) {
   const kind = node.kind();
   const direct = {
@@ -147,7 +154,16 @@ function classifySymbol(language, node, sourceBytes, lineStarts) {
   if (!symbolKind) return null;
   const name = nodeName(node, sourceBytes);
   if (!name) return null;
-  return { name, kind: symbolKind, line: byteLine(lineStarts, node.startByte()), source: 'tree_sitter_ast', trustLevel: 'untrusted_repository_metadata' };
+  return {
+    name,
+    kind: symbolKind,
+    line: byteLine(lineStarts, node.startByte()),
+    ...( ['javascript', 'typescript', 'tsx'].includes(language)
+      ? { exported: exportedDeclaration(language, node, sourceBytes), exportVisibilitySource: 'bounded_ast_declaration_prefix' }
+      : {}),
+    source: 'tree_sitter_ast',
+    trustLevel: 'untrusted_repository_metadata'
+  };
 }
 
 function importSpecifiers(language, nodeKind, text) {
