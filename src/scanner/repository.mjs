@@ -182,6 +182,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
       sourceContents[file] = sourceText;
       const redactedText = redact(sourceText);
       let content;
+      const fileExcerptedRangeKeys = [];
       if (fileRanges.length) {
         const lines = redactedText.split(/\r?\n/);
         const segments = [];
@@ -194,7 +195,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
           if (segment.length + separator.length > remainingChars) continue;
           segments.push(segment);
           remainingChars -= segment.length + separator.length;
-          excerptedRangeKeys.add(rangeKey(range));
+          fileExcerptedRangeKeys.push(rangeKey(range));
         }
         content = segments.join('\n\n');
       } else content = redactedText.slice(0, 5000);
@@ -202,6 +203,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
       if (context.length + content.length > maxContextChars) { contextTruncated = true; continue; }
       context += '\n\n--- [EVIDENCE: ' + id + '] ' + file + ' ---\n' + content;
       const sourceSha256 = sha256(buffer);
+      for (const key of fileExcerptedRangeKeys) excerptedRangeKeys.add(key);
       snippets.push({
         id,
         path: file,
@@ -230,7 +232,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     unexcerptedPaths: matchedPriorityPaths.filter(file => !excerptedPriorityPaths.includes(file)),
     requestedRanges: normalizedPriorityRanges,
     excerptedRanges,
-    missingRanges: normalizedPriorityRanges.filter(range => !files.includes(range.path) || (excerptedPriorityPaths.includes(range.path) && !excerptedRangeKeys.has(rangeKey(range)) && !sourceContents[range.path])),
+    missingRanges: normalizedPriorityRanges.filter(range => !files.includes(range.path)),
     unexcerptedRanges: normalizedPriorityRanges.filter(range => files.includes(range.path) && !excerptedRangeKeys.has(rangeKey(range)))
   };
   const structureSummary = [
