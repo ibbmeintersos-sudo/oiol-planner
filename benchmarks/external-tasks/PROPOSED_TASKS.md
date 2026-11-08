@@ -1,6 +1,6 @@
 # P12 external task blueprints — draft pending scanner evidence
 
-Status: **ten candidate prompts are grounded in five pinned GitHub Actions scanner intakes and targeted source-file inspection; ten draft JSON definitions pass the runner contract tests, but they are not approved or scored**.
+Status: **ten candidate prompts are grounded in five pinned GitHub Actions scanner intakes and targeted source-file inspection; ten draft JSON definitions were revised to separate distinct rubric concepts and pass runner-contract/dry-run checks, but they are not approved or scored**.
 
 These blueprints are deliberately separate from runnable task-definition JSON. The five prioritized repositories were checked out at pinned commits and scanned by the P12 GitHub Actions workflow (run [42461297388](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461297388), scanner version 1.5.0). The reports are available as per-repository workflow artifacts; the workflow runner, not this chat's local filesystem, performed the checkouts. Before promoting any draft into a scored task:
 
@@ -19,7 +19,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### BA-01 — Optional session revocation when an organization member is removed (candidate specified change)
 
-- Suggested scenario: `EX-MONOLITH-004`; task version: `0.2.0-draft`.
+- Suggested scenario: `EX-MONOLITH-004`; task version: `0.3.0-draft`.
 - Request: Add an opt-in organization-plugin option that revokes **all active authentication sessions belonging to a user** after that user is successfully removed from an organization. Keep the default behavior unchanged. This is explicitly a user-wide revocation, so sessions used with the user's other organizations are also ended. Do not revoke API keys, OAuth grants, or unrelated credentials. Preserve the existing removal hook and error/transaction semantics.
 - Confirmed code evidence from the pinned scan: `packages/better-auth/src/plugins/organization/routes/crud-members.ts` (member removal and `afterRemoveMember` hook); `packages/better-auth/src/plugins/organization/types.ts` (hook options); `packages/better-auth/src/plugins/multi-session/index.ts` (device-session operations and `maximumSessions`); `packages/better-auth/src/api/routes/session.ts`; `packages/core/src/db/schema/session.ts`.
 - Tests to inspect: `packages/better-auth/src/plugins/organization/organization.test.ts`; `packages/better-auth/src/plugins/multi-session/multi-session.test.ts`.
@@ -28,7 +28,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### BA-02 — Organization-specific session limits (candidate clarification task)
 
-- Suggested scenario: `EX-API-003`; task version: `0.2.0-draft`; `mustClarify: true`.
+- Suggested scenario: `EX-API-003`; task version: `0.3.0-draft`; `mustClarify: true`.
 - Request: “Allow each organization to control how many active sessions its members can have.” Do not choose a data model or enforcement rule until the scope is clarified.
 - Confirmed code evidence: `packages/better-auth/src/plugins/multi-session/index.ts` exposes a plugin-level `maximumSessions` setting; organization configuration and membership permissions live under `packages/better-auth/src/plugins/organization/`; session persistence is represented in `packages/core/src/db/schema/session.ts`.
 - Required clarification areas: Is the limit per user globally, per organization, or per organization-member relationship? What happens when a user belongs to several organizations? Which organization context governs a new session? Should existing sessions be revoked or only new sessions denied when a limit is lowered? How should trusted server-created sessions behave?
@@ -39,7 +39,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### PN-01 — Document retention metadata and safe expiry workflow (candidate clear change)
 
-- Suggested scenario: `EX-MONOLITH-004`; task version: `0.2.0-draft`.
+- Suggested scenario: `EX-MONOLITH-004`; task version: `0.3.0-draft`.
 - Request: Plan a document-retention capability that lets an authorized administrator assign a retention date to a document, view upcoming expirations, and preview the affected documents before an explicitly confirmed expiry operation. Do not schedule irreversible deletion automatically. Preserve document searchability and auditability.
 - Initial expected concepts: document metadata; retention date; authorization; expiry preview; background task/Celery; audit trail; API/UI consistency; migration; tests.
 - Confirmed code evidence from the pinned scan: `src/documents/models.py` (document model and lifecycle); `src/documents/serialisers.py` and `src/documents/views.py` (API representation and endpoints); `src/documents/permissions.py` (authorization); `src/documents/tasks.py` and `src/documents/signals/handlers.py` (background processing and lifecycle hooks); `src/paperless/urls.py` (route registration); tests in `src/documents/tests/test_document_model.py`, `test_tasks.py`, and `test_api_documents.py`. The bounded scan did not identify an existing retention-policy model or audit workflow; verify the full checkout before promotion.
@@ -59,7 +59,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### PF-01 — Bounded retries for automation webhook actions (candidate specified change)
 
-- Suggested scenario: `EX-MONOLITH-004`; task version: `0.2.0-draft`.
+- Suggested scenario: `EX-MONOLITH-004`; task version: `0.3.0-draft`.
 - Request: Add an opt-in bounded retry policy to the existing `CallWebhook` automation action for transient network failures, timeouts, and HTTP 5xx responses. Specify a maximum attempt count, exponential backoff with a cap, and a stable idempotency identifier for all attempts belonging to one triggered action. Do not retry ordinary HTTP 4xx responses. Preserve current behavior when retries are not configured and do not block event ingestion while waiting for remote delivery.
 - Confirmed code evidence: `src/prefect/server/events/actions.py` contains the server-side `CallWebhook` action and response/failure handling; `src/prefect/events/actions.py` contains the client-facing action model; `src/prefect/server/events/clients.py`, `src/prefect/server/events/worker.py`, and `src/prefect/server/events/models/` provide event delivery/worker context; `ui-v2/src/components/automations/automations-wizard/actions-step/call-webhook-fields.tsx` exposes webhook action configuration.
 - Tests to inspect: `tests/events/server/test_automation_events.py`; `tests/events/server/test_automations_api.py`; webhook/action tests under `tests/events/`.
@@ -68,7 +68,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### PF-02 — “Make webhook delivery more reliable” (candidate clarification task)
 
-- Suggested scenario: `EX-API-003`; task version: `0.2.0-draft`; `mustClarify: true`.
+- Suggested scenario: `EX-API-003`; task version: `0.3.0-draft`; `mustClarify: true`.
 - Request: “Make webhook delivery more reliable.” Do not select delivery guarantees or retry behavior until clarified.
 - Confirmed code evidence: existing `CallWebhook` action in `src/prefect/server/events/actions.py`; `Webhook` block and client/server action schemas; automation event and worker tests.
 - Required clarification areas: at-most-once versus at-least-once delivery; retryable status codes and network failures; attempt/time budget; idempotency contract and receiver support; timeout and payload-size limits; ordering guarantees; dead-letter/manual replay expectations; secret rotation and audit visibility.
@@ -79,7 +79,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### GT-01 — Repository-scoped package cleanup overrides (candidate specified change)
 
-- Suggested scenario: `EX-MONOLITH-004`; task version: `0.2.0-draft`.
+- Suggested scenario: `EX-MONOLITH-004`; task version: `0.3.0-draft`.
 - Request: Extend the existing owner-and-package-type package cleanup rules with optional repository-specific overrides. A repository-specific rule must take precedence for that repository; otherwise the current owner/type rule remains the fallback. Preserve the existing preview-before-cleanup workflow and all current owner-level behavior when no repository override is configured.
 - Confirmed code evidence: `models/packages/package_cleanup_rule.go` stores owner/type, keep-count/pattern, and remove-days/pattern fields; `services/packages/cleanup/cleanup.go` executes enabled rules; `routers/web/shared/packages/packages.go` handles rule configuration; `templates/package/shared/cleanup_rules/preview.tmpl` renders the existing preview; `tests/integration/api_packages_test.go` exercises package cleanup.
 - Initial expected concepts: repository identity and ownership; rule precedence; schema migration and indexes; cleanup execution selection; preview consistency; authorization; backwards compatibility; integration tests.
@@ -87,7 +87,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### GT-02 — “Make package cleanup more granular” (candidate clarification task)
 
-- Suggested scenario: `EX-API-003`; task version: `0.2.0-draft`; `mustClarify: true`.
+- Suggested scenario: `EX-API-003`; task version: `0.3.0-draft`; `mustClarify: true`.
 - Request: “Make package cleanup more granular.” Do not assume the intended scope or precedence.
 - Confirmed code evidence: existing owner/type cleanup model and execution/preview paths listed in GT-01.
 - Required clarification areas: scope (owner, repository, package, version, or tag); precedence when rules overlap; retention by age versus count/pattern; protected versions/tags; preview and approval requirements; cleanup schedule and rollback expectations.
@@ -98,7 +98,7 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### IM-01 — Separate external-library usage reporting (candidate specified change)
 
-- Suggested scenario: `EX-MONOLITH-004`; task version: `0.2.0-draft`.
+- Suggested scenario: `EX-MONOLITH-004`; task version: `0.3.0-draft`.
 - Request: Add a separate per-user external-library storage-usage metric to administrator-facing user/server statistics. Keep it distinct from the existing upload quota and do not change quota enforcement. Use a clearly documented logical-size measurement based on indexed external-library assets; do not claim physical disk usage or deduplicated storage usage unless the repository evidence supports it.
 - Confirmed code evidence: `docs/docs/administration/server-stats.md` explicitly states external libraries are excluded from storage quota because of custom mount points; `server/src/dtos/server.dto.ts` defines usage and per-user quota statistics; `server/src/dtos/user.dto.ts` exposes `quotaSizeInBytes` and `quotaUsageInBytes`; `server/src/services/asset.service.ts`, `server/src/services/user.service.ts`, and `server/src/repositories/user.repository.ts` participate in asset/user usage flows; `server/src/services/library.service.ts` and `server/src/repositories/library.repository.ts` cover external libraries; admin UI includes `web/src/routes/admin/users/[id]/+layout.svelte`.
 - Initial expected concepts: external-library indexing and ownership; logical-size aggregation; DTO/API evolution; admin UI; custom mount points; performance/caching; no change to upload quota enforcement; tests and documentation.
@@ -106,14 +106,14 @@ The source blob SHAs below identify the public README and root manifest versions
 
 ### IM-02 — “Make external libraries count toward storage quotas” (candidate clarification task)
 
-- Suggested scenario: `EX-API-003`; task version: `0.2.0-draft`; `mustClarify: true`.
+- Suggested scenario: `EX-API-003`; task version: `0.3.0-draft`; `mustClarify: true`.
 - Request: “Make external libraries count toward user storage quotas.” Do not change quota enforcement until the accounting policy is clarified.
 - Confirmed code evidence: existing per-user quota fields and enforcement paths; external-library service/repository; server stats documentation explaining the current exclusion.
 - Required clarification areas: logical versus physical bytes; shared mount ownership; duplicate assets and deduplication; symlinks and custom mount points; whether imported and external assets both count; behavior for users already over quota; hard rejection versus warning/grace period.
 - Human review focus: Does OIOL identify why external libraries are currently excluded? Does it ask about ownership and storage measurement before proposing a schema or enforcement change?
 ## Draft JSON task files
 
-Ten draft task-definition JSON files have been created under [`drafts/`](drafts/). They use task version `0.2.0-draft`, map to the existing Existing Project benchmark scenarios, and are intended for contract validation only. They are not yet included in any benchmark run.
+Ten draft task-definition JSON files are stored under [`drafts/`](drafts/). They use task version `0.3.0-draft`, map to the existing Existing Project benchmark scenarios, and are intended for contract validation only. In this revision, rubric groups that had combined distinct concepts (for example, tests/migration/documentation) were split because each group is interpreted as a single concept with lexical alternatives. They are not yet included in any benchmark run.
 
 The test suite validates that all ten files parse through `applyScenarioTaskFile`, have valid task IDs/versions/hashes, and use the expected clarification metadata. Passing schema validation does not equal reviewer approval or benchmark readiness.
 
