@@ -495,7 +495,7 @@ export function analyzeChangeImpact({
   const evidenceByPath = new Map((structure.sourceEvidence || []).map(item => [normPath(item.path), item]));
   const coverageConfidence = createCoverageConfidence(repository, structure);
 
-  if (!queryTokens.size || !sourceFiles.length) {
+  if (!queryTokens.size || (!sourceFiles.length && !(structure.databaseSchema?.tables?.length || structure.databaseSchema?.changes?.length))) {
     return {
       protocolVersion: '1.0.0',
       status: 'insufficient_evidence',
@@ -684,7 +684,7 @@ export function analyzeChangeImpact({
     directMatchConfidence
   };
   const scope = scopeLabel(potentiallyAffectedFiles.length, affectedPackages.length);
-  const status = directSeeds.length || packageSeeds.length ? 'analyzed' : 'no_relevant_matches';
+  const status = directSeeds.length || packageSeeds.length || databaseSchemaImpact.status === 'analyzed' ? 'analyzed' : 'no_relevant_matches';
 
   return {
     protocolVersion: '1.0.0',
@@ -695,11 +695,11 @@ export function analyzeChangeImpact({
     matchingDiagnostics,
     apiContractImpact,
     databaseSchemaImpact,
-    summary: directSeeds.length || packageSeeds.length
+    summary: directSeeds.length || packageSeeds.length || databaseSchemaImpact.status === 'analyzed'
       ? 'The bounded scanner evidence suggests ' + directSeeds.length + ' direct candidate file(s), ' +
         (potentiallyAffectedFiles.length - directSeeds.length) + ' reverse-dependency file(s), ' +
         affectedTests.length + ' potentially affected test file(s), and ' +
-        affectedPackages.length + ' affected workspace package(s). This is a review estimate, not a complete dependency proof.'
+        affectedPackages.length + ' affected workspace package(s), and ' + (databaseSchemaImpact.schemaChanges?.length || 0) + ' matched database schema change(s). This is a review estimate, not a complete dependency proof.'
       : 'No repository file matched the request terms strongly enough to nominate a direct change target. This does not establish that the request has no repository impact.',
     scope,
     confidence,
