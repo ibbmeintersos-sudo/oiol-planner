@@ -52,8 +52,6 @@ function makeRepository({ truncated = false } = {}) {
         { file: files[0], name: 'userSession', kind: 'class' },
         { file: files[1], name: 'readProfile', kind: 'function' },
         { file: files[2], name: 'loadAdminDashboard', kind: 'function' },
-        { file: files[1], name: 'UserProfileResponse', kind: 'interface', line: 14, source: 'tree_sitter_ast', exported: true },
-        { file: files[0], name: 'userSession', kind: 'class', line: 3, source: 'tree_sitter_ast', exported: true },
         { file: files[6], name: 'findUserReviews', kind: 'function' }
       ],
       imports,
@@ -220,9 +218,18 @@ test('depth limit is not reported when the frontier has no unseen dependents', (
 });
 
 test('API contract analysis matches exported symbols and identifies file-level consumers', () => {
+  const repository = makeRepository();
+  repository.structure.symbols.push({
+    file: 'apps/customer-api/src/profile-route.ts',
+    name: 'UserProfileResponse',
+    kind: 'interface',
+    line: 14,
+    source: 'tree_sitter_ast',
+    exported: true
+  });
   const result = analyzeChangeImpact({
     request: 'change public API response contract for user profile',
-    repository: makeRepository()
+    repository
   });
 
   assert.equal(result.apiContractImpact.status, 'analyzed');
