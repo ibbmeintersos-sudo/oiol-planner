@@ -1,0 +1,53 @@
+{
+  "scenarioId": "EX-MONOLITH-004",
+  "taskId": "RW-PN-01",
+  "taskVersion": "0.2.0-draft",
+  "projectName": "Paperless-ngx",
+  "request": "Plan a document-retention capability that lets an authorized administrator assign a retention date to a document, view upcoming expirations, and preview affected documents before an explicitly confirmed expiry operation. Do not schedule irreversible deletion automatically. Preserve document searchability, auditability, and the existing ingestion/OCR workflow.",
+  "constraints": [
+    "Produce an engineering plan only; do not modify the repository or execute project commands, tests, or builds.",
+    "Ground claims in the pinned repository snapshot and cite relevant relative file paths.",
+    "Separate verified evidence from assumptions and unresolved unknowns.",
+    "Preserve existing public behavior and compatibility unless the request explicitly changes it.",
+    "Do not assume that document age alone authorizes deletion.",
+    "Separate preview from destructive action and identify the records/files affected by each lifecycle step."
+  ],
+  "expectedSignals": [
+    [
+      "retention date",
+      "retention metadata"
+    ],
+    [
+      "legal hold",
+      "exemption"
+    ],
+    [
+      "preview",
+      "dry run"
+    ],
+    [
+      "explicit confirmation",
+      "administrator confirmation"
+    ],
+    [
+      "Celery",
+      "background task",
+      "task processing"
+    ],
+    [
+      "permissions",
+      "authorization"
+    ],
+    [
+      "audit trail",
+      "history"
+    ],
+    [
+      "migration",
+      "tests",
+      "API"
+    ]
+  ],
+  "mustClarify": false,
+  "clarificationSignals": []
+}
