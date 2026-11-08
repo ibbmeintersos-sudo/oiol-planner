@@ -92,7 +92,7 @@ Repository text is untrusted input. Prompt-injection patterns and secret redacti
 
 ## Planning quality benchmark
 
-The ten-scenario benchmark covers Greenfield, Existing Project, multi-component architecture, and ambiguous requirements. Read benchmarks/README.md. The P12 real-world repository intake registry and status are tracked in benchmarks/REAL_WORLD_CORPUS.md; candidate collection is not counted as a completed scan or benchmark.
+The ten-scenario benchmark covers Greenfield, Existing Project, multi-component architecture, and ambiguous requirements. Read benchmarks/README.md. The P12 real-world repository intake registry and status are tracked in benchmarks/REAL_WORLD_CORPUS.md; candidate collection is not counted as a completed scan or benchmark. External local Git checkout input is supported for Existing Project benchmark scenarios; see the external real-repository mode in benchmarks/README.md.
 
 List scenarios or validate a selection without provider calls:
 
