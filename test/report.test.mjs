@@ -185,3 +185,49 @@ test('markdown report surfaces migration sequencing, compatibility matrix, and r
     assert.ok(markdown.toLowerCase().includes(value.toLowerCase()), 'missing migration compatibility report content: ' + value);
   }
 });
+
+test('markdown report surfaces test impact, verification gates, gaps, and non-execution boundary', () => {
+  const verificationPlan = {
+    ...plan,
+    project: {
+      ...plan.project,
+      changeImpact: {
+        status: 'analyzed',
+        summary: 'Static change impact estimate.',
+        confidence: { score: 0.7, level: 'medium' },
+        directMatches: [{ path: 'src/auth/session.ts' }],
+        potentiallyAffectedFiles: [],
+        affectedTests: [],
+        affectedPackages: [],
+        apiContractImpact: { status: 'not_requested' },
+        databaseSchemaImpact: { status: 'not_requested' },
+        testImpactAnalysis: {
+          status: 'planned',
+          confidence: 'medium',
+          inventory: { discoveredTestFileCount: 2, linkedTestFileCount: 1 },
+          selectedTests: [{ path: 'test/auth.test.ts', association: 'resolved_test_import_to_impacted_file', confidence: 'high', executionStatus: 'not_executed' }],
+          recommendedTestLevels: [{ level: 'unit', rationale: ['Verify the changed component.'], evidence: ['src/auth/session.ts'] }],
+          coverageAssessment: { requirementAcceptanceCriteria: 'not_assessed', codeCoverage: 'not_available' },
+          prerequisites: ['Use an isolated test environment.'],
+          verificationGates: [{ id: 'required_checks_pass', description: 'External workflow records required results.', status: 'proposed', evidenceStatus: 'not_executed_by_oiol' }],
+          gaps: ['Acceptance criteria coverage has not been assessed.'],
+          limitations: ['Static links do not prove assertion quality.']
+        },
+        risks: [],
+        limitations: []
+      }
+    }
+  };
+  const markdown = renderPlanMarkdown(verificationPlan);
+  for (const value of [
+    'Test impact and verification plan (not executed)',
+    'test/auth.test.ts',
+    'Recommended test levels',
+    'Verification prerequisites',
+    'Verification gates (proposed)',
+    'required_checks_pass',
+    'Verification gaps',
+    'not_assessed',
+    'OIOL does not execute tests'
+  ]) assert.ok(markdown.includes(value), 'missing verification report content: ' + value);
+});
