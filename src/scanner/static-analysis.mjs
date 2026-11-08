@@ -6,7 +6,12 @@ const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
   ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
   ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby']
+]);const EXT = new Map([
+  ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
+  ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
+  ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby']
 ]);
+const SOURCE_EXT = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
 const norm = value => value.replaceAll('\\','/').replace(/^\.\//,'');
 
 function importsFor(source, language) {
@@ -84,9 +89,11 @@ function resolveRelativeImport(file, language, specifier, fileSet) {
 export function analyzeRepositoryStructure({ files = [], contents = {}, manifests = [], maxFileBytes = 16000 } = {}) {
   const normalized = files.map(norm);
   const fileSet = new Set(normalized);
-  const sources = normalized.filter(file => EXT.has(path.posix.extname(file).toLowerCase()));
+  const sources = normalized.filter(file => SOURCE_EXT.test(file));
+  const supportedSources = sources.filter(file => EXT.has(path.posix.extname(file).toLowerCase()));
+  const unsupportedSources = sources.filter(file => !EXT.has(path.posix.extname(file).toLowerCase()));
   const languages = {}, analyzed = [];
-  for (const file of sources) {
+  for (const file of supportedSources) {
     if (typeof contents[file] !== 'string') continue;
     const language = EXT.get(path.posix.extname(file).toLowerCase());
     languages[language] = (languages[language] || 0) + 1;
@@ -151,7 +158,8 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     analyzedSourceFileCount: analyzed.length,
     astFileCount: ast.parsedFileCount,
     lexicalFallbackFileCount: lexicalFallbackFiles.length,
-    unsupportedLanguageFileCount: ast.unsupportedFileCount,
+    unsupportedLanguageFileCount: ast.unsupportedFileCount + unsupportedSources.length,
+    unsupportedLanguageFiles: [...ast.unsupportedFiles.map(item => item.file), ...unsupportedSources].slice(0, 500),
     parseFailureFileCount: ast.failedFileCount,
     syntaxErrorFileCount: ast.parsedFiles.filter(item => item.hasError).length,
     nodeLimitFileCount: ast.parsedFiles.filter(item => item.nodeLimitReached).length,
