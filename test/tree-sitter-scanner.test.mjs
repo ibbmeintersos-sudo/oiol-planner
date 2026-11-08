@@ -132,3 +132,26 @@ test('AST analysis continues across bounded source files after prompt context is
     await f.cleanup();
   }
 });
+
+test('scanner balances high-value server and web roots before mobile and OpenAPI trees', async () => {
+  const f = await fixture('oiol-scan-multi-root-');
+  try {
+    for (const directory of ['server/src', 'web/src', 'mobile/lib', 'open-api/specs']) {
+      await mkdir(path.join(f.root, directory), { recursive: true });
+    }
+    await writeFile(path.join(f.root, 'package.json'), JSON.stringify({ name: 'multi-root-fixture' }));
+    for (let index = 0; index < 10; index++) {
+      await writeFile(path.join(f.root, 'server/src', 'server-' + index + '.ts'), 'export const server' + index + ' = true;\n');
+      await writeFile(path.join(f.root, 'web/src', 'web-' + index + '.ts'), 'export const web' + index + ' = true;\n');
+      await writeFile(path.join(f.root, 'mobile/lib', 'mobile-' + index + '.dart'), 'class Mobile' + index + ' {}\n');
+      await writeFile(path.join(f.root, 'open-api/specs', 'api-' + index + '.yaml'), 'openapi: 3.0.0\n');
+    }
+    const result = await scanRepository(f.root, { maxFiles: 25 });
+    const paths = result.files.map(file => file.path);
+    assert.ok(paths.some(file => file.startsWith('server/src/')));
+    assert.ok(paths.some(file => file.startsWith('web/src/')));
+    assert.equal(paths.some(file => file.startsWith('open-api/')), false);
+  } finally {
+    await f.cleanup();
+  }
+});
