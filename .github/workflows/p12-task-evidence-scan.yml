@@ -1,0 +1,85 @@
+name: P12 Task-specific evidence intake
+
+on:
+  push:
+    paths:
+      - .github/workflows/p12-task-evidence-scan.yml
+      - scripts/run-external-corpus-scan.mjs
+      - src/scanner/**
+      - benchmarks/external-tasks/drafts/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Evidence scan ${{ matrix.id }} — ${{ matrix.repository }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: RW-TS-02
+            repository: better-auth/better-auth
+            ref: de6ef28b86c002c3a3683861d803daf482ec603f
+            task_file: benchmarks/external-tasks/drafts/better-auth-session-revocation.json
+          - id: RW-PY-05
+            repository: paperless-ngx/paperless-ngx
+            ref: 32bc5522e914f1e5f3a36eb60de6988611ca310f
+            task_file: benchmarks/external-tasks/drafts/paperless-retention.json
+          - id: RW-PY-07
+            repository: PrefectHQ/prefect
+            ref: b0479c0c26045b06321191bbad0cdfbb334d7380
+            task_file: benchmarks/external-tasks/drafts/prefect-webhook-retries.json
+          - id: RW-GO-01
+            repository: go-gitea/gitea
+            ref: edebfaa12516a140d7ee3fcbaf25a6a1cc2cdb76
+            task_file: benchmarks/external-tasks/drafts/gitea-repository-cleanup.json
+          - id: RW-TS-06
+            repository: immich-app/immich
+            ref: 87ef895041e160aef4f61f2d7af1ad3f8e38827d
+            task_file: benchmarks/external-tasks/drafts/immich-external-library-usage.json
+    steps:
+      - name: Check out OIOL planner
+        uses: actions/checkout@v4
+        with:
+          path: planner
+          persist-credentials: false
+
+      - name: Check out pinned candidate repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: candidate
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: planner/package-lock.json
+
+      - name: Install OIOL dependencies only
+        working-directory: planner
+        run: npm ci
+
+      - name: Scan task-specific evidence paths
+        working-directory: planner
+        run: |
+          node scripts/run-external-corpus-scan.mjs \
+            --repo ../candidate \
+            --id "${{ matrix.id }}" \
+            --task-file "${{ matrix.task_file }}" \
+            --out "scan-results/${{ matrix.id }}-task-evidence.json"
+
+      - name: Upload evidence-selection report
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-task-evidence-${{ matrix.id }}
+          path: planner/scan-results/${{ matrix.id }}-task-evidence.json
+          if-no-files-found: error
+          retention-days: 30
