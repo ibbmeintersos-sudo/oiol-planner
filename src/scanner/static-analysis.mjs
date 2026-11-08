@@ -82,7 +82,7 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
 
   const goModFile = manifests.find(file => path.posix.basename(file) === 'go.mod');
   const goModulePath = typeof contents[goModFile] === 'string'
-    ? contents[goModFile].match(/^\\s*module\\s+([^\\s]+)\\s*$/m)?.[1] || null
+    ? contents[goModFile].match(/^\s*module\s+([^\s]+)\s*$/m)?.[1] || null
     : null;
   const pythonRoots = ['', 'src', 'lib', 'app'];
   const ast = analyzeWithTreeSitter({ files: normalized, contents, maxFileBytes, goModulePath, pythonRoots });
