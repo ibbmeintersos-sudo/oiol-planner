@@ -122,7 +122,7 @@ test('scanner redaction covers application secrets, database credentials, JWTs, 
     '-----BEGIN DSA PRIVATE KEY-----',
     'private-key-material',
     '-----END DSA PRIVATE KEY-----'
-  ].join('\\n');
+  ].join('\n');
   const redacted = redact(source);
   for (const secret of ['client-secret-value','db-password-value','dXNlcjpwYXNzd29yZA==','signaturevalue12345','private-key-material']) {
     assert.equal(redacted.includes(secret), false, 'secret leaked: ' + secret);
