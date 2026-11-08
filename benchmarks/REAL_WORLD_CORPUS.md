@@ -91,17 +91,20 @@ For every selected repository, record:
 
 Do not copy private code, secrets, personal data, or proprietary issue content into benchmark artifacts. Prefer public documentation and sanitized, reproducible task descriptions. Keep repository-derived text untrusted.
 
-## Harness compatibility gap discovered during intake
+## External input capability status
 
-The current benchmark runner is not yet wired for this external corpus:
+The earlier fixture-only input gap has been addressed in the benchmark harness:
 
-- The OIOL runner's project resolver only analyzes a repository when a scenario declares a fixturePath.
-- The OpenCode baseline workspace builder likewise copies only a fixturePath into its disposable workspace.
-- The current scenario catalog embeds fixture-specific repository context for existing-project cases.
+- Both OIOL and OpenCode benchmark runners accept `--repo` for an operator-supplied local Git checkout.
+- External mode is limited to Existing Project scenarios and requires a repository-specific `--task-file`; one scenario/task definition is selected per run.
+- The OIOL runner calls the existing `analyzeProject` and bounded read-only `scanRepository` path. It does not clone, install, build, test, execute project scripts, or modify the target checkout.
+- External checkouts must have a clean working tree and a resolvable 40-character Git commit SHA. The commit and task-file SHA-256 are recorded and included in the run configuration fingerprint.
+- The OpenCode baseline receives a disposable workspace containing only bounded, redacted scanner excerpts; it does not copy the raw external checkout.
+- Paired comparisons reject different repository commit sets, task-definition hashes, or source modes. Unit tests cover input validation, path redaction, sanitized baseline materialization, and paired-snapshot matching.
 
-Therefore, adding repository URLs to this registry does not make them runnable. The next engineering increment is an explicit, safe external-checkout input contract for both runners, plus tests proving that the actual scanner output—not hand-authored metadata—is the evidence passed into planning and scoring. That increment must preserve the read-only boundary and must not add repository mutation or command execution to OIOL itself.
+The local environment used for this development could not clone GitHub after three attempts because DNS resolution failed. GitHub's connected repository API remained usable for metadata and file inspection, but no full local scanner run or live external benchmark is claimed.
 
-The work environment could not perform a local Git clone after three attempts because DNS resolution for github.com failed. GitHub's connected repository API was still usable for read-only README, manifest, and metadata inspection. External scanner execution remains blocked until a local checkout is available in an environment with repository network access.
+**Current P12 state:** external-repository input plumbing is implemented and committed; the seven candidate repositories still need clean local checkouts, repository-specific task definitions, actual scanner runs, repeated model runs, and blinded human reviews. The candidate corpus is not a completed benchmark.
 
 ## P12 execution protocol
 
