@@ -5,11 +5,10 @@ This script downloads and extracts source archives only. It never imports,
 installs, builds, tests, or executes code from a target repository.
 """
 from __future__ import annotations
-
 import argparse
 import hashlib
 import json
-import os
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 import tarfile
 import tempfile
@@ -27,18 +26,41 @@ def fingerprint(root: Path) -> dict:
             continue
         if path.is_symlink() or not path.is_file():
             continue
-        rel = path.relative_to(root).as_posix()
-        files.append((rel, path))
+        files.append((path.relative_to(root).as_posix(), path))
     files.sort(key=lambda item: item[0])
     digest = hashlib.sha256()
     for rel, path in files:
         digest.update(rel.encode("utf-8"))
-        digest.update(b"\0")
+        digest.update(b"\\0")
         with path.open("rb") as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 digest.update(chunk)
-        digest.update(b"\0")
+        digest.update(b"\\0")
     return {"sha256": digest.hexdigest(), "fileCount": len(files)}
+
+
+def resolve_license_file(snapshot_root: Path, license_file: str) -> Path:
+    """Resolve a declared license path without allowing traversal or symlinks."""
+    if not isinstance(license_file, str) or not license_file:
+        raise ValueError("Declared license path must be a non-empty relative path")
+    if license_file.startswith("/") or "\\" in license_file:
+        raise ValueError("Declared license path must use safe POSIX-relative syntax")
+    parts = license_file.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        raise ValueError("Declared license path contains an unsafe path component")
+    current = snapshot_root
+    for part in parts:
+        current = current / part
+        if current.is_symlink():
+            raise ValueError("Declared license path must not traverse symlinks")
+    try:
+        resolved = current.resolve(strict=True)
+        resolved.relative_to(snapshot_root.resolve(strict=True))
+    except (OSError, ValueError) as exc:
+        raise ValueError("Declared license file is missing or escapes the snapshot") from exc
+    if not resolved.is_file():
+        raise ValueError("Declared license path is not a regular file")
+    return resolved
 
 
 def safe_extract(archive: tarfile.TarFile, destination: Path) -> str:
@@ -68,26 +90,21 @@ def main() -> None:
     parser.add_argument("--case-index", type=int, required=True, help="0-based index in intake-candidates.json candidates[]")
     parser.add_argument("--output", default="acquired")
     args = parser.parse_args()
-
     intake = json.loads(INTAKE.read_text(encoding="utf-8"))
     candidates = intake["candidates"]
     if args.case_index < 0 or args.case_index >= len(candidates):
         raise SystemExit("case-index is outside the primary candidate list")
     candidate = candidates[args.case_index]
-    source = candidate["source"]
-    change = candidate["change"]
-    repository = source["repository"]
-    base_sha = source["baseCommit"]
+    source, change = candidate["source"], candidate["change"]
+    repository, base_sha = source["repository"], source["baseCommit"]
     if len(base_sha) != 40 or any(ch not in "0123456789abcdef" for ch in base_sha):
         raise SystemExit("Base commit is not an immutable full SHA")
-
     output_root = Path(args.output).resolve()
     case_dir = output_root / candidate["caseId"]
     snapshot = case_dir / "snapshot"
     case_dir.mkdir(parents=True, exist_ok=True)
     if snapshot.exists():
         raise SystemExit(f"Refusing to overwrite existing snapshot: {snapshot}")
-
     url = f"https://codeload.github.com/{repository}/tar.gz/{base_sha}"
     request = urllib.request.Request(url, headers={"User-Agent": "OIOL-P12-ReadOnly-Snapshot-Acquirer/1.0"})
     with tempfile.TemporaryFile() as archive_file:
@@ -100,37 +117,24 @@ def main() -> None:
         archive_file.seek(0)
         with tarfile.open(fileobj=archive_file, mode="r:gz") as archive:
             safe_extract(archive, snapshot)
-
     result = fingerprint(snapshot)
-    license_path = snapshot / source["licenseFile"]
-    if not license_path.is_file():
-        raise SystemExit("Declared license file missing from pinned snapshot: " + source["licenseFile"])
-    license_sha256 = hashlib.sha256(license_path.read_bytes()).hexdigest()
+    license_path = resolve_license_file(snapshot, source["licenseFile"])
     metadata = {
-        "schemaVersion": "1.0.0",
-        "caseId": candidate["caseId"],
-        "repository": repository,
-        "repositoryUrl": source["repositoryUrl"],
-        "baseCommit": base_sha,
-        "changeCommit": source["changeCommit"],
-        "pullRequest": change["pullRequest"],
-        "changeUrl": change["url"],
-        "license": source["license"],
-        "licenseFile": source["licenseFile"],
-        "licenseFileUrl": source["licenseFileUrl"],
-        "sizeClass": source["sizeClass"],
+        "schemaVersion": "1.0.0", "caseId": candidate["caseId"],
+        "repository": repository, "repositoryUrl": source["repositoryUrl"],
+        "baseCommit": base_sha, "changeCommit": source["changeCommit"],
+        "pullRequest": change["pullRequest"], "changeUrl": change["url"],
+        "license": source["license"], "licenseFile": source["licenseFile"],
+        "licenseFileUrl": source["licenseFileUrl"], "sizeClass": source["sizeClass"],
         "trackedFileCountAtBase": source["trackedFileCountAtBase"],
-        "primaryLanguages": source["primaryLanguages"],
-        "snapshotPath": "snapshot",
-        "snapshotSha256": result["sha256"],
-        "snapshotFileCount": result["fileCount"],
+        "primaryLanguages": source["primaryLanguages"], "snapshotPath": "snapshot",
+        "snapshotSha256": result["sha256"], "snapshotFileCount": result["fileCount"],
         "trackedFileCountDelta": result["fileCount"] - source["trackedFileCountAtBase"],
-        "licenseFileSha256": license_sha256,
-        "archiveUrl": url,
-        "acquiredAt": datetime.now(timezone.utc).isoformat(),
+        "licenseFileSha256": hashlib.sha256(license_path.read_bytes()).hexdigest(),
+        "archiveUrl": url, "acquiredAt": datetime.now(timezone.utc).isoformat(),
         "executionBoundary": "download-and-extract-only; target project code was not executed"
     }
-    (case_dir / "snapshot-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    (case_dir / "snapshot-metadata.json").write_text(json.dumps(metadata, indent=2) + "\\n", encoding="utf-8")
     print(json.dumps(metadata, indent=2))
 
 
