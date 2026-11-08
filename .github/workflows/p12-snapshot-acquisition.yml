@@ -42,7 +42,7 @@ jobs:
           python-version: "3.12"
 
       - name: Validate snapshot acquisition path safety
-        run: python -m unittest test/p12_snapshot_acquisition_test.py
+        run: python test/p12_snapshot_acquisition_test.py
 
       - name: Download and fingerprint pinned source snapshot
         run: python scripts/acquire-real-world-snapshot.py --case-index "${{ matrix.case_index }}" --output acquired
