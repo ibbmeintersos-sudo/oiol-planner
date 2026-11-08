@@ -1,32 +1,51 @@
 name: Debug tests 2
+
 on:
   push:
+    branches:
+      - feat/quality-stack-integration
   workflow_dispatch:
+
 permissions:
-  contents: read
+  contents: write
+
 jobs:
-  debug:
+  test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os:
+          - ubuntu-latest
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }} / Node 22
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
         with:
-          node-version: 22
-      - name: Install
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Run tests with TAP
+      - name: Run tests and capture output
         shell: bash
         run: |
           set +e
           node --test --test-reporter=tap > test-output.tap 2>&1
           code=$?
-          echo "test exit code: $code"
-          grep -E "not ok|^# fail|AssertionError|Error:|expected:|actual:" test-output.tap | head -120 | while IFS= read -r line; do
-            echo "::error::${line}"
-          done
-          exit $code
+          echo "exit=$code" > test-failures.txt
+          wc -l test-output.tap >> test-failures.txt
+          grep -n -E "^not ok|^# fail|AssertionError|Error:|expected:|actual:|^# Subtest" test-output.tap | head -300 >> test-failures.txt
+          echo "--- tail ---" >> test-failures.txt
+          tail -n 400 test-output.tap >> test-failures.txt
+          exit 0
+      - name: Publish captured output
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B debug-artifacts
+          git add -f test-failures.txt
+          git commit -m "debug: capture test failures"
+          git push -f origin debug-artifacts
