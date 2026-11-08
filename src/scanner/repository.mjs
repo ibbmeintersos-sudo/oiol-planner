@@ -24,7 +24,8 @@ const PRIORITY_DIRS = new Map([
 const LOW_PRIORITY_DIRS = new Set([
   '.github','.gitlab','.changeset','.mise','docs','doc','documentation','demo','demos','examples','example',
   'playground','website','site','storybook','stories','assets','static','public','translations','locales',
-  'images','screenshots','deployment','deploy','contrib'
+  'images','screenshots','deployment','deploy','contrib','i18n','readme_i18n','machine-learning',
+  'design','e2e','docker','native','fastlane','misc','.devcontainer','.vscode'
 ]);
 function entryPriority(entry, depth) {
   const name = entry.name.toLowerCase();
