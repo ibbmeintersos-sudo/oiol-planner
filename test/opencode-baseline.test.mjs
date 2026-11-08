@@ -5,6 +5,23 @@ import { buildBaselinePrompt, parseBaselinePlan, runOpenCodeBaselineScenario } f
 const scenario={id:'GF-API-001',project:{kind:'greenfield',name:'Test API',request:'Create an API'}};
 const validPlan={contractVersion:'1.0',id:'p1',status:'needs_revision',project:scenario.project,requirements:[],architecture:{components:[],decisions:[]},tasks:[],dependencyGraph:{nodes:[],edges:[]},risks:[],evidence:[],clarifications:[],review:null};
 
+function makeV2Mock({ assistantText = JSON.stringify(validPlan), diff = [] } = {}) {
+ const calls=[];
+ const client={
+  async health(){calls.push(['health']);return {version:'2.2.5'};},
+  async createSession(title,options){calls.push(['create',title,options]);return {id:'ses_test'};},
+  async prompt(id,input){calls.push(['prompt',id]);assert.equal(typeof input[0].text,'string');assert.match(input[0].text,/Do not modify files/);return {id:'msg_user',type:'user'};},
+  async waitSession(id){calls.push(['wait',id]);return null;},
+  async getSessionMessages(id){calls.push(['messages',id]);return [
+   {id:'msg_assistant',type:'assistant',model:{providerID:'test',id:'model'},tokens:{input:10,output:20},content:[{type:'text',text:assistantText}]},
+   {id:'msg_user',type:'user',text:'benchmark prompt'}
+  ];},
+  async getSessionDiff(id){calls.push(['diff',id]);return diff;},
+  async deleteSession(id){calls.push(['delete',id]);return null;}
+ };
+ return {client,calls};
+}
+
 test('baseline prompt explicitly prohibits implementation and embeds the identical project input',()=>{
  const prompt=buildBaselinePrompt(scenario.project);
  assert.match(prompt,/without the OIOL planning layer/);
@@ -18,31 +35,78 @@ test('baseline parser accepts strict JSON and fenced JSON but rejects invalid ou
  assert.throws(()=>parseBaselinePlan('not JSON'),/valid JSON plan/);
 });
 
-test('OpenCode baseline creates a read-only planning session and always cleans it up',async()=>{
- const calls=[];
- const client={
-  async createSession(title){calls.push(['create',title]);return {id:'session-1'};},
-  async prompt(id,parts,options){calls.push(['prompt',id,options.agent,options.model]);assert.match(parts[0].text,/Do not modify files/);return {info:{role:'assistant',id:'message-1'},parts:[{type:'text',text:JSON.stringify(validPlan)}]};},
-  async getSessionDiff(){return [];},
-  async deleteSession(id){calls.push(['delete',id]);}
- };
+
+test('OpenCode V2 baseline checks protocol, creates a read-only session, waits, reads messages, and cleans up',async()=>{
+ const {client,calls}=makeV2Mock();
  const result=await runOpenCodeBaselineScenario({client,scenario,agent:'plan',model:{providerID:'test',modelID:'model'}});
  assert.equal(result.plan.id,'p1');
- assert.equal(result.sessionId,'session-1');
+ assert.equal(result.sessionId,'ses_test');
+ assert.equal(result.submittedMessageId,'msg_user');
+ assert.equal(result.messageId,'msg_assistant');
+ assert.equal(result.serverVersion,'2.2.5');
+ assert.equal(calls[0][0],'health');
+ assert.equal(calls.find(x=>x[0]==='create')[2].agent,'plan');
+ assert.equal(calls.find(x=>x[0]==='create')[2].model.modelID,'model');
+ assert.equal(calls.some(x=>x[0]==='wait'),true);
+ assert.equal(calls.some(x=>x[0]==='messages'),true);
  assert.equal(calls.filter(x=>x[0]==='delete').length,1);
- assert.equal(calls[1][2],'plan');
 });
 
-test('OpenCode baseline deletes a session even when the model returns invalid JSON',async()=>{
- let deleted=false;
- const client={
-  async createSession(){return {id:'session-2'};},
-  async prompt(){return {info:{role:'assistant'},parts:[{type:'text',text:'not JSON'}]};},
-  async getSessionDiff(){return [];},
-  async deleteSession(){deleted=true;}
- };
+test('OpenCode V2 baseline rejects an incompatible server before creating a session',async()=>{
+ let created=false;
+ const client={health:async()=>{throw new Error('OpenCode HTTP 404');},createSession:async()=>{created=true;return {id:'ses_never'};}};
+ await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/HTTP 404/);
+ assert.equal(created,false);
+});
+
+test('OpenCode V2 baseline deletes a session when the assistant returns invalid JSON',async()=>{
+ const {client,calls}=makeV2Mock({assistantText:'not JSON'});
  await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/valid JSON plan/);
- assert.equal(deleted,true);
+ assert.equal(calls.filter(x=>x[0]==='delete').length,1);
+});
+
+test('OpenCode V2 baseline rejects changes to the disposable read-only workspace',async()=>{
+ const {client,calls}=makeV2Mock({diff:[{file:'src/unauthorized.mjs'}]});
+ await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/violated its read-only contract/);
+ assert.equal(calls.filter(x=>x[0]==='delete').length,1);
+});
+
+test('OpenCode V2 client uses V2 endpoints, envelopes, model references, and workspace location',async()=>{
+ const calls=[];
+ const fetchImpl=async(url,init={})=>{
+  const parsed=new URL(String(url));
+  const body=init.body?JSON.parse(init.body):null;
+  calls.push({path:parsed.pathname+parsed.search,method:init.method||'GET',body});
+  if(parsed.pathname==='/api/info')return new Response(JSON.stringify({version:'2.2.5',pid:123}),{status:200});
+  if(parsed.pathname==='/api/session'&&init.method==='POST')return new Response(JSON.stringify({data:{id:'ses_test'}}),{status:200});
+  if(parsed.pathname==='/api/session/ses_test/prompt')return new Response(JSON.stringify({data:{id:'msg_user',type:'user'}}),{status:200});
+  if(parsed.pathname==='/api/session/ses_test/message')return new Response(JSON.stringify({data:[],cursor:{}}),{status:200});
+  if(parsed.pathname==='/api/session/ses_test/diff')return new Response(JSON.stringify({data:[]}),{status:200});
+  if(parsed.pathname.endsWith('/wait')||(parsed.pathname==='/api/session/ses_test'&&init.method==='DELETE'))return new Response(null,{status:204});
+  return new Response('not found',{status:404});
+ };
+ const directory=path.resolve(process.cwd());
+ const client=new OpenCodeClient({baseUrl:'http://127.0.0.1:4096',username:'opencode',password:'test-password',directory,fetchImpl});
+ assert.equal((await client.health()).version,'2.2.5');
+ assert.equal((await client.createSession('pilot',{agent:'plan',model:{providerID:'test-provider',modelID:'test-model'}})).id,'ses_test');
+ assert.equal((await client.prompt('ses_test',[{type:'text',text:'Plan only'}])).id,'msg_user');
+ await client.waitSession('ses_test');
+ assert.deepEqual(await client.getSessionMessages('ses_test'),[]);
+ assert.deepEqual(await client.getSessionDiff('ses_test'),[]);
+ await client.deleteSession('ses_test');
+ assert.deepEqual(calls.map(x=>[x.method,x.path]),[
+  ['GET','/api/info'],
+  ['POST','/api/session'],
+  ['POST','/api/session/ses_test/prompt'],
+  ['POST','/api/experimental/session/ses_test/wait'],
+  ['GET','/api/session/ses_test/message?order=desc&limit=200'],
+  ['GET','/api/session/ses_test/diff'],
+  ['DELETE','/api/session/ses_test']
+ ]);
+ assert.deepEqual(calls[1].body.location,{directory});
+ assert.equal(calls[1].body.agent,'plan');
+ assert.deepEqual(calls[1].body.model,{providerID:'test-provider',id:'test-model'});
+ assert.deepEqual(calls[2].body,{text:'Plan only'});
 });
 
 import { main as baselineMain, createBaselineWorkspace } from '../scripts/run-opencode-baseline.mjs';
@@ -70,18 +134,6 @@ test('OpenCode baseline runner dry-run validates config without contacting OpenC
   if(previousOptIn===undefined)delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;else process.env.OIOL_BENCHMARK_ALLOW_LIVE=previousOptIn;
   console.log=previousLog;
  }
-});
-
-test('OpenCode baseline rejects any file changes despite read-only prompt',async()=>{
- let deleted=false;
- const client={
-  async createSession(){return {id:'session-3'};},
-  async prompt(){return {info:{role:'assistant'},parts:[{type:'text',text:JSON.stringify(validPlan)}]};},
-  async getSessionDiff(){return [{file:'src/unauthorized.mjs'}];},
-  async deleteSession(){deleted=true;}
- };
- await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/violated its read-only contract/);
- assert.equal(deleted,true);
 });
 
 test('baseline workspace copies fixtures into a disposable directory and cleans it up',async()=>{
