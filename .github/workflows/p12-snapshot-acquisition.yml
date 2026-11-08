@@ -46,6 +46,8 @@ jobs:
         run: python test/p12_snapshot_acquisition_test.py
 
       - name: Download and fingerprint pinned source snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python scripts/acquire-real-world-snapshot.py --case-index "${{ matrix.case_index }}" --output acquired
 
       - name: Upload immutable snapshot and provenance

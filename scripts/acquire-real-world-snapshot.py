@@ -2,7 +2,7 @@
 """Acquire complete immutable public source snapshots for OIOL P12.
 
 GitHub codeload archives can honor .gitattributes export-ignore and omit
-tracked files. This tool restores any omitted Git blobs from raw.githubusercontent.com
+tracked files. This tool restores omitted Git blobs from raw.githubusercontent.com
 using the exact pinned base commit. It never imports, installs, builds, tests,
 or executes code from a target repository.
 """
@@ -97,24 +97,38 @@ def safe_extract(archive: tarfile.TarFile, destination: Path) -> None:
 
 
 def request_json(url: str) -> dict:
-    request = urllib.request.Request(url, headers={
-        "User-Agent": USER_AGENT,
-        "Accept": "application/vnd.github+json"
-    })
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/vnd.github+json"}
+    token = os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(request, timeout=90) as response:
         return json.loads(response.read().decode("utf-8"))
 
 
 def fetch_missing_blob(repository: str, base_sha: str, entry: dict, snapshot: Path) -> None:
     relative = validate_repo_path(entry["path"])
+    destination = snapshot.joinpath(*relative.parts)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
     if entry.get("mode") == "120000":
-        raise ValueError(f"Snapshot archive omitted symlink {entry['path']}; refusing to synthesize it")
+        blob_url = f"https://api.github.com/repos/{repository}/git/blobs/{entry['sha']}"
+        blob = request_json(blob_url)
+        target = base64.b64decode(blob["content"]).decode("utf-8")
+        if not target or target.startswith("/") or "\\" in target:
+            raise ValueError(f"Unsafe symlink target for {entry['path']}")
+        resolved_target = (destination.parent / target).resolve(strict=False)
+        try:
+            resolved_target.relative_to(snapshot.resolve(strict=True))
+        except ValueError as exc:
+            raise ValueError(f"Symlink target escapes snapshot: {entry['path']}") from exc
+        os.symlink(target, destination)
+        return
+
     if entry.get("mode") not in ("100644", "100755"):
         raise ValueError(f"Unsupported Git blob mode for {entry['path']}: {entry.get('mode')}")
     encoded_path = urllib.parse.quote(relative.as_posix(), safe="/")
     url = f"https://raw.githubusercontent.com/{repository}/{base_sha}/{encoded_path}"
-    destination = snapshot.joinpath(*relative.parts)
-    destination.parent.mkdir(parents=True, exist_ok=True)
 
     last_error = None
     for attempt in range(4):
@@ -148,23 +162,24 @@ def fetch_missing_blob(repository: str, base_sha: str, entry: dict, snapshot: Pa
 
 
 def complete_snapshot(repository: str, base_sha: str, snapshot: Path) -> dict:
-    tree_url = f"https://api.github.com/repos/{repository}/git/trees/{base_sha}?recursive=1"
-    tree_data = request_json(tree_url)
+    commit_data = request_json(f"https://api.github.com/repos/{repository}/commits/{base_sha}")
+    tree_sha = commit_data["commit"]["tree"]["sha"]
+    tree_data = request_json(
+        f"https://api.github.com/repos/{repository}/git/trees/{tree_sha}?recursive=1"
+    )
     if tree_data.get("truncated"):
         raise RuntimeError("Git tree response was truncated; refusing an incomplete snapshot")
-    entries = [
-        item for item in tree_data.get("tree", [])
-        if item.get("type") == "blob"
-    ]
+    entries = [item for item in tree_data.get("tree", []) if item.get("type") == "blob"]
     expected = {}
     for entry in entries:
         relative = validate_repo_path(entry["path"])
         expected[relative.as_posix()] = entry
 
-    actual = set()
-    for path in snapshot.rglob("*"):
-        if path.is_symlink() or path.is_file():
-            actual.add(path.relative_to(snapshot).as_posix())
+    actual = {
+        path.relative_to(snapshot).as_posix()
+        for path in snapshot.rglob("*")
+        if path.is_symlink() or path.is_file()
+    }
     extras = sorted(actual - set(expected))
     if extras:
         raise RuntimeError(f"Archive contains paths absent from pinned Git tree: {extras[:10]}")
@@ -189,7 +204,7 @@ def complete_snapshot(repository: str, base_sha: str, snapshot: Path) -> dict:
         unexpected = sorted(final_paths - set(expected))
         raise RuntimeError(f"Snapshot does not match pinned Git tree; missing={absent[:10]}, extra={unexpected[:10]}")
     return {
-        "gitTreeSha": tree_data["sha"],
+        "gitTreeSha": tree_sha,
         "gitTreeFileCount": len(entries),
         "archiveMissingFileCount": len(missing),
         "archiveExtraFileCount": len(extras),
