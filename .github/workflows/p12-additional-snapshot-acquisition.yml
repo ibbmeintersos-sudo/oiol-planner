@@ -59,4 +59,5 @@ jobs:
           path: acquired/
           if-no-files-found: error
           compression-level: 1
+          include-hidden-files: true
           retention-days: 30
