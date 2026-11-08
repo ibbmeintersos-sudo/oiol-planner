@@ -709,7 +709,7 @@
       "intakeStatus": "historical_candidate_not_adjudicated"
     },
     {
-      "caseId": "BurntSushi-3578-ignore-respect-linked-worktree-exclu",
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
       "source": {
         "repository": "BurntSushi/ripgrep",
         "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
@@ -740,7 +740,7 @@
       "intakeStatus": "historical_candidate_not_adjudicated"
     },
     {
-      "caseId": "BurntSushi-3560-ignore-reuse-incremental-matchers-fo",
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
       "source": {
         "repository": "BurntSushi/ripgrep",
         "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
