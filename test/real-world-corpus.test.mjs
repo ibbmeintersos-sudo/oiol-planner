@@ -25,8 +25,8 @@ const makeCase = () => ({
   },
   annotation: {
     reviewers: [
-      { reviewerId: 'reviewer-a', independent: true, evidenceNotes: ['Reviewed source and change evidence.'] },
-      { reviewerId: 'reviewer-b', independent: true, evidenceNotes: ['Independently reviewed consumer evidence.'] }
+      { reviewerId: 'reviewer-a', independent: true, reviewedAt: '2026-11-01T00:00:00Z', evidenceNotes: ['Reviewed source and change evidence.'] },
+      { reviewerId: 'reviewer-b', independent: true, reviewedAt: '2026-11-02T00:00:00Z', evidenceNotes: ['Independently reviewed consumer evidence.'] }
     ],
     adjudication: { required: false, status: 'not_needed' }
   }
