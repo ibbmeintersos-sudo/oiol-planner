@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
+import { assertExternalRepositorySnapshot } from './run-planner-benchmark.mjs';
 
 function arg(name, fallback = null) {
   const index = process.argv.indexOf('--' + name);
@@ -22,6 +23,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
     name: repositoryId,
     request: 'Read-only repository intake scan for the OIOL P12 real-world planning benchmark.'
   });
+  assertExternalRepositorySnapshot(project);
   const repository = project.repository;
   return {
     protocolVersion: '1.0',
