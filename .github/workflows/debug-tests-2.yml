@@ -1,14 +1,10 @@
 name: Debug tests 2
-
 on:
   push:
-    branches:
-      - feat/quality-stack-integration
+    branches: [feat/quality-stack-integration]
   workflow_dispatch:
-
 permissions:
   contents: write
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,27 +17,29 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Run tests and capture output
+      - name: Run tests and capture diagnostics
         shell: bash
         run: |
           set +e
-          node --test --test-reporter=tap > test-output.tap 2>&1
+          TAP="$RUNNER_TEMP/test-output.tap"
+          node --test --test-reporter=tap > "$TAP" 2>&1
           code=$?
           {
-            echo "exit=${code}"
-            wc -l < test-output.tap | sed 's/^/lines=/'
-            echo "--- failures ---"
-            grep -n -A 40 -E "^not ok" test-output.tap | head -400 || true
+            echo "exit=$code"
+            wc -l "$TAP"
+            grep -n -A 40 -E "^not ok" "$TAP" | head -400
             echo "--- tail ---"
-            tail -n 400 test-output.tap
+            tail -n 400 "$TAP"
+            echo "--- git status ---"
+            git status --porcelain=v1
           } > test-failures.txt
           exit 0
-      - name: Publish captured output
+      - name: Publish diagnostics
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B debug-artifacts
           git add -f test-failures.txt
-          git commit -m "debug: capture test failures"
+          git commit -m "debug: capture test failures and git status"
           git push -f origin debug-artifacts
