@@ -303,7 +303,7 @@ test('all ten P12 external task drafts satisfy the runner contract and remain ex
     assert.ok(task.taskId && !taskIds.has(task.taskId), 'taskId must be present and unique: ' + file);
     taskIds.add(task.taskId);
     repositoryPrefixes.add(task.taskId.split('-').slice(0, 2).join('-'));
-    assert.match(task.taskVersion, /^0\\.2\\.0-draft$/, file);
+    assert.match(task.taskVersion, /^0\.2\.0-draft$/, file);
     assert.ok(task.constraints.some(value => /engineering plan only/i.test(value)), file);
     assert.ok(task.constraints.some(value => /do not modify|do not execute/i.test(value)), file);
     assert.ok(task.constraints.some(value => /pinned repository snapshot/i.test(value)), file);
