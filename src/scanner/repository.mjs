@@ -188,8 +188,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
         const segments = [];
         let remainingChars = maxPriorityExcerptChars;
         for (const range of fileRanges) {
-          if (range.startLine > lines.length) continue;
-          const endLine = Math.min(range.endLine, lines.length);
+          if (range.startLine > lines.length || range.endLine > lines.length) continue;
+          const endLine = range.endLine;
           const segment = '[EVIDENCE RANGE: ' + file + ':' + range.startLine + '-' + endLine + ']\n' + lines.slice(range.startLine - 1, endLine).join('\n');
           const separator = segments.length ? '\n\n' : '';
           if (segment.length + separator.length > remainingChars) continue;
