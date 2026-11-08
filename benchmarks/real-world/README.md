@@ -102,6 +102,12 @@ Validate intake metadata with:
 
     npm run benchmark:real-world:validate -- --corpus-root /absolute/path/to/corpus
 
+Validate the 36-case annotation worklist against the intake and both acquisition reports with:
+
+    npm run benchmark:real-world:worklist
+
+This checks candidate identity, exact base commits, snapshot/artifact mapping, deduplicated shared snapshots, and that no historical paths or ground-truth labels have been prefilled.
+
 Use --allow-empty only for CI protocol tests. It returns a not-ready status and never marks the corpus as complete. The validator enforces the first-report minimums by default: at least 30 cases, 12 unique repositories, and at least four repositories in each size stratum. Every case must have two distinct reviewers attesting both independence and blinding, evidence notes, and a reasoned adjudication outcome. Reduced thresholds are available only through the validator's programmatic test options, not the production CLI.
 
 
