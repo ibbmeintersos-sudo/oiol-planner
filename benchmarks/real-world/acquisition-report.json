@@ -28,7 +28,7 @@
     "trackedFileCountDeltaNonZero": 0,
     "archiveExtraFileCountNonZero": 0,
     "archiveMissingFilesRestored": 4675,
-    "artifactUploadDigestsMatched": 36,
+    "artifactUploadDigestsMatched": 34,
     "independentAnnotationsCompleted": 0
   },
   "fingerprintPolicy": "scripts/validate-real-world-corpus.mjs::fingerprintSnapshot; ignored path components and symbolic links excluded; sorted UTF-8 relative path + NUL + raw bytes + NUL",
