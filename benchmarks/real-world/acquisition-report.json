@@ -2,14 +2,16 @@
   "schemaVersion": "1.0.0",
   "status": "primary_snapshot_acquisition_verified",
   "workflowRun": {
-    "id": 42453782910,
-    "url": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42453782910",
-    "headSha": "a2c549fc193259d5e45a8650a522c5f5b454b8b4",
+    "id": 42454488457,
+    "url": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457",
+    "headSha": "8c3e434e231bdd1d86c98e0f32f4ce8dc1e4218f",
     "conclusion": "success",
-    "completedAt": "2026-11-08T06:13:57Z"
+    "completedAt": "2026-11-08T06:24:17Z"
   },
   "summary": {
     "cases": 12,
+    "uniqueRepositories": 12,
+    "uniquePinnedSnapshots": 12,
     "jobsSucceeded": 12,
     "artifactsAvailable": 12,
     "small": 4,
@@ -18,13 +20,21 @@
     "trackedFileCountDeltaNonZero": 0,
     "archiveExtraFileCountNonZero": 0,
     "archiveMissingFilesRestored": 1559,
+    "artifactUploadDigestsMatched": 12,
     "independentAnnotationsCompleted": 0
   },
   "fingerprintPolicy": "scripts/validate-real-world-corpus.mjs::fingerprintSnapshot; ignored path components and symbolic links excluded; sorted UTF-8 relative path + NUL + raw bytes + NUL",
+  "verificationNotes": [
+    "Every job passed the path-safety regression tests before acquiring its snapshot.",
+    "Each acquired snapshot was compared against the complete pinned Git tree; missing blobs were restored from the exact base commit and no extra paths were accepted.",
+    "The pinned Git tree file count matched the intake inventory for all 12 cases.",
+    "The snapshot fingerprint intentionally excludes the validator's configured ignored path components and symbolic links; therefore snapshotFileCount can be lower than gitTreeFileCount without indicating missing tracked files.",
+    "For all 12 artifacts, the SHA-256 reported by the upload step matched the GitHub Actions Artifacts API digest."
+  ],
   "limitations": [
-    "This verifies only the 12 primary pinned snapshots; it does not complete the required 30-case annotated corpus.",
-    "Artifact ZIP digests are GitHub-reported upload digests; the artifact archives have not been independently downloaded and re-hashed outside GitHub Actions.",
-    "Ground-truth annotations, blinded review, and adjudication remain pending."
+    "The 12 primary snapshots do not complete the required minimum 30 annotated benchmark cases.",
+    "Artifact ZIP digests have not been independently recomputed by downloading and hashing the ZIP files outside GitHub Actions.",
+    "Ground-truth annotations, blinded independent review, and adjudication remain pending; no benchmark accuracy score is claimed."
   ],
   "cases": [
     {
@@ -39,14 +49,16 @@
       "snapshotFileCount": 56,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "license",
       "licenseFileSha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
       "snapshotSha256": "f9c1958be4ac1ab0030bead25f4def788f9a38ba263c12c7dfaead5b769cff4a",
-      "artifactId": 13607180299,
-      "artifactSizeBytes": 244485,
-      "artifactDigest": "sha256:33341afd52e17b9956702f9e0350e79516f2e8701aef193ed4107289edfb138d",
-      "jobId": 128648352513,
-      "acquiredAt": "2026-11-08T06:12:32.104008+00:00"
+      "artifactId": 13607500433,
+      "artifactSizeBytes": 244558,
+      "artifactDigest": "sha256:f4b66eb586e2fe4a7614e41640b6bb4a9a9138aa34ab93604a78f009794a83ba",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489915,
+      "acquiredAt": "2026-11-08T06:22:42.007160+00:00"
     },
     {
       "index": 1,
@@ -60,14 +72,16 @@
       "snapshotFileCount": 49,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE.txt",
       "licenseFileSha256": "63af09891b6be8ad1a4252ed43af0f4efba7fc948e228367bed7f3c5ae0b09d7",
       "snapshotSha256": "a52320e4114f27f911e26e56182bcd08a1a52d16abcde6c48263e51500c53aea",
-      "artifactId": 13606294509,
-      "artifactSizeBytes": 142527,
-      "artifactDigest": "sha256:63a15f2e2d196659e7e6f0d322b5ee3bbb48492100a922c50275dff41e2239be",
-      "jobId": 128648352501,
-      "acquiredAt": "2026-11-08T06:12:29.908565+00:00"
+      "artifactId": 13606953145,
+      "artifactSizeBytes": 142600,
+      "artifactDigest": "sha256:c7ad4198bdba80d7749aa2f67b528bad2cf8cc326abfc8c03b3f3287e5ec02d2",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489917,
+      "acquiredAt": "2026-11-08T06:22:43.517820+00:00"
     },
     {
       "index": 2,
@@ -81,14 +95,16 @@
       "snapshotFileCount": 108,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE",
       "licenseFileSha256": "a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647",
       "snapshotSha256": "ef226037685b52e5a04d16d9b23b5b586c513e1ee812d292fd1009acd753fc34",
-      "artifactId": 13607036266,
-      "artifactSizeBytes": 171646,
-      "artifactDigest": "sha256:3d4fe7e3a20b1dd299d2dd150c8f8dbd7fcaeb3b8fba393e388439614504be73",
-      "jobId": 128648352533,
-      "acquiredAt": "2026-11-08T06:12:31.827653+00:00"
+      "artifactId": 13607261590,
+      "artifactSizeBytes": 171725,
+      "artifactDigest": "sha256:6e0301691c4c7b9b5f61a5a39ddc928eb6a104e230550312240037222875e1f7",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489969,
+      "acquiredAt": "2026-11-08T06:22:43.739382+00:00"
     },
     {
       "index": 3,
@@ -102,14 +118,16 @@
       "snapshotFileCount": 225,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE-MIT",
       "licenseFileSha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
       "snapshotSha256": "c3392f009de44808875c9a479208eb7e4998ed16dba0172d7fde42700381168f",
-      "artifactId": 13606956567,
-      "artifactSizeBytes": 803801,
-      "artifactDigest": "sha256:2450cbf48d822fdfc6c7e267bcf15392b2d6b44f9d6d9a808e508bc156a51340",
-      "jobId": 128648352358,
-      "acquiredAt": "2026-11-08T06:12:31.966804+00:00"
+      "artifactId": 13606467901,
+      "artifactSizeBytes": 803872,
+      "artifactDigest": "sha256:e369341cae53aa348409011a25b3f691406e200f6865b6b51be2703ac14f54ea",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489690,
+      "acquiredAt": "2026-11-08T06:22:41.534218+00:00"
     },
     {
       "index": 4,
@@ -123,14 +141,16 @@
       "snapshotFileCount": 3577,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE",
       "licenseFileSha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3",
       "snapshotSha256": "bdbaee619b4fea87c6f6da1ff43376984eef06652846292e7d93e2127e9db9eb",
-      "artifactId": 13606009378,
-      "artifactSizeBytes": 7193742,
-      "artifactDigest": "sha256:82b7a4a493e3414ade822c6ce9530cf93668354d07a86a6ea6cf54dccce6ec0f",
-      "jobId": 128648352588,
-      "acquiredAt": "2026-11-08T06:12:39.233677+00:00"
+      "artifactId": 13606524257,
+      "artifactSizeBytes": 7193897,
+      "artifactDigest": "sha256:94cd4ccc03e33368dba517bac61ffd937b3ff879deff0caba857de61abfa2bb0",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489961,
+      "acquiredAt": "2026-11-08T06:22:55.979023+00:00"
     },
     {
       "index": 5,
@@ -144,14 +164,16 @@
       "snapshotFileCount": 2748,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE",
       "licenseFileSha256": "56967de93525b12a30717e4446ccef3bbe32fafdbe2350f143c1cc6971b19ed3",
       "snapshotSha256": "13913ac474e6bf868d4fb76577d83b64ed0de7ae771319c3052ffc3e8c59c5ca",
-      "artifactId": 13606596640,
-      "artifactSizeBytes": 3368694,
-      "artifactDigest": "sha256:d8f6ea992f1d51488569dbfbb8900ef9da0ec43ae1ab12f5c1019ca61c76956c",
-      "jobId": 128648352591,
-      "acquiredAt": "2026-11-08T06:12:44.211978+00:00"
+      "artifactId": 13607082584,
+      "artifactSizeBytes": 3368764,
+      "artifactDigest": "sha256:e80d1d0d64492bda726a8649e0b83987ee376cf9111a588d99dda281055a73d6",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489850,
+      "acquiredAt": "2026-11-08T06:22:51.124506+00:00"
     },
     {
       "index": 6,
@@ -165,14 +187,16 @@
       "snapshotFileCount": 3490,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 1559,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE.md",
       "licenseFileSha256": "7b4f9149597fbae2ce689bc9317d1869e17f1b3fa5f01c289998c108f8c37cf7",
       "snapshotSha256": "c6de642d113eb110236183e809006478c65ff346d131315f9cfb99fbad2effb9",
-      "artifactId": 13606562743,
-      "artifactSizeBytes": 9898612,
-      "artifactDigest": "sha256:48671e3a4e3302491ff9aad9cd0477a58a25087026f35aa13de3478c551e0d53",
-      "jobId": 128648352488,
-      "acquiredAt": "2026-11-08T06:13:10.127863+00:00"
+      "artifactId": 13606467969,
+      "artifactSizeBytes": 9898685,
+      "artifactDigest": "sha256:6d473b61d9be609bd52caac86d87b645791784ef98b52e6f0686f69a275d6374",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489864,
+      "acquiredAt": "2026-11-08T06:23:18.164498+00:00"
     },
     {
       "index": 7,
@@ -186,14 +210,16 @@
       "snapshotFileCount": 11031,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE.txt",
       "licenseFileSha256": "7200000367e0e8b47822d563a5ddd2dd3a97cc05b32bd7dbcc7b4eeb92b76628",
       "snapshotSha256": "11ddf148dcd71599d7ecda2ebc3710f195021a5d9a0702725ce302f2dd071c95",
-      "artifactId": 13605689969,
-      "artifactSizeBytes": 14438402,
-      "artifactDigest": "sha256:9bcf7742cf6a0bf446418ee25dc0d212914cb6e7e8d05c50810caefb2c657776",
-      "jobId": 128648352714,
-      "acquiredAt": "2026-11-08T06:12:52.729768+00:00"
+      "artifactId": 13607245966,
+      "artifactSizeBytes": 14438473,
+      "artifactDigest": "sha256:471b1f54fa42d9987b3ae684665dea94ff1df41ac30b135546053686c5e8eaed",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489998,
+      "acquiredAt": "2026-11-08T06:23:06.574928+00:00"
     },
     {
       "index": 8,
@@ -207,14 +233,16 @@
       "snapshotFileCount": 26026,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE",
       "licenseFileSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "snapshotSha256": "62475984e90ea5d735f18db1bcf2e761c7ba10ced51eaeded670cccd129a7012",
-      "artifactId": 13606856908,
-      "artifactSizeBytes": 77083867,
-      "artifactDigest": "sha256:b05e91b678a690329a9b77527e4cf4114fd4e994dcec833414c6d4d970b42371",
-      "jobId": 128648352569,
-      "acquiredAt": "2026-11-08T06:13:07.483911+00:00"
+      "artifactId": 13606997965,
+      "artifactSizeBytes": 77083936,
+      "artifactDigest": "sha256:da5633a6b7f81cb89798abaee816177fe5e69438fea4a71e5b047165a7583245",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489992,
+      "acquiredAt": "2026-11-08T06:23:26.636831+00:00"
     },
     {
       "index": 9,
@@ -228,14 +256,16 @@
       "snapshotFileCount": 37708,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE",
       "licenseFileSha256": "71c6915d04265772a0339bed47276942c678b45cc01534210ebe6984fd1aec65",
       "snapshotSha256": "5913f28b285fdd6016b54fbcf784412ce48581c1904d51ff33bf775f03188057",
-      "artifactId": 13606702237,
-      "artifactSizeBytes": 166534418,
-      "artifactDigest": "sha256:c7e70873d6252c41f87a0dfe2dad317940d536407e2c754b0c55bc3fcc356b50",
-      "jobId": 128648352555,
-      "acquiredAt": "2026-11-08T06:13:23.497143+00:00"
+      "artifactId": 13607127599,
+      "artifactSizeBytes": 166534490,
+      "artifactDigest": "sha256:1dc8b828e82b1ed716b288f272fe9df9294ece1cc032924c10c5d8314c472319",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650490058,
+      "acquiredAt": "2026-11-08T06:23:36.203929+00:00"
     },
     {
       "index": 10,
@@ -249,14 +279,16 @@
       "snapshotFileCount": 24284,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE",
       "licenseFileSha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
       "snapshotSha256": "0e0db1db82cd642c3bf317b58326941dce6883eb57f33386f07ba716c14c7a5f",
-      "artifactId": 13606887089,
-      "artifactSizeBytes": 72534334,
-      "artifactDigest": "sha256:6cbea0c9058c110a3e7f062f875a31fa39cd3ae51d4f5fefe0677cf888ae7af8",
-      "jobId": 128648352573,
-      "acquiredAt": "2026-11-08T06:13:19.802819+00:00"
+      "artifactId": 13607291627,
+      "artifactSizeBytes": 72534405,
+      "artifactDigest": "sha256:868e616ddddc2a89175de0e2779abd240c1d1378bc41efa4190feacc951aa776",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650490011,
+      "acquiredAt": "2026-11-08T06:23:46.407505+00:00"
     },
     {
       "index": 11,
@@ -270,14 +302,16 @@
       "snapshotFileCount": 30400,
       "trackedFileCountDelta": 0,
       "archiveMissingFileCountRestored": 0,
+      "archiveExtraFileCount": 0,
       "licenseFile": "LICENSE.md",
       "licenseFileSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
       "snapshotSha256": "cc414e91103e226ff8142bbfdbdf25ca0441220414595e605a2c87cd1b3f7bb2",
-      "artifactId": 13606418436,
-      "artifactSizeBytes": 56340276,
-      "artifactDigest": "sha256:c46b8fe368c2412d17fcc38cac1296a2d1ad555631219fb6ac36ebb67a720561",
-      "jobId": 128648352692,
-      "acquiredAt": "2026-11-08T06:13:39.510378+00:00"
+      "artifactId": 13606838458,
+      "artifactSizeBytes": 56340349,
+      "artifactDigest": "sha256:7d27c915f0b1c0269f6d4579931137dc86b4b16013f3f9ba482a2159e69eda84",
+      "artifactUploadDigestVerified": true,
+      "jobId": 128650489968,
+      "acquiredAt": "2026-11-08T06:23:55.314361+00:00"
     }
   ]
 }
