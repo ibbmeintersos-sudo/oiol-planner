@@ -5,7 +5,7 @@ import { analyzeWithTreeSitter, resolveLocalImport } from './tree-sitter-ast.mjs
 const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
   ['.ts','typescript'],['.tsx','typescript'],['.py','python'],['.go','go'],['.rs','rust'],
-  ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby']
+  ['.java','java'],['.kt','kotlin'],['.php','php'],['.rb','ruby'],['.dart','dart'],['.swift','swift']
 ]);
 const SOURCE_EXT = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
 const norm = value => value.replaceAll('\\','/').replace(/^\.\//,'');
@@ -30,6 +30,10 @@ function importsFor(source, language) {
     for (const m of source.matchAll(/\b(?:require|include)(?:_once)?\s*\(?\s*['"]([^'"]+)['"]/g)) add(m[1]);
   } else if (language === 'ruby') {
     for (const m of source.matchAll(/^\s*require(?:_relative)?\s+['"]([^'"]+)['"]/gm)) add(m[1]);
+  } else if (language === 'dart') {
+    for (const m of source.matchAll(/^\s*(?:import|export)\s+['"]([^'"]+)['"]/gm)) add(m[1]);
+  } else if (language === 'swift') {
+    for (const m of source.matchAll(/^\s*import\s+(?:typealias|struct|class|enum|protocol|let|var|func)?\s*([\w.]+)/gm)) add(m[1]);
   }
   return out;
 }
@@ -44,7 +48,9 @@ function symbolsFor(source, language) {
     java:[['type',/^\s*(?:(?:public|protected|private|abstract|final|static)\s+)*(?:class|interface|enum|record)\s+([\w]+)/gm]],
     kotlin:[['class',/^\s*(?:(?:data|sealed|open)\s+)?class\s+([\w]+)/gm],['function',/^\s*fun\s+([\w]+)/gm]],
     php:[['class',/^\s*(?:abstract\s+|final\s+)?class\s+([\w]+)/gm],['function',/^\s*(?:public|protected|private|static|\s)*function\s+([\w]+)/gm]],
-    ruby:[['class',/^\s*class\s+([\w]+)/gm],['module',/^\s*module\s+([\w]+)/gm],['function',/^\s*def\s+([\w]+)/gm]]
+    ruby:[['class',/^\s*class\s+([\w]+)/gm],['module',/^\s*module\s+([\w]+)/gm],['function',/^\s*def\s+([\w]+)/gm]],
+    dart:[['class',/^\s*class\s+([\w]+)/gm],['mixin',/^\s*mixin\s+([\w]+)/gm],['enum',/^\s*enum\s+([\w]+)/gm],['function',/^\s*(?:Future<[^>]+>|[\w<>?]+)\s+([\w]+)\s*\(/gm]],
+    swift:[['class',/^\s*(?:open\s+|public\s+|final\s+)*class\s+([\w]+)/gm],['struct',/^\s*(?:public\s+)?struct\s+([\w]+)/gm],['enum',/^\s*(?:public\s+)?enum\s+([\w]+)/gm],['protocol',/^\s*(?:public\s+)?protocol\s+([\w]+)/gm],['function',/^\s*(?:public\s+|private\s+|internal\s+|static\s+|override\s+)*func\s+([\w]+)/gm]]
   };
   const out = [];
   for (const [kind, re] of rules[language] || []) for (const match of source.matchAll(re)) out.push({ name: match[1], kind, line: source.slice(0, match.index).split('\n').length, source: 'bounded_lexical_heuristic' });
