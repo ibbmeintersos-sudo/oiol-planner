@@ -96,7 +96,9 @@ async function attachReviewer(plan,project,reviewer,reviewConfig,modelRef,usage)
 }
 
 export async function main(){
- const chosen=selectScenarios(arg('scenarios','all'));\n const repositoryRoot=arg('repo',process.env.OIOL_BENCHMARK_REPOSITORY||null);\n if(repositoryRoot && chosen.some(scenario=>scenario.project?.kind!=='existing')) throw new Error('--repo can only be used with Existing Project scenarios');
+ const chosen=selectScenarios(arg('scenarios','all'));
+ const repositoryRoot=arg('repo',process.env.OIOL_BENCHMARK_REPOSITORY||null);
+ if(repositoryRoot && chosen.some(scenario=>scenario.project?.kind!=='existing')) throw new Error('--repo can only be used with Existing Project scenarios');
  if(process.argv.includes('--list')){for(const s of scenarios)console.log(s.id+' ['+s.category+'/'+s.difficulty+']');return 0;}
  const baseConfig={baseUrl:process.env.OIOL_OPENCODE_URL||'http://127.0.0.1:4096',username:process.env.OIOL_OPENCODE_USERNAME||'opencode',password:process.env.OIOL_OPENCODE_PASSWORD||'',agent:process.env.OIOL_OPENCODE_AGENT||'plan',modelRef:parseModelRef(process.env.OIOL_OPENCODE_MODEL),timeoutMs:Number(process.env.OIOL_OPENCODE_TIMEOUT_MS||600000)};
  const reviewConfig=process.env.OIOL_REVIEW_PROVIDER?providerConfig('OIOL_REVIEW_'):null;
@@ -111,8 +113,9 @@ export async function main(){
   const started=Date.now();
   let project=null,workspace=null,record=null,workspaceCleanupWarning=null;
   try{
-   project=await resolveScenarioProject(scenario);
-   workspace=await createBaselineWorkspace(scenario);
+   project=await resolveScenarioProject(scenario,{repositoryRoot});
+   if(repositoryRoot) assertExternalRepositorySnapshot(project);
+   workspace=await createBaselineWorkspace(scenario,{repositoryRoot,project});
    const client=new OpenCodeClient({baseUrl:baseConfig.baseUrl,username:baseConfig.username,password:baseConfig.password,directory:workspace.projectDirectory,timeoutMs:baseConfig.timeoutMs});
    const baseline=await runOpenCodeBaselineScenario({client,scenario,project,agent:baseConfig.agent,model:baseConfig.modelRef});
    const plan=baseline.plan;
