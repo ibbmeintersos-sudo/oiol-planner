@@ -26,7 +26,9 @@ Use Node.js 22 or 24. Configure planning and reviewer providers using the `OIOL_
 The benchmark can incur provider charges. Explicitly opt in before live calls:
 
 ```sh
-OIOL_BENCHMARK_ALLOW_LIVE=1 node scripts/run-planner-benchmark.mjs
+OIOL_BENCHMARK_ALLOW_LIVE=1 \
+OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 \
+node scripts/run-planner-benchmark.mjs
 ```
 
 Run a subset or choose an output path:
@@ -80,6 +82,7 @@ Run the OpenCode planning baseline against the same checkout and scenario:
 OIOL_OPENCODE_MODEL=providerID/modelID \
 OIOL_OPENCODE_AGENT=plan \
 OIOL_BENCHMARK_ALLOW_LIVE=1 \
+OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1 \
 npm run benchmark:opencode -- --repo /absolute/path/to/clean/checkout \
   --task-file /absolute/path/to/repository-task.json \
   --scenarios EX-API-003 \
