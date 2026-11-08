@@ -34,6 +34,17 @@ export function benchmarkConfigFingerprint(config) {
   return createHash('sha256').update(JSON.stringify(config)).digest('hex');
 }
 
+export function assertExternalRepositorySnapshot(project) {
+  const git = project?.repository?.git;
+  if (!git?.isRepo || !/^[a-f0-9]{40}$/i.test(git.commit || '')) {
+    throw new Error('External benchmark repository must be a Git checkout with a resolvable 40-character commit SHA');
+  }
+  if (git.dirty !== false) {
+    throw new Error('External benchmark repository must have a clean working tree; commit or discard local changes before benchmarking');
+  }
+  return { commit: git.commit, branch: git.branch || null, dirty: false };
+}
+
 export async function resolveScenarioProject(scenario, { repositoryRoot = null } = {}) {
   if (repositoryRoot) {
     if (scenario.project?.kind !== 'existing') {
