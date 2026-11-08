@@ -30,6 +30,11 @@ DOWNLOAD_WORKERS = 8
 FINGERPRINT_IGNORED = {".git", "node_modules", ".venv", "venv", "vendor", "dist", "build", "coverage"}
 
 
+def load_candidates() -> list[dict]:
+    intake = json.loads(INTAKE.read_text(encoding="utf-8"))
+    return intake["candidates"] + intake.get("additionalChangeCandidates", [])
+
+
 def validate_repo_path(value: str) -> PurePosixPath:
     if not isinstance(value, str) or not value or value.startswith("/") or "\\" in value:
         raise ValueError(f"Unsafe Git tree path: {value!r}")
@@ -220,8 +225,7 @@ def main() -> None:
     parser.add_argument("--output", default="acquired")
     args = parser.parse_args()
 
-    intake = json.loads(INTAKE.read_text(encoding="utf-8"))
-    candidates = intake["candidates"]
+    candidates = load_candidates()
     if args.case_index < 0 or args.case_index >= len(candidates):
         raise SystemExit("case-index is outside the primary candidate list")
     candidate = candidates[args.case_index]
@@ -260,7 +264,14 @@ def main() -> None:
     license_path = resolve_license_file(snapshot, source["licenseFile"])
     metadata = {
         "schemaVersion": "1.0.0",
+        "candidateIndex": args.case_index,
         "caseId": candidate["caseId"],
+        "sharedSnapshotCases": [
+            {"candidateIndex": index, "caseId": item["caseId"], "changeCommit": item["source"]["changeCommit"],
+             "pullRequest": item["change"]["pullRequest"], "changeUrl": item["change"]["url"]}
+            for index, item in enumerate(candidates)
+            if item["source"]["repository"] == repository and item["source"]["baseCommit"] == base_sha
+        ],
         "repository": repository,
         "repositoryUrl": source["repositoryUrl"],
         "baseCommit": base_sha,

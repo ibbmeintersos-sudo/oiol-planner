@@ -38,6 +38,11 @@ class SnapshotAcquisitionSafetyTests(unittest.TestCase):
             (root / "link.txt").symlink_to(root / "target.txt")
             self.assertEqual(MODULE.fingerprint(root)["fileCount"], 1)
 
+    def test_loads_primary_and_additional_candidate_sets(self):
+        candidates = MODULE.load_candidates()
+        self.assertEqual(len(candidates), 36)
+        self.assertEqual(candidates[18]["source"]["baseCommit"], candidates[19]["source"]["baseCommit"])
+
     def test_rejects_parent_traversal(self):
         with self.assertRaises(ValueError):
             MODULE.validate_repo_path("../outside")
