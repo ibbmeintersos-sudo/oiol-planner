@@ -110,7 +110,8 @@ async function main() {
   }
 
   // Backward compatibility: flags and positional arguments are passed to cli.mjs unchanged.
-  await prepareEnv(configPath, profileName);
+  // Validation does not need provider configuration, so do not fail on a missing or invalid profile.
+  if (!rest.includes('--validate')) await prepareEnv(configPath, profileName);
   return delegate(rest);
 }
 
