@@ -161,3 +161,10 @@ node src/cli.mjs --export linear --input plan.json --team-id TEAM_UUID --out lin
 ~~~
 
 Review the preview and destination before publishing. External writes require the additional `--publish` flag and credentials supplied through environment variables (GitHub: `OIOL_GITHUB_TOKEN` or `GITHUB_TOKEN`; Linear: `LINEAR_API_KEY`, optionally `LINEAR_AUTH_MODE=oauth`). These adapters create issue descriptions only. They do not implement tasks or track completion.
+
+
+## Independent Change Impact benchmark
+
+The deterministic Change Impact Analyzer has a separate offline regression benchmark at `npm run benchmark:change-impact`. It measures direct-file, reverse-dependency, test-association, workspace-package, and API-consumer predictions against manually curated synthetic goldens using precision, recall, and F1. It is deliberately separate from the LLM engineering-plan quality score: these are distinct capabilities and must not be combined into one score.
+
+The benchmark does not call an LLM provider and does not run any target-project commands. Its synthetic graph cases measure algorithm behavior against authored expected sets; they do not establish semantic or runtime completeness. See [benchmarks/README.md](benchmarks/README.md) for the protocol, limitations, and expansion requirements.
