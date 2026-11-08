@@ -248,16 +248,10 @@ export async function main() {
   for(const scenario of chosen){
     const started=Date.now();
     try{
-<<<<<<< HEAD
-      const project=await resolveScenarioProject(scenario);
-      const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds}).createPlan(project);
-      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan});
-=======
       const project=await resolveScenarioProject(scenario,{repositoryRoot,scanOptions:taskDefinition?.evidencePaths?{priorityPaths:taskDefinition.evidencePaths,priorityRanges:taskDefinition.evidenceRanges}:null});
       if(repositoryRoot) assertExternalRepositorySnapshot(project);
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:summarizeRepositoryEvidence(project),plan});
->>>>>>> origin/main
       console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
     }catch(error){
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message}});
@@ -269,12 +263,7 @@ export async function main() {
   const repositoryCommitShas=repositoryRoot?[...new Set(records.map(x=>x.projectEvidence?.git?.commit).filter(Boolean))].sort():[];
   const scannerConfigurations=[...new Set(records.map(x=>x.projectEvidence?.scanLimits?JSON.stringify(x.projectEvidence.scanLimits):null).filter(Boolean))].sort();
   const comparisonKey=process.env.OIOL_BENCHMARK_COMPARISON_KEY||null,budgetKey=process.env.OIOL_BENCHMARK_BUDGET_KEY||null;
-<<<<<<< HEAD
-  const runId=createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16);
-  const output={protocolVersion:'1.3',runnerVersion:'1.3.0',benchmarkMode:'oiol',comparisonKey,budgetKey,runId,createdAt:new Date().toISOString(),maxRepairRounds,configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.2',benchmarkMode:'oiol',comparisonKey,budgetKey,maxRepairRounds,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','Existing-project scenarios use synthetic repository evidence fixtures.','Automated concept matching is a screening heuristic; human review remains required.']};
-=======
   const output={protocolVersion:'1.1',runnerVersion:'1.7.0',benchmarkMode:'oiol',sourceMode:repositoryRoot?'external-local-checkout':'checked-in-fixtures',taskDefinition,repositorySnapshot:repositoryRoot?{source:'operator-supplied local checkout',commitShas:[...new Set(records.map(x=>x.projectEvidence?.git?.commit).filter(Boolean))],allGitCommitsDetected:records.every(x=>Boolean(x.projectEvidence?.git?.commit))}:null,comparisonKey,budgetKey,runId:createHash('sha256').update(Date.now()+'|'+process.pid+'|'+chosen.map(x=>x.id).join(',')).digest('hex').slice(0,16),createdAt:new Date().toISOString(),configFingerprint:benchmarkConfigFingerprint({protocolVersion:'1.1',benchmarkMode:'oiol',runnerVersion:'1.7.0',scannerVersion:SCANNER_VERSION,scannerConfigurations,sourceMode:repositoryRoot?'external-local-checkout':'checked-in-fixtures',repositoryCommitShas,taskDefinition,comparisonKey,budgetKey,planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):'same-provider',scenarioIds:chosen.map(x=>x.id).sort()}),provider:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'},usageAccounting:aggregateUsage(records),summary,scores,records,limitations:['Token usage is reported only when provider metadata is returned; monetary cost is not estimated.','External repository mode reads an operator-supplied local checkout; OIOL does not clone, install, build, test, or modify it.','A benchmark run is not reproducible unless its repository commit SHA is recorded.','Automated concept matching is a screening heuristic; human review remains required.']};
->>>>>>> origin/main
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
