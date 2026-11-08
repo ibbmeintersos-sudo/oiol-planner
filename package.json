@@ -42,6 +42,7 @@
     "plan": "node src/cli.mjs",
     "init": "node src/bin.mjs init",
     "doctor": "node src/bin.mjs doctor",
+    "report": "node src/bin.mjs report",
     "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
     "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs",
     "benchmark:human-review": "node scripts/aggregate-human-reviews.mjs",
