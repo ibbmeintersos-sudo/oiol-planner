@@ -10,6 +10,32 @@ const exec = promisify(execFile);
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.pem|.*\.key|credentials\.json)$/i;
 const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'composer.json'];
+const SOURCE_FILE = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb)$/i;
+const TEST_FILE = /(^|\/)(?:__tests__|tests?|spec)(\/|$)|\.(?:test|spec)\.[^.]+$|(?:^|\/)[^/]+_test\.[^.]+$/i;
+const CONFIG_FILE = /(^|\/)(?:config|configs|configuration)(\/|$)|(^|\/)(?:[^/]+\.)?(?:config|conf|settings|tsconfig)\.[^/]+$/i;
+const PRIORITY_DIRS = new Set([
+  'src','app','apps','packages','server','web','mobile','client','cmd','internal','pkg','lib','crates',
+  'modules','routers','routes','services','api','core','engine','backend','frontend','models','controllers',
+  'documents','open-api','cli'
+]);
+const LOW_PRIORITY_DIRS = new Set([
+  '.github','.gitlab','.changeset','.mise','docs','doc','documentation','demo','demos','examples','example',
+  'playground','website','site','storybook','stories','assets','static','public','translations','locales',
+  'images','screenshots','deployment','deploy','contrib'
+]);
+function entryPriority(entry, depth) {
+  const name = entry.name.toLowerCase();
+  if (entry.isFile() && MANIFESTS.includes(name)) return depth === 0 ? -30 : -12;
+  if (entry.isFile() && ['readme.md','license','license.md'].includes(name)) return depth === 0 ? -20 : 8;
+  if (entry.isDirectory() && PRIORITY_DIRS.has(name)) return -10;
+  if (entry.isFile() && SOURCE_FILE.test(name)) return 0;
+  if (entry.isFile() && TEST_FILE.test(name)) return 3;
+  if (entry.isDirectory() && LOW_PRIORITY_DIRS.has(name)) return 12;
+  if (entry.isFile() && CONFIG_FILE.test(name)) return 6;
+  if (entry.isFile() && /\.(?:md|mdx|rst|adoc)$/i.test(name)) return 10;
+  return 5;
+}
+
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const evidenceId = file => 'REPO-' + sha256(file).slice(0, 12);
 
@@ -20,7 +46,7 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
     if (truncated || depth > maxDepth) return;
     let entries;
     try { entries = await fs.readdir(path.join(root, rel), { withFileTypes: true }); } catch { return; }
-    entries.sort((a, b) => a.name.localeCompare(b.name));
+    entries.sort((a, b) => entryPriority(a, depth) - entryPriority(b, depth) || a.name.localeCompare(b.name));
     for (const entry of entries) {
       if (truncated) break;
       const relative = path.posix.join(rel.replaceAll('\\', '/'), entry.name);
@@ -63,8 +89,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   const manifests = files.filter(file => MANIFESTS.includes(path.posix.basename(file)));
   const scripts = [], tests = [], configs = [];
   for (const file of files) {
-    if (/test|spec|__tests__/i.test(file)) tests.push(file);
-    if (/config|\.config\./i.test(file)) configs.push(file);
+    if (TEST_FILE.test(file)) tests.push(file);
+    if (CONFIG_FILE.test(file)) configs.push(file);
     if (path.posix.basename(file) === 'package.json') {
       try {
         const json = JSON.parse(await fs.readFile(path.join(root, file), 'utf8'));
@@ -77,7 +103,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     ...manifests,
     ...tests.slice(0, 20),
     ...configs.slice(0, 20),
-    ...files.filter(file => /\.(mjs|cjs|js|ts|tsx|py|go|rs|java|md)$/i.test(file)).slice(0, 50)
+    ...files.filter(file => SOURCE_FILE.test(file)).slice(0, 100)
   ])];
   let context = '', contextTruncated = false;
   const snippets = [];
