@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { scenarios } from '../benchmarks/scenarios.mjs';
 import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig } from '../scripts/run-planner-benchmark.mjs';
 
@@ -112,4 +114,24 @@ test('provider defaults use the selected provider endpoint rather than OpenAI fo
   if(previousBase===undefined) delete process.env.OIOL_BASE_URL; else process.env.OIOL_BASE_URL=previousBase;
   if(previousModel===undefined) delete process.env.OIOL_MODEL; else process.env.OIOL_MODEL=previousModel;
  }
+});
+
+test('external repository input uses the actual scanner and does not leak the operator absolute path', async () => {
+  const scenario = scenarios.find(item => item.id === 'EX-API-003');
+  const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../benchmarks/fixtures/customer-api');
+  const project = await resolveScenarioProject(scenario, { repositoryRoot });
+  assert.equal(project.kind, 'existing');
+  assert.equal(project.repository.root, 'external-repository');
+  assert.ok(project.repository.files.some(file => file.path === 'src/routes/customers.mjs'));
+  assert.ok(project.repository.snippets.some(file => file.path === 'package.json'));
+  assert.ok(project.evidence.some(item => item.type === 'repository_scan'));
+  assert.equal(JSON.stringify(project).includes(repositoryRoot), false);
+});
+
+test('external repository input is rejected for greenfield scenarios', async () => {
+  const scenario = scenarios.find(item => item.id === 'GF-API-001');
+  await assert.rejects(
+    () => resolveScenarioProject(scenario, { repositoryRoot: process.cwd() }),
+    /only be used with Existing Project scenarios/
+  );
 });
