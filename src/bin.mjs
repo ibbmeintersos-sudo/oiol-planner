@@ -5,6 +5,7 @@ import { spawn } from 'node:child_process';
 import { loadConfig, applyConfigToEnv, resolveProfile, CONFIG_FILE } from './config.mjs';
 import { initCommand } from './commands/init.mjs';
 import { doctorCommand } from './commands/doctor.mjs';
+import { reportCommand } from './commands/report.mjs';
 
 const cliPath = resolve(dirname(fileURLToPath(import.meta.url)), 'cli.mjs');
 
@@ -15,6 +16,7 @@ Commands:
   init       Create oiol.config.json and a .env template
   doctor     Check Node.js, config, API key, and dependencies
   plan       Generate an engineering plan (planning only)
+  report     Render an HTML, Markdown, or JSON review report
   validate   Validate an existing plan JSON
 
 Global options:
@@ -27,6 +29,7 @@ Examples:
   oiol doctor
   oiol plan --mode greenfield --name "Inventory Service" --request "..." --out plan.json
   oiol validate plan.json --format md
+  oiol report plan.json --out plan.html
 
 The legacy form "oiol --validate plan.json" and "node src/cli.mjs ..." remain supported.
 `);
@@ -94,6 +97,8 @@ async function main() {
     await prepareEnv(configPath, profileName);
     return doctorCommand(rest.slice(1));
   }
+
+  if (command === 'report') return reportCommand(rest.slice(1));
 
   if (command === 'plan') {
     await prepareEnv(configPath, profileName);
