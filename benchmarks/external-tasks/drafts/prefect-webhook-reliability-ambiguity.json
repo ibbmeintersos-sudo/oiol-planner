@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-API-003",
   "taskId": "RW-PF-02",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Prefect",
   "request": "A product request says: “Make webhook delivery more reliable.” Produce a planning response, but do not select delivery guarantees or retry behavior until the blocking requirements are clarified.",
   "constraints": [
@@ -50,11 +50,15 @@
   "mustClarify": true,
   "clarificationSignals": [
     [
-      "at-most-once",
+      "at-most-once"
+    ],
+    [
       "at-least-once"
     ],
     [
-      "retryable status codes",
+      "retryable status codes"
+    ],
+    [
       "network failures"
     ],
     [
@@ -62,20 +66,30 @@
       "time budget"
     ],
     [
-      "idempotency",
+      "idempotency"
+    ],
+    [
       "receiver support"
     ],
     [
-      "timeout",
-      "payload size",
+      "timeout"
+    ],
+    [
+      "payload size"
+    ],
+    [
       "ordering"
     ],
     [
-      "dead-letter",
+      "dead-letter"
+    ],
+    [
       "manual replay"
     ],
     [
-      "secret rotation",
+      "secret rotation"
+    ],
+    [
       "audit visibility"
     ]
   ]
