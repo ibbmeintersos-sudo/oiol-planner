@@ -117,16 +117,16 @@ The first candidate batch has been pinned to immutable historical pull-request b
 | Medium | [nestjs/nest](https://github.com/nestjs/nest) | 2,748 | TypeScript | [PR 18439](https://github.com/nestjs/nest/pull/18439) |
 | Medium | [laravel/framework](https://github.com/laravel/framework) | 3,502 | PHP | [PR 62342](https://github.com/laravel/framework/pull/62342) |
 | Medium | [spring-projects/spring-boot](https://github.com/spring-projects/spring-boot) | 11,383 | Java | [PR 52557](https://github.com/spring-projects/spring-boot/pull/52557) |
-| Large | [microsoft/vscode](https://github.com/microsoft/vscode) | 19,119 | TypeScript | [PR 335016](https://github.com/microsoft/vscode/pull/335016) |
+| Large | [home-assistant/core](https://github.com/home-assistant/core) | 30,403 | Python | [PR 190773](https://github.com/home-assistant/core/pull/190773) |
 | Large | [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes) | 31,452 | Go | [PR 143073](https://github.com/kubernetes/kubernetes/pull/143073) |
 | Large | [tensorflow/tensorflow](https://github.com/tensorflow/tensorflow) | 37,712 | C++ / Python | [PR 129352](https://github.com/tensorflow/tensorflow/pull/129352) |
 | Large | [grafana/grafana](https://github.com/grafana/grafana) | 24,718 | Go / TypeScript | [PR 137251](https://github.com/grafana/grafana/pull/137251) |
 
-The full machine-readable intake record, including exact 40-character base and merged-change commit IDs, license-file URLs, PR metadata, and historical changed paths, is [intake-candidates.json](./intake-candidates.json).
+The full machine-readable intake record, including exact 40-character base and merged-change commit IDs, license-file URLs, PR metadata, and historical changed paths, is [intake-candidates.json](./intake-candidates.json). A medium-size reserve candidate ([microsoft/vscode](https://github.com/microsoft/vscode), 19,119 files) is recorded separately and is not counted in the 12-repository first batch.
 
 ### Intake status
 
-- 12/12 candidate repositories identified and pinned.
+- 12/12 selected candidate repositories identified and pinned (plus one reserve candidate).
 - 4 small, 4 medium, and 4 large repositories.
 - 12/12 selected historical PRs confirmed merged; base and merged commit IDs recorded.
 - License texts checked at the pinned base revisions.
@@ -135,4 +135,4 @@ The full machine-readable intake record, including exact 40-character base and m
 - Two independent blinded annotations per case: pending.
 - Additional cases required to reach the 30-case first-report gate: at least 18.
 
-The corpus manifest remains empty until snapshots and independent annotations are complete. These 12 entries are an intake shortlist, not completed benchmark cases. The large-repository size class is based on the measured base snapshot count; the 20,000-file threshold is a strict classification rule, so VS Code at 19,119 files is currently medium by that rule and must not be reported as large.
+The corpus manifest remains empty until snapshots and independent annotations are complete. These 12 entries are an intake shortlist, not completed benchmark cases. Size classes use the strict thresholds in this protocol: small up to 2,000 files, medium 2,001–20,000 files, and large above 20,000 files. The reserve VS Code candidate has 19,119 files and is therefore medium, not large.
