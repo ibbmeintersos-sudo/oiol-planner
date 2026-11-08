@@ -39,11 +39,13 @@ test('external paired comparison accepts the same clean pinned commit',()=>{
  const snapshot={allGitCommitsDetected:true,commitShas:['c'.repeat(40)]};
  const taskDefinition={id:'RW-COMPARE',version:'1.0.0',sha256:'f'.repeat(64)};
  const result=compareBenchmarkModes(
-  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition},
-  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition}
+  {...oi,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition,configFingerprint:'oiol-config'},
+  {...base,sourceMode:'external-local-checkout',repositorySnapshot:snapshot,taskDefinition,configFingerprint:'baseline-config'}
  );
  assert.equal(result.sourceMode,'external-local-checkout');
  assert.deepEqual(result.repositorySnapshot,snapshot);
+ assert.deepEqual(result.taskDefinition,taskDefinition);
+ assert.deepEqual(result.runConfigFingerprints,{oiol:'oiol-config',baseline:'baseline-config'});
 });
 
 test('paired comparison rejects mixing fixture and external repository modes',()=>{
