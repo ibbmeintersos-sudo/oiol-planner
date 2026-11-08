@@ -164,13 +164,13 @@ test('scanner reports source files in unsupported languages instead of silently 
     await mkdir(path.join(f.root, 'mobile', 'lib'), { recursive: true });
     await mkdir(path.join(f.root, 'native'), { recursive: true });
     await writeFile(path.join(f.root, 'server', 'src', 'main.ts'), 'export function main() { return true; }\n');
-    await writeFile(path.join(f.root, 'mobile', 'lib', 'main.dart'), 'class MainScreen {}\n');
-    await writeFile(path.join(f.root, 'native', 'main.swift'), 'struct NativeApp {}\n');
+    await writeFile(path.join(f.root, 'mobile', 'lib', 'main.scala'), 'class MainScreen {}\n');
+    await writeFile(path.join(f.root, 'native', 'main.cs'), 'public class NativeApp {}\n');
     const result = await scanRepository(f.root);
     assert.equal(result.structure.sourceFileCount, 3);
     assert.equal(result.structure.analyzedSourceFileCount, 1);
     assert.equal(result.structure.unsupportedLanguageFileCount, 2);
-    assert.deepEqual(result.structure.unsupportedLanguageFiles.sort(), ['mobile/lib/main.dart', 'native/main.swift']);
+    assert.deepEqual(result.structure.unsupportedLanguageFiles.sort(), ['mobile/lib/main.scala', 'native/main.cs']);
   } finally {
     await f.cleanup();
   }
