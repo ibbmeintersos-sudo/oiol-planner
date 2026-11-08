@@ -31,14 +31,14 @@ export const changeImpactCases = [
     request: 'change invoice service',
     repository: base({
       nodes: ['src/billing/invoice-service.mjs','src/routes/list.mjs','src/audit/history.mjs','src/admin/dashboard.mjs','test/invoice-service.test.mjs'],
-      edges: [edge('src/routes/invoices.mjs','src/billing/invoice-service.mjs'),edge('src/audit/invoice-audit.mjs','src/billing/invoice-service.mjs'),edge('src/admin/dashboard.mjs','src/audit/invoice-audit.mjs'),edge('test/invoice-service.test.mjs','src/billing/invoice-service.mjs')],
+      edges: [edge('src/routes/list.mjs','src/billing/invoice-service.mjs'),edge('src/audit/history.mjs','src/billing/invoice-service.mjs'),edge('src/admin/dashboard.mjs','src/audit/history.mjs'),edge('test/invoice-service.test.mjs','src/billing/invoice-service.mjs')],
       imports: [{from:'test/invoice-service.test.mjs',to:'src/billing/invoice-service.mjs',resolved:true}],
       testFiles: ['test/invoice-service.test.mjs']
     }),
     expected: {
       status: 'analyzed',
       directFiles: ['src/billing/invoice-service.mjs'],
-      affectedFiles: ['src/billing/invoice-service.mjs','src/routes/invoices.mjs','src/audit/invoice-audit.mjs','src/admin/dashboard.mjs'],
+      affectedFiles: ['src/billing/invoice-service.mjs','src/routes/list.mjs','src/audit/history.mjs','src/admin/dashboard.mjs'],
       testFiles: ['test/invoice-service.test.mjs'],
       packagePaths: []
     }
@@ -76,7 +76,7 @@ export const changeImpactCases = [
     expected: {
       status: 'analyzed',
       directFiles: ['packages/catalog/src/catalog-service.mjs'],
-      affectedFiles: ['packages/catalog/src/catalog-service.mjs','packages/storefront/src/catalog-page.mjs','packages/admin/src/catalog-admin.mjs'],
+      affectedFiles: ['packages/catalog/src/catalog-service.mjs','packages/storefront/src/product-page.mjs','packages/admin/src/inventory-admin.mjs'],
       testFiles: [],
       packagePaths: ['packages/catalog','packages/storefront','packages/admin']
     }
@@ -96,7 +96,7 @@ export const changeImpactCases = [
     expected: {
       status: 'analyzed',
       directFiles: ['src/api/customer-response.mjs'],
-      affectedFiles: ['src/api/customer-response.mjs','apps/web/customer-client.mjs'],
+      affectedFiles: ['src/api/customer-response.mjs','apps/web/profile-view.mjs'],
       testFiles: ['test/customer-response.test.mjs'],
       packagePaths: [],
       apiStatus: 'analyzed',
