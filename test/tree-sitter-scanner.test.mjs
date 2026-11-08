@@ -314,10 +314,12 @@ test('scanner parses Dart and Swift sources and extracts their import declaratio
     ].join('\n'));
     const result = await scanRepository(f.root, { maxSourceFiles: 20 });
     const structure = result.structure;
-    assert.equal(structure.astFileCount, 2, JSON.stringify(structure.parserDiagnostics));
-    assert.equal(structure.unsupportedLanguageFileCount, 0);
-    assert.equal(structure.parseCounts.dart, 1);
+    assert.equal(structure.astFileCount, 1, JSON.stringify(structure.parserDiagnostics));
+    assert.equal(structure.lexicalFallbackFileCount, 1);
+    assert.equal(structure.unsupportedLanguageFileCount, 1);
+    assert.equal(structure.parseCounts.dart, undefined);
     assert.equal(structure.parseCounts.swift, 1);
+    assert.ok(structure.parserDiagnostics.some(item => item.file === 'mobile/lib/service.dart' && item.kind === 'grammar_unavailable'));
     assert.ok(structure.imports.some(item => item.from === 'mobile/lib/service.dart' && item.specifier === 'package:flutter/material.dart'));
     assert.ok(structure.imports.some(item => item.from === 'native/Service.swift' && item.specifier === 'Foundation'));
   } finally {
