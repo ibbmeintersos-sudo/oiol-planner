@@ -39,7 +39,7 @@ PostHog was reviewed as a stretch target because its repository is substantially
 | vercel/turborepo | Yes | Yes | Audited; file-limit truncated; sparse graph | Not drafted | Not in initial planning pilot |
 | plausible/analytics | Yes | Yes | Audited; 81.3% unsupported source ratio | Not drafted | Not in initial planning pilot |
 | paperless-ngx/paperless-ngx | Yes | Yes | Scanner 1.7.0 task-priority scan; 4/10 excerpts | Drafts; six oversized files missing | Blocked |
-| immich-app/immich | Yes | Yes | Scanner 1.7.0 task-priority scan; 9/9 excerpts | IM-01 evidence gate passed | Candidate for first paired pilot |
+| immich-app/immich | Yes | Yes | Scanner 1.7.0 task-priority scan; 9/9 paths, 12/12 ranges | IM-01 evidence gate passed | Candidate for first paired pilot |
 | PrefectHQ/prefect | Yes | Yes | Scanner 1.7.0 task-priority scan; 5/7 excerpts | Drafts; two oversized files missing | Blocked |
 | PostHog/posthog (stretch) | Yes | Pending | Pending | Pending | Pending |
 
@@ -61,7 +61,7 @@ The following values were retrieved from GitHub repository metadata on 2026-11-0
 
 The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size and unresolved GitHub license metadata.
 
-A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path. The expanded seven-repository scanner-only workflow completed, and all seven artifacts were downloaded and audited. A second task-prioritized intake for the five task-bearing repositories completed in [run 42505668870](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42505668870). Immich IM-01 is the only task whose required evidence paths and line ranges all arrived as excerpts (9/9 paths, 12/12 ranges); it is the first paired-pilot candidate. The other four task families remain blocked. See [P12_SCANNER_AUDIT.md](P12_SCANNER_AUDIT.md). No live planning score is claimed.
+A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. GitHub Actions provided a working networked checkout path. The expanded seven-repository scanner-only workflow completed, and all seven artifacts were downloaded and audited. A path-priority intake for the five task-bearing repositories completed in [run 42505668870](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42505668870), followed by line-range intake in [run 42506197751](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42506197751). Immich IM-01 is the only task whose required evidence paths and line ranges all arrived as excerpts (9/9 paths, 12/12 ranges); it is the first paired-pilot candidate. The other four task families remain blocked. See [P12_SCANNER_AUDIT.md](P12_SCANNER_AUDIT.md). No live planning score is claimed.
 
 ## Observed remote default-branch tips
 
