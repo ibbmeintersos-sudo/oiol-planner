@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-API-003",
   "taskId": "RW-BA-02",
-  "taskVersion": "0.3.0-draft",
+  "taskVersion": "0.4.0-draft",
   "projectName": "Better Auth",
   "request": "A product request says: “Allow each organization to control how many active sessions its members can have.” Produce a planning response, but do not choose a data model or enforcement rule until the blocking policy decisions are clarified.",
   "constraints": [
@@ -75,5 +75,14 @@
       "trusted server-created sessions",
       "server-created sessions"
     ]
+  ],
+  "evidencePaths": [
+    "packages/better-auth/src/plugins/organization/routes/crud-members.ts",
+    "packages/better-auth/src/plugins/organization/types.ts",
+    "packages/better-auth/src/plugins/multi-session/index.ts",
+    "packages/better-auth/src/api/routes/session.ts",
+    "packages/core/src/db/schema/session.ts",
+    "packages/better-auth/src/plugins/organization/organization.test.ts",
+    "packages/better-auth/src/plugins/multi-session/multi-session.test.ts"
   ]
 }
