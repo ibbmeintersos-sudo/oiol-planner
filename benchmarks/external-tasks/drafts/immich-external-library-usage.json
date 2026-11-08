@@ -69,7 +69,7 @@
     {
       "path": "docs/docs/administration/server-stats.md",
       "startLine": 1,
-      "endLine": 15
+      "endLine": 10
     },
     {
       "path": "server/src/dtos/server.dto.ts",
