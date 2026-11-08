@@ -55,7 +55,15 @@ test('OpenCode V2 baseline checks protocol, creates a read-only session, waits, 
 
 test('OpenCode V2 baseline rejects an incompatible server before creating a session',async()=>{
  let created=false;
- const client={health:async()=>{throw new Error('OpenCode HTTP 404');},createSession:async()=>{created=true;return {id:'ses_never'};}};
+ const client={
+  health:async()=>{throw new Error('OpenCode HTTP 404');},
+  createSession:async()=>{created=true;return {id:'ses_never'};},
+  prompt:async()=>({id:'msg_user'}),
+  waitSession:async()=>null,
+  getSessionMessages:async()=>[],
+  getSessionDiff:async()=>[],
+  deleteSession:async()=>null
+ };
  await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/HTTP 404/);
  assert.equal(created,false);
 });
