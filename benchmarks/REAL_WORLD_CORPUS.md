@@ -34,13 +34,13 @@ PostHog was reviewed as a stretch target because its repository is substantially
 
 | Repository | README fetched | Pinned CI checkout | Scanner run | Planning task authored | Benchmark run |
 |---|---:|---:|---:|---:|---:|
-| go-gitea/gitea | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
-| better-auth/better-auth | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
+| go-gitea/gitea | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
+| better-auth/better-auth | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
 | vercel/turborepo | Yes | Pending | Pending | Pending | Pending |
 | plausible/analytics | Yes | Pending | Pending | Pending | Pending |
-| paperless-ngx/paperless-ngx | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
-| immich-app/immich | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
-| PrefectHQ/prefect | Yes | Yes | First pass complete (truncated) | Drafts (pending expanded scan) | Pending |
+| paperless-ngx/paperless-ngx | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
+| immich-app/immich | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
+| PrefectHQ/prefect | Yes | Yes | Expanded scan complete (truncated) | Drafts (evidence-reviewed; pending JSON promotion) | Pending |
 | PostHog/posthog (stretch) | Yes | Pending | Pending | Pending | Pending |
 
 
