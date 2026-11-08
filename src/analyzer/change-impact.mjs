@@ -149,13 +149,16 @@ function buildFileFeatures(structure, sourceFiles, queryTokens, evidenceByPath, 
     const matchedTerms = new Set([...pathMatches, ...symbolMatches, ...importMatches]);
     if (!matchedTerms.size) continue;
 
-    const denominator = queryTokens.size || 1;
+    // Long natural-language requests often contain context terms unrelated to file naming.
+    // Cap the denominator so one strong path/symbol signal is not diluted by request length.
+    // Import-specifier-only matches remain deliberately weak.
+    const denominator = Math.min(queryTokens.size || 1, 4);
     const score = (
       0.55 * pathMatches.size / denominator +
       0.35 * symbolMatches.size / denominator +
       0.10 * importMatches.size / denominator
     );
-    if (score < 0.15) continue;
+    if (score < 0.08) continue;
     const evidence = evidenceByPath.get(file);
     const pkg = packageForFile(file, workspacePackages);
     const signals = [];
@@ -372,6 +375,16 @@ export function analyzeChangeImpact({
     structure, sourceFiles, queryTokens, evidenceByPath, workspacePackages
   );
   const directSeeds = directMatches.slice(0, maxDirectMatches);
+  const matchedRequestTerms = sorted(new Set(directMatches.flatMap(item => item.matchedTerms)));
+  const matchingDiagnostics = {
+    requestTermCount: queryTokens.size,
+    matchedRequestTermCount: matchedRequestTerms.length,
+    matchedRequestTerms,
+    unmatchedRequestTerms: sorted(new Set([...queryTokens].filter(term => !matchedRequestTerms.includes(term)))),
+    directMatchCountBeforeLimit: directMatches.length,
+    directMatchLimit: maxDirectMatches,
+    directMatchLimitReached: directMatches.length > maxDirectMatches
+  };
   const directSeedPaths = directSeeds.map(item => item.path);
   const reverseImports = new Map();
   for (const item of structure.dependencyGraph?.edges || []) {
@@ -498,6 +511,7 @@ export function analyzeChangeImpact({
     method: 'deterministic_static_impact_estimate',
     requestSha256: requestHash,
     requestTerms: sorted(queryTokens),
+    matchingDiagnostics,
     summary: directSeeds.length || packageSeeds.length
       ? 'The bounded scanner evidence suggests ' + directSeeds.length + ' direct candidate file(s), ' +
         (potentiallyAffectedFiles.length - directSeeds.length) + ' reverse-dependency file(s), ' +
