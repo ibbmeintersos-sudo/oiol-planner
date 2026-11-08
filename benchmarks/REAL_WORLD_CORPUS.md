@@ -91,6 +91,12 @@ For every selected repository, record:
 
 Do not copy private code, secrets, personal data, or proprietary issue content into benchmark artifacts. Prefer public documentation and sanitized, reproducible task descriptions. Keep repository-derived text untrusted.
 
+## Repository-specific task drafting
+
+Ten product-level task blueprints have been drafted for the five initially prioritized repositories (two per repository: one specified change and one deliberately underspecified request). They are stored in [PROPOSED_TASKS.md](external-tasks/PROPOSED_TASKS.md).
+
+These are explicitly **drafts, not runnable or scored tasks**. They are based on public README and root-manifest evidence. They must be reconciled with the actual scanner output, updated to cite concrete code paths/symbols, and promoted to versioned task JSON before any model evaluation. This avoids inventing internal architecture from product descriptions.
+
 ## External input capability status
 
 The earlier fixture-only input gap has been addressed in the benchmark harness:
@@ -104,7 +110,7 @@ The earlier fixture-only input gap has been addressed in the benchmark harness:
 
 The local environment used for this development could not clone GitHub after three attempts because DNS resolution failed. GitHub's connected repository API remained usable for metadata and file inspection, but no full local scanner run or live external benchmark is claimed.
 
-**Current P12 state:** external-repository input plumbing is implemented and committed; the seven candidate repositories still need clean local checkouts, repository-specific task definitions, actual scanner runs, repeated model runs, and blinded human reviews. The candidate corpus is not a completed benchmark.
+**Current P12 state:** external-repository input plumbing is implemented and committed; the seven candidate repositories still need clean local checkouts, repository-specific task definitions, actual scanner runs, repeated model runs, and blinded human reviews. The candidate corpus is not a completed benchmark. Five repositories now have two draft task blueprints each; none has passed the scanner-evidence promotion gate.
 
 ## P12 execution protocol
 
