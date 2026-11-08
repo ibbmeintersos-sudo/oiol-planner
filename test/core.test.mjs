@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validatePlan } from '../src/core/validator.mjs';
-import { safePath } from '../src/core/utils.mjs';
+import { safePath, redact } from '../src/core/utils.mjs';
 import { topologicalWaves } from '../src/core/graph.mjs';
 import { comparePlans } from '../src/core/revision.mjs';
 import { buildTraceability } from '../src/core/traceability.mjs';
@@ -111,4 +111,23 @@ test('review gate passes only a valid plan with approved clean review and distin
   });
   assert.equal(gate.status, 'passed');
   assert.equal(gate.passed, true);
+});
+
+test('scanner redaction covers application secrets, database credentials, JWTs, and private keys',()=>{
+  const source = [
+    'const clientSecret = "client-secret-value";',
+    'DATABASE_URL=postgres://appuser:db-password-value@db.example.internal/app',
+    'Authorization: Basic dXNlcjpwYXNzd29yZA==',
+    'const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signaturevalue12345";',
+    '-----BEGIN DSA PRIVATE KEY-----',
+    'private-key-material',
+    '-----END DSA PRIVATE KEY-----'
+  ].join('\\n');
+  const redacted = redact(source);
+  for (const secret of ['client-secret-value','db-password-value','dXNlcjpwYXNzd29yZA==','signaturevalue12345','private-key-material']) {
+    assert.equal(redacted.includes(secret), false, 'secret leaked: ' + secret);
+  }
+  assert.match(redacted, /REDACTED/);
+  assert.match(redacted, /REDACTED_JWT/);
+  assert.match(redacted, /REDACTED_PRIVATE_KEY/);
 });
