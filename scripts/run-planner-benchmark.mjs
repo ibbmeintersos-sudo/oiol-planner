@@ -75,6 +75,12 @@ export function assertExternalRepositorySnapshot(project) {
   if (!Number.isInteger(project?.repository?.fileCount) || project.repository.fileCount < 1 || !Array.isArray(project.repository.snippets) || project.repository.snippets.length < 1) {
     throw new Error('External benchmark repository scan produced no usable file evidence');
   }
+  const sourceEvidence = project.repository.snippets.some(snippet =>
+    /\\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift)$/i.test(snippet.path || '')
+  );
+  if (!sourceEvidence) {
+    throw new Error('External benchmark repository scan produced no implementation source excerpts; README or manifest evidence alone is insufficient');
+  }
   const git = project?.repository?.git;
   if (!git?.isRepo || !/^[a-f0-9]{40}$/i.test(git.commit || '')) {
     throw new Error('External benchmark repository must be a Git checkout with a resolvable 40-character commit SHA');
