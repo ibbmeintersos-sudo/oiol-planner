@@ -63,6 +63,22 @@ The initial balanced checkout subset should prioritize better-auth, paperless-ng
 
 A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. Consequently, no local scanner run or live benchmark is claimed here.
 
+## Observed remote default-branch tips
+
+GitHub's commits API returned the following default-branch tip SHAs on 2026-11-08. These are **remote observations only**: they have not been checked out or scanned locally. Pin the exact same SHA after a successful clone, and record the actual checkout result before scoring.
+
+| Repository | Branch | Observed remote tip SHA |
+|---|---|---|
+| go-gitea/gitea | main | `edebfaa12516a140d7ee3fcbaf25a6a1cc2cdb76` |
+| better-auth/better-auth | main | `de6ef28b86c002c3a3683861d803daf482ec603f` |
+| vercel/turborepo | main | `17691acd9bc80171e5ef4b3532ff0748ba231813` |
+| plausible/analytics | master | `31fc1910fe9be0362b27dacbd2886f16442da20f` |
+| paperless-ngx/paperless-ngx | dev | `32bc5522e914f1e5f3a36eb60de6988611ca310f` |
+| immich-app/immich | main | `87ef895041e160aef4f61f2d7af1ad3f8e38827d` |
+| PrefectHQ/prefect | main | `b0479c0c26045b06321191bbad0cdfbb334d7380` |
+
+Do not treat these observations as a substitute for local checkout verification. A branch can move after the observation, and the scanner report must show the commit actually present in the checkout.
+
 ## Manifest-level technology verification
 
 Root manifest/configuration files were also fetched from GitHub. These are direct file-level checks, not full repository scans:
