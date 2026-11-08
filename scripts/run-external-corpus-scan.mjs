@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
 import { SCANNER_VERSION, EXTERNAL_REPOSITORY_SCAN_OPTIONS } from '../src/scanner/repository.mjs';
@@ -11,6 +13,34 @@ function arg(name, fallback = null) {
   return index >= 0 ? process.argv[index + 1] : fallback;
 }
 
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+
+const exec = promisify(execFile);
+
+// Benchmark intake is an operator-directed tool, not the read-only core scanner.
+// Git metadata is collected here so the scanner itself never invokes target-project commands.
+async function collectGitMetadata(repositoryRoot) {
+  const fallback = { isRepo: false, branch: null, commit: null, dirty: null, status: 'not_collected' };
+  try {
+    const [{ stdout: commitOut }, { stdout: branchOut }, { stdout: statusOut }] = await Promise.all([
+      exec('git', ['rev-parse', 'HEAD'], { cwd: repositoryRoot }),
+      exec('git', ['branch', '--show-current'], { cwd: repositoryRoot }),
+      exec('git', ['status', '--porcelain=v1', '-z'], { cwd: repositoryRoot })
+    ]);
+    const commit = String(commitOut || '').trim();
+    if (!/^[a-f0-9]{40}$/i.test(commit)) return fallback;
+    return {
+      isRepo: true,
+      branch: String(branchOut || '').trim() || null,
+      commit,
+      dirty: String(statusOut || '').length > 0,
+      status: 'collected'
+    };
+  } catch {
+    return fallback;
+  }
+}
 export async function scanExternalRepository({ repositoryRoot, repositoryId = 'external-repository', scanOptions = EXTERNAL_REPOSITORY_SCAN_OPTIONS }) {
   if (typeof repositoryRoot !== 'string' || !repositoryRoot.trim()) {
     throw new Error('--repo must point to a local repository checkout');
@@ -25,6 +55,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
     request: 'Read-only repository intake scan for the OIOL P12 real-world planning benchmark.',
     scanOptions
   });
+  project.repository.git = await collectGitMetadata(path.resolve(repositoryRoot));
   assertExternalRepositorySnapshot(project, { requireRequestedEvidence: false });
   const repository = project.repository;
   const scannerEvidence = summarizeRepositoryEvidence(project);
