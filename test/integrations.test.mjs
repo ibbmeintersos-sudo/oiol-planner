@@ -108,6 +108,25 @@ test('OpenCode V2 server info is read from /api/info',async()=>{
   assert.equal(call.options.headers['x-opencode-directory'],undefined);
 });
 
+test('OpenCode V2 message pagination omits order when following a cursor',async()=>{
+  const calls=[];
+  let page=0;
+  const client=new OpenCodeClient({fetchImpl:async(url)=>{
+    calls.push(new URL(url));
+    page++;
+    return page===1
+      ? response({data:[{id:'m1'}],cursor:{next:'cursor-2'}})
+      : response({data:[{id:'m2'}],cursor:{}});
+  }});
+  const messages=await client.getSessionMessages('session-1');
+  assert.deepEqual(messages.map(message=>message.id),['m1','m2']);
+  assert.equal(calls.length,2);
+  assert.equal(calls[0].searchParams.get('order'),'asc');
+  assert.equal(calls[0].searchParams.has('cursor'),false);
+  assert.equal(calls[1].searchParams.get('cursor'),'cursor-2');
+  assert.equal(calls[1].searchParams.has('order'),false);
+});
+
 test('OpenCode V2 deletes only the requested session ID',async()=>{
   let call;
   const client=new OpenCodeClient({fetchImpl:async(url,options)=>{call={url,options};return new Response(null,{status:204});}});
