@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildBaselinePrompt, parseBaselinePlan, runOpenCodeBaselineScenario } from '../benchmarks/opencode/baseline.mjs';
+import { isSupportedOpenCodeV2 } from '../benchmarks/opencode/client.mjs';
 
 const scenario={id:'GF-API-001',project:{kind:'greenfield',name:'Test API',request:'Create an API'}};
 const validPlan={contractVersion:'1.0',id:'p1',status:'needs_revision',project:scenario.project,requirements:[],architecture:{components:[],decisions:[]},tasks:[],dependencyGraph:{nodes:[],edges:[]},risks:[],evidence:[],clarifications:[],review:null};
@@ -12,17 +13,27 @@ test('baseline prompt explicitly prohibits implementation and embeds the identic
  assert.ok(prompt.includes(JSON.stringify(scenario.project,null,2)));
 });
 
+test('OpenCode compatibility gate accepts V2 2.2.5+ and rejects V1 or earlier V2',()=>{
+ assert.equal(isSupportedOpenCodeV2('2.2.5'),true);
+ assert.equal(isSupportedOpenCodeV2('2.3.0'),true);
+ assert.equal(isSupportedOpenCodeV2('v2.2.4'),false);
+ assert.equal(isSupportedOpenCodeV2('1.19.5'),false);
+ assert.equal(isSupportedOpenCodeV2('3.0.0'),false);
+});
+
 test('baseline parser accepts strict JSON and fenced JSON but rejects invalid output',()=>{
  assert.deepEqual(parseBaselinePlan(JSON.stringify(validPlan)),validPlan);
  assert.deepEqual(parseBaselinePlan('```json\n'+JSON.stringify(validPlan)+'\n```'),validPlan);
  assert.throws(()=>parseBaselinePlan('not JSON'),/valid JSON plan/);
 });
 
-test('OpenCode baseline creates a read-only planning session and always cleans it up',async()=>{
+test('OpenCode V2 baseline waits for execution, reads projected messages, and always cleans up',async()=>{
  const calls=[];
  const client={
-  async createSession(title){calls.push(['create',title]);return {id:'session-1'};},
-  async prompt(id,parts,options){calls.push(['prompt',id,options.agent,options.model]);assert.match(parts[0].text,/Do not modify files/);return {info:{role:'assistant',id:'message-1'},parts:[{type:'text',text:JSON.stringify(validPlan)}]};},
+  async createSession(title,options){calls.push(['create',title,options.agent,options.model]);return {id:'session-1'};},
+  async prompt(id,text){calls.push(['prompt',id]);assert.match(text,/Do not modify files/);},
+  async waitSession(id){calls.push(['wait',id]);},
+  async getSessionMessages(id){calls.push(['messages',id]);return [{id:'message-1',type:'assistant',content:[{type:'text',text:JSON.stringify(validPlan)}],model:{providerID:'test',id:'model'},tokens:{input:1,output:2}}];},
   async getSessionDiff(){return [];},
   async deleteSession(id){calls.push(['delete',id]);}
  };
@@ -30,14 +41,17 @@ test('OpenCode baseline creates a read-only planning session and always cleans i
  assert.equal(result.plan.id,'p1');
  assert.equal(result.sessionId,'session-1');
  assert.equal(calls.filter(x=>x[0]==='delete').length,1);
- assert.equal(calls[1][2],'plan');
+ assert.equal(calls.find(x=>x[0]==='create')[2],'plan');
+ assert.deepEqual(calls.map(x=>x[0]),['create','prompt','wait','messages','delete']);
 });
 
-test('OpenCode baseline deletes a session even when the model returns invalid JSON',async()=>{
+test('OpenCode V2 baseline deletes a session even when the model returns invalid JSON',async()=>{
  let deleted=false;
  const client={
   async createSession(){return {id:'session-2'};},
-  async prompt(){return {info:{role:'assistant'},parts:[{type:'text',text:'not JSON'}]};},
+  async prompt(){return {id:'input-1'};},
+  async waitSession(){},
+  async getSessionMessages(){return [{id:'message-2',type:'assistant',content:[{type:'text',text:'not JSON'}]}];},
   async getSessionDiff(){return [];},
   async deleteSession(){deleted=true;}
  };
@@ -72,15 +86,17 @@ test('OpenCode baseline runner dry-run validates config without contacting OpenC
  }
 });
 
-test('OpenCode baseline rejects any file changes despite read-only prompt',async()=>{
+test('OpenCode V2 baseline rejects tool calls and any file changes',async()=>{
  let deleted=false;
  const client={
   async createSession(){return {id:'session-3'};},
-  async prompt(){return {info:{role:'assistant'},parts:[{type:'text',text:JSON.stringify(validPlan)}]};},
+  async prompt(){},
+  async waitSession(){},
+  async getSessionMessages(){return [{id:'message-3',type:'assistant',content:[{type:'tool',name:'shell',state:{status:'completed'}}]}];},
   async getSessionDiff(){return [{file:'src/unauthorized.mjs'}];},
   async deleteSession(){deleted=true;}
  };
- await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/violated its read-only contract/);
+ await assert.rejects(()=>runOpenCodeBaselineScenario({client,scenario}),/tool call was recorded/);
  assert.equal(deleted,true);
 });
 
