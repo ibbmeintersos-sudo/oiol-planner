@@ -45,6 +45,26 @@ function changeImpactSection(impact) {
       : ['- No consumer file could be linked to a matched contract candidate.']),
     ...(Array.isArray(impact.apiContractImpact?.limitations) ? impact.apiContractImpact.limitations.map(item => '- Caveat: ' + text(item)) : []),
     '',
+    '### Database schema impact (static estimate)',
+    '',
+    '- **Schema analysis status:** ' + text(impact.databaseSchemaImpact?.status || 'Not requested'),
+    '- **Schema objects matched:** ' + (Number.isFinite(impact.databaseSchemaImpact?.diagnostics?.matchedTableCount) ? impact.databaseSchemaImpact.diagnostics.matchedTableCount : 'Not recorded'),
+    '- **DDL changes matched:** ' + (Number.isFinite(impact.databaseSchemaImpact?.diagnostics?.matchedChangeCount) ? impact.databaseSchemaImpact.diagnostics.matchedChangeCount : 'Not recorded'),
+    '- **Potential consumers:** ' + (Number.isFinite(impact.databaseSchemaImpact?.diagnostics?.consumerCandidateCount) ? impact.databaseSchemaImpact.diagnostics.consumerCandidateCount : 'Not recorded'),
+    '- **Migration files detected:** ' + (Number.isFinite(impact.databaseSchemaImpact?.diagnostics?.migrationFileCount) ? impact.databaseSchemaImpact.diagnostics.migrationFileCount : 'Not recorded'),
+    '- **Result limits reached:** ' + (impact.databaseSchemaImpact?.diagnostics ? (impact.databaseSchemaImpact.diagnostics.tableResultLimitReached || impact.databaseSchemaImpact.diagnostics.changeResultLimitReached || impact.databaseSchemaImpact.diagnostics.consumerResultLimitReached ? 'Yes' : 'No') : 'Not recorded'),
+    ...(Array.isArray(impact.databaseSchemaImpact?.matchedTables) && impact.databaseSchemaImpact.matchedTables.length
+      ? impact.databaseSchemaImpact.matchedTables.map(item => '- **Table: ' + text(item.table) + '** — ' + text(item.path) + (item.line ? ':' + text(item.line) : '') + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : ''))
+      : ['- No schema object matched the request terms.']),
+    ...(Array.isArray(impact.databaseSchemaImpact?.schemaChanges) && impact.databaseSchemaImpact.schemaChanges.length
+      ? impact.databaseSchemaImpact.schemaChanges.map(item => '- **' + text(item.severity) + ' — ' + text(item.operation) + '** on ' + text(item.table || 'unknown table') + (item.column ? '.' + text(item.column) : '') + ' — ' + text(item.path) + (item.line ? ':' + text(item.line) : '') + '; risks: ' + text((item.riskSignals || []).join(', ')))
+      : ['- No matching DDL change was identified.']),
+    ...(Array.isArray(impact.databaseSchemaImpact?.potentiallyAffectedConsumers) && impact.databaseSchemaImpact.potentiallyAffectedConsumers.length
+      ? impact.databaseSchemaImpact.potentiallyAffectedConsumers.map(item => '- **' + text(item.path) + '** — textual reference to table ' + text(item.table) + '; confidence: ' + text(item.confidence) + '; proof: ' + text(item.proofLevel))
+      : ['- No consumer file could be linked to a matched schema object.']),
+    ...(Array.isArray(impact.databaseSchemaImpact?.riskSignals) ? impact.databaseSchemaImpact.riskSignals.map(item => '- Risk signal: ' + text(item)) : []),
+    ...(Array.isArray(impact.databaseSchemaImpact?.limitations) ? impact.databaseSchemaImpact.limitations.map(item => '- Caveat: ' + text(item)) : []),
+    '',
     '### Direct candidate files',
     '',
     ...(direct.length ? direct.slice(0, 30).map(item => '- **' + text(item.path) + '** — score ' + text(item.score) + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : '')) : ['- No direct candidate file was identified.']),
