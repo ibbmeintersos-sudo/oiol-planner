@@ -127,3 +127,27 @@ test('markdown report surfaces P2 quality metrics, test strategy, rollback, and 
     assert.ok(markdown.includes(value), 'missing P2 quality evidence: ' + value);
   }
 });
+
+test('markdown report surfaces database schema impact, DDL risk, consumers, and limitations', () => {
+  const schemaPlan = {
+    ...plan,
+    project: {
+      ...plan.project,
+      changeImpact: {
+        databaseSchemaImpact: {
+          status: 'analyzed',
+          diagnostics: { matchedTableCount: 1, matchedChangeCount: 1, consumerCandidateCount: 1, migrationFileCount: 1 },
+          matchedTables: [{ table: 'customers', path: 'db/schema.sql', line: 4, matchedTerms: ['customer'], evidenceId: 'REPO-000000000001' }],
+          schemaChanges: [{ operation: 'drop_column', table: 'customers', column: 'email', path: 'db/migrations/001.sql', line: 8, severity: 'critical', riskSignals: ['data_loss_risk'] }],
+          potentiallyAffectedConsumers: [{ path: 'src/customer-repository.ts', table: 'customers', confidence: 'medium', proofLevel: 'textual_reference_not_runtime_binding' }],
+          riskSignals: ['data_loss_risk'],
+          limitations: ['Textual consumer references do not prove runtime query execution.']
+        }
+      }
+    }
+  };
+  const markdown = renderPlanMarkdown(schemaPlan);
+  for (const value of ['Database schema impact','Schema objects matched','drop_column','customers','src/customer-repository.ts','data_loss_risk','Textual consumer references do not prove runtime query execution.']) {
+    assert.ok(markdown.includes(value), 'missing database schema impact evidence: ' + value);
+  }
+});
