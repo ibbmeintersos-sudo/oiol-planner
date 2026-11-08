@@ -32,7 +32,8 @@ function entryPriority(entry, depth) {
   if (entry.isFile() && MANIFESTS.includes(name)) return depth === 0 ? -30 : -12;
   if (entry.isFile() && ['readme.md','license','license.md'].includes(name)) return depth === 0 ? -20 : 8;
   if (entry.isDirectory() && PRIORITY_DIRS.has(name)) return PRIORITY_DIRS.get(name);
-  if (entry.isFile() && SOURCE_FILE.test(name)) return 0;
+  if (entry.isFile() && SUPPORTED_SOURCE_FILE.test(name)) return 0;
+  if (entry.isFile() && SOURCE_FILE.test(name)) return 1;
   if (entry.isFile() && TEST_FILE.test(name)) return 3;
   if (entry.isDirectory() && LOW_PRIORITY_DIRS.has(name)) return 12;
   if (entry.isFile() && CONFIG_FILE.test(name)) return 6;
@@ -104,7 +105,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
 
   const selected = [...new Set([
     ...manifests,
-    ...files.filter(file => SOURCE_FILE.test(file)).slice(0, 100),
+    ...files.filter(file => SUPPORTED_SOURCE_FILE.test(file)).slice(0, 100),
     ...tests.slice(0, 15),
     ...configs.slice(0, 15)
   ])];
