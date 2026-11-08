@@ -5,6 +5,46 @@ import { buildTraceability } from './traceability.mjs';
 const text = value => String(value && typeof value === 'object' ? (value.statement || value.description || value.question || JSON.stringify(value)) : value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ').trim();
 const list = values => Array.isArray(values) && values.length ? values.map(value => '- ' + text(value)).join('\n') : '- None recorded';
 
+function testImpactSection(analysis) {
+  if (!analysis || typeof analysis !== 'object') return [];
+  const inventory = analysis.inventory || {};
+  const tests = Array.isArray(analysis.selectedTests) ? analysis.selectedTests : [];
+  const levels = Array.isArray(analysis.recommendedTestLevels) ? analysis.recommendedTestLevels : [];
+  const gates = Array.isArray(analysis.verificationGates) ? analysis.verificationGates : [];
+  return [
+    '### Test impact and verification plan (not executed)',
+    '',
+    '- **Analysis status:** ' + text(analysis.status || 'Not recorded'),
+    '- **Confidence:** ' + text(analysis.confidence || 'Not recorded'),
+    '- **Discovered test files:** ' + (inventory.discoveredTestFileCount ?? 'Not recorded'),
+    '- **Linked test candidates:** ' + (inventory.linkedTestFileCount ?? tests.length),
+    '- **Requirement acceptance-criteria coverage:** ' + text(analysis.coverageAssessment?.requirementAcceptanceCriteria || 'Not assessed'),
+    '- **Code coverage:** ' + text(analysis.coverageAssessment?.codeCoverage || 'Not available'),
+    ...(tests.length ? tests.map(item => '- **' + text(item.path) + '** — ' + text(item.association) + '; confidence: ' + text(item.confidence) + '; execution: NOT EXECUTED') : ['- No existing test file was linked to the current impact evidence.']),
+    '',
+    '#### Recommended test levels',
+    '',
+    ...(levels.length ? levels.map(item => '- **' + text(item.level) + '** — ' + text((item.rationale || []).join(' ')) + (item.evidence?.length ? '; evidence candidates: ' + text(item.evidence.join(', ')) : '')) : ['- No test level recommendation recorded.']),
+    '',
+    '#### Verification prerequisites',
+    '',
+    list(analysis.prerequisites),
+    '',
+    '#### Verification gates (proposed)',
+    '',
+    ...(gates.length ? gates.map(item => '- **' + text(item.id) + '** — ' + text(item.description) + '; status: ' + text(item.status) + (item.evidenceStatus ? '; evidence: ' + text(item.evidenceStatus) : '')) : ['- No verification gates recorded.']),
+    '',
+    '#### Verification gaps',
+    '',
+    list(analysis.gaps),
+    '',
+    ...(Array.isArray(analysis.limitations) ? analysis.limitations.map(item => '- Caveat: ' + text(item)) : []),
+    '',
+    '*These are recommendations for a separate implementation/verification workflow. OIOL does not execute tests, builds, scripts, migrations, or target-project commands, and does not claim checks have passed.*',
+    ''
+  ];
+}
+
 function changeImpactSection(impact) {
   if (!impact || typeof impact !== 'object' || impact.status === 'not_applicable') return [];
   const direct = Array.isArray(impact.directMatches) ? impact.directMatches : [];
@@ -89,6 +129,7 @@ function changeImpactSection(impact) {
       ? impact.databaseSchemaImpact.migrationCompatibility.limitations.map(item => '- Migration caveat: ' + text(item))
       : []),
     '',
+    ...testImpactSection(impact.testImpactAnalysis),
     '### Direct candidate files',
     '',
     ...(direct.length ? direct.slice(0, 30).map(item => '- **' + text(item.path) + '** — score ' + text(item.score) + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : '')) : ['- No direct candidate file was identified.']),
