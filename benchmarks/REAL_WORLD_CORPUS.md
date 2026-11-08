@@ -63,6 +63,22 @@ The initial balanced checkout subset should prioritize better-auth, paperless-ng
 
 A local checkout attempt from the current work environment failed three times because the environment could not resolve github.com. This is an environment/network limitation, not evidence that the public repositories are unavailable. Consequently, no local scanner run or live benchmark is claimed here.
 
+## Manifest-level technology verification
+
+Root manifest/configuration files were also fetched from GitHub. These are direct file-level checks, not full repository scans:
+
+| Repository | File checked | Verified signal | Manifest blob SHA |
+|---|---|---|---|
+| go-gitea/gitea | go.mod | Go module; module path gitea.dev | 1d7f26bdb1a69e96a267958bace6f478904e0a46 |
+| better-auth/better-auth | package.json | TypeScript/JavaScript monorepo indicators; pnpm and Turborepo scripts | fb556e54e566eeeb6bf5111bb28315152aa46b65 |
+| vercel/turborepo | package.json | Rust workspace build via Cargo plus Node tooling; pnpm | 32b95afc4dc745ccca3530ccf2392c0ec509d6b2 |
+| plausible/analytics | mix.exs | Elixir Mix application; Plausible project module | e839f4403108ce68f7bd39bff54b9b931f49a96f |
+| paperless-ngx/paperless-ngx | pyproject.toml | Python project; Django and Celery dependencies | 5eb0f59ed2c7f0b2d36d76d3446a16b10b639961 |
+| immich-app/immich | package.json | pnpm-managed monorepo | b8755b803e41448cdd117bc890624cf3ad498b70 |
+| PrefectHQ/prefect | pyproject.toml | Python package; Apache-2.0 license declaration; workflow orchestration description | 76525cc05f89a7e9f687aebffe39207041ac207d |
+
+Blob SHAs identify the fetched manifest contents, not the repository commit SHA. Exact repository commit SHAs still must be captured from pinned checkouts before any scored run.
+
 ## Required intake record before a repository can enter a scored run
 
 For every selected repository, record:
