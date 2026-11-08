@@ -11,7 +11,7 @@ const tokens = value => {
 };
 const sorted = values => [...values].sort((a, b) => a.localeCompare(b));
 const overlap = (a, b) => sorted([...a].filter(item => b.has(item)));
-const isRequested = request => /\b(?:database|db|schema|table|column|migration|migrations|ddl|sql|orm|prisma|drizzle|typeorm|sequelize|django|sqlalchemy|foreign\s+key|index|constraint|nullable|not\s+null)\b|قاعد(?:ة|ه)\s+بيانات|مخطط\s+البيانات|جدول|جداول|عمود|اعمده|أعمدة|ترحيل|ترحيلات|فهرس|فهارس|قيد\s+مرجع/u.test(request);
+const isRequested = request => /\\b(?:database|db|schema|table|column|migration|migrations|ddl|sql|orm|prisma|drizzle|typeorm|sequelize|django|sqlalchemy|foreign\\s+key|index|constraint|nullable|not\\s+null|rollout|rolling\\s+deploy(?:ment)?|backward\\s+compatibility|forward\\s+compatibility|zero\\s+downtime|expand.contract)\\b|قاعد(?:ة|ه)\\s+بيانات|مخطط\\s+البيانات|جدول|جداول|عمود|اعمده|أعمدة|ترحيل|ترحيلات|فهرس|فهارس|توافق\\s+(?:خلفي|امامي|الإصدارات)|نشر\\s+تدريجي/u.test(request);
 const evidenceFields = evidence => evidence ? {
   evidenceId: evidence.id || null,
   sourceSha256: evidence.sourceSha256 || null,
@@ -101,7 +101,7 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
   const limitedChanges = matchedChanges.slice(0, maxResults);
   const limitedConsumers = consumers.slice(0, maxResults);
   const riskSignals = sorted(new Set(matchedChanges.flatMap(item => item.riskSignals)));
-  const status = matchedTables.length || matchedChanges.length ? 'analyzed' : 'insufficient_schema_match';
+  const status = matchedTables.length || matchedChanges.length || migrationCompatibility.status === 'analyzed' ? 'analyzed' : 'insufficient_schema_match';
   return {
     status,
     method: 'bounded_schema_metadata_and_reference_analysis',
