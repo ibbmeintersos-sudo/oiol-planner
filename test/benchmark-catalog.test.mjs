@@ -126,9 +126,11 @@ test('external repository input uses the actual scanner and does not leak the op
   assert.equal(project.kind, 'existing');
   assert.equal(project.repository.root, 'external-repository');
   const scannerSummary = summarizeRepositoryEvidence(project);
-  assert.equal(scannerSummary.scannerVersion, '1.2.0');
-  assert.equal(scannerSummary.scanLimits.maxFiles, 2000);
-  assert.equal(scannerSummary.scanLimits.maxSourceFiles, 250);
+  assert.equal(scannerSummary.scannerVersion, '1.3.0');
+  assert.equal(scannerSummary.scanLimits.maxFiles, 5000);
+  assert.equal(scannerSummary.scanLimits.maxSourceFiles, 500);
+  assert.equal(scannerSummary.scanLimits.maxTestFiles, 25);
+  assert.equal(scannerSummary.scanLimits.maxConfigFiles, 25);
   assert.ok(scannerSummary.skipped.counts);
   assert.ok(scannerSummary.structure.astFileCount + scannerSummary.structure.lexicalFallbackFileCount > 0);
   assert.ok(scannerSummary.includedPaths.includes('src/routes/customers.mjs'));
@@ -251,10 +253,12 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.ok(report.evidence.length > 0);
   assert.equal(JSON.stringify(report).includes(repositoryRoot), false);
   assert.equal(report.root, 'external-repository');
-  assert.equal(report.scannerVersion, '1.2.0');
+  assert.equal(report.scannerVersion, '1.3.0');
   assert.ok(report.skipped.counts);
-  assert.equal(report.scanLimits.maxFiles, 2000);
-  assert.equal(report.scanLimits.maxSourceFiles, 250);
+  assert.equal(report.scanLimits.maxFiles, 5000);
+  assert.equal(report.scanLimits.maxSourceFiles, 500);
+  assert.equal(report.scanLimits.maxTestFiles, 25);
+  assert.equal(report.scanLimits.maxConfigFiles, 25);
 });
 
 test('external live planning requires explicit consent before sending repository excerpts', async () => {
