@@ -173,7 +173,7 @@ test('repository-specific task files override request and rubric with a stable c
     request: 'Plan a safe change grounded in the scanned repository architecture.',
     constraints: ['Preserve public interfaces', 'Do not invent repository behavior'],
     expectedSignals: [['architecture', 'module boundaries'], ['acceptance criteria', 'verification']],
-    mustClarify: false
+    evidencePaths: ['src/service.ts'], mustClarify: false
   };
   try {
     await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
@@ -196,7 +196,7 @@ test('task files reject scenario mismatches and invalid scoring rubrics', async 
   const task = {
     scenarioId: 'GF-API-001', taskId: 'RW-TEST-001', taskVersion: '1.0.0',
     projectName: 'Example', request: 'Plan a change', constraints: [],
-    expectedSignals: [['signal']], mustClarify: false
+    expectedSignals: [['signal']], evidencePaths: ['src/service.ts'], mustClarify: false
   };
   try {
     await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
@@ -219,7 +219,7 @@ test('external benchmark dry-run requires and fingerprints the repository-specif
     projectName: 'Dry Run Repository', request: 'Assess a bounded architectural change.',
     constraints: ['Preserve existing behavior'],
     expectedSignals: [['architecture'], ['acceptance criteria']],
-    mustClarify: false
+    evidencePaths: ['src/service.ts'], mustClarify: false
   };
   const previousArgv = process.argv;
   const previousOptIn = process.env.OIOL_BENCHMARK_ALLOW_LIVE;
