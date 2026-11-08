@@ -51,6 +51,7 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
     throw new Error('--task-file expectedSignals must be a non-empty array of non-empty string groups');
   }
   if (!Array.isArray(task.evidencePaths) || !task.evidencePaths.length || task.evidencePaths.some(value => typeof value !== 'string' || !value.trim() || value.startsWith('/') || value.includes('..') || value.includes(String.fromCharCode(92)))) throw new Error('--task-file requires non-empty safe relative evidencePaths');
+  if (task.evidenceRanges !== undefined && (!Array.isArray(task.evidenceRanges) || task.evidenceRanges.some(range => !range || typeof range.path !== 'string' || !task.evidencePaths.includes(range.path) || !Number.isInteger(range.startLine) || !Number.isInteger(range.endLine) || range.startLine < 1 || range.endLine < range.startLine || range.endLine - range.startLine > 200))) throw new Error('--task-file evidenceRanges must use evidencePaths and valid 1-based line ranges of at most 201 lines');
   if (typeof task.mustClarify !== 'boolean') throw new Error('--task-file mustClarify must be a boolean');
   if (task.mustClarify && (!Array.isArray(task.clarificationSignals) || !task.clarificationSignals.length || task.clarificationSignals.some(group => !Array.isArray(group) || !group.length || group.some(value => typeof value !== 'string')))) {
     throw new Error('--task-file requires clarificationSignals for blocking-clarification tasks');
@@ -68,7 +69,8 @@ export async function applyScenarioTaskFile(chosen, taskFilePath = null) {
       id: task.taskId,
       version: task.taskVersion,
       sha256: createHash('sha256').update(raw).digest('hex'),
-      evidencePaths: [...task.evidencePaths]
+      evidencePaths: [...task.evidencePaths],
+      evidenceRanges: [...(task.evidenceRanges || [])]
     }
   };
 }
@@ -80,7 +82,8 @@ export function assertExternalRepositorySnapshot(project, { requireRequestedEvid
   const evidenceSelection = project?.repository?.evidenceSelection;
   if (requireRequestedEvidence && Array.isArray(evidenceSelection?.requestedPaths) && evidenceSelection.requestedPaths.length) {
     const missing = [...(evidenceSelection.missingPaths || []), ...(evidenceSelection.unexcerptedPaths || [])];
-    if (missing.length) throw new Error('Required task evidence paths were not supplied as excerpts: ' + [...new Set(missing)].join(', '));
+    const missingRanges = [...(evidenceSelection.missingRanges || []), ...(evidenceSelection.unexcerptedRanges || [])];
+    if (missing.length || missingRanges.length) throw new Error('Required task evidence was not supplied as excerpts: ' + [...new Set(missing)].join(', ') + (missingRanges.length ? ' | ranges: ' + missingRanges.map(range => range.path + ':' + range.startLine + '-' + range.endLine).join(', ') : ''));
   }
   const git = project?.repository?.git;
   if (!git?.isRepo || !/^[a-f0-9]{40}$/i.test(git.commit || '')) {
@@ -243,7 +246,7 @@ export async function main() {
   for(const scenario of chosen){
     const started=Date.now();
     try{
-      const project=await resolveScenarioProject(scenario,{repositoryRoot,scanOptions:taskDefinition?.evidencePaths?{priorityPaths:taskDefinition.evidencePaths}:null});
+      const project=await resolveScenarioProject(scenario,{repositoryRoot,scanOptions:taskDefinition?.evidencePaths?{priorityPaths:taskDefinition.evidencePaths,priorityRanges:taskDefinition.evidenceRanges}:null});
       if(repositoryRoot) assertExternalRepositorySnapshot(project);
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:summarizeRepositoryEvidence(project),plan});
