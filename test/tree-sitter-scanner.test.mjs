@@ -85,7 +85,6 @@ test('Tree-sitter syntax recovery is surfaced as evidence instead of crashing th
   }
 });
 
-<<<<<<< HEAD
 test('Tree-sitter distinguishes exported and module-local TypeScript contract declarations', async () => {
   const f = await fixture('oiol-ast-ts-exports-');
   try {
@@ -102,7 +101,11 @@ test('Tree-sitter distinguishes exported and module-local TypeScript contract de
     assert.ok(symbols.some(item => item.name === 'UserProfileResponse' && item.kind === 'interface' && item.exported === true));
     assert.ok(symbols.some(item => item.name === 'PublicUserId' && item.kind === 'type' && item.exported === true));
     assert.ok(symbols.some(item => item.name === 'InternalProfile' && item.exported === false));
-=======
+  } finally {
+    await f.cleanup();
+  }
+});
+
 test('scanner prioritizes root manifests and application source over metadata and documentation', async () => {
   const f = await fixture('oiol-scan-priority-');
   try {
@@ -422,7 +425,6 @@ test('scanner reports line ranges that cannot be supplied', async () => {
     });
     assert.deepEqual(result.evidenceSelection.excerptedRanges, []);
     assert.deepEqual(result.evidenceSelection.unexcerptedRanges, [{ path: 'src/short.ts', startLine: 99, endLine: 101 }]);
->>>>>>> origin/main
   } finally {
     await f.cleanup();
   }
