@@ -1,7 +1,4 @@
-import path from 'node:path';
-
 const norm = value => String(value || '').replaceAll('\\', '/').replace(/^\.\//, '');
-const sha = value => String(value || '');
 const evidenceMap = items => new Map((items || []).map(item => [norm(item.path), item]));
 const lineAt = (source, index) => source.slice(0, index).split('\n').length;
 const cleanIdentifier = value => String(value || '').trim().replace(/^[\`"[]|[\`"\]]$/g, '');
@@ -35,11 +32,11 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
   const evidence = evidenceMap(sourceEvidence);
   const objects = [], changes = [], diagnostics = [];
   const analyzedFiles = files.map(norm).filter(file => typeof contents[file] === 'string');
-  let sqlFileCount = 0, ormFileCount = 0, migrationFileCount = 0;
+  let sqlFileCount = 0, migrationFileCount = 0;
+  const ormFiles = new Set();
 
   for (const file of analyzedFiles) {
     const source = contents[file];
-    const lowerPath = file.toLowerCase();
     const isMigration = /(^|\/)(migrations?|schema|ddl)(\/|$)|\d{4,}[_-].*(?:migration|schema)/i.test(file);
     if (isMigration) migrationFileCount++;
 
@@ -87,7 +84,7 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
     }
 
     if (/\.prisma$/i.test(file)) {
-      ormFileCount++;
+      ormFiles.add(file);
       for (const match of source.matchAll(/^model\s+(\w+)\s*\{([\s\S]*?)^\}/gm)) {
         const fields = [];
         for (const row of match[2].split(/\r?\n/)) {
@@ -108,13 +105,15 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
         { re: /(?:pgTable|mysqlTable|sqliteTable)\(\s*['"]([^'"]+)['"]/g, kind: 'drizzle_table' }
       ];
       for (const pattern of ormPatterns) for (const match of source.matchAll(pattern.re)) {
-        ormFileCount++;
-        addObject(objects, { kind: 'table', name: match[1], path: file, line: lineAt(source, match.index), columns: [], sourceKind: pattern.kind, evidence: evidence.get(file) || null });
+        ormFiles.add(file);
+        const className = source.slice(match.index + match[0].length).match(/^\\s*(?:export\\s+)?(?:abstract\\s+)?class\\s+(\\w+)/m)?.[1] || null;
+        addObject(objects, { kind: 'table', name: match[1], model: className, path: file, line: lineAt(source, match.index), columns: [], sourceKind: pattern.kind, evidence: evidence.get(file) || null });
       }
     }
   }
 
   const tables = new Map(objects.filter(item => item.kind === 'table').map(item => [tableKey(item.name), item]));
+  const modelToTable = new Map(objects.filter(item => item.model).map(item => [String(item.model).toLowerCase(), tableKey(item.name)]));
   const consumers = [];
   for (const file of analyzedFiles) {
     if (/\.(?:sql|prisma)$/i.test(file)) continue;
@@ -137,7 +136,7 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
     diagnostics: {
       analyzedFileCount: analyzedFiles.length,
       sqlFileCount,
-      ormFileCount,
+      ormFileCount: ormFiles.size,
       migrationFileCount,
       changeCountBeforeLimit: changes.length,
       changeLimitReached: changes.length > 2000,
