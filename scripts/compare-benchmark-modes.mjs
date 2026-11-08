@@ -18,6 +18,7 @@ export function compareBenchmarkModes(oiol,baseline){
  const baselineExternal=baseline.sourceMode==='external-local-checkout';
  if(oiolExternal!==baselineExternal)throw new Error('OIOL and OpenCode runs must use the same repository source mode');
  if(oiolExternal){
+  if(!oiol.taskDefinition?.sha256||oiol.taskDefinition.sha256!==baseline.taskDefinition?.sha256)throw new Error('External paired runs must use the exact same versioned task definition');
   const a=oiol.repositorySnapshot,b=baseline.repositorySnapshot;
   if(!a?.allGitCommitsDetected||!b?.allGitCommitsDetected)throw new Error('External paired runs require detected Git commit SHAs in both results');
   const commitsA=[...(a.commitShas||[])].sort(),commitsB=[...(b.commitShas||[])].sort();
