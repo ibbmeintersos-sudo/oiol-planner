@@ -58,6 +58,7 @@ export async function resolveScenarioProject(scenario, { repositoryRoot = null }
     });
     // Do not expose the operator's absolute local path in plans or benchmark artifacts.
     project.repository.root = 'external-repository';
+    project.evidence = project.evidence.map(item => item.type === 'repository_scan' ? { ...item, source: 'external-repository' } : item);
     return project;
   }
   const fixturePath=scenario.project?.fixturePath;
