@@ -318,3 +318,37 @@ test('all ten P12 external task drafts satisfy the runner contract and remain ex
   }
   assert.equal(repositoryPrefixes.size, 5);
 });
+
+test('all P12 task drafts support credential-free external dry-run manifests', async () => {
+  const draftDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../benchmarks/external-tasks/drafts');
+  const files = (await fs.readdir(draftDirectory)).filter(file => file.endsWith('.json')).sort();
+  const previousArgv = process.argv;
+  const previousLog = console.log;
+  const previousLive = process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+  const previousSource = process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE;
+  const previousKey = process.env.OIOL_API_KEY;
+  try {
+    delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+    delete process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE;
+    delete process.env.OIOL_API_KEY;
+    for (const file of files) {
+      const taskPath = path.join(draftDirectory, file);
+      const task = JSON.parse(await fs.readFile(taskPath, 'utf8'));
+      const lines = [];
+      console.log = value => lines.push(String(value));
+      process.argv = ['node', 'run-planner-benchmark.mjs', '--repo', '/unused/checkout', '--task-file', taskPath, '--scenarios', task.scenarioId, '--dry-run'];
+      assert.equal(await main(), 0, file);
+      const report = JSON.parse(lines.at(-1));
+      assert.equal(report.dryRun, true, file);
+      assert.equal(report.sourceMode, 'external-local-checkout', file);
+      assert.equal(report.taskDefinition.id, task.taskId, file);
+      assert.equal(report.liveCalls, false, file);
+    }
+  } finally {
+    process.argv = previousArgv;
+    console.log = previousLog;
+    if (previousLive === undefined) delete process.env.OIOL_BENCHMARK_ALLOW_LIVE; else process.env.OIOL_BENCHMARK_ALLOW_LIVE = previousLive;
+    if (previousSource === undefined) delete process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE; else process.env.OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE = previousSource;
+    if (previousKey === undefined) delete process.env.OIOL_API_KEY; else process.env.OIOL_API_KEY = previousKey;
+  }
+});
