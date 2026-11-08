@@ -1,0 +1,51 @@
+{
+  "scenarioId": "EX-MONOLITH-004",
+  "taskId": "RW-IM-01",
+  "taskVersion": "0.2.0-draft",
+  "projectName": "Immich",
+  "request": "Plan a separate per-user external-library storage-usage metric for administrator-facing user/server statistics. Keep it distinct from the existing upload quota and do not change quota enforcement. Use a clearly documented logical-size measurement based on indexed external-library assets; do not claim physical disk usage or deduplicated storage usage unless repository evidence supports it.",
+  "constraints": [
+    "Produce an engineering plan only; do not modify the repository or execute project commands, tests, or builds.",
+    "Ground claims in the pinned repository snapshot and cite relevant relative file paths.",
+    "Separate verified evidence from assumptions and unresolved unknowns.",
+    "Preserve existing public behavior and compatibility unless the request explicitly changes it.",
+    "Preserve the current upload quota calculation, which excludes assets with a non-null libraryId.",
+    "Account for custom mount points and clearly label logical indexed bytes rather than physical disk consumption.",
+    "Avoid double counting assets."
+  ],
+  "expectedSignals": [
+    [
+      "external library",
+      "libraryId"
+    ],
+    [
+      "logical size",
+      "fileSizeInByte"
+    ],
+    [
+      "per-user usage",
+      "ownerId"
+    ],
+    [
+      "separate metric",
+      "separate from upload quota"
+    ],
+    [
+      "server stats",
+      "admin UI",
+      "DTO"
+    ],
+    [
+      "custom mount points"
+    ],
+    [
+      "no quota enforcement change"
+    ],
+    [
+      "tests",
+      "documentation"
+    ]
+  ],
+  "mustClarify": false,
+  "clarificationSignals": []
+}
