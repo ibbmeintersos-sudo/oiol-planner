@@ -29,7 +29,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
   const repository = project.repository;
   return {
     protocolVersion: '1.0',
-    scanRunnerVersion: '1.2.0',
+    scanRunnerVersion: '1.3.0',
     scannerVersion: repository.scannerVersion || SCANNER_VERSION,
     repositoryId,
     scannedAt: new Date().toISOString(),
