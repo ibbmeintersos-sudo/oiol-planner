@@ -1,16 +1,16 @@
 import { createHash } from 'node:crypto';
 
 const sha256 = value => createHash('sha256').update(String(value || '')).digest('hex');
-const normPath = value => String(value || '').replaceAll('\\\\', '/').replace(/^\\.\\//, '');
+const normPath = value => String(value || '').replaceAll('\\', '/').replace(/^\.\//, '');
 const normalize = value => String(value || '').normalize('NFKC').toLowerCase()
-  .replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
+  .replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
 const tokens = value => {
   const prepared = String(value || '').replace(/([a-z0-9])([A-Z])/g, '$1 $2');
-  return new Set((prepared.match(/[\\p{L}\\p{N}]+/gu) || []).map(normalize).filter(item => item.length > 1));
+  return new Set((prepared.match(/[\p{L}\p{N}]+/gu) || []).map(normalize).filter(item => item.length > 1));
 };
 const sorted = values => [...values].sort((a, b) => a.localeCompare(b));
 const overlap = (a, b) => sorted([...a].filter(item => b.has(item)));
-const isRequested = request => /\\b(?:database|db|schema|table|column|migration|migrations|ddl|sql|orm|prisma|drizzle|typeorm|sequelize|django|sqlalchemy|foreign\\s+key|index|constraint|nullable|not\\s+null)\\b|قاعد(?:ة|ه)\\s+بيانات|مخطط\\s+البيانات|جدول|جداول|عمود|اعمده|أعمدة|ترحيل|ترحيلات|فهرس|فهارس|قيد\\s+مرجع/u.test(request);
+const isRequested = request => /\b(?:database|db|schema|table|column|migration|migrations|ddl|sql|orm|prisma|drizzle|typeorm|sequelize|django|sqlalchemy|foreign\s+key|index|constraint|nullable|not\s+null)\b|قاعد(?:ة|ه)\s+بيانات|مخطط\s+البيانات|جدول|جداول|عمود|اعمده|أعمدة|ترحيل|ترحيلات|فهرس|فهارس|قيد\s+مرجع/u.test(request);
 const evidenceFields = evidence => evidence ? {
   evidenceId: evidence.id || null,
   sourceSha256: evidence.sourceSha256 || null,
@@ -76,7 +76,7 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
       oldType: change.oldType || null, newType: change.newType || null,
       path: normPath(change.path), line: change.line || null,
       matchedTerms, severity: risk.severity, riskSignals: risk.risks,
-      migrationFileCandidate: /(^|\\/)(migrations?|schema|ddl)(\\/|$)|\\d{4,}[_-].*(?:migration|schema)/i.test(change.path || ''),
+      migrationFileCandidate: /(^|\/)(migrations?|schema|ddl)(\/|$)|\d{4,}[_-].*(?:migration|schema)/i.test(change.path || ''),
       ...evidenceFields(change.evidence)
     };
   }).filter(Boolean).sort((a, b) => ({ critical: 0, high: 1, medium: 2, low: 3, unknown: 4 }[a.severity] - { critical: 0, high: 1, medium: 2, low: 3, unknown: 4 }[b.severity]) || a.path.localeCompare(b.path) || (a.line || 0) - (b.line || 0));
