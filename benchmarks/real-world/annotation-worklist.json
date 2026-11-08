@@ -1,0 +1,1421 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Reviewer queue for the 36 historical change candidates. This is not a validated benchmark corpus and intentionally contains no ground-truth labels.",
+  "totalCases": 36,
+  "acquiredUniqueSnapshots": 34,
+  "reviewPolicy": "Two distinct non-conflicted reviewers must annotate each case independently and blindly using ANNOTATION_GUIDE.md. Do not expose OIOL outputs. Preserve evidence and disagreements; adjudicate where required.",
+  "forbiddenPrepopulation": "Historical PR changed paths are intentionally omitted from this worklist and must not be copied into ground truth without independent evidence-based reasoning.",
+  "cases": [
+    {
+      "caseIndex": 0,
+      "caseId": "ky-dispatcher-option-ignored",
+      "repository": "sindresorhus/ky",
+      "repositoryUrl": "https://github.com/sindresorhus/ky",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "TypeScript",
+        "JavaScript"
+      ],
+      "license": "MIT",
+      "licenseFile": "license",
+      "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/0f2f00a55592ccfe08c9a82a4d2db2a511f78e9b/license",
+      "baseCommit": "0f2f00a55592ccfe08c9a82a4d2db2a511f78e9b",
+      "changeCommit": "5a3fc90ccba78d10809e48fa89cef722543c9597",
+      "pullRequest": 757,
+      "pullRequestTitle": "Fix dispatcher option being ignored",
+      "pullRequestUrl": "https://github.com/sindresorhus/ky/pull/757",
+      "changeCategory": "source_change",
+      "changeRequest": "Correct the request option handling so fetch-only dispatcher options are preserved when creating and sending requests.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 0,
+        "gitTreeSha": "dc3f9bea4ec0026159a22b0e72f5520fcd5472f7",
+        "gitTreeFileCount": 56,
+        "fingerprintSha256": "f9c1958be4ac1ab0030bead25f4def788f9a38ba263c12c7dfaead5b769cff4a",
+        "licenseFileSha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+        "artifactName": "p12-snapshot-0",
+        "artifactId": 13607500433,
+        "artifactDigest": "sha256:f4b66eb586e2fe4a7614e41640b6bb4a9a9138aa34ab93604a78f009794a83ba",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13607500433"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 1,
+      "caseId": "itsdangerous-drop-eol-python",
+      "repository": "pallets/itsdangerous",
+      "repositoryUrl": "https://github.com/pallets/itsdangerous",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "BSD-3-Clause",
+      "licenseFile": "LICENSE.txt",
+      "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/LICENSE.txt",
+      "baseCommit": "117218e006641644a038772e557a3ae6cb1448a1",
+      "changeCommit": "4dffa1963f896a0a311dec3c14f003a5f382c446",
+      "pullRequest": 405,
+      "pullRequestTitle": "Drop end of life Python versions",
+      "pullRequestUrl": "https://github.com/pallets/itsdangerous/pull/405",
+      "changeCategory": "cross_component",
+      "changeRequest": "Raise the minimum supported Python version and align package metadata, CI, type-checker configuration, and tests with the new support policy.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 1,
+        "gitTreeSha": "c3d26af1d25a8eb5f1241cc7318ea82db3df3899",
+        "gitTreeFileCount": 49,
+        "fingerprintSha256": "a52320e4114f27f911e26e56182bcd08a1a52d16abcde6c48263e51500c53aea",
+        "licenseFileSha256": "63af09891b6be8ad1a4252ed43af0f4efba7fc948e228367bed7f3c5ae0b09d7",
+        "artifactName": "p12-snapshot-1",
+        "artifactId": 13606953145,
+        "artifactDigest": "sha256:c7ad4198bdba80d7749aa2f67b528bad2cf8cc326abfc8c03b3f3287e5ec02d2",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606953145"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 2,
+      "caseId": "chi-suppress-not-found-route-context",
+      "repository": "go-chi/chi",
+      "repositoryUrl": "https://github.com/go-chi/chi",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Go"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/go-chi/chi/blob/60755706125129a9f9dfb99ac22f7ba016a1b60c/LICENSE",
+      "baseCommit": "60755706125129a9f9dfb99ac22f7ba016a1b60c",
+      "changeCommit": "3a33ba578e0dd93444e0ff386cc26e665d92e31e",
+      "pullRequest": 1220,
+      "pullRequestTitle": "SupressNotFound must not mutate request route context",
+      "pullRequestUrl": "https://github.com/go-chi/chi/pull/1220",
+      "changeCategory": "source_change",
+      "changeRequest": "Prevent the not-found suppression middleware from mutating a live request route context, preserving mounted-router parameters and middleware behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 2,
+        "gitTreeSha": "df8bc4d6580a301c5898881cfec35e03c6dbf8fb",
+        "gitTreeFileCount": 108,
+        "fingerprintSha256": "ef226037685b52e5a04d16d9b23b5b586c513e1ee812d292fd1009acd753fc34",
+        "licenseFileSha256": "a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647",
+        "artifactName": "p12-snapshot-2",
+        "artifactId": 13607261590,
+        "artifactDigest": "sha256:6e0301691c4c7b9b5f61a5a39ddc928eb6a104e230550312240037222875e1f7",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13607261590"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 3,
+      "caseId": "ripgrep-basename-regex-matching",
+      "repository": "BurntSushi/ripgrep",
+      "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Rust"
+      ],
+      "license": "MIT OR Unlicense",
+      "licenseFile": "LICENSE-MIT",
+      "licenseFileUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/LICENSE-MIT",
+      "baseCommit": "9d07a922605313dc47b78b802c7b0616fd76d409",
+      "changeCommit": "d19650f4fca84c0f65f4ec024b16200bf3d41c33",
+      "pullRequest": 3561,
+      "pullRequestTitle": "Match filename-only regexes against basenames",
+      "pullRequestUrl": "https://github.com/BurntSushi/ripgrep/pull/3561",
+      "changeCategory": "source_change",
+      "changeRequest": "Optimize filename-only regular-expression matching so eligible patterns are evaluated against the basename without changing matching semantics.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 3,
+        "gitTreeSha": "6cfdcc26f052dce764fb43e97828abee766c4110",
+        "gitTreeFileCount": 226,
+        "fingerprintSha256": "c3392f009de44808875c9a479208eb7e4998ed16dba0172d7fde42700381168f",
+        "licenseFileSha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+        "artifactName": "p12-snapshot-3",
+        "artifactId": 13606467901,
+        "artifactDigest": "sha256:e369341cae53aa348409011a25b3f691406e200f6865b6b51be2703ac14f54ea",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606467901"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 4,
+      "caseId": "pydantic-decimal-json-schema-pattern",
+      "repository": "pydantic/pydantic",
+      "repositoryUrl": "https://github.com/pydantic/pydantic",
+      "repositoryKind": "library",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/LICENSE",
+      "baseCommit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+      "changeCommit": "dabcc6461dafa4337c52faf3e9941431ea41ce4a",
+      "pullRequest": 14244,
+      "pullRequestTitle": "Fix Decimal JSON Schema patterns accepting bare zero",
+      "pullRequestUrl": "https://github.com/pydantic/pydantic/pull/14244",
+      "changeCategory": "api_change",
+      "changeRequest": "Correct generated Decimal JSON Schema patterns when no whole-number digits are permitted, keeping schema acceptance aligned with runtime validation.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 4,
+        "gitTreeSha": "dba0a3cafcf27199a932ec6199827dd67a60f0a4",
+        "gitTreeFileCount": 3579,
+        "fingerprintSha256": "bdbaee619b4fea87c6f6da1ff43376984eef06652846292e7d93e2127e9db9eb",
+        "licenseFileSha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3",
+        "artifactName": "p12-snapshot-4",
+        "artifactId": 13606524257,
+        "artifactDigest": "sha256:94cd4ccc03e33368dba517bac61ffd937b3ff879deff0caba857de61abfa2bb0",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606524257"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 5,
+      "caseId": "nestjs-node-adapter-req-route",
+      "repository": "nestjs/nest",
+      "repositoryUrl": "https://github.com/nestjs/nest",
+      "repositoryKind": "workspace",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "TypeScript"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/LICENSE",
+      "baseCommit": "9430227544b0e11b249a55123b1bea77e9e46094",
+      "changeCommit": "4d63dc2d02c2fb7f178ca71c85e1cc412e5e5711",
+      "pullRequest": 18439,
+      "pullRequestTitle": "Set req.route on the node adapter like Express",
+      "pullRequestUrl": "https://github.com/nestjs/nest/pull/18439",
+      "changeCategory": "api_change",
+      "changeRequest": "Expose route-template metadata on the Node adapter request object consistently with the Express adapter, including route methods and global prefixes.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 5,
+        "gitTreeSha": "52c6e981c6f708c959f79970320e2bc428b61ad1",
+        "gitTreeFileCount": 2748,
+        "fingerprintSha256": "13913ac474e6bf868d4fb76577d83b64ed0de7ae771319c3052ffc3e8c59c5ca",
+        "licenseFileSha256": "56967de93525b12a30717e4446ccef3bbe32fafdbe2350f143c1cc6971b19ed3",
+        "artifactName": "p12-snapshot-5",
+        "artifactId": 13607082584,
+        "artifactDigest": "sha256:e80d1d0d64492bda726a8649e0b83987ee376cf9111a588d99dda281055a73d6",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13607082584"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 6,
+      "caseId": "laravel-migration-failed-event",
+      "repository": "laravel/framework",
+      "repositoryUrl": "https://github.com/laravel/framework",
+      "repositoryKind": "library",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "PHP"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE.md",
+      "licenseFileUrl": "https://github.com/laravel/framework/blob/288b3b4b85b1d28802dd439d2cec5516c513c31e/LICENSE.md",
+      "baseCommit": "288b3b4b85b1d28802dd439d2cec5516c513c31e",
+      "changeCommit": "fdaba1b7c005dd88e093861bae4017074e43229c",
+      "pullRequest": 62342,
+      "pullRequestTitle": "Add MigrationFailed event",
+      "pullRequestUrl": "https://github.com/laravel/framework/pull/62342",
+      "changeCategory": "migration_change",
+      "changeRequest": "Introduce a MigrationFailed event and dispatch it when a database migration throws, preserving existing migration lifecycle behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 6,
+        "gitTreeSha": "0b766eec7e4f730e512eef6e0fd9a64cdeaab2d5",
+        "gitTreeFileCount": 3502,
+        "fingerprintSha256": "c6de642d113eb110236183e809006478c65ff346d131315f9cfb99fbad2effb9",
+        "licenseFileSha256": "7b4f9149597fbae2ce689bc9317d1869e17f1b3fa5f01c289998c108f8c37cf7",
+        "artifactName": "p12-snapshot-6",
+        "artifactId": 13606467969,
+        "artifactDigest": "sha256:6d473b61d9be609bd52caac86d87b645791784ef98b52e6f0686f69a275d6374",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606467969"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 7,
+      "caseId": "spring-boot-duration-micros-overflow",
+      "repository": "spring-projects/spring-boot",
+      "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+      "repositoryKind": "workspace",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "Java"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.txt",
+      "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/LICENSE.txt",
+      "baseCommit": "7c1bef5e4d7d74642eca5defe24beec37f57810f",
+      "changeCommit": "9ef5b48b9a077778763fc95224136c3aec843144",
+      "pullRequest": 52557,
+      "pullRequestTitle": "Avoid premature overflow converting durations to microseconds",
+      "pullRequestUrl": "https://github.com/spring-projects/spring-boot/pull/52557",
+      "changeCategory": "source_change",
+      "changeRequest": "Avoid intermediate nanosecond overflow when converting large Duration values to microseconds while preserving exact conversion behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 7,
+        "gitTreeSha": "63cf470d37d7674b60e41821a2b6194c7d7217df",
+        "gitTreeFileCount": 11383,
+        "fingerprintSha256": "11ddf148dcd71599d7ecda2ebc3710f195021a5d9a0702725ce302f2dd071c95",
+        "licenseFileSha256": "7200000367e0e8b47822d563a5ddd2dd3a97cc05b32bd7dbcc7b4eeb92b76628",
+        "artifactName": "p12-snapshot-7",
+        "artifactId": 13607245966,
+        "artifactDigest": "sha256:471b1f54fa42d9987b3ae684665dea94ff1df41ac30b135546053686c5e8eaed",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13607245966"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 8,
+      "caseId": "kubernetes-spdy-upgrade-failure-close",
+      "repository": "kubernetes/kubernetes",
+      "repositoryUrl": "https://github.com/kubernetes/kubernetes",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Go"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/LICENSE",
+      "baseCommit": "dd17674001a6e7649c7e5ec69a8617b779a131f2",
+      "changeCommit": "776432e660634388d82e866341df0f35cf0e82c4",
+      "pullRequest": 143073,
+      "pullRequestTitle": "Close underlying connection when SPDY upgrade fails",
+      "pullRequestUrl": "https://github.com/kubernetes/kubernetes/pull/143073",
+      "changeCategory": "source_change",
+      "changeRequest": "Ensure the raw connection is closed when a streaming SPDY upgrade fails, while retaining the response error handling behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 8,
+        "gitTreeSha": "87a3ba5050f6cdd9e60b24a066898420179900b7",
+        "gitTreeFileCount": 31452,
+        "fingerprintSha256": "62475984e90ea5d735f18db1bcf2e761c7ba10ced51eaeded670cccd129a7012",
+        "licenseFileSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "artifactName": "p12-snapshot-8",
+        "artifactId": 13606997965,
+        "artifactDigest": "sha256:da5633a6b7f81cb89798abaee816177fe5e69438fea4a71e5b047165a7583245",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606997965"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 9,
+      "caseId": "tensorflow-release-gil-device-context",
+      "repository": "tensorflow/tensorflow",
+      "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "C++",
+        "Python"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/LICENSE",
+      "baseCommit": "dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af",
+      "changeCommit": "27ee80feff7896ab55b35a4dec09317fc2849a23",
+      "pullRequest": 129352,
+      "pullRequestTitle": "Release Python GIL during physical-device listing and context creation",
+      "pullRequestUrl": "https://github.com/tensorflow/tensorflow/pull/129352",
+      "changeCategory": "cross_component",
+      "changeRequest": "Release the Python GIL around synchronous C++ device discovery and context creation so unrelated Python threads are not blocked.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 9,
+        "gitTreeSha": "8c9995c4c41457eeee79984a0681d30e5e1df295",
+        "gitTreeFileCount": 37712,
+        "fingerprintSha256": "5913f28b285fdd6016b54fbcf784412ce48581c1904d51ff33bf775f03188057",
+        "licenseFileSha256": "71c6915d04265772a0339bed47276942c678b45cc01534210ebe6984fd1aec65",
+        "artifactName": "p12-snapshot-9",
+        "artifactId": 13607127599,
+        "artifactDigest": "sha256:1dc8b828e82b1ed716b288f272fe9df9294ece1cc032924c10c5d8314c472319",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13607127599"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 10,
+      "caseId": "grafana-provisioning-job-tracing",
+      "repository": "grafana/grafana",
+      "repositoryUrl": "https://github.com/grafana/grafana",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Go",
+        "TypeScript"
+      ],
+      "license": "AGPL-3.0-only",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/grafana/grafana/blob/e381a87421a65c3415e9d72c14038a1b32271296/LICENSE",
+      "baseCommit": "e381a87421a65c3415e9d72c14038a1b32271296",
+      "changeCommit": "03106fa29ab5c49996b6e9742c41c94486af0db5",
+      "pullRequest": 137251,
+      "pullRequestTitle": "Start a root span for each provisioning job",
+      "pullRequestUrl": "https://github.com/grafana/grafana/pull/137251",
+      "changeCategory": "cross_component",
+      "changeRequest": "Create a root tracing span for each provisioning job and wire the tracer into the concurrent job driver.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 10,
+        "gitTreeSha": "6e69b0ab07154735f4760f7a2b04c2bdb7b172eb",
+        "gitTreeFileCount": 24718,
+        "fingerprintSha256": "0e0db1db82cd642c3bf317b58326941dce6883eb57f33386f07ba716c14c7a5f",
+        "licenseFileSha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+        "artifactName": "p12-snapshot-10",
+        "artifactId": 13607291627,
+        "artifactDigest": "sha256:868e616ddddc2a89175de0e2779abd240c1d1378bc41efa4190feacc951aa776",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13607291627"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 11,
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "repository": "home-assistant/core",
+      "repositoryUrl": "https://github.com/home-assistant/core",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.md",
+      "licenseFileUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/LICENSE.md",
+      "baseCommit": "cbf2c02c9bff331537c19bff69da8dc11c3fbfbf",
+      "changeCommit": "f4e3a420d981b8a523fad8614923ffbc18494741",
+      "pullRequest": 190773,
+      "pullRequestTitle": "Forget disabled UniFi entities when their registry entry is removed",
+      "pullRequestUrl": "https://github.com/home-assistant/core/pull/190773",
+      "changeCategory": "cross_component",
+      "changeRequest": "Ensure disabled UniFi entities are removed from the integration's entity state when their registry entry is deleted, consistently across entity loading and sensor handling.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 11,
+        "gitTreeSha": "c3c2d955f1d68cc67f4c95a233ae6d1b4b5df2b9",
+        "gitTreeFileCount": 30403,
+        "fingerprintSha256": "cc414e91103e226ff8142bbfdbdf25ca0441220414595e605a2c87cd1b3f7bb2",
+        "licenseFileSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "artifactName": "p12-snapshot-11",
+        "artifactId": 13606838458,
+        "artifactDigest": "sha256:7d27c915f0b1c0269f6d4579931137dc86b4b16013f3f9ba482a2159e69eda84",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606838458"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 12,
+      "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "repository": "sindresorhus/ky",
+      "repositoryUrl": "https://github.com/sindresorhus/ky",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "TypeScript",
+        "JavaScript"
+      ],
+      "license": "MIT",
+      "licenseFile": "license",
+      "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/license",
+      "baseCommit": "c2ac4a1ac858cd8b423756c6c686b64071e834eb",
+      "changeCommit": "e68ea7ad3080fa25ce2eba6a367c00dfff74f0f3",
+      "pullRequest": 883,
+      "pullRequestTitle": "Preserve caller stack for schema validation errors",
+      "pullRequestUrl": "https://github.com/sindresorhus/ky/pull/883",
+      "changeCategory": "source_change",
+      "changeRequest": "Preserve the original caller stack when schema validation fails, while keeping the validation error contract consistent.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 12,
+        "gitTreeSha": "0fa148c4829ea75b4516bf1eaccedfbd54e17ad2",
+        "gitTreeFileCount": 70,
+        "fingerprintSha256": "2b6d8250e22be9f708d6d734815756c353fd964c5618a0f14c5301b0869b8497",
+        "licenseFileSha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+        "artifactName": "p12-snapshot-12",
+        "artifactId": 13606583405,
+        "artifactDigest": "sha256:c319f88bc3ad7217635964ad4ac8a12cb19cf591344e76dd7ada2a016d84c56d",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606583405"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 13,
+      "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "repository": "sindresorhus/ky",
+      "repositoryUrl": "https://github.com/sindresorhus/ky",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "TypeScript",
+        "JavaScript"
+      ],
+      "license": "MIT",
+      "licenseFile": "license",
+      "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/license",
+      "baseCommit": "0bda554d448c1b57c17a5c18114432c02465d467",
+      "changeCommit": "99644d0169138eb0c42718f06862061288f05a96",
+      "pullRequest": 881,
+      "pullRequestTitle": "Fix progress callbacks for empty request and response bodies",
+      "pullRequestUrl": "https://github.com/sindresorhus/ky/pull/881",
+      "changeCategory": "source_change",
+      "changeRequest": "Ensure progress callbacks behave consistently for empty request and response bodies, including stream handling and browser tests.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 13,
+        "gitTreeSha": "0337759ea08d2cc69804f97af92d66ff7ef0e95e",
+        "gitTreeFileCount": 70,
+        "fingerprintSha256": "74599d58538546a72b0fd450d85b88b4b911cef9e87e5d006f72eb9844018fb2",
+        "licenseFileSha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+        "artifactName": "p12-snapshot-13",
+        "artifactId": 13606468687,
+        "artifactDigest": "sha256:a12a633e3625e74cb019d488e8ea29f06ddbbcf24b8167972d79a8daff1f971c",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606468687"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 14,
+      "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "repository": "pallets/itsdangerous",
+      "repositoryUrl": "https://github.com/pallets/itsdangerous",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "BSD-3-Clause",
+      "licenseFile": "LICENSE.txt",
+      "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/LICENSE.txt",
+      "baseCommit": "1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4",
+      "changeCommit": "09a8e058a9cca4cae9fb993d936957278cbec151",
+      "pullRequest": 404,
+      "pullRequestTitle": "Update project to use uv for dependency management",
+      "pullRequestUrl": "https://github.com/pallets/itsdangerous/pull/404",
+      "changeCategory": "cross_component",
+      "changeRequest": "Migrate the project's dependency and development workflow to uv, keeping build, documentation, publishing, pre-commit, and CI configuration aligned.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 14,
+        "gitTreeSha": "31278b31828f7fc223797c0e8f25fc38d4782691",
+        "gitTreeFileCount": 58,
+        "fingerprintSha256": "48ae56ceeaf6251b7ee4b9cff7647eada2f68d6955f598565076a1adf8780b9b",
+        "licenseFileSha256": "63af09891b6be8ad1a4252ed43af0f4efba7fc948e228367bed7f3c5ae0b09d7",
+        "artifactName": "p12-snapshot-14",
+        "artifactId": 13607521508,
+        "artifactDigest": "sha256:4c212828425db19b514a229917fa8dd443a7847bc493119e8e8aaf62a4a76a9f",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607521508"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 15,
+      "caseId": "pallets-406-remove-previously-deprecated-code",
+      "repository": "pallets/itsdangerous",
+      "repositoryUrl": "https://github.com/pallets/itsdangerous",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "BSD-3-Clause",
+      "licenseFile": "LICENSE.txt",
+      "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/LICENSE.txt",
+      "baseCommit": "4dffa1963f896a0a311dec3c14f003a5f382c446",
+      "changeCommit": "31f46a3469dbfb2ecf83dd0c4297c1efc508fcca",
+      "pullRequest": 406,
+      "pullRequestTitle": "remove previously deprecated code",
+      "pullRequestUrl": "https://github.com/pallets/itsdangerous/pull/406",
+      "changeCategory": "source_change",
+      "changeRequest": "Remove the previously deprecated public API and update package exports and release notes to reflect the removal.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 15,
+        "gitTreeSha": "1c77f5a17d7221aaee9bc8c2b74e00f28715ba16",
+        "gitTreeFileCount": 49,
+        "fingerprintSha256": "c79b843eeb999bd196ff326071c1f5bc14c95f916c486a1596a8b99a8a276868",
+        "licenseFileSha256": "63af09891b6be8ad1a4252ed43af0f4efba7fc948e228367bed7f3c5ae0b09d7",
+        "artifactName": "p12-snapshot-15",
+        "artifactId": 13607277576,
+        "artifactDigest": "sha256:b8f30ea8b5c3c2eb6e7ebec6f0ae607fc3788f89be3a3853148a7e57b3e69d77",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607277576"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 16,
+      "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "repository": "go-chi/chi",
+      "repositoryUrl": "https://github.com/go-chi/chi",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Go"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/LICENSE",
+      "baseCommit": "167e1e3bd039d060696b99c8da4e876ae04f42c1",
+      "changeCommit": "9f8adb1aabaa8a91180a821111d3f8e668d1c0bf",
+      "pullRequest": 1213,
+      "pullRequestTitle": "middleware: preserve status after empty ReadFrom",
+      "pullRequestUrl": "https://github.com/go-chi/chi/pull/1213",
+      "changeCategory": "source_change",
+      "changeRequest": "Preserve the response status when the wrapped writer receives an empty ReadFrom call, including the expected middleware writer behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 16,
+        "gitTreeSha": "78ea402444f50acbf2de96c413503d75ef8b6e54",
+        "gitTreeFileCount": 105,
+        "fingerprintSha256": "f8b29ce60479d473e168669e828f5b1c9ecd2f961738142139c0db77080c0b9b",
+        "licenseFileSha256": "a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647",
+        "artifactName": "p12-snapshot-16",
+        "artifactId": 13607540710,
+        "artifactDigest": "sha256:ef40d4205af7c5b8c0978f518eb8b52c6e0dbbe2e82bead459a58512342f16f7",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607540710"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 17,
+      "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "repository": "go-chi/chi",
+      "repositoryUrl": "https://github.com/go-chi/chi",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Go"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/LICENSE",
+      "baseCommit": "46295d0582d9fe19194db1ab13ff74d01a02d7bb",
+      "changeCommit": "60755706125129a9f9dfb99ac22f7ba016a1b60c",
+      "pullRequest": 1218,
+      "pullRequestTitle": "middleware: parse quoted ContentCharset media parameters",
+      "pullRequestUrl": "https://github.com/go-chi/chi/pull/1218",
+      "changeCategory": "api_change",
+      "changeRequest": "Parse quoted charset values in Content-Type media parameters without changing middleware behavior for valid unquoted values.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 17,
+        "gitTreeSha": "ed4fa4582ea165a9d85eb8244c76e6fd0768f2da",
+        "gitTreeFileCount": 108,
+        "fingerprintSha256": "e654837c37f1fc3c2f0e838c0fde94fc9ad520e0c1a1b2b33aad4544c50779a0",
+        "licenseFileSha256": "a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647",
+        "artifactName": "p12-snapshot-17",
+        "artifactId": 13607470906,
+        "artifactDigest": "sha256:4af37c725f9c2754d95dbcc15d0ba55b8cfec7ddeeba6e18670e7347642cb466",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607470906"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 18,
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "repository": "BurntSushi/ripgrep",
+      "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Rust"
+      ],
+      "license": "MIT OR Unlicense",
+      "licenseFile": "LICENSE-MIT",
+      "licenseFileUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/LICENSE-MIT",
+      "baseCommit": "6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30",
+      "changeCommit": "65e072fab262fdaaa19ef788bbb468ae6f8e4f8e",
+      "pullRequest": 3578,
+      "pullRequestTitle": "ignore: respect linked worktree excludes without requiring Git",
+      "pullRequestUrl": "https://github.com/BurntSushi/ripgrep/pull/3578",
+      "changeCategory": "source_change",
+      "changeRequest": "Respect exclude rules associated with linked worktrees during ignore matching without invoking Git commands from the scanned target project.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 18,
+        "gitTreeSha": "001188142aafc099433e73b882b37437b7fbfadf",
+        "gitTreeFileCount": 226,
+        "fingerprintSha256": "94ab7ab76d6742985a4b3d9819cfc60be8865fc0cd8efb1ee4ec60467acce042",
+        "licenseFileSha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+        "artifactName": "p12-snapshot-18",
+        "artifactId": 13606774602,
+        "artifactDigest": "sha256:d99d1157d3bc8b9960aaeb5b0c2efb042cbff99139571ad0d21a450fea5ef155",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606774602"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 19,
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+      "repository": "BurntSushi/ripgrep",
+      "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
+      "repositoryKind": "library",
+      "sizeClass": "small",
+      "primaryLanguages": [
+        "Rust"
+      ],
+      "license": "MIT OR Unlicense",
+      "licenseFile": "LICENSE-MIT",
+      "licenseFileUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/LICENSE-MIT",
+      "baseCommit": "6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30",
+      "changeCommit": "9d07a922605313dc47b78b802c7b0616fd76d409",
+      "pullRequest": 3560,
+      "pullRequestTitle": "ignore: reuse incremental matchers for directories without rules",
+      "pullRequestUrl": "https://github.com/BurntSushi/ripgrep/pull/3560",
+      "changeCategory": "source_change",
+      "changeRequest": "Reuse incremental ignore matchers for directories without local rules while preserving parent-rule matching semantics.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 18,
+        "gitTreeSha": "001188142aafc099433e73b882b37437b7fbfadf",
+        "gitTreeFileCount": 226,
+        "fingerprintSha256": "94ab7ab76d6742985a4b3d9819cfc60be8865fc0cd8efb1ee4ec60467acce042",
+        "licenseFileSha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+        "artifactName": "p12-snapshot-18",
+        "artifactId": 13606774602,
+        "artifactDigest": "sha256:d99d1157d3bc8b9960aaeb5b0c2efb042cbff99139571ad0d21a450fea5ef155",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606774602"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 20,
+      "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "repository": "pydantic/pydantic",
+      "repositoryUrl": "https://github.com/pydantic/pydantic",
+      "repositoryKind": "library",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/LICENSE",
+      "baseCommit": "1400371ea83dd5b94ce995411278d1d8d7af2f03",
+      "changeCommit": "b947584cc89eb0f4e57ba6efd0debdcccdcd3515",
+      "pullRequest": 14249,
+      "pullRequestTitle": "Support list and DecimalTuple inputs for Decimal",
+      "pullRequestUrl": "https://github.com/pydantic/pydantic/pull/14249",
+      "changeCategory": "api_change",
+      "changeRequest": "Extend Decimal input conversion to support list and DecimalTuple representations, keeping documented conversions and runtime validation consistent.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 20,
+        "gitTreeSha": "a598dc899b044a1daa104fe0fca5bf36711b362b",
+        "gitTreeFileCount": 3579,
+        "fingerprintSha256": "d2805120562dcf784cf5ebe3b09dcded0ba8e0170dbc5547eef4f5e89f003dcd",
+        "licenseFileSha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3",
+        "artifactName": "p12-snapshot-20",
+        "artifactId": 13607561147,
+        "artifactDigest": "sha256:4a2e51d2592bcfab67dac2d7c522ec5988337d8ded204b475e9749ee8ce14f9e",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607561147"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 21,
+      "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+      "repository": "pydantic/pydantic",
+      "repositoryUrl": "https://github.com/pydantic/pydantic",
+      "repositoryKind": "library",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/LICENSE",
+      "baseCommit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+      "changeCommit": "62c615a375b1d41d60d72bb98b56a9862a029c3d",
+      "pullRequest": 14246,
+      "pullRequestTitle": "Change the arguments schema for validate_call",
+      "pullRequestUrl": "https://github.com/pydantic/pydantic/pull/14246",
+      "changeCategory": "api_change",
+      "changeRequest": "Update the generated arguments schema for validate_call and keep core validation, JSON Schema generation, error types, and public documentation consistent.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 4,
+        "gitTreeSha": "dba0a3cafcf27199a932ec6199827dd67a60f0a4",
+        "gitTreeFileCount": 3579,
+        "fingerprintSha256": "bdbaee619b4fea87c6f6da1ff43376984eef06652846292e7d93e2127e9db9eb",
+        "licenseFileSha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3",
+        "artifactName": "p12-snapshot-4",
+        "artifactId": 13606524257,
+        "artifactDigest": "sha256:94cd4ccc03e33368dba517bac61ffd937b3ff879deff0caba857de61abfa2bb0",
+        "workflowRunId": 42454488457,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42454488457/artifacts/13606524257"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 22,
+      "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "repository": "nestjs/nest",
+      "repositoryUrl": "https://github.com/nestjs/nest",
+      "repositoryKind": "workspace",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "TypeScript"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/LICENSE",
+      "baseCommit": "206a5ccd302739a552ce000c1193c606c1ca58ad",
+      "changeCommit": "0fd8642c2bbea1a541cb490ea6f890ab8ca29d95",
+      "pullRequest": 18385,
+      "pullRequestTitle": "roll back modules on failed lazy load",
+      "pullRequestUrl": "https://github.com/nestjs/nest/pull/18385",
+      "changeCategory": "cross_component",
+      "changeRequest": "Ensure module discovery and container state are rolled back consistently when a lazy module load fails, including scanner and loader behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 22,
+        "gitTreeSha": "53b5ae68966e0d499884faf7805613bd1196917f",
+        "gitTreeFileCount": 2729,
+        "fingerprintSha256": "07117464b88b5fed419e8be2d18790a2c8438cbf182e4ba04eb3b36a26d827d3",
+        "licenseFileSha256": "56967de93525b12a30717e4446ccef3bbe32fafdbe2350f143c1cc6971b19ed3",
+        "artifactName": "p12-snapshot-22",
+        "artifactId": 13607201964,
+        "artifactDigest": "sha256:373990c0defd1b1789e6f25bb6db1824fe9043c762fde5559487cd6bcc8795e2",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607201964"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 23,
+      "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "repository": "nestjs/nest",
+      "repositoryUrl": "https://github.com/nestjs/nest",
+      "repositoryKind": "workspace",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "TypeScript"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/LICENSE",
+      "baseCommit": "6e83cc83c99cbac0108384392902e7230ed94843",
+      "changeCommit": "ca790a95825ddf4f4fc99ef63ec42a919d836051",
+      "pullRequest": 18419,
+      "pullRequestTitle": "keep the fields of grouped item errors in parse array pipe",
+      "pullRequestUrl": "https://github.com/nestjs/nest/pull/18419",
+      "changeCategory": "api_change",
+      "changeRequest": "Preserve item-level validation fields in grouped errors emitted by ParseArrayPipe, maintaining the observable error contract and associated tests.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 23,
+        "gitTreeSha": "5dc9e396ca16ea5d261dc7fc9ff4bcc5c5493f1c",
+        "gitTreeFileCount": 2743,
+        "fingerprintSha256": "d19c9f6366398715ef8c3e2463a1630e4e755dce4ef77f365d8c92c622a88345",
+        "licenseFileSha256": "56967de93525b12a30717e4446ccef3bbe32fafdbe2350f143c1cc6971b19ed3",
+        "artifactName": "p12-snapshot-23",
+        "artifactId": 13606668211,
+        "artifactDigest": "sha256:e207d8c55afdfb5a3dbbb65187fe2e7b8e85622fdc179fb05b71e4bdcbcf80e5",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606668211"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 24,
+      "caseId": "laravel-62326-add-origin-to-uri-class",
+      "repository": "laravel/framework",
+      "repositoryUrl": "https://github.com/laravel/framework",
+      "repositoryKind": "library",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "PHP"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE.md",
+      "licenseFileUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/LICENSE.md",
+      "baseCommit": "21719b7b765c01d4bb19fd0c4304f3292322ae3d",
+      "changeCommit": "f8080dd48e34ad9d4bdfa91a38e987db6a3b87b7",
+      "pullRequest": 62326,
+      "pullRequestTitle": "Add origin() to Uri class",
+      "pullRequestUrl": "https://github.com/laravel/framework/pull/62326",
+      "changeCategory": "api_change",
+      "changeRequest": "Expose an origin() accessor on the URI value object and keep package metadata and URI tests aligned with the public API.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 24,
+        "gitTreeSha": "8b136df410ca1f2aea3d21bdca57e414e388527e",
+        "gitTreeFileCount": 3500,
+        "fingerprintSha256": "6f86f4752944615c2eb3d549f3420e1051af161b7dc57c288ad2c702662a327c",
+        "licenseFileSha256": "7b4f9149597fbae2ce689bc9317d1869e17f1b3fa5f01c289998c108f8c37cf7",
+        "artifactName": "p12-snapshot-24",
+        "artifactId": 13606914374,
+        "artifactDigest": "sha256:7d39e53636bdf4c7ddeaf1f72fdf323aa1d5260d1b8e3e8ee0caab1b5fc7e5e7",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606914374"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 25,
+      "caseId": "laravel-62360-include-identical-belongstomany-reso",
+      "repository": "laravel/framework",
+      "repositoryUrl": "https://github.com/laravel/framework",
+      "repositoryKind": "library",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "PHP"
+      ],
+      "license": "MIT",
+      "licenseFile": "LICENSE.md",
+      "licenseFileUrl": "https://github.com/laravel/framework/blob/3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee/LICENSE.md",
+      "baseCommit": "3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee",
+      "changeCommit": "aca3cc22f3dcdbff47468ce046a959f71db79fd4",
+      "pullRequest": 62360,
+      "pullRequestTitle": "Include identical BelongsToMany resources once in JSON:API compound documents",
+      "pullRequestUrl": "https://github.com/laravel/framework/pull/62360",
+      "changeCategory": "api_change",
+      "changeRequest": "Deduplicate identical BelongsToMany resources in JSON:API compound documents while preserving lazy relationship resolution and serialization behavior.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 25,
+        "gitTreeSha": "1e2d76bf2201f2b2e38961331fa11ce6c1d1987c",
+        "gitTreeFileCount": 3502,
+        "fingerprintSha256": "704257275daee2e1eaf1792bd14bffd8663c32d3c960a05c85f786068e76157e",
+        "licenseFileSha256": "7b4f9149597fbae2ce689bc9317d1869e17f1b3fa5f01c289998c108f8c37cf7",
+        "artifactName": "p12-snapshot-25",
+        "artifactId": 13607327651,
+        "artifactDigest": "sha256:d374601e30e0e912b8143b35c5715df246afb97d1f14724f8873a410a7535f0c",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607327651"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 26,
+      "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "repository": "spring-projects/spring-boot",
+      "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+      "repositoryKind": "workspace",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "Java"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.txt",
+      "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/LICENSE.txt",
+      "baseCommit": "39b546e7425ecd5e4fc4325bf33974d43a62d1a2",
+      "changeCommit": "6a7c795c8cf624283e371f68aa251d95902a7bb6",
+      "pullRequest": 52619,
+      "pullRequestTitle": "OpenTelemetry semantic conventions setting enables neither convention",
+      "pullRequestUrl": "https://github.com/spring-projects/spring-boot/pull/52619",
+      "changeCategory": "cross_component",
+      "changeRequest": "Correct the management observation convention selection so enabling OpenTelemetry conventions activates the intended semantic convention and its tests.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 26,
+        "gitTreeSha": "814fc8fff2b4ef0e34d0a0205a8dccbfccf4e2a1",
+        "gitTreeFileCount": 11978,
+        "fingerprintSha256": "45d8357a3bcf47250b350b1514b86ea54cea05b6dc5243b6546130e4b29cca0e",
+        "licenseFileSha256": "7200000367e0e8b47822d563a5ddd2dd3a97cc05b32bd7dbcc7b4eeb92b76628",
+        "artifactName": "p12-snapshot-26",
+        "artifactId": 13607526782,
+        "artifactDigest": "sha256:3bf86985af402c028e7092af1bf2d97b330977908924989103cc082f02484ddc",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607526782"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 27,
+      "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "repository": "spring-projects/spring-boot",
+      "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+      "repositoryKind": "workspace",
+      "sizeClass": "medium",
+      "primaryLanguages": [
+        "Java"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.txt",
+      "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/LICENSE.txt",
+      "baseCommit": "eed334dc6992755673503c742708f8e37f1ac928",
+      "changeCommit": "66414bcff6f16cf3a632c187b60c52303f6f19a0",
+      "pullRequest": 52585,
+      "pullRequestTitle": "PushGatewayTaskScheduler shutdown on context close",
+      "pullRequestUrl": "https://github.com/spring-projects/spring-boot/pull/52585",
+      "changeCategory": "source_change",
+      "changeRequest": "Ensure the PushGateway task scheduler shuts down correctly when the application context closes, preserving lifecycle cleanup semantics.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 27,
+        "gitTreeSha": "a59fbb8556fec3bcf9f6127fd328839b2300b027",
+        "gitTreeFileCount": 11384,
+        "fingerprintSha256": "df4fe6ecb1b9d9227c88df845cc45938b5597073df1a680e00aea114e1d1e538",
+        "licenseFileSha256": "7200000367e0e8b47822d563a5ddd2dd3a97cc05b32bd7dbcc7b4eeb92b76628",
+        "artifactName": "p12-snapshot-27",
+        "artifactId": 13607521764,
+        "artifactDigest": "sha256:c54cdb2df8517b07359df0c3ac7683ddca59e66c19daa5f16b791dd02039b5fb",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607521764"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 28,
+      "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "repository": "kubernetes/kubernetes",
+      "repositoryUrl": "https://github.com/kubernetes/kubernetes",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Go"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/LICENSE",
+      "baseCommit": "59332646f342a3e2c485e4f9e4b776eb2f79042f",
+      "changeCommit": "6b5d04cd0bf7e9aa953dc4a13028878a8a48bd6a",
+      "pullRequest": 143816,
+      "pullRequestTitle": "Enforce ResourceSlice object size budget",
+      "pullRequestUrl": "https://github.com/kubernetes/kubernetes/pull/143816",
+      "changeCategory": "api_change",
+      "changeRequest": "Document and enforce the ResourceSlice object size budget, including validation and integration coverage for the API resource.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 28,
+        "gitTreeSha": "496b4e3b575960ff35684f8ee56ffd3e5f2997c2",
+        "gitTreeFileCount": 31744,
+        "fingerprintSha256": "1f4338da8dfca142f0936f683c2c4c8c35d9353464a5da3401036c23f57462d1",
+        "licenseFileSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "artifactName": "p12-snapshot-28",
+        "artifactId": 13606749931,
+        "artifactDigest": "sha256:d0f0c4a09119ebad02c29bed5bcc9c226f5d74302be4d4c135a4c85a79a4dfa7",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606749931"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 29,
+      "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "repository": "kubernetes/kubernetes",
+      "repositoryUrl": "https://github.com/kubernetes/kubernetes",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Go"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/LICENSE",
+      "baseCommit": "5ef140c09dc653e642e6e06ee9c5bea9a5383c67",
+      "changeCommit": "adc24a78c7f38d82faeb7eb544bbccfaa1788181",
+      "pullRequest": 143291,
+      "pullRequestTitle": "Decorate Service and PVC objects on storage decode",
+      "pullRequestUrl": "https://github.com/kubernetes/kubernetes/pull/143291",
+      "changeCategory": "database_change",
+      "changeRequest": "Apply the storage decode decoration consistently to Service and PersistentVolumeClaim objects, including generic registry integration and storage tests.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 29,
+        "gitTreeSha": "53a092911b45290e6d32d3bf4c49b6a0efaf6a9e",
+        "gitTreeFileCount": 31499,
+        "fingerprintSha256": "715bf76b6596093a26d81c4a2a7c9d472bcae8a0a90ba092b7b29746ad7633b0",
+        "licenseFileSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "artifactName": "p12-snapshot-29",
+        "artifactId": 13607492016,
+        "artifactDigest": "sha256:2d207bddc85cc6c88dadf56f2e9cedcff5ab3aba24f0279ffc1d56d652a3fee8",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607492016"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 30,
+      "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "repository": "tensorflow/tensorflow",
+      "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "C++",
+        "Python"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/LICENSE",
+      "baseCommit": "dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36",
+      "changeCommit": "c1f4588972ea4091cea94aee83e12222394394e4",
+      "pullRequest": 129795,
+      "pullRequestTitle": "Optimize CheckpointReader HasTensor lookup",
+      "pullRequestUrl": "https://github.com/tensorflow/tensorflow/pull/129795",
+      "changeCategory": "source_change",
+      "changeRequest": "Use the initialized in-memory shape map for HasTensor lookups and align Python binding lock behavior with the optimized reader path.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 30,
+        "gitTreeSha": "2f8615f13176169f055b8e8377f118c97a48d853",
+        "gitTreeFileCount": 37712,
+        "fingerprintSha256": "772e0ee49036dde6085596c1972bec258c09e8d7e6f7b4b4f41c6574face857e",
+        "licenseFileSha256": "71c6915d04265772a0339bed47276942c678b45cc01534210ebe6984fd1aec65",
+        "artifactName": "p12-snapshot-30",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/undefined"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 31,
+      "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "repository": "tensorflow/tensorflow",
+      "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "C++",
+        "Python"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/LICENSE",
+      "baseCommit": "a867034f72b09350ffef56ee29cef3034a535deb",
+      "changeCommit": "d2ae0c42f788f1c66b6e453fbf3e4d4ebc6e98f5",
+      "pullRequest": 129473,
+      "pullRequestTitle": "Skip UTF-8 BOM when make_csv_dataset reads column names",
+      "pullRequestUrl": "https://github.com/tensorflow/tensorflow/pull/129473",
+      "changeCategory": "source_change",
+      "changeRequest": "Ignore a UTF-8 byte order mark when make_csv_dataset parses CSV column names, and preserve the behavior with a focused data-loading regression test.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 31,
+        "gitTreeSha": "36a2dd86b5f57451622e5d9297d7efef6bed7009",
+        "gitTreeFileCount": 37478,
+        "fingerprintSha256": "e9db7da505a620092108f38c010f709925633a4270cb0dae22fa5869b2c213be",
+        "licenseFileSha256": "71c6915d04265772a0339bed47276942c678b45cc01534210ebe6984fd1aec65",
+        "artifactName": "p12-snapshot-31",
+        "artifactId": 13606924641,
+        "artifactDigest": "sha256:90db899a178e7e81172bf2966458f70fb8df875514dc07d12754d65ba06f3661",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606924641"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 32,
+      "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "repository": "grafana/grafana",
+      "repositoryUrl": "https://github.com/grafana/grafana",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Go",
+        "TypeScript"
+      ],
+      "license": "AGPL-3.0-only",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/LICENSE",
+      "baseCommit": "b9e28156159bf92fd84a9051da2bf2eb2076b749",
+      "changeCommit": "560f3cab9ae748d4087b88f8242e32e899153a59",
+      "pullRequest": 136907,
+      "pullRequestTitle": "Annotation permission mappings for Zanzana",
+      "pullRequestUrl": "https://github.com/grafana/grafana/pull/136907",
+      "changeCategory": "cross_component",
+      "changeRequest": "Add annotation permission mappings to the authorization model and keep tuple translation, legacy permission parity, and authorization tests consistent.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 32,
+        "gitTreeSha": "4380f2af34c76d79622f8c47a9254961f4173f44",
+        "gitTreeFileCount": 24713,
+        "fingerprintSha256": "1f0f8f1094be894b4b44c649ce2c502c396e1987bc6680cba3082fe68e3639e2",
+        "licenseFileSha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+        "artifactName": "p12-snapshot-32",
+        "artifactId": 13607103896,
+        "artifactDigest": "sha256:ae322edb8a5cb6922504ddb250e31a421f70d001bc35d2616b46de6cafc4db5b",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13607103896"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 33,
+      "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "repository": "grafana/grafana",
+      "repositoryUrl": "https://github.com/grafana/grafana",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Go",
+        "TypeScript"
+      ],
+      "license": "AGPL-3.0-only",
+      "licenseFile": "LICENSE",
+      "licenseFileUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/LICENSE",
+      "baseCommit": "af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28",
+      "changeCommit": "c8edd31e90f871325fd09a73c84201365d273f49",
+      "pullRequest": 137046,
+      "pullRequestTitle": "Split folder has-rules label into alert and recording rule labels",
+      "pullRequestUrl": "https://github.com/grafana/grafana/pull/137046",
+      "changeCategory": "cross_component",
+      "changeRequest": "Separate folder labels for alert rules and recording rules, updating synchronization, service behavior, persistence, and related tests.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 33,
+        "gitTreeSha": "092dd5ba2f7f8312f04f627947ee3bb8de6e86e2",
+        "gitTreeFileCount": 24610,
+        "fingerprintSha256": "e6736f0e0bdf95eab85dbff444834c4b736a8f0e95001e33744b786732e6c3ce",
+        "licenseFileSha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+        "artifactName": "p12-snapshot-33",
+        "artifactId": 13606439247,
+        "artifactDigest": "sha256:a26606557afe3f13dff738f454c2d5e82630755d9fe3b3e562190b3c88e5d7fe",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606439247"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 34,
+      "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "repository": "home-assistant/core",
+      "repositoryUrl": "https://github.com/home-assistant/core",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.md",
+      "licenseFileUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/LICENSE.md",
+      "baseCommit": "7c5eb2b0838093fa9d1357d5e7c81c607a95aa15",
+      "changeCommit": "c97172ccafa1672d9854d9b862598d4640999b0d",
+      "pullRequest": 189946,
+      "pullRequestTitle": "Prohibit Nest thermostat temperature changes in Eco mode",
+      "pullRequestUrl": "https://github.com/home-assistant/core/pull/189946",
+      "changeCategory": "source_change",
+      "changeRequest": "Prevent temperature changes while the Nest thermostat is in Eco mode, keeping integration behavior and its climate tests aligned.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 34,
+        "gitTreeSha": "028d2d91cf445fc032f1d0d2ad8410f20e0b9a51",
+        "gitTreeFileCount": 30386,
+        "fingerprintSha256": "b3ce267c7e2e3658b9c025fc0e327b66ec5e1c5bd4ec98449752fb08bcff3f96",
+        "licenseFileSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "artifactName": "p12-snapshot-34",
+        "artifactId": 13606903217,
+        "artifactDigest": "sha256:937ccab8acd5710270af9c0c56e2a616a14c928018edc60c0b27923b539cec38",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606903217"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    },
+    {
+      "caseIndex": 35,
+      "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "repository": "home-assistant/core",
+      "repositoryUrl": "https://github.com/home-assistant/core",
+      "repositoryKind": "workspace",
+      "sizeClass": "large",
+      "primaryLanguages": [
+        "Python"
+      ],
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE.md",
+      "licenseFileUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/LICENSE.md",
+      "baseCommit": "185ff6043357ee966afd764391dda5476df41278",
+      "changeCommit": "3b21cee2a7016ee5fc87c26b190a52e09f6bcce0",
+      "pullRequest": 189189,
+      "pullRequestTitle": "Add UniFi IPS engine update entity",
+      "pullRequestUrl": "https://github.com/home-assistant/core/pull/189189",
+      "changeCategory": "api_change",
+      "changeRequest": "Add a UniFi IPS engine update entity and keep integration strings, update behavior, snapshots, and tests consistent.",
+      "snapshot": {
+        "sharedAcquisitionIndex": 35,
+        "gitTreeSha": "7070e700ee270bf870d79832e48b88c274db5120",
+        "gitTreeFileCount": 30390,
+        "fingerprintSha256": "016fbc76eff0926b18865b718c8ec843e46fb4b3e8eaa25a759b2a0a7ec36727",
+        "licenseFileSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "artifactName": "p12-snapshot-35",
+        "artifactId": 13606344811,
+        "artifactDigest": "sha256:6d9a2ea99cfe2c9eaf48a7ae313368eec5a3e6b7745a0189d732e33164ac3ba8",
+        "workflowRunId": 42455004221,
+        "artifactUrl": "https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42455004221/artifacts/13606344811"
+      },
+      "annotationStatus": "awaiting_independent_review",
+      "reviewers": [],
+      "adjudication": {
+        "status": "pending"
+      },
+      "groundTruthStatus": "not_annotated"
+    }
+  ]
+}
