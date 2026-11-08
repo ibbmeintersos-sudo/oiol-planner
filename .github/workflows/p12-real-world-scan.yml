@@ -22,19 +22,19 @@ jobs:
         include:
           - id: RW-TS-02
             repository: better-auth/better-auth
-            ref: main
+            ref: de6ef28b86c002c3a3683861d803daf482ec603f
           - id: RW-PY-05
             repository: paperless-ngx/paperless-ngx
-            ref: dev
+            ref: 32bc5522e914f1e5f3a36eb60de6988611ca310f
           - id: RW-PY-07
             repository: PrefectHQ/prefect
-            ref: main
+            ref: b0479c0c26045b06321191bbad0cdfbb334d7380
           - id: RW-TS-06
             repository: immich-app/immich
-            ref: main
+            ref: 87ef895041e160aef4f61f2d7af1ad3f8e38827d
           - id: RW-GO-01
             repository: go-gitea/gitea
-            ref: main
+            ref: edebfaa12516a140d7ee3fcbaf25a6a1cc2cdb76
     steps:
       - name: Check out OIOL planner
         uses: actions/checkout@v4
