@@ -269,3 +269,16 @@ test('API contract analysis reports unavailable when export metadata is absent',
   assert.equal(result.apiContractImpact.status, 'unavailable');
   assert.equal(result.apiContractImpact.diagnostics.exportMetadataFileCount, 0);
 });
+
+test('change impact attaches a planning-only test verification analysis', () => {
+  const result = analyzeChangeImpact({
+    request: 'update authentication for user accounts',
+    repository: makeRepository()
+  });
+
+  assert.equal(result.testImpactAnalysis.status, 'planned');
+  assert.ok(result.testImpactAnalysis.recommendedTestLevels.some(item => item.level === 'unit'));
+  assert.ok(result.testImpactAnalysis.recommendedTestLevels.some(item => item.level === 'regression'));
+  assert.ok(result.testImpactAnalysis.selectedTests.every(item => item.executionStatus === 'not_executed'));
+  assert.ok(result.testImpactAnalysis.verificationGates.every(item => item.status === 'proposed'));
+});
