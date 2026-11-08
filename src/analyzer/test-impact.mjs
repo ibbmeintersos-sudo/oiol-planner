@@ -72,10 +72,10 @@ export function analyzeTestImpact({ request = '', repository = null, changeImpac
   if (schemaChanges.length || migrations.status === 'analyzed') {
     addCandidate(candidates, 'migration_compatibility', 'Plan old-application/new-schema and new-application/old-schema checks, migration ordering review, representative data validation, and rollback compatibility checks.', schemaChanges.map(item => item.path));
   }
-  if (/\\b(auth|authentication|authorization|permission|security|token|credential)\\b/.test(requestText)) {
+  if (hasAnyTerm('auth', 'authentication', 'authorization', 'permission', 'security', 'token', 'credential')) {
     addCandidate(candidates, 'security', 'Review authorization boundaries, identity/session handling, negative access cases, and sensitive-data exposure.');
   }
-  if (/\\b(performance|latency|throughput|scale|load|index|query)\\b/.test(requestText) || schemaChanges.some(item => /index|alter_column_type|drop_column/i.test(item.operation || ''))) {
+  if (hasAnyTerm('performance', 'latency', 'throughput', 'scale', 'load', 'index', 'query') || schemaChanges.some(item => ['add_index', 'drop_index', 'alter_column_type', 'drop_column'].includes(item.operation))) {
     addCandidate(candidates, 'performance', 'Consider representative query/load checks where the changed path or schema can affect latency, throughput, or resource use.', schemaChanges.map(item => item.path));
   }
   addCandidate(candidates, 'regression', 'Run the relevant existing regression suite and adjacent critical workflows selected by the implementation team after reviewing the impact graph.', selectedTests.map(item => item.path));
