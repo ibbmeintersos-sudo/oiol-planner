@@ -107,7 +107,7 @@ export async function main(){
  const baseConfig={baseUrl:process.env.OIOL_OPENCODE_URL||'http://127.0.0.1:4096',username:process.env.OIOL_OPENCODE_USERNAME||'opencode',password:process.env.OIOL_OPENCODE_PASSWORD||'',agent:process.env.OIOL_OPENCODE_AGENT||'plan',modelRef:parseModelRef(process.env.OIOL_OPENCODE_MODEL),timeoutMs:Number(process.env.OIOL_OPENCODE_TIMEOUT_MS||600000)};
  const reviewConfig=process.env.OIOL_REVIEW_PROVIDER?providerConfig('OIOL_REVIEW_'):null;
  const configView={baseUrl:baseConfig.baseUrl,username:baseConfig.username,agent:baseConfig.agent,model:baseConfig.modelRef,timeoutMs:baseConfig.timeoutMs,credentialConfigured:Boolean(baseConfig.password),reviewer:reviewConfig?{provider:reviewConfig.provider,model:reviewConfig.model,baseUrl:reviewConfig.baseUrl,credentialConfigured:Boolean(reviewConfig.apiKey)}:null};
- if(process.argv.includes('--dry-run')){console.log(JSON.stringify({dryRun:true,benchmarkMode:'opencode-baseline',selected:chosen.map(x=>x.id),config:configView,liveCalls:false},null,2));return 0;}
+ if(process.argv.includes('--dry-run')){console.log(JSON.stringify({dryRun:true,benchmarkMode:'opencode-baseline',selected:chosen.map(x=>x.id),sourceMode:repositoryRoot?'external-local-checkout':'checked-in-fixtures',taskDefinition,config:configView,liveCalls:false},null,2));return 0;}
  if(process.env.OIOL_BENCHMARK_ALLOW_LIVE!=='1')throw new Error('Set OIOL_BENCHMARK_ALLOW_LIVE=1 to confirm OpenCode baseline calls.');
  if(!baseConfig.modelRef)throw new Error('Set OIOL_OPENCODE_MODEL=providerID/modelID so the baseline model is explicit and auditable.');
  if(reviewConfig&&!reviewConfig.apiKey&&reviewConfig.provider!=='ollama')throw new Error('OIOL_REVIEW_API_KEY is required for the configured remote reviewer.');
