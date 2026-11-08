@@ -2,7 +2,7 @@
 
 Status: **ten candidate prompts are grounded in five pinned GitHub Actions scanner intakes and targeted source-file inspection; ten draft JSON definitions pass the runner contract tests, but they are not approved or scored**.
 
-These blueprints are deliberately separate from runnable task-definition JSON. The five prioritized repositories were checked out at pinned commits and scanned by the P12 GitHub Actions workflow (run [42461012821](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461012821)). The reports are available as per-repository workflow artifacts; the workflow runner, not this chat's local filesystem, performed the checkouts. Before promoting any draft into a scored task:
+These blueprints are deliberately separate from runnable task-definition JSON. The five prioritized repositories were checked out at pinned commits and scanned by the P12 GitHub Actions workflow (run [42461297388](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461297388), scanner version 1.5.0). The reports are available as per-repository workflow artifacts; the workflow runner, not this chat's local filesystem, performed the checkouts. Before promoting any draft into a scored task:
 
 1. Retrieve the corresponding scanner artifact from the P12 workflow and verify its repository commit SHA and scanner version.
 2. Inspect the full report, including truncation, selected source paths, test/config coverage, AST versus lexical fallback, unsupported languages, and parser diagnostics.
