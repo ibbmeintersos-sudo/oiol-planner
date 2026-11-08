@@ -265,6 +265,13 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.equal(report.scanLimits.maxSourceFiles, 500);
   assert.equal(report.scanLimits.maxTestFiles, 25);
   assert.equal(report.scanLimits.maxConfigFiles, 25);
+  assert.ok(report.evidenceSelection);
+  const missingEvidenceReport = await scanExternalRepository({
+    repositoryRoot,
+    repositoryId: 'RW-TEST-MISSING-EVIDENCE',
+    scanOptions: { maxFiles: 5000, maxFileBytes: 32000, maxContextChars: 150000, maxDepth: 16, maxSourceFiles: 500, maxTestFiles: 25, maxConfigFiles: 25, priorityPaths: ['src/does-not-exist.ts'] }
+  });
+  assert.deepEqual(missingEvidenceReport.evidenceSelection.missingPaths, ['src/does-not-exist.ts']);
 });
 
 test('external live planning requires explicit consent before sending repository excerpts', async () => {
