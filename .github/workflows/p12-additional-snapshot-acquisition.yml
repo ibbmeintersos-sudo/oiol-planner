@@ -5,10 +5,11 @@ on:
     branches:
       - quality/p12-real-world-benchmark
     paths:
+      - .github/workflows/p12-additional-snapshot-acquisition.yml
+      - benchmarks/real-world/additional-snapshot-batch.json
+      - benchmarks/real-world/intake-candidates.json
       - scripts/acquire-real-world-snapshot.py
       - test/p12_snapshot_acquisition_test.py
-      - .github/workflows/p12-additional-snapshot-acquisition.yml
-      - benchmarks/real-world/intake-candidates.json
   workflow_dispatch:
 
 permissions:
@@ -20,14 +21,14 @@ concurrency:
 
 jobs:
   acquire:
-    name: Acquire additional pinned snapshot ${{ matrix.case_index }}
+    name: Acquire additional pinned snapshot \${{ matrix.case_index }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
-        case_index: [12, 13, 14, 16, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 35]
+        case_index: [12, 13, 14, 15, 16, 17, 18, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
     steps:
       - name: Checkout OIOL benchmark metadata only
         uses: actions/checkout@v4
@@ -48,13 +49,13 @@ jobs:
 
       - name: Download and fingerprint pinned source snapshot
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: python scripts/acquire-real-world-snapshot.py --case-index "${{ matrix.case_index }}" --output acquired
+          GH_TOKEN: \${{ github.token }}
+        run: python scripts/acquire-real-world-snapshot.py --case-index "\${{ matrix.case_index }}" --output acquired
 
       - name: Upload immutable snapshot and provenance
         uses: actions/upload-artifact@v4
         with:
-          name: p12-additional-snapshot-${{ matrix.case_index }}
+          name: p12-snapshot-\${{ matrix.case_index }}
           path: acquired/
           if-no-files-found: error
           compression-level: 1
