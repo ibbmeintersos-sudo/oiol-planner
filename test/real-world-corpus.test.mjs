@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fingerprintSnapshot, validateCase, validateCorpus } from '../scripts/validate-real-world-corpus.mjs';
+import { scanRepository } from '../src/scanner/repository.mjs';
 
 const makeCase = () => ({
   schemaVersion: '1.0.0',
@@ -64,5 +65,16 @@ test('empty corpus is pending, never a passing benchmark', async () => {
     assert.equal(intakeOnly.ready, false);
     assert.equal(intakeOnly.status, 'collection_pending');
     assert.equal(intakeOnly.errors.length, 0);
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
+});
+
+test('scanner does not execute Git commands to inspect target repositories', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oiol-readonly-scan-'));
+  try {
+    await fs.writeFile(path.join(root, 'sample.mjs'), 'export function sample() { return true; }');
+    const result = await scanRepository(root, { analysisMode: 'lexical' });
+    assert.equal(result.git.status, 'not_collected');
+    assert.equal(result.git.commit, null);
+    assert.equal(result.git.branch, null);
   } finally { await fs.rm(root, { recursive: true, force: true }); }
 });
