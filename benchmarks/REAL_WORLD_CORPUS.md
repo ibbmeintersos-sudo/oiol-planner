@@ -117,15 +117,15 @@ The first-pass reports did not record parser failures. Better Auth and Immich di
 
 The scanner now supports a separate bounded profile for external repositories:
 
-- Maximum discovered files: 2,000.
-- Maximum selected source files: 250.
+- Maximum discovered files: 5,000.
+- Maximum primary source files: 500, plus up to 25 test files and 25 configuration files.
 - Maximum bytes per file: 32 KiB.
-- Maximum model context: 100,000 characters.
-- Maximum directory depth: 14.
+- Maximum model context: 150,000 characters.
+- Maximum directory depth: 16.
 - Evidence selection interleaves manifests, implementation source, tests, and configuration rather than filling the context with source files first.
 - Scanner version and exact scan limits are included in the report and benchmark configuration fingerprint.
 
-The five repositories will be rescanned with this profile before the draft task prompts are promoted to runnable task definitions. The first-pass reports remain useful as an initial coverage baseline, but are not the final scan evidence.
+The five repositories are being rescanned with this wider profile before the draft task prompts are promoted to runnable task definitions. The first-pass reports remain useful as an initial coverage baseline, but are not the final scan evidence.
 
 ## Required intake record before a repository can enter a scored run
 
