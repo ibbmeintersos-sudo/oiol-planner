@@ -84,3 +84,24 @@ test('Tree-sitter syntax recovery is surfaced as evidence instead of crashing th
     await f.cleanup();
   }
 });
+
+test('Tree-sitter distinguishes exported and module-local TypeScript contract declarations', async () => {
+  const f = await fixture('oiol-ast-ts-exports-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    await writeFile(path.join(f.root, 'src', 'contracts.ts'), [
+      'export interface UserProfileResponse { userId: string; }',
+      'export type PublicUserId = string;',
+      'interface InternalProfile { secret: boolean; }',
+      ''
+    ].join('\\n'));
+
+    const result = await scanRepository(f.root);
+    const symbols = result.structure.symbols.filter(item => item.file === 'src/contracts.ts');
+    assert.ok(symbols.some(item => item.name === 'UserProfileResponse' && item.kind === 'interface' && item.exported === true));
+    assert.ok(symbols.some(item => item.name === 'PublicUserId' && item.kind === 'type' && item.exported === true));
+    assert.ok(symbols.some(item => item.name === 'InternalProfile' && item.exported === false));
+  } finally {
+    await f.cleanup();
+  }
+});
