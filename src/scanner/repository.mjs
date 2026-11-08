@@ -7,7 +7,8 @@ import { redact } from '../core/utils.mjs';
 import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
 const exec = promisify(execFile);
-export const SCANNER_VERSION = '1.1.0';
+export const SCANNER_VERSION = '1.2.0';
+export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 2000, maxFileBytes: 32000, maxContextChars: 100000, maxDepth: 14, maxSourceFiles: 250 });
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.(?:pem|key|p12|pfx|jks|keystore)|(?:credentials|secrets)\.(?:json|ya?ml)|\.npmrc|\.pypirc|\.netrc)$/i;
 const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'composer.json'];
@@ -45,6 +46,15 @@ function entryPriority(entry, depth) {
 
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const evidenceId = file => 'REPO-' + sha256(file).slice(0, 12);
+
+function interleaveGroups(groups) {
+  const output = [];
+  const maxLength = Math.max(0, ...groups.map(group => group.length));
+  for (let index = 0; index < maxLength; index++) {
+    for (const group of groups) if (index < group.length) output.push(group[index]);
+  }
+  return output;
+}
 
 async function walkBounded(root, { maxFiles, maxDepth }) {
   const files = [];
@@ -93,8 +103,8 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
   return { files, discovered, truncated, depthTruncated, skipped };
 }
 
-export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12 } = {}) {
-  for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth })) {
+export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, maxSourceFiles = 100 } = {}) {
+  for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles })) {
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
   }
   const root = await fs.realpath(path.resolve(repoPath));
@@ -126,12 +136,13 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     }
   }
 
-  const selected = [...new Set([
-    ...manifests,
-    ...files.filter(file => SUPPORTED_SOURCE_FILE.test(file)).slice(0, 100),
-    ...tests.slice(0, 15),
-    ...configs.slice(0, 15)
-  ])];
+  const sourceFiles = files.filter(file => SUPPORTED_SOURCE_FILE.test(file)).slice(0, maxSourceFiles);
+  const selected = [...new Set(interleaveGroups([
+    manifests,
+    sourceFiles,
+    tests.slice(0, 15),
+    configs.slice(0, 15)
+  ]))];
   let context = '', contextTruncated = false;
   const snippets = [];
   const sourceContents = Object.create(null);
@@ -164,7 +175,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     } catch {}
   }
 
-  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests });
+  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests, maxFileBytes });
   const structureSummary = [
     'Repository structure analysis (Tree-sitter AST where bundled grammars are available; bounded lexical fallback otherwise; evidence, not certainty):',
     'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
@@ -200,6 +211,6 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     structure: { ...structure, sourceEvidence: snippets.map(({id,path,sourceSha256,excerptSha256}) => ({id,path,sourceSha256,excerptSha256,trustLevel:'untrusted_repository_content'})) },
     snippets,
     contextTruncated,
-    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth }
+    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles }
   };
 }
