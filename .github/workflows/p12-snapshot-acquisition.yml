@@ -21,7 +21,7 @@ jobs:
   acquire:
     name: Acquire pinned snapshot ${{ matrix.case_index }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 4

@@ -22,23 +22,28 @@ class SnapshotAcquisitionSafetyTests(unittest.TestCase):
             expected.update(bytes([0]))
             self.assertEqual(MODULE.fingerprint(root)["sha256"], expected.hexdigest())
 
+    def test_fingerprint_does_not_drop_tracked_vendor_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "vendor").mkdir()
+            (root / "vendor" / "tracked.php").write_text("tracked", encoding="utf-8")
+            self.assertEqual(MODULE.fingerprint(root)["fileCount"], 1)
+
+    def test_rejects_parent_traversal(self):
+        with self.assertRaises(ValueError):
+            MODULE.validate_repo_path("../outside")
+
+    def test_rejects_absolute_path(self):
+        with self.assertRaises(ValueError):
+            MODULE.validate_repo_path("/etc/passwd")
+
     def test_accepts_existing_regular_license_file(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             (root / "LICENSE").write_text("license", encoding="utf-8")
             self.assertEqual(MODULE.resolve_license_file(root, "LICENSE"), root / "LICENSE")
 
-    def test_rejects_parent_traversal(self):
-        with tempfile.TemporaryDirectory() as temp:
-            with self.assertRaises(ValueError):
-                MODULE.resolve_license_file(Path(temp), "../outside")
-
-    def test_rejects_absolute_path(self):
-        with tempfile.TemporaryDirectory() as temp:
-            with self.assertRaises(ValueError):
-                MODULE.resolve_license_file(Path(temp), "/etc/passwd")
-
-    def test_rejects_symlink_component(self):
+    def test_rejects_license_symlink(self):
         with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as outside:
             root = Path(temp)
             (Path(outside) / "LICENSE").write_text("outside", encoding="utf-8")

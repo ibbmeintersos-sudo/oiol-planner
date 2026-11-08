@@ -1,55 +1,67 @@
 #!/usr/bin/env python3
-"""Acquire immutable public source snapshots for OIOL P12.
+"""Acquire complete immutable public source snapshots for OIOL P12.
 
-This script downloads and extracts source archives only. It never imports,
-installs, builds, tests, or executes code from a target repository.
+GitHub codeload archives can honor .gitattributes export-ignore and omit
+tracked files. This tool restores any omitted Git blobs from raw.githubusercontent.com
+using the exact pinned base commit. It never imports, installs, builds, tests,
+or executes code from a target repository.
 """
 from __future__ import annotations
+
 import argparse
+import base64
 import hashlib
 import json
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
-import tarfile
 import tempfile
+import tarfile
+import time
+import urllib.error
+import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 INTAKE = ROOT / "benchmarks" / "real-world" / "intake-candidates.json"
-IGNORED = {".git", "node_modules", ".venv", "venv", "vendor", "dist", "build", "coverage"}
+USER_AGENT = "OIOL-P12-ReadOnly-Snapshot-Acquirer/1.0"
+DOWNLOAD_WORKERS = 8
+
+
+def validate_repo_path(value: str) -> PurePosixPath:
+    if not isinstance(value, str) or not value or value.startswith("/") or "\\" in value:
+        raise ValueError(f"Unsafe Git tree path: {value!r}")
+    parts = value.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        raise ValueError(f"Unsafe Git tree path: {value!r}")
+    return PurePosixPath(*parts)
 
 
 def fingerprint(root: Path) -> dict:
     files = []
     for path in root.rglob("*"):
-        if any(part in IGNORED for part in path.relative_to(root).parts):
-            continue
-        if path.is_symlink() or not path.is_file():
-            continue
-        files.append((path.relative_to(root).as_posix(), path))
+        if path.is_symlink() or path.is_file():
+            files.append((path.relative_to(root).as_posix(), path))
     files.sort(key=lambda item: item[0])
     digest = hashlib.sha256()
     for rel, path in files:
         digest.update(rel.encode("utf-8"))
         digest.update(bytes([0]))
-        with path.open("rb") as stream:
-            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-                digest.update(chunk)
+        if path.is_symlink():
+            digest.update(os.readlink(path).encode("utf-8"))
+        else:
+            with path.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
         digest.update(bytes([0]))
     return {"sha256": digest.hexdigest(), "fileCount": len(files)}
 
 
 def resolve_license_file(snapshot_root: Path, license_file: str) -> Path:
-    """Resolve a declared license path without allowing traversal or symlinks."""
-    if not isinstance(license_file, str) or not license_file:
-        raise ValueError("Declared license path must be a non-empty relative path")
-    if license_file.startswith("/") or "\\" in license_file:
-        raise ValueError("Declared license path must use safe POSIX-relative syntax")
-    parts = license_file.split("/")
-    if any(part in ("", ".", "..") for part in parts):
-        raise ValueError("Declared license path contains an unsafe path component")
+    relative = validate_repo_path(license_file)
     current = snapshot_root
-    for part in parts:
+    for part in relative.parts:
         current = current / part
         if current.is_symlink():
             raise ValueError("Declared license path must not traverse symlinks")
@@ -63,7 +75,7 @@ def resolve_license_file(snapshot_root: Path, license_file: str) -> Path:
     return resolved
 
 
-def safe_extract(archive: tarfile.TarFile, destination: Path) -> str:
+def safe_extract(archive: tarfile.TarFile, destination: Path) -> None:
     members = archive.getmembers()
     roots = {PurePosixPath(member.name).parts[0] for member in members if PurePosixPath(member.name).parts}
     if len(roots) != 1:
@@ -82,7 +94,106 @@ def safe_extract(archive: tarfile.TarFile, destination: Path) -> str:
         member.name = relative.as_posix()
         rewritten.append(member)
     archive.extractall(destination, members=rewritten, filter="data")
-    return prefix
+
+
+def request_json(url: str) -> dict:
+    request = urllib.request.Request(url, headers={
+        "User-Agent": USER_AGENT,
+        "Accept": "application/vnd.github+json"
+    })
+    with urllib.request.urlopen(request, timeout=90) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def fetch_missing_blob(repository: str, base_sha: str, entry: dict, snapshot: Path) -> None:
+    relative = validate_repo_path(entry["path"])
+    if entry.get("mode") == "120000":
+        raise ValueError(f"Snapshot archive omitted symlink {entry['path']}; refusing to synthesize it")
+    if entry.get("mode") not in ("100644", "100755"):
+        raise ValueError(f"Unsupported Git blob mode for {entry['path']}: {entry.get('mode')}")
+    encoded_path = urllib.parse.quote(relative.as_posix(), safe="/")
+    url = f"https://raw.githubusercontent.com/{repository}/{base_sha}/{encoded_path}"
+    destination = snapshot.joinpath(*relative.parts)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    last_error = None
+    for attempt in range(4):
+        temporary = None
+        try:
+            request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            with urllib.request.urlopen(request, timeout=120) as response:
+                with tempfile.NamedTemporaryFile(dir=destination.parent, prefix=".oiol-", delete=False) as out:
+                    temporary = Path(out.name)
+                    while True:
+                        chunk = response.read(1024 * 1024)
+                        if not chunk:
+                            break
+                        out.write(chunk)
+            os.replace(temporary, destination)
+            if entry.get("mode") == "100755":
+                destination.chmod(0o755)
+            return
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code == 404:
+                raise ValueError(f"Pinned raw blob is unavailable: {entry['path']}") from exc
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            last_error = exc
+        finally:
+            if temporary is not None and temporary.exists():
+                temporary.unlink()
+        if attempt < 3:
+            time.sleep(2 ** attempt)
+    raise RuntimeError(f"Could not restore omitted blob {entry['path']}: {last_error}")
+
+
+def complete_snapshot(repository: str, base_sha: str, snapshot: Path) -> dict:
+    tree_url = f"https://api.github.com/repos/{repository}/git/trees/{base_sha}?recursive=1"
+    tree_data = request_json(tree_url)
+    if tree_data.get("truncated"):
+        raise RuntimeError("Git tree response was truncated; refusing an incomplete snapshot")
+    entries = [
+        item for item in tree_data.get("tree", [])
+        if item.get("type") == "blob"
+    ]
+    expected = {}
+    for entry in entries:
+        relative = validate_repo_path(entry["path"])
+        expected[relative.as_posix()] = entry
+
+    actual = set()
+    for path in snapshot.rglob("*"):
+        if path.is_symlink() or path.is_file():
+            actual.add(path.relative_to(snapshot).as_posix())
+    extras = sorted(actual - set(expected))
+    if extras:
+        raise RuntimeError(f"Archive contains paths absent from pinned Git tree: {extras[:10]}")
+
+    missing = [expected[path] for path in sorted(set(expected) - actual)]
+    if missing:
+        with ThreadPoolExecutor(max_workers=DOWNLOAD_WORKERS) as pool:
+            futures = [
+                pool.submit(fetch_missing_blob, repository, base_sha, entry, snapshot)
+                for entry in missing
+            ]
+            for future in as_completed(futures):
+                future.result()
+
+    final_paths = {
+        path.relative_to(snapshot).as_posix()
+        for path in snapshot.rglob("*")
+        if path.is_symlink() or path.is_file()
+    }
+    if final_paths != set(expected):
+        absent = sorted(set(expected) - final_paths)
+        unexpected = sorted(final_paths - set(expected))
+        raise RuntimeError(f"Snapshot does not match pinned Git tree; missing={absent[:10]}, extra={unexpected[:10]}")
+    return {
+        "gitTreeSha": tree_data["sha"],
+        "gitTreeFileCount": len(entries),
+        "archiveMissingFileCount": len(missing),
+        "archiveExtraFileCount": len(extras),
+    }
 
 
 def main() -> None:
@@ -90,6 +201,7 @@ def main() -> None:
     parser.add_argument("--case-index", type=int, required=True, help="0-based index in intake-candidates.json candidates[]")
     parser.add_argument("--output", default="acquired")
     args = parser.parse_args()
+
     intake = json.loads(INTAKE.read_text(encoding="utf-8"))
     candidates = intake["candidates"]
     if args.case_index < 0 or args.case_index >= len(candidates):
@@ -99,14 +211,16 @@ def main() -> None:
     repository, base_sha = source["repository"], source["baseCommit"]
     if len(base_sha) != 40 or any(ch not in "0123456789abcdef" for ch in base_sha):
         raise SystemExit("Base commit is not an immutable full SHA")
+
     output_root = Path(args.output).resolve()
     case_dir = output_root / candidate["caseId"]
     snapshot = case_dir / "snapshot"
     case_dir.mkdir(parents=True, exist_ok=True)
     if snapshot.exists():
         raise SystemExit(f"Refusing to overwrite existing snapshot: {snapshot}")
-    url = f"https://codeload.github.com/{repository}/tar.gz/{base_sha}"
-    request = urllib.request.Request(url, headers={"User-Agent": "OIOL-P12-ReadOnly-Snapshot-Acquirer/1.0"})
+
+    archive_url = f"https://codeload.github.com/{repository}/tar.gz/{base_sha}"
+    request = urllib.request.Request(archive_url, headers={"User-Agent": USER_AGENT})
     with tempfile.TemporaryFile() as archive_file:
         with urllib.request.urlopen(request, timeout=180) as response:
             while True:
@@ -117,21 +231,38 @@ def main() -> None:
         archive_file.seek(0)
         with tarfile.open(fileobj=archive_file, mode="r:gz") as archive:
             safe_extract(archive, snapshot)
+
+    tree_info = complete_snapshot(repository, base_sha, snapshot)
     result = fingerprint(snapshot)
+    if result["fileCount"] != tree_info["gitTreeFileCount"]:
+        raise RuntimeError("Snapshot file count does not equal the pinned Git tree blob count")
     license_path = resolve_license_file(snapshot, source["licenseFile"])
     metadata = {
-        "schemaVersion": "1.0.0", "caseId": candidate["caseId"],
-        "repository": repository, "repositoryUrl": source["repositoryUrl"],
-        "baseCommit": base_sha, "changeCommit": source["changeCommit"],
-        "pullRequest": change["pullRequest"], "changeUrl": change["url"],
-        "license": source["license"], "licenseFile": source["licenseFile"],
-        "licenseFileUrl": source["licenseFileUrl"], "sizeClass": source["sizeClass"],
+        "schemaVersion": "1.0.0",
+        "caseId": candidate["caseId"],
+        "repository": repository,
+        "repositoryUrl": source["repositoryUrl"],
+        "baseCommit": base_sha,
+        "changeCommit": source["changeCommit"],
+        "pullRequest": change["pullRequest"],
+        "changeUrl": change["url"],
+        "license": source["license"],
+        "licenseFile": source["licenseFile"],
+        "licenseFileUrl": source["licenseFileUrl"],
+        "sizeClass": source["sizeClass"],
         "trackedFileCountAtBase": source["trackedFileCountAtBase"],
-        "primaryLanguages": source["primaryLanguages"], "snapshotPath": "snapshot",
-        "snapshotSha256": result["sha256"], "snapshotFileCount": result["fileCount"],
+        "primaryLanguages": source["primaryLanguages"],
+        "snapshotPath": "snapshot",
+        "snapshotSha256": result["sha256"],
+        "snapshotFileCount": result["fileCount"],
         "trackedFileCountDelta": result["fileCount"] - source["trackedFileCountAtBase"],
         "licenseFileSha256": hashlib.sha256(license_path.read_bytes()).hexdigest(),
-        "archiveUrl": url, "acquiredAt": datetime.now(timezone.utc).isoformat(),
+        "archiveUrl": archive_url,
+        "gitTreeSha": tree_info["gitTreeSha"],
+        "gitTreeFileCount": tree_info["gitTreeFileCount"],
+        "archiveMissingFileCountRestored": tree_info["archiveMissingFileCount"],
+        "archiveExtraFileCount": tree_info["archiveExtraFileCount"],
+        "acquiredAt": datetime.now(timezone.utc).isoformat(),
         "executionBoundary": "download-and-extract-only; target project code was not executed"
     }
     (case_dir / "snapshot-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
