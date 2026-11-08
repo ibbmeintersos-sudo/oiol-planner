@@ -101,9 +101,9 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
 
   const selected = [...new Set([
     ...manifests,
-    ...tests.slice(0, 20),
-    ...configs.slice(0, 20),
-    ...files.filter(file => SOURCE_FILE.test(file)).slice(0, 100)
+    ...files.filter(file => SOURCE_FILE.test(file)).slice(0, 100),
+    ...tests.slice(0, 15),
+    ...configs.slice(0, 15)
   ])];
   let context = '', contextTruncated = false;
   const snippets = [];
@@ -117,7 +117,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
       const redactedText = redact(sourceText);
       const content = redactedText.slice(0, 5000);
       const id = evidenceId(file);
-      if (context.length + content.length > maxContextChars) { contextTruncated = true; break; }
+      if (context.length + content.length > maxContextChars) { contextTruncated = true; continue; }
       context += '\n\n--- [EVIDENCE: ' + id + '] ' + file + ' ---\n' + content;
       const sourceSha256 = sha256(buffer);
       snippets.push({
