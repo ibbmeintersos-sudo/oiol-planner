@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 let TreeSitter = null;
 let treeSitterLoadError = null;
 try {
@@ -6,10 +5,7 @@ try {
 } catch (error) {
   treeSitterLoadError = String(error?.message || error).slice(0, 180);
 }
-=======
-import * as TreeSitter from '@xberg-io/tree-sitter-language-pack-wasm';
 import path from 'node:path';
->>>>>>> origin/main
 import { redact } from '../core/utils.mjs';
 
 const EXTENSION_LANGUAGE = new Map([
