@@ -6,7 +6,7 @@ const EXTENSION_LANGUAGE = new Map([
   ['.js', 'javascript'], ['.jsx', 'javascript'], ['.mjs', 'javascript'], ['.cjs', 'javascript'],
   ['.ts', 'typescript'], ['.tsx', 'tsx'],
   ['.py', 'python'], ['.go', 'go'], ['.rs', 'rust'], ['.java', 'java'],
-  ['.kt', 'kotlin'], ['.php', 'php'], ['.rb', 'ruby']
+  ['.kt', 'kotlin'], ['.php', 'php'], ['.rb', 'ruby'], ['.dart', 'dart'], ['.swift', 'swift']
 ]);
 
 const parserCache = new Map();
@@ -117,7 +117,9 @@ function classifySymbol(language, node, sourceBytes, lineStarts) {
       function_definition: 'function', class_declaration: 'class', interface_declaration: 'interface',
       trait_declaration: 'trait', enum_declaration: 'enum', method_declaration: 'method'
     },
-    ruby: { class: 'class', module: 'module', method: 'method', singleton_method: 'method' }
+    ruby: { class: 'class', module: 'module', method: 'method', singleton_method: 'method' },
+    dart: { class_definition: 'class', enum_declaration: 'enum', mixin_declaration: 'mixin', extension_declaration: 'extension', function_signature: 'function', method_signature: 'method' },
+    swift: { class_declaration: 'class', struct_declaration: 'struct', enum_declaration: 'enum', protocol_declaration: 'protocol', function_declaration: 'function', init_declaration: 'initializer' }
   };
   let symbolKind = direct[language]?.[kind] || null;
   if (language === 'go' && kind === 'type_spec') {
@@ -180,6 +182,12 @@ function importSpecifiers(language, nodeKind, text) {
   } else if (language === 'ruby') {
     const match = text.match(/\b(?:require|require_relative)\s*\(?\s*['"]([^'"]+)['"]/);
     if (match) add(match[1]);
+  } else if (language === 'dart') {
+    const match = text.match(/^\s*(?:import|export)\s+['"]([^'"]+)['"]/);
+    if (match) add(match[1]);
+  } else if (language === 'swift') {
+    const match = text.match(/^\s*import\s+(?:typealias|struct|class|enum|protocol|let|var|func)?\s*([\w.]+)/);
+    if (match) add(match[1]);
   }
   return values;
 }
@@ -194,7 +202,9 @@ const IMPORT_NODES = {
   java: new Set(['import_declaration']),
   kotlin: new Set(['import_header']),
   php: new Set(['namespace_use_declaration', 'include_expression', 'require_expression']),
-  ruby: new Set(['call'])
+  ruby: new Set(['call']),
+  dart: new Set(['import_or_export']),
+  swift: new Set(['import_declaration'])
 };
 
 export function resolveLocalImport(file, language, specifier, fileSet, { goModulePath = null, pythonRoots = ['', 'src', 'lib', 'app'] } = {}) {
