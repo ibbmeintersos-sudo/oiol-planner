@@ -6,12 +6,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateJsonSchema } from '../src/core/schema-validator.mjs';
-import { loadConfig, applyConfigToEnv, resolveProfile, getProfileConfig, DEFAULTS } from '../src/config.mjs';
+import { loadConfig, applyConfigToEnv, resolveProfile, getProfileConfig, validateConfig } from '../src/config.mjs';
 
 const bin = fileURLToPath(new URL('../src/bin.mjs', import.meta.url));
 const schemaPath = fileURLToPath(new URL('../schemas/oiol-config.schema.json', import.meta.url));
-const schemaText = await readFile(schemaPath, 'utf8');
-const CONFIG_SCHEMA = JSON.parse(schemaText);
+const CONFIG_SCHEMA = JSON.parse(await readFile(schemaPath, 'utf8'));
 
 const validConfig = {
   version: 1,
@@ -22,17 +21,17 @@ const validConfig = {
   }
 };
 
-test('config schema accepts valid config', () => {
+test('config schema accepts a valid config', () => {
   const result = validateJsonSchema(validConfig, CONFIG_SCHEMA);
   assert.equal(result.valid, true, result.errors.join('; '));
 });
 
-test('config schema rejects invalid provider', () => {
+test('config schema rejects an invalid provider', () => {
   const invalid = structuredClone(validConfig);
   invalid.profiles.default.provider = 'invalid-provider';
   const result = validateJsonSchema(invalid, CONFIG_SCHEMA);
   assert.equal(result.valid, false);
-  assert.ok(result.errors.some(e => e.includes('provider')));
+  assert.ok(result.errors.some(error => error.includes('provider')));
 });
 
 test('config schema rejects missing required fields', () => {
@@ -48,7 +47,15 @@ test('config schema rejects unknown properties', () => {
   assert.equal(result.valid, false);
 });
 
-test('loadConfig reads and validates config file', async () => {
+test('validateConfig rejects an unknown defaultProfile', async () => {
+  const invalid = structuredClone(validConfig);
+  invalid.defaultProfile = 'missing';
+  const result = await validateConfig(invalid);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some(error => error.includes('defaultProfile')));
+});
+
+test('loadConfig reads and validates a config file', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-config-'));
   try {
     const file = path.join(root, 'oiol.config.json');
@@ -60,7 +67,7 @@ test('loadConfig reads and validates config file', async () => {
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('loadConfig rejects invalid config', async () => {
+test('loadConfig rejects an invalid config', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-config-bad-'));
   try {
     const file = path.join(root, 'oiol.config.json');
@@ -69,20 +76,20 @@ test('loadConfig rejects invalid config', async () => {
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('resolveProfile prefers explicit, then defaultProfile, then first key', () => {
+test('resolveProfile prefers explicit, then defaultProfile, then the first key', () => {
   assert.equal(resolveProfile(validConfig, 'explicit'), 'explicit');
   assert.equal(resolveProfile(validConfig, undefined), 'default');
   const noDefault = { version: 1, profiles: { first: {}, second: {} } };
   assert.equal(resolveProfile(noDefault, undefined), 'first');
 });
 
-test('getProfileConfig returns profile or null', () => {
+test('getProfileConfig returns the profile or null', () => {
   assert.ok(getProfileConfig(validConfig, 'default'));
   assert.equal(getProfileConfig(validConfig, 'missing'), null);
 });
 
-test('applyConfigToEnv does not override existing env vars', async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-env-'));
+test('applyConfigToEnv does not override existing env vars', () => {
+  const saved = { provider: process.env.OIOL_PROVIDER, model: process.env.OIOL_MODEL };
   try {
     process.env.OIOL_PROVIDER = 'existing';
     process.env.OIOL_MODEL = 'existing-model';
@@ -90,13 +97,14 @@ test('applyConfigToEnv does not override existing env vars', async () => {
     applyConfigToEnv(config, 'default');
     assert.equal(process.env.OIOL_PROVIDER, 'existing');
     assert.equal(process.env.OIOL_MODEL, 'existing-model');
-    delete process.env.OIOL_PROVIDER;
-    delete process.env.OIOL_MODEL;
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    if (saved.provider === undefined) delete process.env.OIOL_PROVIDER; else process.env.OIOL_PROVIDER = saved.provider;
+    if (saved.model === undefined) delete process.env.OIOL_MODEL; else process.env.OIOL_MODEL = saved.model;
+  }
 });
 
-test('applyConfigToEnv sets unset env vars from profile', async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-env2-'));
+test('applyConfigToEnv sets unset env vars from the profile', () => {
+  const saved = { provider: process.env.OIOL_PROVIDER, model: process.env.OIOL_MODEL };
   try {
     delete process.env.OIOL_PROVIDER;
     delete process.env.OIOL_MODEL;
@@ -104,9 +112,10 @@ test('applyConfigToEnv sets unset env vars from profile', async () => {
     applyConfigToEnv(config, 'default');
     assert.equal(process.env.OIOL_PROVIDER, 'anthropic');
     assert.equal(process.env.OIOL_MODEL, 'claude-3');
-    delete process.env.OIOL_PROVIDER;
-    delete process.env.OIOL_MODEL;
-  } finally { await rm(root, { recursive: true, force: true }); }
+  } finally {
+    if (saved.provider === undefined) delete process.env.OIOL_PROVIDER; else process.env.OIOL_PROVIDER = saved.provider;
+    if (saved.model === undefined) delete process.env.OIOL_MODEL; else process.env.OIOL_MODEL = saved.model;
+  }
 });
 
 test('bin delegates --validate to cli.mjs (back-compat)', async () => {
@@ -116,25 +125,35 @@ test('bin delegates --validate to cli.mjs (back-compat)', async () => {
     const plan = { schemaVersion: '1.0.0', contractVersion: '1.0', id: 'test', status: 'needs_revision', project: { kind: 'greenfield', name: 'Test', request: 'test' }, requirements: [{ id: 'r1', statement: 'req' }], architecture: { components: [{ id: 'c1', name: 'C' }], decisions: [] }, tasks: [{ id: 't1', title: 'Task', requirementIds: ['r1'], componentIds: ['c1'], dependencies: [], acceptanceCriteria: ['ok'], writeScope: ['docs'] }], dependencyGraph: { nodes: ['t1'], edges: [] }, risks: [], clarifications: [] };
     await writeFile(file, JSON.stringify(plan));
     const result = spawnSync(process.execPath, [bin, '--validate', file], { encoding: 'utf8', env: { PATH: process.env.PATH } });
-    assert.equal(result.status, 0);
-    const out = JSON.parse(result.stdout);
-    assert.equal(out.validation.valid, true);
+    assert.equal(result.status, 0, result.stderr);
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.validation.valid, true);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('init --yes --force creates config and .env in temp dir', async () => {
+test('init --yes --force creates config and .env in a temp dir', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-init-'));
   try {
     const configOut = path.join(root, 'oiol.config.json');
     const envOut = path.join(root, '.env');
-    const result = spawnSync(process.execPath, [bin, 'init', '--yes', '--force', '--out', configOut, '--env-out', envOut], { encoding: 'utf8', env: { PATH: process.env.PATH, ...process.env } });
+    const result = spawnSync(process.execPath, [bin, 'init', '--yes', '--force', '--out', configOut, '--env-out', envOut], { encoding: 'utf8', env: { PATH: process.env.PATH } });
     assert.equal(result.status, 0, result.stderr);
     const config = JSON.parse(await readFile(configOut, 'utf8'));
     assert.equal(config.version, 1);
     assert.ok(config.profiles.default);
     assert.ok(config.profiles.default.provider);
     const envText = await readFile(envOut, 'utf8');
-    assert.match(envText, /OIOL_PROVIDER=/);
-    assert.match(envText, /OIOL_MODEL=/);
+    assert.match(envText, /OIOL_API_KEY=/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('doctor --json returns structured checks without a config', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'oiol-doctor-'));
+  try {
+    const result = spawnSync(process.execPath, [bin, 'doctor', '--json'], { encoding: 'utf8', cwd: root, env: { PATH: process.env.PATH } });
+    const report = JSON.parse(result.stdout);
+    assert.equal(typeof report.ok, 'boolean');
+    assert.ok(Array.isArray(report.checks));
+    assert.ok(report.checks.some(check => check.id === 'node'));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
