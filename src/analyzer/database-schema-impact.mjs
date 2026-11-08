@@ -67,7 +67,8 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
     const fieldTerms = tokens([change.column, change.oldName, change.newName, change.constraint, change.index].filter(Boolean).join(' '));
     const tableTerms = tokens(change.table || '');
     const matchedTerms = sorted(new Set([...overlap(requestTerms, fieldTerms), ...overlap(requestTerms, tableTerms)]));
-    const relevant = Boolean(table || matchedNames.has(tableName) || matchedTerms.length >= 2);
+    const columnMatch = Boolean(change.column && overlap(requestTerms, tokens(change.column)).length) || Boolean(change.oldName && overlap(requestTerms, tokens(change.oldName)).length) || Boolean(change.newName && overlap(requestTerms, tokens(change.newName)).length);
+    const relevant = Boolean(table || matchedNames.has(tableName) || columnMatch || matchedTerms.length >= 2);
     if (!relevant) return null;
     const risk = classifyRisk(change);
     return {
@@ -87,6 +88,12 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
   const consumers = (databaseSchema.consumers || []).filter(item => relevantTables.has(String(item.table || '').toLowerCase()))
     .map(item => ({ table: item.table, path: normPath(item.path), relationship: item.relationship || 'static_table_name_reference', confidence: item.confidence || 'medium', proofLevel: item.proofLevel || 'textual_reference_not_runtime_binding', ...evidenceFields(item.evidence) }))
     .sort((a, b) => a.table.localeCompare(b.table) || a.path.localeCompare(b.path));
+  for (const change of matchedChanges) {
+    const hasConsumers = consumers.some(item => String(item.table || '').toLowerCase() === String(change.table || '').toLowerCase());
+    if (hasConsumers && ['drop_table', 'drop_column', 'rename_table', 'rename_column', 'alter_column_type', 'set_not_null'].includes(change.operation)) {
+      change.riskSignals = sorted(new Set([...change.riskSignals, 'migration_order_risk']));
+    }
+  }
   const limitedChanges = matchedChanges.slice(0, maxResults);
   const limitedConsumers = consumers.slice(0, maxResults);
   const riskSignals = sorted(new Set(matchedChanges.flatMap(item => item.riskSignals)));
