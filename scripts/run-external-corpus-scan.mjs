@@ -81,7 +81,8 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
       sourceSha256: item.sourceSha256 || null,
       excerptSha256: item.excerptSha256 || null,
       trustLevel: item.trustLevel
-    }))
+    })),
+    coverage: scannerEvidence.coverage
   };
 }
 
