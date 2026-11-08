@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { analyzeMigrationCompatibility } from './migration-compatibility.mjs';
 
 const sha256 = value => createHash('sha256').update(String(value || '')).digest('hex');
 const normPath = value => String(value || '').replaceAll('\\', '/').replace(/^\.\//, '');
@@ -39,11 +40,13 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
   if (!isRequested(requestText)) return {
     status: 'not_requested', method: 'bounded_schema_metadata_and_reference_analysis',
     matchedTables: [], schemaChanges: [], potentiallyAffectedConsumers: [],
+    migrationCompatibility: { status: 'not_requested', orderedMigrations: [], compatibilityFindings: [], rolloutSequence: [], sequenceRisks: [] },
     diagnostics: { tableMetadataCount: 0, matchedTableCount: 0, matchedChangeCount: 0, consumerCandidateCount: 0 }
   };
   if (!databaseSchema || !Array.isArray(databaseSchema.tables) || databaseSchema.status === 'no_schema_metadata_found') return {
     status: 'unavailable', method: 'bounded_schema_metadata_and_reference_analysis',
     matchedTables: [], schemaChanges: [], potentiallyAffectedConsumers: [],
+    migrationCompatibility: analyzeMigrationCompatibility({ databaseSchema }),
     diagnostics: { tableMetadataCount: databaseSchema?.tables?.length || 0, matchedTableCount: 0, matchedChangeCount: 0, consumerCandidateCount: 0 },
     limitations: ['No supported SQL DDL, Prisma, or recognized ORM schema metadata was available in the bounded scan.', 'Unavailable schema metadata is not evidence that the project has no database schema.']
   };
@@ -94,6 +97,7 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
       change.riskSignals = sorted(new Set([...change.riskSignals, 'migration_order_risk']));
     }
   }
+  const migrationCompatibility = analyzeMigrationCompatibility({ databaseSchema, maxMigrations: maxResults, maxFindings: maxResults });
   const limitedChanges = matchedChanges.slice(0, maxResults);
   const limitedConsumers = consumers.slice(0, maxResults);
   const riskSignals = sorted(new Set(matchedChanges.flatMap(item => item.riskSignals)));
@@ -104,6 +108,7 @@ export function analyzeDatabaseSchemaImpact({ request = '', queryTokens = new Se
     matchedTables: matchedTables.slice(0, maxResults),
     schemaChanges: limitedChanges,
     potentiallyAffectedConsumers: limitedConsumers,
+    migrationCompatibility,
     riskSignals,
     diagnostics: {
       tableMetadataCount: tableRecords.length,
