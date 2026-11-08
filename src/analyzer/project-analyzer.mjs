@@ -4,7 +4,7 @@ import { id } from '../core/utils.mjs';
 export async function analyzeProject(input) {
   if (input.mode === 'existing') {
     if (!input.repo) throw new Error('Existing-project mode requires --repo');
-    const repo = await scanRepository(input.repo);
+    const repo = await scanRepository(input.repo, input.scanOptions || {});
     const evidence = [{
       id: id('ev'),
       type: 'repository_scan',
