@@ -84,6 +84,53 @@ export function assertExternalRepositorySnapshot(project) {
   return { commit: git.commit, branch: git.branch || null, dirty: false };
 }
 
+export function summarizeRepositoryEvidence(project) {
+  const repository = project?.repository;
+  if (!repository) return null;
+  const structure = repository.structure || {};
+  return {
+    root: repository.root,
+    git: repository.git,
+    fileCount: repository.fileCount,
+    includedFileCount: repository.includedFileCount,
+    fileCountIsLowerBound: repository.fileCountIsLowerBound,
+    truncated: repository.truncated,
+    depthTruncated: repository.depthTruncated,
+    skipped: repository.skipped,
+    scanLimits: repository.scanLimits,
+    manifests: repository.manifests,
+    scripts: repository.scripts,
+    tests: repository.tests,
+    configs: repository.configs,
+    includedPaths: (repository.files || []).map(file => file.path),
+    contextTruncated: repository.contextTruncated,
+    snippetCount: (repository.snippets || []).length,
+    snippetPaths: (repository.snippets || []).map(snippet => snippet.path),
+    structure: {
+      method: structure.method,
+      languages: structure.languages,
+      sourceFileCount: structure.sourceFileCount,
+      analyzedSourceFileCount: structure.analyzedSourceFileCount,
+      astFileCount: structure.astFileCount,
+      lexicalFallbackFileCount: structure.lexicalFallbackFileCount,
+      unsupportedLanguageFileCount: structure.unsupportedLanguageFileCount,
+      unsupportedLanguageFiles: structure.unsupportedLanguageFiles,
+      parseFailureFileCount: structure.parseFailureFileCount,
+      syntaxErrorFileCount: structure.syntaxErrorFileCount,
+      nodeLimitFileCount: structure.nodeLimitFileCount,
+      depthLimitFileCount: structure.depthLimitFileCount,
+      frameworks: structure.frameworks,
+      entryPoints: structure.entryPoints,
+      dependencyGraph: { nodeCount: structure.dependencyGraph?.nodes?.length || 0, edgeCount: structure.dependencyGraph?.edgeCount || 0 },
+      unresolvedLocalImportCount: structure.unresolvedLocalImportCount,
+      diagnostics: structure.diagnostics,
+      parserDiagnostics: structure.parserDiagnostics,
+      limitations: structure.limitations
+    },
+    evidence: project.evidence
+  };
+}
+
 export async function resolveScenarioProject(scenario, { repositoryRoot = null } = {}) {
   if (repositoryRoot) {
     if (scenario.project?.kind !== 'existing') {
@@ -159,7 +206,7 @@ export async function main() {
       const project=await resolveScenarioProject(scenario,{repositoryRoot});
       if(repositoryRoot) assertExternalRepositorySnapshot(project);
       const plan=await new HybridPlanner({provider,reviewer,maxRepairRounds:Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2)}).createPlan(project);
-      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan});
+      records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:summarizeRepositoryEvidence(project),plan});
       console.log('['+scenario.id+'] '+plan.status+' in '+(Date.now()-started)+'ms');
     }catch(error){
       records.push({scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message}});
