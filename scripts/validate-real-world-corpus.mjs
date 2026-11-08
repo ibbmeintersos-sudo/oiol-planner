@@ -8,6 +8,7 @@ const option = name => {
   const index = process.argv.indexOf('--' + name);
   return index < 0 ? null : process.argv[index + 1];
 };
+const compareText = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const ignored = new Set(['.git', 'node_modules', '.venv', 'venv', 'vendor', 'dist', 'build', 'coverage']);
 
@@ -15,7 +16,7 @@ export async function fingerprintSnapshot(root) {
   const entries = [];
   async function walk(dir, relative = '') {
     const children = await fs.readdir(dir, { withFileTypes: true });
-    children.sort((a, b) => a.name.localeCompare(b.name));
+    children.sort((a, b) => compareText(a.name, b.name));
     for (const child of children) {
       if (ignored.has(child.name) || child.isSymbolicLink()) continue;
       const rel = path.posix.join(relative, child.name);
@@ -26,7 +27,7 @@ export async function fingerprintSnapshot(root) {
   }
   await walk(root);
   const hash = createHash('sha256');
-  entries.sort((a, b) => a.path.localeCompare(b.path));
+  entries.sort((a, b) => compareText(a.path, b.path));
   for (const entry of entries) {
     hash.update(entry.path); hash.update(Buffer.from([0]));
     hash.update(entry.bytes); hash.update(Buffer.from([0]));
@@ -34,57 +35,125 @@ export async function fingerprintSnapshot(root) {
   return { sha256: hash.digest('hex'), fileCount: entries.length };
 }
 
+const safeRelativePath = value =>
+  typeof value === 'string' &&
+  value.length > 0 &&
+  !path.posix.isAbsolute(value) &&
+  !path.win32.isAbsolute(value) &&
+  !value.split(/[\\/]/).includes('..') &&
+  !value.includes('\\0');
+
 export function validateCase(item, seen = new Set()) {
   const errors = [];
   if (!item || typeof item !== 'object') return ['case must be an object'];
   if (item.schemaVersion !== '1.0.0') errors.push('schemaVersion must be 1.0.0');
   if (!/^[a-z0-9][a-z0-9-]{2,63}$/.test(item.caseId || '')) errors.push('caseId is invalid');
   if (seen.has(item.caseId)) errors.push('duplicate caseId');
+
   const source = item.source || {};
-  for (const key of ['repositoryUrl', 'license', 'licenseFileUrl', 'changeUrl']) if (!source[key]) errors.push('source.' + key + ' is required');
-  for (const key of ['baseCommit', 'changeCommit']) if (!/^[0-9a-f]{40}$/.test(source[key] || '')) errors.push('source.' + key + ' must be a full commit SHA');
+  for (const key of ['repositoryUrl', 'license', 'licenseFileUrl', 'changeUrl']) {
+    if (!source[key]) errors.push('source.' + key + ' is required');
+  }
+  for (const key of ['baseCommit', 'changeCommit']) {
+    if (!/^[0-9a-f]{40}$/.test(source[key] || '')) errors.push('source.' + key + ' must be a full commit SHA');
+  }
   if (source.baseCommit && source.baseCommit === source.changeCommit) errors.push('baseCommit and changeCommit must differ');
+  if (source.baseCommit && source.licenseFileUrl && !source.licenseFileUrl.includes('/' + source.baseCommit + '/')) {
+    errors.push('source.licenseFileUrl must be pinned to baseCommit');
+  }
+  try {
+    const repositoryUrl = new URL(source.repositoryUrl);
+    if (repositoryUrl.protocol !== 'https:' || repositoryUrl.hostname !== 'github.com') errors.push('source.repositoryUrl must be a GitHub HTTPS URL');
+  } catch { errors.push('source.repositoryUrl must be a valid URL'); }
+  if (!['small', 'medium', 'large'].includes(source.sizeClass)) errors.push('source.sizeClass is invalid');
+  if (source.repositoryKind && !['library', 'service', 'monolith', 'workspace', 'other'].includes(source.repositoryKind)) {
+    errors.push('source.repositoryKind is invalid');
+  }
+
   if (typeof item.change?.request !== 'string' || item.change.request.trim().length < 8) errors.push('change.request is too short');
-  if (!['source_change','api_change','database_change','migration_change','test_change','cross_component','ambiguous'].includes(item.change?.category)) errors.push('change.category is invalid');
+  if (typeof item.change?.summary !== 'string' || item.change.summary.trim().length < 12) errors.push('change.summary is too short');
+  if (!['source_change', 'api_change', 'database_change', 'migration_change', 'test_change', 'cross_component', 'ambiguous'].includes(item.change?.category)) {
+    errors.push('change.category is invalid');
+  }
+
   const snapshot = item.snapshot || {};
-  if (!snapshot.relativePath || path.isAbsolute(snapshot.relativePath) || snapshot.relativePath.split(/[\\/]/).includes('..')) errors.push('snapshot.relativePath must be safe and relative');
+  if (!safeRelativePath(snapshot.relativePath)) errors.push('snapshot.relativePath must be safe and relative');
   if (!/^[0-9a-f]{64}$/.test(snapshot.sha256 || '')) errors.push('snapshot.sha256 must be a SHA-256 fingerprint');
+
   const truth = item.groundTruth || {};
-  for (const key of ['directFiles','affectedFiles','tests','packages','apiConsumers','databaseConsumers','migrationFiles','scannerSymbols','dependencyEdges','unknowns','risks']) {
+  for (const key of ['directFiles', 'affectedFiles', 'tests', 'packages', 'apiConsumers', 'databaseConsumers', 'migrationFiles', 'scannerSymbols', 'dependencyEdges', 'unknowns', 'risks']) {
     if (!Array.isArray(truth[key])) errors.push('groundTruth.' + key + ' must be an array');
   }
+  for (const key of ['directFiles', 'affectedFiles', 'tests', 'apiConsumers', 'databaseConsumers', 'migrationFiles']) {
+    if (Array.isArray(truth[key]) && truth[key].some(value => !safeRelativePath(value))) {
+      errors.push('groundTruth.' + key + ' contains an unsafe relative path');
+    }
+  }
+  if (Array.isArray(truth.scannerSymbols) && truth.scannerSymbols.some(value => !value || !safeRelativePath(value.file) || typeof value.name !== 'string' || typeof value.kind !== 'string')) {
+    errors.push('groundTruth.scannerSymbols contains an invalid symbol reference');
+  }
+  if (Array.isArray(truth.dependencyEdges) && truth.dependencyEdges.some(value => !value || !safeRelativePath(value.from) || !safeRelativePath(value.to))) {
+    errors.push('groundTruth.dependencyEdges contains an invalid edge');
+  }
+
   const reviewers = item.annotation?.reviewers || [];
-  if (reviewers.length < 2) errors.push('at least two independent reviewers are required');
+  if (reviewers.length < 2) errors.push('at least two independent blinded reviewers are required');
   const ids = reviewers.map(r => r?.reviewerId).filter(Boolean);
   if (new Set(ids).size !== ids.length) errors.push('reviewer IDs must be distinct');
   for (const reviewer of reviewers) {
     if (reviewer.independent !== true) errors.push('reviewer must attest independence');
+    if (reviewer.blinded !== true) errors.push('reviewer must attest blinding from candidate output');
     if (!Number.isFinite(Date.parse(reviewer.reviewedAt || ''))) errors.push('reviewer reviewedAt must be a valid timestamp');
     if (!Array.isArray(reviewer.evidenceNotes) || !reviewer.evidenceNotes.length) errors.push('reviewer evidence notes are required');
   }
   const adjudication = item.annotation?.adjudication || {};
-  if (adjudication.required === true && adjudication.status !== 'completed') errors.push('required adjudication is incomplete');
-  if (adjudication.required !== true && !['not_needed', 'completed'].includes(adjudication.status)) errors.push('adjudication status is invalid');
+  if (adjudication.required === true) {
+    if (adjudication.status !== 'completed') errors.push('required adjudication is incomplete');
+    if (typeof adjudication.reviewerId !== 'string' || !adjudication.reviewerId) errors.push('completed adjudication requires reviewerId');
+    if (typeof adjudication.rationale !== 'string' || adjudication.rationale.trim().length < 12) errors.push('completed adjudication requires a substantive rationale');
+  } else if (adjudication.required === false) {
+    if (adjudication.status !== 'not_needed') errors.push('non-required adjudication must be marked not_needed');
+    if (typeof adjudication.rationale !== 'string' || adjudication.rationale.trim().length < 12) errors.push('not-needed adjudication requires a rationale');
+  } else {
+    errors.push('annotation.adjudication.required must be boolean');
+  }
   return errors;
 }
 
-export async function validateCorpus(root, { allowEmpty = false } = {}) {
+export async function validateCorpus(root, {
+  allowEmpty = false,
+  minimumCases = 30,
+  minimumRepositories = 12,
+  minimumPerSizeClass = 4
+} = {}) {
   const errors = [];
   const manifest = JSON.parse(await fs.readFile(path.join(root, 'manifest.json'), 'utf8'));
   if (manifest.schemaVersion !== '1.0.0') errors.push('manifest schemaVersion must be 1.0.0');
   if (!Array.isArray(manifest.cases)) errors.push('manifest.cases must be an array');
   const cases = Array.isArray(manifest.cases) ? manifest.cases : [];
   if (!cases.length && !allowEmpty) errors.push('corpus is empty; real-world evaluation is not ready');
+  if (cases.length && cases.length < minimumCases) errors.push('corpus requires at least ' + minimumCases + ' independently annotated cases');
   const seen = new Set();
+  const repositories = new Map();
   const verified = [];
   for (const record of cases) {
-    if (!record?.caseFile) { errors.push('manifest record requires caseFile'); continue; }
+    if (!record?.caseFile || !safeRelativePath(record.caseFile)) {
+      errors.push('manifest record requires a safe relative caseFile');
+      continue;
+    }
     const casePath = path.resolve(root, record.caseFile);
     if (!casePath.startsWith(path.resolve(root) + path.sep)) { errors.push('caseFile escapes corpus root'); continue; }
     try {
       const item = JSON.parse(await fs.readFile(casePath, 'utf8'));
       for (const message of validateCase(item, seen)) errors.push(item.caseId + ': ' + message);
       seen.add(item.caseId);
+      const repository = item.source?.repositoryUrl;
+      const sizeClass = item.source?.sizeClass;
+      if (repository) {
+        const existing = repositories.get(repository);
+        if (existing && existing !== sizeClass) errors.push(repository + ': inconsistent size class across cases');
+        repositories.set(repository, sizeClass);
+      }
       const snapshotPath = path.resolve(root, item.snapshot.relativePath);
       if (!snapshotPath.startsWith(path.resolve(root) + path.sep)) { errors.push(item.caseId + ': snapshot path escapes corpus root'); continue; }
       const fingerprint = await fingerprintSnapshot(snapshotPath);
@@ -94,8 +163,23 @@ export async function validateCorpus(root, { allowEmpty = false } = {}) {
       errors.push(record.caseFile + ': ' + error.message);
     }
   }
-  const ready = cases.length > 0 && errors.length === 0;
-  return { ready, status: ready ? 'ready_for_analysis' : cases.length ? 'invalid_corpus' : 'collection_pending', caseCount: cases.length, verified, errors };
+  if (cases.length) {
+    if (repositories.size < minimumRepositories) errors.push('corpus requires at least ' + minimumRepositories + ' unique repositories');
+    const distribution = { small: 0, medium: 0, large: 0 };
+    for (const sizeClass of repositories.values()) if (Object.hasOwn(distribution, sizeClass)) distribution[sizeClass]++;
+    for (const [sizeClass, count] of Object.entries(distribution)) {
+      if (count < minimumPerSizeClass) errors.push('corpus requires at least ' + minimumPerSizeClass + ' unique ' + sizeClass + ' repositories');
+    }
+  }
+  const ready = cases.length >= minimumCases && errors.length === 0;
+  return {
+    ready,
+    status: ready ? 'ready_for_analysis' : cases.length ? 'invalid_corpus' : 'collection_pending',
+    caseCount: cases.length,
+    repositoryCount: repositories.size,
+    verified,
+    errors
+  };
 }
 
 export async function main() {
