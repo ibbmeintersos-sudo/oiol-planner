@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-MONOLITH-004",
   "taskId": "RW-PN-01",
-  "taskVersion": "0.3.0-draft",
+  "taskVersion": "0.4.0-draft",
   "projectName": "Paperless-ngx",
   "request": "Plan a document-retention capability that lets an authorized administrator assign a retention date to a document, view upcoming expirations, and preview affected documents before an explicitly confirmed expiry operation. Do not schedule irreversible deletion automatically. Preserve document searchability, auditability, and the existing ingestion/OCR workflow.",
   "constraints": [
@@ -53,5 +53,17 @@
     ]
   ],
   "mustClarify": false,
-  "clarificationSignals": []
+  "clarificationSignals": [],
+  "evidencePaths": [
+    "src/documents/models.py",
+    "src/documents/tasks.py",
+    "src/documents/permissions.py",
+    "src/documents/views.py",
+    "src/documents/serialisers.py",
+    "src/documents/signals/handlers.py",
+    "src/paperless/urls.py",
+    "src/documents/tests/test_document_model.py",
+    "src/documents/tests/test_tasks.py",
+    "src/documents/tests/test_api_documents.py"
+  ]
 }
