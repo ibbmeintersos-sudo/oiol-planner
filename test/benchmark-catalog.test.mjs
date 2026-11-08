@@ -257,7 +257,7 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.ok(report.evidence.length > 0);
   assert.equal(JSON.stringify(report).includes(repositoryRoot), false);
   assert.equal(report.root, 'external-repository');
-  assert.equal(report.scannerVersion, '1.5.0');
+  assert.equal(report.scannerVersion, '1.6.0');
   assert.ok(report.skipped.counts);
   assert.ok(report.coverage.sourceAnalysisRatio > 0);
   assert.equal(report.coverage.includedFileCount, report.includedFileCount);
@@ -272,7 +272,7 @@ test('external live planning requires explicit consent before sending repository
   const taskPath = path.join(directory, 'task.json');
   const task = {
     scenarioId: 'EX-API-003', taskId: 'RW-CONSENT-001', taskVersion: '1.0.0',
-    projectName: 'Consent Test', request: 'Plan a repository change.',
+    projectName: 'Consent Test', request: 'Plan a repository change.', evidencePaths: ['src/app.js'],
     constraints: ['Do not invent project facts'],
     expectedSignals: [['architecture']], mustClarify: false
   };
@@ -314,6 +314,7 @@ test('all ten P12 external task drafts satisfy the runner contract and remain ex
     assert.equal(applied.scenarios.length, 1, file);
     assert.equal(applied.scenarios[0].mustClarify, task.mustClarify, file);
     assert.match(applied.taskDefinition.sha256, /^[a-f0-9]{64}$/, file);
+    assert.deepEqual(applied.taskDefinition.evidencePaths, task.evidencePaths, file);
     if (task.mustClarify) assert.ok(applied.scenarios[0].clarificationSignals.length > 0, file);
   }
   assert.equal(repositoryPrefixes.size, 5);
@@ -342,6 +343,7 @@ test('all P12 task drafts support credential-free external dry-run manifests', a
       assert.equal(report.dryRun, true, file);
       assert.equal(report.sourceMode, 'external-local-checkout', file);
       assert.equal(report.taskDefinition.id, task.taskId, file);
+      assert.deepEqual(report.taskDefinition.evidencePaths, task.evidencePaths, file);
       assert.equal(report.liveCalls, false, file);
     }
   } finally {
