@@ -151,3 +151,37 @@ test('markdown report surfaces database schema impact, DDL risk, consumers, and 
     assert.ok(markdown.includes(value), 'missing database schema impact evidence: ' + value);
   }
 });
+
+test('markdown report surfaces migration sequencing, compatibility matrix, and rollout gates', () => {
+  const migrationPlan = {
+    ...plan,
+    project: {
+      ...plan.project,
+      changeImpact: {
+        databaseSchemaImpact: {
+          status: 'analyzed',
+          diagnostics: { matchedTableCount: 1, matchedChangeCount: 1, consumerCandidateCount: 1, migrationFileCount: 2 },
+          matchedTables: [],
+          schemaChanges: [],
+          potentiallyAffectedConsumers: [],
+          riskSignals: [],
+          limitations: [],
+          migrationCompatibility: {
+            status: 'analyzed',
+            diagnostics: { orderedMigrationCount: 2, unorderedMigrationCount: 0, expandContractPairCount: 1 },
+            orderedMigrations: [{ path: 'db/migrations/001_expand.sql', orderKey: '001', phase: 'expand_or_additive', operations: [{ operation: 'add_column', table: 'customers', column: 'email_new' }] }],
+            sequenceRisks: [],
+            possibleExpandContractPairs: [{ table: 'customers', addedColumn: 'email_new', removedColumn: 'email', earlierMigration: 'db/migrations/001_expand.sql', laterMigration: 'db/migrations/002_contract.sql' }],
+            compatibilityFindings: [{ operation: 'drop_column', table: 'customers', compatibility: { oldApplicationWithNewSchema: 'breaking_change_candidate_for_detected_consumers', newApplicationWithOldSchema: 'incompatible_if_new_code_still_expects_removed_object', rolloutGuidance: 'Wait until old consumers are retired.' } }],
+            rolloutSequence: [{ stage: 'backfill', purpose: 'Populate the new representation.', gates: ['Validate completion before contract.'] }],
+            limitations: ['Filename order does not prove migration execution order.']
+          }
+        }
+      }
+    }
+  };
+  const markdown = renderPlanMarkdown(migrationPlan);
+  for (const value of ['Migration ordering and rollout compatibility', 'Ordered migration candidates', 'possible expand/contract', 'old app/new schema', 'breaking_change_candidate_for_detected_consumers', 'backfill', 'Filename order does not prove migration execution order.']) {
+    assert.ok(markdown.toLowerCase().includes(value.toLowerCase()), 'missing migration compatibility report content: ' + value);
+  }
+});
