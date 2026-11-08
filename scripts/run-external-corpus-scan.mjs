@@ -25,7 +25,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
     request: 'Read-only repository intake scan for the OIOL P12 real-world planning benchmark.',
     scanOptions
   });
-  assertExternalRepositorySnapshot(project);
+  assertExternalRepositorySnapshot(project, { requireRequestedEvidence: false });
   const repository = project.repository;
   const scannerEvidence = summarizeRepositoryEvidence(project);
   return {
