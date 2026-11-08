@@ -8,7 +8,7 @@ import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
 const exec = promisify(execFile);
 export const SCANNER_VERSION = '1.6.0';
-export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 5000, maxFileBytes: 32000, maxContextChars: 150000, maxDepth: 16, maxSourceFiles: 500, maxTestFiles: 25, maxConfigFiles: 25 });
+export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 5000, maxFileBytes: 32000, maxPriorityFileBytes: 256000, maxContextChars: 150000, maxPriorityExcerptChars: 10000, maxDepth: 16, maxSourceFiles: 500, maxTestFiles: 25, maxConfigFiles: 25 });
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.(?:pem|key|p12|pfx|jks|keystore)|(?:credentials|secrets)\.(?:json|ya?ml)|\.npmrc|\.pypirc|\.netrc)$/i;
 const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'composer.json'];
@@ -103,8 +103,8 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
   return { files, discovered, truncated, depthTruncated, skipped };
 }
 
-export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, maxSourceFiles = 100, maxTestFiles = 15, maxConfigFiles = 15, priorityPaths = [] } = {}) {
-  for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles })) {
+export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxPriorityFileBytes = 128000, maxContextChars = 50000, maxPriorityExcerptChars = 10000, maxDepth = 12, maxSourceFiles = 100, maxTestFiles = 15, maxConfigFiles = 15, priorityPaths = [], priorityRanges = [] } = {}) {
+  for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxPriorityFileBytes, maxContextChars, maxPriorityExcerptChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles })) {
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
   }
   if (!Array.isArray(priorityPaths) || priorityPaths.some(value => typeof value !== 'string' || !value.trim())) throw new Error('priorityPaths must be an array of non-empty relative paths');
@@ -116,6 +116,16 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     }
     if (SENSITIVE.test(relative)) throw new Error('Sensitive priority evidence path is not allowed: ' + relative);
   }
+  if (!Array.isArray(priorityRanges) || priorityRanges.some(range => !range || typeof range.path !== 'string' || !range.path.trim() || !Number.isInteger(range.startLine) || !Number.isInteger(range.endLine) || range.startLine < 1 || range.endLine < range.startLine || range.endLine - range.startLine > 200)) throw new Error('priorityRanges must contain safe paths and 1-based line ranges of at most 201 lines');
+  const normalizedPriorityRanges = priorityRanges.map(range => ({ path: range.path.replaceAll('\\\\', '/'), startLine: range.startLine, endLine: range.endLine }));
+  for (const range of normalizedPriorityRanges) {
+    const normalized = path.posix.normalize(range.path);
+    if (range.path.startsWith('/') || /^[a-z]:/i.test(range.path) || normalized !== range.path || normalized.split('/').includes('..')) throw new Error('Unsafe priority evidence range path: ' + range.path);
+    if (SENSITIVE.test(range.path)) throw new Error('Sensitive priority evidence range path is not allowed: ' + range.path);
+    if (!normalizedPriorityPaths.includes(range.path)) throw new Error('Priority evidence range path must also appear in priorityPaths: ' + range.path);
+  }
+  const priorityRangesByPath = new Map();
+  for (const range of normalizedPriorityRanges) priorityRangesByPath.set(range.path, [...(priorityRangesByPath.get(range.path) || []), range]);
   const root = await fs.realpath(path.resolve(repoPath));
   const stat = await fs.stat(root);
   if (!stat.isDirectory()) throw new Error('Repository path is not a directory');
@@ -163,11 +173,20 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   for (const file of selected) {
     try {
       const buffer = await fs.readFile(path.join(root, file));
-      if (buffer.length > maxFileBytes || buffer.includes(0)) continue;
+      const fileRanges = priorityRangesByPath.get(file) || [];
+      const allowedBytes = fileRanges.length ? maxPriorityFileBytes : maxFileBytes;
+      if (buffer.length > allowedBytes || buffer.includes(0)) continue;
       const sourceText = buffer.toString('utf8');
       sourceContents[file] = sourceText;
       const redactedText = redact(sourceText);
-      const content = redactedText.slice(0, 5000);
+      let content;
+      if (fileRanges.length) {
+        const lines = redactedText.split(/\\r?\\n/);
+        content = fileRanges.map(range => {
+          const endLine = Math.min(range.endLine, lines.length);
+          return '[EVIDENCE RANGE: ' + file + ':' + range.startLine + '-' + endLine + ']\\n' + lines.slice(range.startLine - 1, endLine).join('\\n');
+        }).join('\\n\\n').slice(0, maxPriorityExcerptChars);
+      } else content = redactedText.slice(0, 5000);
       const id = evidenceId(file);
       if (context.length + content.length > maxContextChars) { contextTruncated = true; continue; }
       context += '\n\n--- [EVIDENCE: ' + id + '] ' + file + ' ---\n' + content;
@@ -191,12 +210,17 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
 
   const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests, maxFileBytes });
   const excerptedPriorityPaths = matchedPriorityPaths.filter(file => snippets.some(snippet => snippet.path === file));
+  const excerptedRanges = normalizedPriorityRanges.filter(range => excerptedPriorityPaths.includes(range.path));
   const evidenceSelection = {
     requestedPaths: normalizedPriorityPaths,
     matchedPaths: matchedPriorityPaths,
     excerptedPaths: excerptedPriorityPaths,
     missingPaths: normalizedPriorityPaths.filter(file => !files.includes(file)),
-    unexcerptedPaths: matchedPriorityPaths.filter(file => !excerptedPriorityPaths.includes(file))
+    unexcerptedPaths: matchedPriorityPaths.filter(file => !excerptedPriorityPaths.includes(file)),
+    requestedRanges: normalizedPriorityRanges,
+    excerptedRanges,
+    missingRanges: normalizedPriorityRanges.filter(range => !files.includes(range.path)),
+    unexcerptedRanges: normalizedPriorityRanges.filter(range => !excerptedPriorityPaths.includes(range.path))
   };
   const structureSummary = [
     'Repository structure analysis (Tree-sitter AST where bundled grammars are available; bounded lexical fallback otherwise; evidence, not certainty):',
@@ -234,6 +258,6 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     snippets,
     evidenceSelection,
     contextTruncated,
-    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles }
+    scanLimits: { maxFiles, maxFileBytes, maxPriorityFileBytes, maxContextChars, maxPriorityExcerptChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles }
   };
 }
