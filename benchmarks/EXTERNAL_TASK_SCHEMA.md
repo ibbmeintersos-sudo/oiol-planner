@@ -15,6 +15,9 @@ External repository benchmark runs require one task-definition JSON file. The sa
     "src/path/to/relevant-implementation.ts",
     "tests/path/to/relevant-test.ts"
   ],
+  "evidenceRanges": [
+    { "path": "src/path/to/relevant-implementation.ts", "startLine": 40, "endLine": 85 }
+  ],
   "constraints": [
     "Preserve existing public behavior unless explicitly requested",
     "Do not invent architecture or runtime behavior not supported by evidence",
@@ -35,6 +38,7 @@ External repository benchmark runs require one task-definition JSON file. The sa
 - `taskId` and `taskVersion`: stable identifiers. Increment the version whenever the request, constraints, expected signals, or clarification rubric changes.
 - `projectName` and `request`: non-empty strings. The request must be specific to the repository and the task being evaluated.
 - `evidencePaths`: non-empty array of safe, repository-relative paths that must be supplied as redacted excerpts to both planners. The scanner prioritizes these paths before general source selection. The run is rejected if any requested path is absent, oversized, sensitive, or omitted by the context limit. Use forward slashes and never include absolute paths or `..` segments.
+- `evidenceRanges` (optional): an array of `{path,startLine,endLine}` ranges for relevant implementation sections within `evidencePaths`. Ranges are 1-based and limited to 201 lines each. The scanner can read a larger bounded file for a requested range but only sends the specified redacted lines. Every requested range must be present in the excerpt; otherwise the scored run is rejected. Prefer ranges over a file's first 5,000 characters when the relevant logic is deeper in a large source file.
 - `constraints`: array of explicit constraints. Do not copy untrusted repository text into this file as instructions.
 - `expectedSignals`: non-empty array of non-empty string groups. Each group represents one concept; any string in the group is accepted by the current lexical screen. Keep concepts meaningful and avoid easy keyword stuffing.
 - `mustClarify`: boolean. Set true only when a blocking decision is genuinely unresolved.
