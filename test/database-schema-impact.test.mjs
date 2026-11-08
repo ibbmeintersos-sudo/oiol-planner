@@ -148,3 +148,36 @@ export async function loadCustomer(prisma) {
   assert.ok(result.tables.some(item => item.name === 'customers' && item.model === 'Customer' && item.sourceKind === 'prisma_model'));
   assert.ok(result.consumers.some(item => item.table === 'customers' && item.path === appPath));
 });
+
+test('schema-only repositories retain confidence when schema evidence is the direct match', () => {
+  const databaseSchema = scanDatabaseSchema({
+    files: [migrationPath],
+    contents: { [migrationPath]: migration },
+    sourceEvidence: evidence.slice(0, 1)
+  });
+  const result = analyzeChangeImpact({
+    request: 'drop email column from customers database schema migration',
+    repository: {
+      fileCount: 1,
+      fileCountIsLowerBound: false,
+      truncated: false,
+      depthTruncated: false,
+      tests: [],
+      coverage: { sourceFilesOmittedBySelectionLimit: 0, readFailureCount: 0, oversizedFileCount: 0 },
+      structure: {
+        astFileCount: 0,
+        symbols: [],
+        imports: [],
+        testFiles: [],
+        sourceEvidence: evidence.slice(0, 1),
+        dependencyGraph: { nodes: [], edges: [], edgeCount: 0 },
+        workspaceGraph: { packages: [], dependencies: [] },
+        databaseSchema
+      }
+    }
+  });
+
+  assert.equal(result.status, 'analyzed');
+  assert.ok(result.confidence.score > 0.35);
+  assert.equal(result.confidence.penalties.includes('no_direct_request_match_found'), false);
+});
