@@ -100,7 +100,7 @@ export async function main() {
   const corpusRoot = option('corpus-root');
   if (!corpusRoot) throw new Error('Pass --corpus-root <path>');
   const result = await validateCorpus(path.resolve(corpusRoot), { allowEmpty: process.argv.includes('--allow-empty') });
-  process.stdout.write(JSON.stringify(result, null, 2) + '\\n');
+  process.stdout.write(JSON.stringify(result, null, 2) + '\n');
   return result.ready || (process.argv.includes('--allow-empty') && result.caseCount === 0 && result.errors.length === 0) ? 0 : 2;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
