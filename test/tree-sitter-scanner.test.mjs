@@ -292,3 +292,35 @@ test('scanner resolves Go module imports and Python absolute package imports', a
     await f.cleanup();
   }
 });
+
+test('scanner parses Dart and Swift sources and extracts their import declarations', async () => {
+  const f = await fixture('oiol-ast-dart-swift-');
+  try {
+    await mkdir(path.join(f.root, 'mobile', 'lib'), { recursive: true });
+    await mkdir(path.join(f.root, 'native'), { recursive: true });
+    await writeFile(path.join(f.root, 'mobile', 'lib', 'service.dart'), [
+      "import 'package:flutter/material.dart';",
+      'class MobileService {',
+      '  Future<void> load() async {}',
+      '}',
+      ''
+    ].join('\n'));
+    await writeFile(path.join(f.root, 'native', 'Service.swift'), [
+      'import Foundation',
+      'public struct NativeService {',
+      '  public func load() {}',
+      '}',
+      ''
+    ].join('\n'));
+    const result = await scanRepository(f.root, { maxSourceFiles: 20 });
+    const structure = result.structure;
+    assert.equal(structure.astFileCount, 2, JSON.stringify(structure.parserDiagnostics));
+    assert.equal(structure.unsupportedLanguageFileCount, 0);
+    assert.equal(structure.parseCounts.dart, 1);
+    assert.equal(structure.parseCounts.swift, 1);
+    assert.ok(structure.imports.some(item => item.file === 'mobile/lib/service.dart' && item.specifier === 'package:flutter/material.dart'));
+    assert.ok(structure.imports.some(item => item.file === 'native/Service.swift' && item.specifier === 'Foundation'));
+  } finally {
+    await f.cleanup();
+  }
+});
