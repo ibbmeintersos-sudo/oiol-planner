@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { analyzeProject } from '../src/analyzer/project-analyzer.mjs';
 import { SCANNER_VERSION, EXTERNAL_REPOSITORY_SCAN_OPTIONS } from '../src/scanner/repository.mjs';
-import { assertExternalRepositorySnapshot } from './run-planner-benchmark.mjs';
+import { assertExternalRepositorySnapshot, summarizeRepositoryEvidence } from './run-planner-benchmark.mjs';
 
 function arg(name, fallback = null) {
   const index = process.argv.indexOf('--' + name);
@@ -27,6 +27,7 @@ export async function scanExternalRepository({ repositoryRoot, repositoryId = 'e
   });
   assertExternalRepositorySnapshot(project);
   const repository = project.repository;
+  const scannerEvidence = summarizeRepositoryEvidence(project);
   return {
     protocolVersion: '1.0',
     scanRunnerVersion: '1.3.0',
