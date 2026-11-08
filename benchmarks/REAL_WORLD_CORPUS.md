@@ -34,13 +34,13 @@ PostHog was reviewed as a stretch target because its repository is substantially
 
 | Repository | README fetched | Local checkout | Scanner run | Planning task authored | Benchmark run |
 |---|---:|---:|---:|---:|---:|
-| go-gitea/gitea | Yes | Pending | Pending | Pending | Pending |
-| better-auth/better-auth | Yes | Pending | Pending | Pending | Pending |
+| go-gitea/gitea | Yes | Pending | Pending | Drafts (pending scan) | Pending |
+| better-auth/better-auth | Yes | Pending | Pending | Drafts (pending scan) | Pending |
 | vercel/turborepo | Yes | Pending | Pending | Pending | Pending |
 | plausible/analytics | Yes | Pending | Pending | Pending | Pending |
-| paperless-ngx/paperless-ngx | Yes | Pending | Pending | Pending | Pending |
-| immich-app/immich | Yes | Pending | Pending | Pending | Pending |
-| PrefectHQ/prefect | Yes | Pending | Pending | Pending | Pending |
+| paperless-ngx/paperless-ngx | Yes | Pending | Pending | Drafts (pending scan) | Pending |
+| immich-app/immich | Yes | Pending | Pending | Drafts (pending scan) | Pending |
+| PrefectHQ/prefect | Yes | Pending | Pending | Drafts (pending scan) | Pending |
 | PostHog/posthog (stretch) | Yes | Pending | Pending | Pending | Pending |
 
 
