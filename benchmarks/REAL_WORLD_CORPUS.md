@@ -46,18 +46,18 @@ PostHog was reviewed as a stretch target because its repository is substantially
 
 ## GitHub metadata snapshot (2026-11-08)
 
-The following values were retrieved from GitHub repository metadata. Repository size is GitHub's reported size in KiB, not source LOC, a scanner file count, or a reliable estimate of a shallow checkout size.
+The following values were retrieved from GitHub repository metadata on 2026-11-08. License identifiers are GitHub's SPDX metadata and should be checked against the repository's license files and any applicable third-party notices before redistribution. Repository size is GitHub's reported size in KiB, not source LOC, a scanner file count, or a reliable estimate of a shallow checkout size.
 
-| Repository | Default branch | GitHub size (KiB) | Public | Archived |
-|---|---|---:|---:|---:|
-| go-gitea/gitea | main | 371202 | Yes | No |
-| better-auth/better-auth | main | 170753 | Yes | No |
-| vercel/turborepo | main | 849433 | Yes | No |
-| plausible/analytics | master | 715873 | Yes | No |
-| paperless-ngx/paperless-ngx | dev | 234146 | Yes | No |
-| immich-app/immich | main | 323636 | Yes | No |
-| PrefectHQ/prefect | main | 253254 | Yes | No |
-| PostHog/posthog (stretch) | master | 9056955 | Yes | No |
+| Repository | Default branch | License (SPDX) | GitHub size (KiB) | Public | Archived |
+|---|---|---|---:|---:|---:|
+| go-gitea/gitea | main | MIT | 371202 | Yes | No |
+| better-auth/better-auth | main | MIT | 170753 | Yes | No |
+| vercel/turborepo | main | MIT | 849433 | Yes | No |
+| plausible/analytics | master | AGPL-3.0 | 715873 | Yes | No |
+| paperless-ngx/paperless-ngx | dev | GPL-3.0 | 234146 | Yes | No |
+| immich-app/immich | main | AGPL-3.0 | 323636 | Yes | No |
+| PrefectHQ/prefect | main | Apache-2.0 | 253254 | Yes | No |
+| PostHog/posthog (stretch) | master | NOASSERTION (Other) | 9056955 | Yes | No |
 
 The initial balanced checkout subset should prioritize better-auth, paperless-ngx, Prefect, Gitea, and Immich, subject to a successful shallow checkout and scanner feasibility check. Turborepo and Plausible remain candidates but have larger reported repository sizes. PostHog remains a stretch target due to its much larger reported size.
 
