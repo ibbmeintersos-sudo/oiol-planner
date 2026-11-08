@@ -30,3 +30,14 @@ This packet defines a single reviewer's submission format. It is separate from t
 - A completed review is not itself an accepted gold label. Both reviews and adjudication must pass the corpus validator before a case enters manifest.json.
 
 No reviewer submissions are included in this commit. The 36-case worklist remains unassigned and ground truth remains empty.
+## Validate a reviewer submission
+
+After saving one completed review JSON file, validate it against the pinned worklist:
+
+    npm run benchmark:real-world:review -- --review reviews/<case-id>/<reviewer-id>.json
+
+When both independent submissions are available, pass the other file as well to enforce distinct reviewer IDs:
+
+    npm run benchmark:real-world:review -- --review reviews/<case-id>/reviewer-a.json --other-review reviews/<case-id>/reviewer-b.json
+
+The validator checks the case identity, pseudonymous reviewer ID, independence and blinding attestations, all ground-truth dimensions, safe relative paths, and evidence notes. It does not decide whether a human's semantic judgment is correct; that remains the purpose of adjudication.
