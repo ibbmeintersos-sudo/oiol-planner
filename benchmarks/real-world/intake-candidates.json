@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "batchId": "p12-initial-12-repositories",
-  "status": "36_historical_change_candidates_pinned_snapshots_and_annotations_pending",
+  "status": "36_historical_change_candidates_snapshots_acquired_annotations_pending",
   "collectionNotes": [
     "Repository tracked-file counts were computed from the exact PR base commit Git tree using the recursive Git Trees API; all 12 responses reported truncated=false.",
     "Change commit is the merged PR commit. Historical changed paths are evidence only and are not treated as the complete impact ground truth.",
-    "No target repository code has been executed. Snapshot archives and content fingerprints have not yet been collected.",
+    "All 36 historical change cases now map to 34 unique immutable base snapshots. Snapshot tree parity, license-file hashes, content fingerprints, and artifact upload digests are recorded in acquisition-report.json and additional-acquisition-report.json. Independent annotations remain pending.",
     "Each case requires two independent blinded reviewers and adjudication where needed before it can enter manifest.json.",
     "The first large-project candidate batch was adjusted after exact base-tree counting: VS Code has 19,119 tracked files and is therefore medium under the strict >20,000 large threshold; Home Assistant Core (30,403 tracked files at its PR base) replaces it in the large cohort.",
     "VS Code is retained as a medium-size reserve candidate (19,119 tracked files) and is excluded from the 12-repository first batch so the required 4/4/4 strata remain balanced.",

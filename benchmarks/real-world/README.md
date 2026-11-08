@@ -19,7 +19,7 @@ The change commit / pull request is provenance for the historical change. It is 
 
 ## Independence and blinding
 
-The operational field-by-field protocol is in [ANNOTATION_GUIDE.md](./ANNOTATION_GUIDE.md). The 36-case reviewer queue, including exact snapshot artifact references and empty reviewer slots, is in [annotation-worklist.json](./annotation-worklist.json). Use the guide for every case; the JSON schema alone does not define annotation judgment.
+The operational field-by-field protocol is in [ANNOTATION_GUIDE.md](./ANNOTATION_GUIDE.md). The 36-case reviewer queue, including exact snapshot artifact references and empty reviewer slots, is in [annotation-worklist.json](./annotation-worklist.json). Use the [independent review packet](./REVIEW_PACKET.md), [review schema](./review.schema.json), and [review template](./review-template.json) to keep two reviewers' submissions separate until adjudication.
 
 1. Corpus curators select changes before running the candidate OIOL version.
 2. Annotators do not see OIOL output, scores, confidence, or diagnostics.
