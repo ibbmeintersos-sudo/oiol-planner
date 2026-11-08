@@ -479,6 +479,7 @@ export function analyzeChangeImpact({
       potentiallyAffectedFiles: [],
       affectedTests: [],
       affectedPackages: [],
+      testImpactAnalysis: analyzeTestImpact({ request: requestText, repository }),
       risks: [],
       limitations: ['No target project commands, tests, builds, or scripts are executed by OIOL.']
     };
@@ -511,6 +512,7 @@ export function analyzeChangeImpact({
       potentiallyAffectedFiles: [],
       affectedTests: [],
       affectedPackages: [],
+      testImpactAnalysis: analyzeTestImpact({ request: requestText, repository, changeImpact: { directMatches: [], affectedTests: [], graph: { traversalLimits: {} } }, maxCandidates: maxTests }),
       risks: ['insufficient_source_evidence'],
       limitations: [
         'A lack of matching evidence is not proof that no files are affected.',
