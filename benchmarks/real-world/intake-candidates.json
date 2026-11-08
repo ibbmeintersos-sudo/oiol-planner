@@ -6,7 +6,8 @@
     "Repository tracked-file counts were computed from the exact PR base commit Git tree using the recursive Git Trees API; all 12 responses reported truncated=false.",
     "Change commit is the merged PR commit. Historical changed paths are evidence only and are not treated as the complete impact ground truth.",
     "No target repository code has been executed. Snapshot archives and content fingerprints have not yet been collected.",
-    "Each case requires two independent blinded reviewers and adjudication where needed before it can enter manifest.json."
+    "Each case requires two independent blinded reviewers and adjudication where needed before it can enter manifest.json.",
+    "The first large-project candidate batch was adjusted after exact base-tree counting: VS Code has 19,119 tracked files and is therefore medium under the strict >20,000 large threshold; Home Assistant Core (30,403 tracked files at its PR base) replaces it in the large cohort."
   ],
   "targetDistribution": {
     "small": 4,
@@ -284,7 +285,7 @@
         "licenseFileUrl": "https://github.com/microsoft/vscode/blob/eb47bf7592b0412fb056dbe631cdaa9bfeed9d17/LICENSE.txt",
         "baseCommit": "eb47bf7592b0412fb056dbe631cdaa9bfeed9d17",
         "changeCommit": "95dce80d5e39707263b26d7c3b6884a57582fd48",
-        "sizeClass": "large",
+        "sizeClass": "medium",
         "trackedFileCountAtBase": 19119,
         "primaryLanguages": [
           "TypeScript"
@@ -445,6 +446,40 @@
           "pkg/registry/apis/provisioning/jobs/driver.go",
           "pkg/registry/apis/provisioning/jobs/driver_tracing_test.go",
           "pkg/registry/apis/provisioning/register.go"
+        ],
+        "changedFileCount": 5
+      }
+    },
+    {
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "source": {
+        "repository": "home-assistant/core",
+        "repositoryUrl": "https://github.com/home-assistant/core",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/LICENSE.md",
+        "baseCommit": "cbf2c02c9bff331537c19bff69da8dc11c3fbfbf",
+        "changeCommit": "f4e3a420d981b8a523fad8614923ffbc18494741",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 30403,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 190773,
+        "url": "https://github.com/home-assistant/core/pull/190773",
+        "mergedAt": "2026-11-06T23:01:43Z",
+        "title": "Forget disabled UniFi entities when their registry entry is removed",
+        "category": "cross_component",
+        "candidateRequest": "Ensure disabled UniFi entities are removed from the integration's entity state when their registry entry is deleted, consistently across entity loading and sensor handling.",
+        "historicalChangedPaths": [
+          "homeassistant/components/unifi/__init__.py",
+          "homeassistant/components/unifi/entity.py",
+          "homeassistant/components/unifi/hub/entity_loader.py",
+          "homeassistant/components/unifi/sensor.py",
+          "tests/components/unifi/test_init.py"
         ],
         "changedFileCount": 5
       }
