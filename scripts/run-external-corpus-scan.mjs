@@ -95,13 +95,14 @@ export async function main() {
   const repositoryRoot = arg('repo');
   const repositoryId = arg('id', 'external-repository');
   const taskFilePath = arg('task-file');
-  let priorityPaths = [];
+  let priorityPaths = [], priorityRanges = [];
   if (taskFilePath) {
     const task = JSON.parse(await fs.readFile(path.resolve(taskFilePath), 'utf8'));
     if (!Array.isArray(task.evidencePaths) || !task.evidencePaths.length) throw new Error('--task-file must contain non-empty evidencePaths');
     priorityPaths = task.evidencePaths;
+    priorityRanges = task.evidenceRanges || [];
   }
-  const report = await scanExternalRepository({ repositoryRoot, repositoryId, scanOptions: { ...EXTERNAL_REPOSITORY_SCAN_OPTIONS, priorityPaths } });
+  const report = await scanExternalRepository({ repositoryRoot, repositoryId, scanOptions: { ...EXTERNAL_REPOSITORY_SCAN_OPTIONS, priorityPaths, priorityRanges } });
   const output = arg('out');
   if (output) {
     const destination = path.resolve(output);
