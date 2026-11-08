@@ -116,7 +116,7 @@ export function scanDatabaseSchema({ files = [], contents = {}, sourceEvidence =
   const modelToTable = new Map(objects.filter(item => item.model).map(item => [String(item.model).toLowerCase(), tableKey(item.name)]));
   const consumers = [];
   for (const file of analyzedFiles) {
-    if (/\.(?:sql|prisma)$/i.test(file)) continue;
+    if (/\\.prisma$/i.test(file) || /(^|\\/)(migrations?|schema|ddl)(\\/|$)/i.test(file)) continue;
     const source = contents[file];
     const names = new Set();
     for (const match of source.matchAll(/\b(?:from|join|into|update|references)\s+[\`"[]?([\w.]+)[\`"\]]?/gi)) names.add(tableKey(match[1]));
