@@ -34,6 +34,9 @@ function changeImpactSection(impact) {
     '- **Contract analysis status:** ' + text(impact.apiContractImpact?.status || 'Not requested'),
     '- **Exported contract symbols matched:** ' + (Number.isFinite(impact.apiContractImpact?.diagnostics?.matchedContractSymbolCount) ? impact.apiContractImpact.diagnostics.matchedContractSymbolCount : 'Not recorded'),
     '- **Export-metadata files:** ' + (Number.isFinite(impact.apiContractImpact?.diagnostics?.exportMetadataFileCount) ? impact.apiContractImpact.diagnostics.exportMetadataFileCount : 'Not recorded'),
+    '- **Consumer graph depth limit reached:** ' + (impact.apiContractImpact?.diagnostics?.depthLimitReached === true ? 'Yes' : impact.apiContractImpact?.diagnostics?.depthLimitReached === false ? 'No' : 'Not recorded'),
+    '- **Unseen consumer frontier:** ' + (Number.isFinite(impact.apiContractImpact?.diagnostics?.depthFrontierCount) ? impact.apiContractImpact.diagnostics.depthFrontierCount : 'Not recorded'),
+    '- **Consumer graph node/result cap reached:** ' + (impact.apiContractImpact?.diagnostics ? (impact.apiContractImpact.diagnostics.nodeLimitReached || impact.apiContractImpact.diagnostics.consumerResultLimitReached ? 'Yes' : 'No') : 'Not recorded'),
     ...(Array.isArray(impact.apiContractImpact?.contractSymbols) && impact.apiContractImpact.contractSymbols.length
       ? impact.apiContractImpact.contractSymbols.map(item => '- **' + text(item.name) + '** (' + text(item.kind) + ') — ' + text(item.file) + (item.line ? ':' + text(item.line) : '') + '; matched: ' + text((item.matchedTerms || []).join(', ')) + (item.evidenceId ? '; evidence: ' + text(item.evidenceId) : ''))
       : ['- No AST-backed exported contract symbol was matched.']),
