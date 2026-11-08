@@ -143,7 +143,7 @@ export async function main() {
   const reviewConfig=process.env.OIOL_REVIEW_PROVIDER?providerConfig('OIOL_REVIEW_'):null;
   const configSummary={planner:publicConfig(planningConfig),reviewer:reviewConfig?publicConfig(reviewConfig):{mode:'same-provider critique; not independent'}};
   if(process.argv.includes('--dry-run')) {
-    console.log(JSON.stringify({dryRun:true,selected:chosen.map(x=>x.id),config:configSummary,liveCalls:false},null,2));
+    console.log(JSON.stringify({dryRun:true,selected:chosen.map(x=>x.id),sourceMode:repositoryRoot?'external-local-checkout':'checked-in-fixtures',taskDefinition,config:configSummary,liveCalls:false},null,2));
     return 0;
   }
   if(process.env.OIOL_BENCHMARK_ALLOW_LIVE!=='1') throw new Error('Set OIOL_BENCHMARK_ALLOW_LIVE=1 to confirm that this run may call configured LLM providers.');
