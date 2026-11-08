@@ -1,17 +1,15 @@
-const pathOf = value => String(value || '').replaceAll('\\\\', '/').replace(/^\\.\\//, '');
+const pathOf = value => String(value || '').replaceAll('\\', '/').replace(/^\.\//, '');
 const basename = value => pathOf(value).split('/').at(-1) || '';
 const numericOrder = value => {
-  const name = basename(value);
+  const timestamp = name.match(/^(20\d{2}[01]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d)/);
   const timestamp = name.match(/^(20\\d{2}[01]\\d[0-3]\\d[0-2]\\d[0-5]\\d[0-5]\\d)/);
-  if (timestamp) return { kind: 'timestamp', value: timestamp[1] };
+  const prefix = name.match(/^(\d{3,})/);
   const prefix = name.match(/^(\\d{3,})/);
   if (prefix) return { kind: 'numeric_prefix', value: prefix[1].padStart(16, '0') };
   return { kind: 'unknown', value: null };
 };
-const sortByPath = (a, b) => a.path.localeCompare(b.path);
 const destructive = new Set(['drop_table', 'drop_column', 'rename_table', 'rename_column', 'alter_column_type', 'set_not_null', 'drop_constraint']);
 const additive = new Set(['create_table', 'add_column', 'add_constraint', 'add_index', 'drop_not_null']);
-const oldAndNewNames = change => [change.oldName, change.newName, change.column].filter(Boolean).map(value => String(value).toLowerCase());
 
 function classifyPhase(operations) {
   if (operations.some(item => destructive.has(item.operation))) return 'contract_or_destructive';
@@ -104,7 +102,7 @@ export function analyzeMigrationCompatibility({ databaseSchema = null, maxMigrat
   }
   for (const table of databaseSchema.tables || []) {
     const path = pathOf(table.path);
-    if (!path || !/(^|\\/)(migrations?|schema|ddl)(\\/|$)|\\d{4,}[_-]/i.test(path)) continue;
+    if (!path || /(^|\/)(migrations?|schema|ddl)(\/|$)|\d{4,}[_-]/i.test(path) === false) continue;
     if (!groups.has(path)) groups.set(path, []);
     if (!groups.get(path).some(item => item.operation === 'create_table' && String(item.table || item.name).toLowerCase() === String(table.name).toLowerCase())) {
       groups.get(path).push({
