@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-API-003",
   "taskId": "RW-GT-02",
-  "taskVersion": "0.3.0-draft",
+  "taskVersion": "0.4.0-draft",
   "projectName": "Gitea",
   "request": "A product request says: “Make package cleanup more granular.” Produce a planning response, but do not assume the intended scope, precedence, or deletion policy.",
   "constraints": [
@@ -115,5 +115,12 @@
     [
       "recovery"
     ]
+  ],
+  "evidencePaths": [
+    "models/packages/package_cleanup_rule.go",
+    "services/packages/cleanup/cleanup.go",
+    "routers/web/shared/packages/packages.go",
+    "templates/package/shared/cleanup_rules/preview.tmpl",
+    "tests/integration/api_packages_test.go"
   ]
 }
