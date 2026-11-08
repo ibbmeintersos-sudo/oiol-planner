@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oiol.dev/schemas/real-world-benchmark-case-1.0.0.schema.json",
+  "title": "OIOL Real-World Benchmark Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "caseId", "source", "change", "snapshot", "groundTruth", "annotation"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "caseId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositoryUrl", "license", "licenseFileUrl", "baseCommit", "changeCommit", "changeUrl"],
+      "properties": {
+        "repositoryUrl": { "type": "string", "format": "uri" },
+        "license": { "type": "string", "minLength": 1 },
+        "licenseFileUrl": { "type": "string", "format": "uri" },
+        "baseCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "changeCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "changeUrl": { "type": "string", "format": "uri" },
+        "repositoryKind": { "enum": ["library", "service", "monolith", "workspace", "other"] },
+        "sizeClass": { "enum": ["small", "medium", "large"] },
+        "primaryLanguages": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request", "category", "summary"],
+      "properties": {
+        "request": { "type": "string", "minLength": 8 },
+        "category": { "enum": ["source_change", "api_change", "database_change", "migration_change", "test_change", "cross_component", "ambiguous"] },
+        "summary": { "type": "string", "minLength": 12 }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relativePath", "sha256"],
+      "properties": {
+        "relativePath": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "trackedFileCount": { "type": "integer", "minimum": 1 },
+        "sourceFileCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "groundTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directFiles", "affectedFiles", "tests", "packages", "apiConsumers", "databaseConsumers", "migrationFiles", "scannerSymbols", "dependencyEdges", "unknowns", "risks"],
+      "properties": {
+        "directFiles": { "type": "array", "items": { "type": "string" } },
+        "affectedFiles": { "type": "array", "items": { "type": "string" } },
+        "tests": { "type": "array", "items": { "type": "string" } },
+        "packages": { "type": "array", "items": { "type": "string" } },
+        "apiConsumers": { "type": "array", "items": { "type": "string" } },
+        "databaseConsumers": { "type": "array", "items": { "type": "string" } },
+        "migrationFiles": { "type": "array", "items": { "type": "string" } },
+        "scannerSymbols": { "type": "array", "items": { "type": "object", "required": ["file", "name", "kind"], "properties": { "file": { "type": "string" }, "name": { "type": "string" }, "kind": { "type": "string" } } } },
+        "dependencyEdges": { "type": "array", "items": { "type": "object", "required": ["from", "to"], "properties": { "from": { "type": "string" }, "to": { "type": "string" } } } },
+        "unknowns": { "type": "array", "items": { "type": "string" } },
+        "risks": { "type": "array", "items": { "type": "object", "required": ["id", "severity", "rationale"], "properties": { "id": { "type": "string" }, "severity": { "enum": ["low", "medium", "high", "critical"] }, "rationale": { "type": "string" } } } }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewers", "adjudication"],
+      "properties": {
+        "reviewers": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["reviewerId", "independent", "reviewedAt", "evidenceNotes"],
+            "properties": {
+              "reviewerId": { "type": "string", "minLength": 2 },
+              "independent": { "const": true },
+              "reviewedAt": { "type": "string", "format": "date-time" },
+              "evidenceNotes": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+            }
+          }
+        },
+        "adjudication": {
+          "type": "object",
+          "required": ["required", "status"],
+          "properties": {
+            "required": { "type": "boolean" },
+            "status": { "enum": ["not_needed", "completed", "pending"] },
+            "reviewerId": { "type": "string" },
+            "rationale": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
