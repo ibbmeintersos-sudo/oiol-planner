@@ -7,8 +7,8 @@ import { redact } from '../core/utils.mjs';
 import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
 const exec = promisify(execFile);
-export const SCANNER_VERSION = '1.2.0';
-export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 2000, maxFileBytes: 32000, maxContextChars: 100000, maxDepth: 14, maxSourceFiles: 250 });
+export const SCANNER_VERSION = '1.3.0';
+export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 5000, maxFileBytes: 32000, maxContextChars: 150000, maxDepth: 16, maxSourceFiles: 500, maxTestFiles: 25, maxConfigFiles: 25 });
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.(?:pem|key|p12|pfx|jks|keystore)|(?:credentials|secrets)\.(?:json|ya?ml)|\.npmrc|\.pypirc|\.netrc)$/i;
 const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'composer.json'];
@@ -103,8 +103,8 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
   return { files, discovered, truncated, depthTruncated, skipped };
 }
 
-export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, maxSourceFiles = 100 } = {}) {
-  for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles })) {
+export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12, maxSourceFiles = 100, maxTestFiles = 15, maxConfigFiles = 15 } = {}) {
+  for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles })) {
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
   }
   const root = await fs.realpath(path.resolve(repoPath));
@@ -140,8 +140,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   const selected = [...new Set(interleaveGroups([
     manifests,
     sourceFiles,
-    tests.slice(0, 15),
-    configs.slice(0, 15)
+    tests.slice(0, maxTestFiles),
+    configs.slice(0, maxConfigFiles)
   ]))];
   let context = '', contextTruncated = false;
   const snippets = [];
@@ -211,6 +211,6 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     structure: { ...structure, sourceEvidence: snippets.map(({id,path,sourceSha256,excerptSha256}) => ({id,path,sourceSha256,excerptSha256,trustLevel:'untrusted_repository_content'})) },
     snippets,
     contextTruncated,
-    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles }
+    scanLimits: { maxFiles, maxFileBytes, maxContextChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles }
   };
 }
