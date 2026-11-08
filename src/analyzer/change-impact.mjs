@@ -651,9 +651,11 @@ export function analyzeChangeImpact({
       ...(databaseSchemaImpact.status === 'unavailable' ? ['database_schema_metadata_unavailable'] : []),
       ...(databaseSchemaImpact.status === 'insufficient_schema_match' ? ['database_schema_match_not_found'] : []),
       ...(databaseSchemaImpact.diagnostics?.tableResultLimitReached || databaseSchemaImpact.diagnostics?.changeResultLimitReached || databaseSchemaImpact.diagnostics?.consumerResultLimitReached ? ['database_schema_results_truncated'] : []),
+      ...(databaseSchemaImpact.migrationCompatibility?.sequenceRisks?.length ? ['migration_sequence_order_unproven'] : []),
+      ...(databaseSchemaImpact.migrationCompatibility?.diagnostics?.migrationLimitReached || databaseSchemaImpact.migrationCompatibility?.diagnostics?.compatibilityFindingLimitReached ? ['migration_compatibility_results_truncated'] : []),
       ...(apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? ['api_contract_consumer_graph_truncated'] : [])
     ],
-    score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0) - (apiContractImpact.status === 'unavailable' ? 0.06 : apiContractImpact.status === 'insufficient_symbol_match' ? 0.04 : 0) - (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? 0.04 : 0)))
+    score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0) - (apiContractImpact.status === 'unavailable' ? 0.06 : apiContractImpact.status === 'insufficient_symbol_match' ? 0.04 : 0) - (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? 0.04 : 0) - (databaseSchemaImpact.migrationCompatibility?.sequenceRisks?.length ? 0.04 : 0) - (databaseSchemaImpact.migrationCompatibility?.diagnostics?.migrationLimitReached || databaseSchemaImpact.migrationCompatibility?.diagnostics?.compatibilityFindingLimitReached ? 0.03 : 0)))
   };
   if (!directSeeds.length && !packageSeeds.length && databaseSchemaImpact.status !== 'analyzed') {
     overallConfidence.score = Math.min(overallConfidence.score, 0.35);
@@ -674,6 +676,8 @@ export function analyzeChangeImpact({
   if (databaseSchemaImpact.status === 'unavailable') risks.push('database_schema_analysis_unavailable');
   if (databaseSchemaImpact.status === 'insufficient_schema_match') risks.push('database_schema_match_not_found');
   if (databaseSchemaImpact.diagnostics?.tableResultLimitReached || databaseSchemaImpact.diagnostics?.changeResultLimitReached || databaseSchemaImpact.diagnostics?.consumerResultLimitReached) risks.push('database_schema_analysis_truncated');
+  if (databaseSchemaImpact.migrationCompatibility?.sequenceRisks?.length) risks.push('migration_sequence_order_unproven');
+  if (databaseSchemaImpact.migrationCompatibility?.diagnostics?.migrationLimitReached || databaseSchemaImpact.migrationCompatibility?.diagnostics?.compatibilityFindingLimitReached) risks.push('migration_compatibility_analysis_truncated');
   if (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached) risks.push('api_contract_consumer_graph_truncated');
   if (potentiallyAffectedFiles.length >= 20 || affectedPackages.length >= 6) risks.push('broad_change_impact_scope');
   if (affectedTests.length === 0 && (repository.tests?.length || structure.testFiles?.length)) risks.push('no_test_file_could_be_linked_to_the_current_impact_evidence');
