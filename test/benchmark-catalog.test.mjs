@@ -262,6 +262,7 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.ok(report.coverage.sourceAnalysisRatio > 0);
   assert.equal(report.coverage.includedFileCount, report.includedFileCount);
   assert.equal(report.scanLimits.maxFiles, 5000);
+  assert.equal(report.scanLimits.maxPriorityFileBytes, 256000);
   assert.equal(report.scanLimits.maxSourceFiles, 500);
   assert.equal(report.scanLimits.maxTestFiles, 25);
   assert.equal(report.scanLimits.maxConfigFiles, 25);
@@ -312,7 +313,7 @@ test('all ten P12 external task drafts satisfy the runner contract and remain ex
     assert.ok(task.taskId && !taskIds.has(task.taskId), 'taskId must be present and unique: ' + file);
     taskIds.add(task.taskId);
     repositoryPrefixes.add(task.taskId.split('-').slice(0, 2).join('-'));
-    assert.match(task.taskVersion, /^0\.4\.0-draft$/, file);
+    assert.match(task.taskVersion, /^0\.(?:4|5)\.0-draft$/, file);
     assert.ok(task.constraints.some(value => /engineering plan only/i.test(value)), file);
     assert.ok(task.constraints.some(value => /do not modify|do not execute/i.test(value)), file);
     assert.ok(task.constraints.some(value => /pinned repository snapshot/i.test(value)), file);
@@ -322,6 +323,7 @@ test('all ten P12 external task drafts satisfy the runner contract and remain ex
     assert.equal(applied.scenarios[0].mustClarify, task.mustClarify, file);
     assert.match(applied.taskDefinition.sha256, /^[a-f0-9]{64}$/, file);
     assert.deepEqual(applied.taskDefinition.evidencePaths, task.evidencePaths, file);
+    assert.deepEqual(applied.taskDefinition.evidenceRanges, task.evidenceRanges || [], file);
     if (task.mustClarify) assert.ok(applied.scenarios[0].clarificationSignals.length > 0, file);
   }
   assert.equal(repositoryPrefixes.size, 5);
@@ -351,6 +353,7 @@ test('all P12 task drafts support credential-free external dry-run manifests', a
       assert.equal(report.sourceMode, 'external-local-checkout', file);
       assert.equal(report.taskDefinition.id, task.taskId, file);
       assert.deepEqual(report.taskDefinition.evidencePaths, task.evidencePaths, file);
+      assert.deepEqual(report.taskDefinition.evidenceRanges, task.evidenceRanges || [], file);
       assert.equal(report.liveCalls, false, file);
     }
   } finally {
