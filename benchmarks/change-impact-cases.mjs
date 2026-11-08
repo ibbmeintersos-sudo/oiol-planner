@@ -30,7 +30,7 @@ export const changeImpactCases = [
     description: 'Direct service change propagates to reverse importers and a resolved test import.',
     request: 'change invoice service',
     repository: base({
-      nodes: ['src/billing/invoice-service.mjs','src/routes/invoices.mjs','src/audit/invoice-audit.mjs','src/admin/dashboard.mjs','test/invoice-service.test.mjs'],
+      nodes: ['src/billing/invoice-service.mjs','src/routes/list.mjs','src/audit/history.mjs','src/admin/dashboard.mjs','test/invoice-service.test.mjs'],
       edges: [edge('src/routes/invoices.mjs','src/billing/invoice-service.mjs'),edge('src/audit/invoice-audit.mjs','src/billing/invoice-service.mjs'),edge('src/admin/dashboard.mjs','src/audit/invoice-audit.mjs'),edge('test/invoice-service.test.mjs','src/billing/invoice-service.mjs')],
       imports: [{from:'test/invoice-service.test.mjs',to:'src/billing/invoice-service.mjs',resolved:true}],
       testFiles: ['test/invoice-service.test.mjs']
@@ -68,8 +68,8 @@ export const changeImpactCases = [
     description: 'Workspace dependency propagation identifies consumer package boundaries.',
     request: 'change catalog service',
     repository: base({
-      nodes: ['packages/catalog/src/catalog-service.mjs','packages/storefront/src/catalog-page.mjs','packages/admin/src/catalog-admin.mjs'],
-      edges: [edge('packages/storefront/src/catalog-page.mjs','packages/catalog/src/catalog-service.mjs'),edge('packages/admin/src/catalog-admin.mjs','packages/catalog/src/catalog-service.mjs')],
+      nodes: ['packages/catalog/src/catalog-service.mjs','packages/storefront/src/product-page.mjs','packages/admin/src/inventory-admin.mjs'],
+      edges: [edge('packages/storefront/src/product-page.mjs','packages/catalog/src/catalog-service.mjs'),edge('packages/admin/src/inventory-admin.mjs','packages/catalog/src/catalog-service.mjs')],
       workspacePackages: [pkg('@shop/catalog','packages/catalog'),pkg('@shop/storefront','packages/storefront'),pkg('@shop/admin','packages/admin')],
       workspaceDependencies: [edge('packages/storefront','packages/catalog'),edge('packages/admin','packages/catalog')]
     }),
@@ -87,8 +87,8 @@ export const changeImpactCases = [
     description: 'Exported API contract candidate is connected to a downstream consumer.',
     request: 'change customer API response contract',
     repository: base({
-      nodes: ['src/api/customer-response.mjs','apps/web/customer-client.mjs','test/customer-response.test.mjs'],
-      edges: [edge('apps/web/customer-client.mjs','src/api/customer-response.mjs'),edge('test/customer-response.test.mjs','src/api/customer-response.mjs')],
+      nodes: ['src/api/customer-response.mjs','apps/web/profile-view.mjs','test/customer-response.test.mjs'],
+      edges: [edge('apps/web/profile-view.mjs','src/api/customer-response.mjs'),edge('test/customer-response.test.mjs','src/api/customer-response.mjs')],
       imports: [{from:'test/customer-response.test.mjs',to:'src/api/customer-response.mjs',resolved:true}],
       testFiles: ['test/customer-response.test.mjs'],
       symbols: [{file:'src/api/customer-response.mjs',name:'CustomerResponse',exported:true,source:'tree_sitter_ast'}]
@@ -100,7 +100,7 @@ export const changeImpactCases = [
       testFiles: ['test/customer-response.test.mjs'],
       packagePaths: [],
       apiStatus: 'analyzed',
-      apiConsumerFiles: ['apps/web/customer-client.mjs']
+      apiConsumerFiles: ['apps/web/profile-view.mjs']
     }
   },
   {
