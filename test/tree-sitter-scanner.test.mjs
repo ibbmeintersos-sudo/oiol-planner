@@ -199,7 +199,7 @@ test('scanner excludes common credential and private-key file formats from evide
   const f = await fixture('oiol-sensitive-files-');
   try {
     await mkdir(path.join(f.root, 'src'), { recursive: true });
-    await writeFile(path.join(f.root, 'src', 'app.js'), 'export const safe = true;\\n');
+    await writeFile(path.join(f.root, 'src', 'app.js'), 'export const safe = true;\n');
     const sensitive = [
       '.env.production', '.npmrc', '.pypirc', '.netrc',
       'credentials.json', 'credentials.yaml', 'secrets.yml',
