@@ -1,0 +1,32 @@
+name: Debug tests 2
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  debug:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} / Node 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run tests with TAP
+        shell: bash
+        run: |
+          set +e
+          node --test --test-reporter=tap > test-output.tap 2>&1
+          code=$?
+          echo "test exit code: $code"
+          grep -E "not ok|^# fail|AssertionError|Error:|expected:|actual:" test-output.tap | head -120 | while IFS= read -r line; do
+            echo "::error::${line}"
+          done
+          exit $code
