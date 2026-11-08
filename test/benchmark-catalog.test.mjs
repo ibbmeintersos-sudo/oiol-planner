@@ -290,3 +290,29 @@ test('external live planning requires explicit consent before sending repository
     await fs.rm(directory, { recursive: true, force: true });
   }
 });
+
+test('all ten P12 external task drafts satisfy the runner contract and remain explicitly unapproved', async () => {
+  const draftDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../benchmarks/external-tasks/drafts');
+  const files = (await fs.readdir(draftDirectory)).filter(file => file.endsWith('.json')).sort();
+  assert.equal(files.length, 10, 'expected two draft tasks for each of five pinned repositories');
+  const taskIds = new Set();
+  const repositoryPrefixes = new Set();
+  for (const file of files) {
+    const raw = await fs.readFile(path.join(draftDirectory, file), 'utf8');
+    const task = JSON.parse(raw);
+    assert.ok(task.taskId && !taskIds.has(task.taskId), 'taskId must be present and unique: ' + file);
+    taskIds.add(task.taskId);
+    repositoryPrefixes.add(task.taskId.split('-').slice(0, 2).join('-'));
+    assert.match(task.taskVersion, /^0\\.2\\.0-draft$/, file);
+    assert.ok(task.constraints.some(value => /engineering plan only/i.test(value)), file);
+    assert.ok(task.constraints.some(value => /do not modify|do not execute/i.test(value)), file);
+    assert.ok(task.constraints.some(value => /pinned repository snapshot/i.test(value)), file);
+    const selected = selectScenarios(task.scenarioId);
+    const applied = await applyScenarioTaskFile(selected, path.join(draftDirectory, file));
+    assert.equal(applied.scenarios.length, 1, file);
+    assert.equal(applied.scenarios[0].mustClarify, task.mustClarify, file);
+    assert.match(applied.taskDefinition.sha256, /^[a-f0-9]{64}$/, file);
+    if (task.mustClarify) assert.ok(applied.scenarios[0].clarificationSignals.length > 0, file);
+  }
+  assert.equal(repositoryPrefixes.size, 5);
+});
