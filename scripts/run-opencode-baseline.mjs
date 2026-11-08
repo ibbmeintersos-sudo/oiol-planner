@@ -28,7 +28,7 @@ export async function createBaselineWorkspace(scenario, { repositoryRoot = null,
    // Materialize only bounded, redacted scanner excerpts; never copy the operator's raw checkout.
    for(const snippet of project.repository.snippets||[]) {
     if(typeof snippet.path!=='string'||typeof snippet.content!=='string') continue;
-    const relative=snippet.path.replaceAll('\\\\','/');
+    const relative=snippet.path.replaceAll('\\','/');
     if(relative.startsWith('/')||relative.split('/').some(part=>part==='..'||part==='.')) continue;
     const destination=path.resolve(projectDirectory,...relative.split('/'));
     if(!destination.startsWith(projectDirectory+path.sep)) continue;
