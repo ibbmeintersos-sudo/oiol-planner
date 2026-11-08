@@ -1,12 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import { redact } from '../core/utils.mjs';
 import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
-const exec = promisify(execFile);
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.pem|.*\.key|credentials\.json)$/i;
 const MANIFESTS = [
@@ -60,15 +57,9 @@ export async function scanRepository(repoPath, {
   const stat = await fs.stat(root);
   if (!stat.isDirectory()) throw new Error('Repository path is not a directory');
 
-  let git = { isRepo: false, branch: null, commit: null, dirty: null };
-  try {
-    const [branch, commit, status] = await Promise.all([
-      exec('git', ['branch', '--show-current'], { cwd: root }),
-      exec('git', ['rev-parse', 'HEAD'], { cwd: root }),
-      exec('git', ['status', '--porcelain=v1', '-z'], { cwd: root })
-    ]);
-    git = { isRepo: true, branch: branch.stdout.trim(), commit: commit.stdout.trim(), dirty: status.stdout.length > 0 };
-  } catch {}
+  // Scanner is filesystem-read-only: repository metadata is supplied by trusted caller context.
+  // Never invoke Git or any other target-project command during repository analysis.
+  const git = { isRepo: false, branch: null, commit: null, dirty: null, status: 'not_collected' };
 
   const scan = await walkBounded(root, { maxFiles, maxDepth });
   const files = scan.files;
