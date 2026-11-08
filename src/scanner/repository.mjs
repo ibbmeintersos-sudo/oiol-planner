@@ -48,6 +48,11 @@ const evidenceId = file => 'REPO-' + sha256(file).slice(0, 12);
 async function walkBounded(root, { maxFiles, maxDepth }) {
   const files = [];
   const queue = [{ rel: '', depth: 0, rootPriority: -100, localPriority: -100 }];
+  const skipped = { counts: { ignored: 0, sensitive: 0, symbolicLink: 0, depthLimit: 0, fileLimit: 0 }, paths: [], fileLimitReachedAt: null };
+  const recordSkipped = (relative, reason) => {
+    skipped.counts[reason]++;
+    if (skipped.paths.length < 250) skipped.paths.push({ path: relative, reason });
+  };
   let discovered = 0, truncated = false, depthTruncated = false;
   while (queue.length && !truncated) {
     queue.sort((a, b) =>
@@ -63,9 +68,11 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
     for (const entry of entries) {
       if (truncated) break;
       const relative = path.posix.join(current.rel.replaceAll('\\', '/'), entry.name);
-      if (IGNORE.has(entry.name) || SENSITIVE.test(relative) || entry.isSymbolicLink()) continue;
+      if (IGNORE.has(entry.name)) { recordSkipped(relative, 'ignored'); continue; }
+      if (SENSITIVE.test(relative)) { recordSkipped(relative, 'sensitive'); continue; }
+      if (entry.isSymbolicLink()) { recordSkipped(relative, 'symbolicLink'); continue; }
       if (entry.isDirectory()) {
-        if (current.depth >= maxDepth) depthTruncated = true;
+        if (current.depth >= maxDepth) { depthTruncated = true; recordSkipped(relative, 'depthLimit'); }
         else {
           const localPriority = entryPriority(entry, current.depth);
           queue.push({
@@ -78,11 +85,11 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
       } else if (entry.isFile()) {
         discovered++;
         if (files.length < maxFiles) files.push(relative);
-        else truncated = true;
+        else { truncated = true; skipped.fileLimitReachedAt = relative; recordSkipped(relative, 'fileLimit'); }
       }
     }
   }
-  return { files, discovered, truncated, depthTruncated };
+  return { files, discovered, truncated, depthTruncated, skipped };
 }
 
 export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxContextChars = 50000, maxDepth = 12 } = {}) {
@@ -182,6 +189,7 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     fileCountIsLowerBound: scan.truncated || scan.depthTruncated,
     truncated: scan.truncated,
     depthTruncated: scan.depthTruncated,
+    skipped: scan.skipped,
     manifests,
     scripts: [...new Set(scripts)],
     tests,
