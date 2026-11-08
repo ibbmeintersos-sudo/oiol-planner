@@ -22,11 +22,20 @@ class SnapshotAcquisitionSafetyTests(unittest.TestCase):
             expected.update(bytes([0]))
             self.assertEqual(MODULE.fingerprint(root)["sha256"], expected.hexdigest())
 
-    def test_fingerprint_does_not_drop_tracked_vendor_files(self):
+    def test_fingerprint_matches_validator_ignore_policy(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
+            (root / "src").mkdir()
             (root / "vendor").mkdir()
+            (root / "src" / "a.js").write_text("source", encoding="utf-8")
             (root / "vendor" / "tracked.php").write_text("tracked", encoding="utf-8")
+            self.assertEqual(MODULE.fingerprint(root)["fileCount"], 1)
+
+    def test_fingerprint_excludes_symlinks_like_validator(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "target.txt").write_text("target", encoding="utf-8")
+            (root / "link.txt").symlink_to(root / "target.txt")
             self.assertEqual(MODULE.fingerprint(root)["fileCount"], 1)
 
     def test_rejects_parent_traversal(self):

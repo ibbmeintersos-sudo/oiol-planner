@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 INTAKE = ROOT / "benchmarks" / "real-world" / "intake-candidates.json"
 USER_AGENT = "OIOL-P12-ReadOnly-Snapshot-Acquirer/1.0"
 DOWNLOAD_WORKERS = 8
+FINGERPRINT_IGNORED = {".git", "node_modules", ".venv", "venv", "vendor", "dist", "build", "coverage"}
 
 
 def validate_repo_path(value: str) -> PurePosixPath:
@@ -39,21 +40,23 @@ def validate_repo_path(value: str) -> PurePosixPath:
 
 
 def fingerprint(root: Path) -> dict:
+    """Match validate-real-world-corpus.mjs fingerprintSnapshot exactly."""
     files = []
     for path in root.rglob("*"):
-        if path.is_symlink() or path.is_file():
-            files.append((path.relative_to(root).as_posix(), path))
+        relative = path.relative_to(root)
+        if any(part in FINGERPRINT_IGNORED for part in relative.parts):
+            continue
+        if path.is_symlink() or not path.is_file():
+            continue
+        files.append((relative.as_posix(), path))
     files.sort(key=lambda item: item[0])
     digest = hashlib.sha256()
     for rel, path in files:
         digest.update(rel.encode("utf-8"))
         digest.update(bytes([0]))
-        if path.is_symlink():
-            digest.update(os.readlink(path).encode("utf-8"))
-        else:
-            with path.open("rb") as stream:
-                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-                    digest.update(chunk)
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
         digest.update(bytes([0]))
     return {"sha256": digest.hexdigest(), "fileCount": len(files)}
 
@@ -248,9 +251,12 @@ def main() -> None:
             safe_extract(archive, snapshot)
 
     tree_info = complete_snapshot(repository, base_sha, snapshot)
+    if tree_info["gitTreeFileCount"] != source["trackedFileCountAtBase"]:
+        raise RuntimeError(
+            "Pinned Git tree file count differs from the intake inventory: "
+            f"{tree_info['gitTreeFileCount']} != {source['trackedFileCountAtBase']}"
+        )
     result = fingerprint(snapshot)
-    if result["fileCount"] != tree_info["gitTreeFileCount"]:
-        raise RuntimeError("Snapshot file count does not equal the pinned Git tree blob count")
     license_path = resolve_license_file(snapshot, source["licenseFile"])
     metadata = {
         "schemaVersion": "1.0.0",
@@ -270,7 +276,7 @@ def main() -> None:
         "snapshotPath": "snapshot",
         "snapshotSha256": result["sha256"],
         "snapshotFileCount": result["fileCount"],
-        "trackedFileCountDelta": result["fileCount"] - source["trackedFileCountAtBase"],
+        "trackedFileCountDelta": tree_info["gitTreeFileCount"] - source["trackedFileCountAtBase"],
         "licenseFileSha256": hashlib.sha256(license_path.read_bytes()).hexdigest(),
         "archiveUrl": archive_url,
         "gitTreeSha": tree_info["gitTreeSha"],
