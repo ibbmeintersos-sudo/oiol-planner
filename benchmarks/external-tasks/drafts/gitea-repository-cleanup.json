@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-MONOLITH-004",
   "taskId": "RW-GT-01",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Gitea",
   "request": "Plan an extension to the existing package cleanup rules that supports optional repository-specific overrides. A repository-specific rule takes precedence for that repository; when no override exists, the current owner-and-package-type rule remains the fallback. Preserve the existing preview-before-cleanup workflow and all current owner-level behavior when no repository override is configured.",
   "constraints": [
@@ -43,7 +43,9 @@
       "indexes"
     ],
     [
-      "integration tests",
+      "integration tests"
+    ],
+    [
       "backwards compatibility"
     ]
   ],
