@@ -1,5 +1,5 @@
 import { emptyPlan } from '../contracts/types.mjs';
-import { PLANNER_SYSTEM_PROMPT, plannerUserPrompt, REVIEW_SYSTEM_PROMPT } from './prompts.mjs';
+import { PLANNER_SYSTEM_PROMPT, plannerUserPrompt, repairUserPrompt, reviewUserPrompt, REVIEW_SYSTEM_PROMPT } from './prompts.mjs';
 import { validatePlan } from './validator.mjs';
 import { validatePlanSchema } from './schema-validator.mjs';
 import { dependencyEdgesFromTasks } from './graph.mjs';
@@ -40,18 +40,18 @@ export class HybridPlanner {
     const first=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT,user:plannerUserPrompt(project),temperature:0});
     let plan=normalize(first.data,project),validation=await validateContract(plan,project);
     for(let round=0;round<this.maxRepairRounds&&!validation.valid;round++) {
-      const repaired=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nRepair the supplied plan. Fix every validation error. Return the complete JSON plan.',user:JSON.stringify({project,plan,validation},null,2),temperature:0});
+      const repaired=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nRepair the supplied plan. Fix every validation error. Return the complete JSON plan.',user:repairUserPrompt(project,plan,validation,'structural_validation'),temperature:0});
       plan=normalize(repaired.data,project); validation=await validateContract(plan,project);
     }
     let review=null,reviewError=null;
     if(validation.valid&&this.reviewer) {
-      try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data,plan); }
+      try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:reviewUserPrompt(project,plan,validation),temperature:0})).data,plan); }
       catch(error) { reviewError=error; }
       for(let round=0;round<this.maxRepairRounds&&review&&hasHighFindings(review);round++) {
-        const fixed=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:JSON.stringify({project,plan,findings:review.findings},null,2),temperature:0});
+        const fixed=await request('planner',this.provider,{system:PLANNER_SYSTEM_PROMPT+'\nResolve every high and critical review finding. Return the complete plan JSON.',user:repairUserPrompt(project,plan,{findings:review.findings},'review_findings'),temperature:0});
         plan=normalize(fixed.data,project); validation=await validateContract(plan,project);
         if(!validation.valid) break;
-        try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:JSON.stringify({project,plan,validation},null,2),temperature:0})).data,plan); }
+        try { review=validateReview((await request('reviewer',this.reviewer,{system:REVIEW_SYSTEM_PROMPT,user:reviewUserPrompt(project,plan,validation),temperature:0})).data,plan); }
         catch(error) { review=null; reviewError=error; break; }
       }
     }

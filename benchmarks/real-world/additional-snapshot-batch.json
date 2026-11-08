@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0.0",
+  "purpose": "Deduplicated acquisition plan for the 24 additional historical change candidates.",
+  "candidateCount": 36,
+  "primaryAcquiredIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "additionalAcquisitionIndices": [
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    20,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+  ],
+  "deduplication": [
+    {
+      "repository": "pydantic/pydantic",
+      "baseCommit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+      "acquisitionIndex": 4,
+      "sharedCaseIndices": [
+        4,
+        21
+      ],
+      "reason": "Both historical changes use the same immutable base tree."
+    },
+    {
+      "repository": "BurntSushi/ripgrep",
+      "baseCommit": "6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30",
+      "acquisitionIndex": 18,
+      "sharedCaseIndices": [
+        18,
+        19
+      ],
+      "reason": "Both historical changes use the same immutable base tree."
+    }
+  ],
+  "expected": {
+    "totalCases": 36,
+    "uniquePinnedSnapshots": 34,
+    "primarySnapshots": 12,
+    "additionalUniqueSnapshots": 22
+  },
+  "note": "A snapshot may be shared by multiple change cases only when repository and full base commit SHA are identical. Each case still requires its own independent ground-truth annotation."
+}

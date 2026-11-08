@@ -1,12 +1,14 @@
 import fs from 'node:fs/promises';
 import { isObject } from './utils.mjs';
+import { SCHEMA_VERSION, PLAN_SCHEMA_CONTRACTS } from '../contracts/types.mjs';
 
-const SUPPORTED = new Set([
+export const SUPPORTED_SCHEMA_KEYWORDS = Object.freeze([
   '$schema', '$id', '$defs', '$ref', 'title', 'description',
   'type', 'required', 'properties', 'items', 'additionalProperties',
   'const', 'enum', 'minLength', 'minItems', 'uniqueItems',
   'oneOf', 'anyOf', 'not'
 ]);
+const SUPPORTED = new Set(SUPPORTED_SCHEMA_KEYWORDS);
 let schemaPromise;
 
 function deepEqual(left, right) {
@@ -48,16 +50,32 @@ function typeMatches(value, type) {
 
 function inspectSchema(schema, path = '$schema') {
   if (!isObject(schema)) throw new Error('Schema node must be an object at ' + path);
+  const validTypes = new Set(['null', 'object', 'array', 'string', 'boolean', 'integer', 'number']);
   for (const [keyword, value] of Object.entries(schema)) {
     if (!SUPPORTED.has(keyword)) throw new Error('Unsupported JSON Schema keyword "' + keyword + '" at ' + path);
-    if (keyword === 'properties' || keyword === '$defs') {
+    if (keyword === 'type') {
+      const types = Array.isArray(value) ? value : [value];
+      if (!types.length || types.some(type => !validTypes.has(type))) throw new Error('type must be a supported JSON Schema type or non-empty array at ' + path);
+    } else if (keyword === 'required') {
+      if (!Array.isArray(value) || value.some(name => typeof name !== 'string')) throw new Error('required must be an array of strings at ' + path);
+    } else if (keyword === 'enum' || keyword === 'oneOf' || keyword === 'anyOf') {
+      if (!Array.isArray(value) || value.length === 0) throw new Error(keyword + ' must be a non-empty array at ' + path);
+      if (keyword !== 'enum') value.forEach((child, index) => inspectSchema(child, path + '/' + keyword + '/' + index));
+    } else if (keyword === 'minLength' || keyword === 'minItems') {
+      if (!Number.isInteger(value) || value < 0) throw new Error(keyword + ' must be a non-negative integer at ' + path);
+    } else if (keyword === 'uniqueItems') {
+      if (typeof value !== 'boolean') throw new Error('uniqueItems must be a boolean at ' + path);
+    } else if (keyword === 'properties' || keyword === '$defs') {
       if (!isObject(value)) throw new Error(keyword + ' must be an object at ' + path);
       for (const [name, child] of Object.entries(value)) inspectSchema(child, path + '/' + keyword + '/' + name);
-    } else if (keyword === 'items' || keyword === 'not' || keyword === 'additionalProperties') {
-      if (isObject(value)) inspectSchema(value, path + '/' + keyword);
-    } else if (keyword === 'oneOf' || keyword === 'anyOf') {
-      if (!Array.isArray(value)) throw new Error(keyword + ' must be an array at ' + path);
-      value.forEach((child, index) => inspectSchema(child, path + '/' + keyword + '/' + index));
+    } else if (keyword === 'items' || keyword === 'not') {
+      if (!isObject(value)) throw new Error(keyword + ' must be a schema object at ' + path);
+      inspectSchema(value, path + '/' + keyword);
+    } else if (keyword === 'additionalProperties') {
+      if (typeof value !== 'boolean' && !isObject(value)) throw new Error('additionalProperties must be a boolean or schema object at ' + path);
+      if (isObject(value)) inspectSchema(value, path + '/additionalProperties');
+    } else if (keyword === '$ref') {
+      if (typeof value !== 'string' || !value.startsWith('#/')) throw new Error('Only local JSON Schema pointer references are supported at ' + path);
     }
   }
 }
@@ -135,18 +153,25 @@ export function validateJsonSchema(value, schema) {
   return { valid: errors.length === 0, errors };
 }
 
-async function loadPublishedSchema() {
-  if (!schemaPromise) {
-    schemaPromise = fs.readFile(new URL('../../schemas/plan.schema.json', import.meta.url), 'utf8')
-      .then(JSON.parse)
-      .catch(error => {
-        schemaPromise = null;
-        throw error;
-      });
+const schemaPromises = new Map();
+async function loadPublishedSchema(version = SCHEMA_VERSION) {
+  if (!Object.hasOwn(PLAN_SCHEMA_CONTRACTS, version)) {
+    throw new Error('Unsupported plan schemaVersion: ' + version);
   }
-  return schemaPromise;
+  if (!schemaPromises.has(version)) {
+    const promise = fs.readFile(new URL('../../schemas/plan-' + version + '.schema.json', import.meta.url), 'utf8')
+      .then(JSON.parse)
+      .catch(error => { schemaPromises.delete(version); throw error; });
+    schemaPromises.set(version, promise);
+  }
+  return schemaPromises.get(version);
 }
 
 export async function validatePlanSchema(plan) {
-  return validateJsonSchema(plan, await loadPublishedSchema());
+  const version = typeof plan?.schemaVersion === 'string' ? plan.schemaVersion : SCHEMA_VERSION;
+  try {
+    return validateJsonSchema(plan, await loadPublishedSchema(version));
+  } catch (error) {
+    return { valid: false, errors: [error.message] };
+  }
 }

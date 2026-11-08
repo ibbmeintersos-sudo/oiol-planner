@@ -49,13 +49,22 @@
     "benchmark:opencode": "node scripts/run-opencode-baseline.mjs",
     "benchmark:compare": "node scripts/compare-benchmark-modes.mjs",
     "benchmark:compare:aggregate": "node scripts/aggregate-paired-comparisons.mjs",
+    "benchmark:series": "node scripts/run-benchmark-series.mjs",
+    "benchmark:scanner": "node scripts/run-scanner-accuracy-benchmark.mjs",
+    "release:check": "node scripts/check-release.mjs",
+    "benchmark:change-impact": "node scripts/run-change-impact-benchmark.mjs",
+    "benchmark:real-world:validate": "node scripts/validate-real-world-corpus.mjs",
+    "benchmark:real-world": "node scripts/run-real-world-benchmark.mjs",
+    "benchmark:real-world:intake": "node scripts/validate-real-world-intake.mjs",
+    "benchmark:real-world:worklist": "node scripts/validate-annotation-worklist.mjs",
+    "benchmark:real-world:review": "node scripts/validate-independent-review.mjs",
     "benchmark:scan-external": "node scripts/run-external-corpus-scan.mjs"
   },
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "@xberg-io/tree-sitter-language-pack-wasm": "1.25.0"
   }
 }

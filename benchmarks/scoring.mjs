@@ -1,4 +1,5 @@
 import { validatePlan } from '../src/core/validator.mjs';
+import { evaluatePlanQuality } from '../src/core/evaluate.mjs';
 
 const normalize = value => String(value ?? '').toLowerCase().replace(/[^a-z0-9\s_-]/g,' ').replace(/\s+/g,' ').trim();
 const matchesGroup = (text, group) => group.some(term => normalize(text).includes(normalize(term)));
@@ -32,15 +33,21 @@ export function scoreScenario(scenario, result) {
   const scopeRate=tasks.length?tasksWithScope/tasks.length:0;
   const expectedClarificationErrors=scenario.mustClarify&&blockingClarification?validation.errors.filter(x=>x.startsWith('Unresolved blocking clarification:')):[];
   const unexpectedValidationErrors=validation.errors.filter(x=>!expectedClarificationErrors.includes(x));
+  const planQuality=evaluatePlanQuality(plan);
   const dimensions={
     structuralValidity:unexpectedValidationErrors.length===0?1:0,
     requirementSignalCoverage:signalRate,
     clarificationDiscipline:clarificationPass?clarificationRate:0,
     acceptanceCriteria:tasks.length?Math.min(1,criteria/(tasks.length*2)):0,
     scopedTasks:scopeRate,
-    reviewerConfigurationSeparation:plan.review?.configurationDistinct===true?1:0
+    reviewerConfigurationSeparation:plan.review?.configurationDistinct===true?1:0,
+    nfrMeasurement:planQuality.nfr.measurableRate,
+    testStrategy:planQuality.testStrategy.completeness,
+    rollbackStrategy:planQuality.rollback.completeness,
+    unknownsTransparency:planQuality.unknowns.transparency,
+    riskEstimation:planQuality.risks.estimatedRate*0.5+planQuality.risks.mitigationRate*0.15+planQuality.risks.confidenceRate*0.2+planQuality.risks.assessmentBasisRate*0.15
   };
-  const weights={structuralValidity:25,requirementSignalCoverage:25,clarificationDiscipline:20,acceptanceCriteria:15,scopedTasks:10,reviewerConfigurationSeparation:5};
+  const weights={structuralValidity:20,requirementSignalCoverage:15,clarificationDiscipline:15,acceptanceCriteria:10,scopedTasks:5,reviewerConfigurationSeparation:5,nfrMeasurement:10,testStrategy:5,rollbackStrategy:5,unknownsTransparency:5,riskEstimation:5};
   const score=Object.entries(weights).reduce((sum,[key,weight])=>sum+dimensions[key]*weight,0);
   const blockers=[];
   if(unexpectedValidationErrors.length) blockers.push(...unexpectedValidationErrors);
@@ -51,7 +58,7 @@ export function scoreScenario(scenario, result) {
     scenarioId:scenario.id,category:scenario.category,difficulty:scenario.difficulty,
     status:plan.status||'missing',score:Number(score.toFixed(2)),dimensions,weights,
     validation:{valid:validation.valid,structurallyValid:unexpectedValidationErrors.length===0,schemaValid:schemaValidation?.valid??null,errors:validation.errors,expectedGateErrors:expectedClarificationErrors,warnings:validation.warnings},
-    requirementSignals:signalResults,clarificationSignals:clarificationResults,
+    requirementSignals:signalResults,clarificationSignals:clarificationResults,planQuality,
     clarificationPass,blockingClarification,taskCount:tasks.length,acceptanceCriteriaCount:criteria,
     tasksWithWriteScope:tasksWithScope,
     reviewerConfigurationDistinct:plan.review?.configurationDistinct===true,
@@ -65,5 +72,7 @@ export function summarizeBenchmark(rows) {
   const median=values.length?(values.length%2?values[(values.length-1)/2]:(values[values.length/2-1]+values[values.length/2])/2):0;
   const byCategory={};
   for(const row of rows){(byCategory[row.category]??=[]).push(row.score);}
-  return {scenarioCount:rows.length,averageScore:Number(avg.toFixed(2)),medianScore:Number(median.toFixed(2)),minimumScore:values[0]??0,maximumScore:values.at(-1)??0,passCount:rows.filter(x=>x.score>=80&&x.blockers.length===0).length,byCategory:Object.fromEntries(Object.entries(byCategory).map(([k,v])=>[k,{count:v.length,average:Number((v.reduce((a,b)=>a+b,0)/v.length).toFixed(2))}]))};
+  const dimensionKeys=Object.keys(rows[0]?.dimensions||{});
+  const dimensionAverages=Object.fromEntries(dimensionKeys.map(key=>[key,Number((rows.reduce((sum,row)=>sum+(row.dimensions?.[key]||0),0)/(rows.length||1)).toFixed(4))]));
+  return {scenarioCount:rows.length,averageScore:Number(avg.toFixed(2)),medianScore:Number(median.toFixed(2)),minimumScore:values[0]??0,maximumScore:values.at(-1)??0,passCount:rows.filter(x=>x.score>=80&&x.blockers.length===0).length,dimensionAverages,byCategory:Object.fromEntries(Object.entries(byCategory).map(([k,v])=>[k,{count:v.length,average:Number((v.reduce((a,b)=>a+b,0)/v.length).toFixed(2))}]))};
 }

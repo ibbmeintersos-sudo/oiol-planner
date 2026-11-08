@@ -242,6 +242,8 @@ export async function main() {
   if(reviewConfig&&!reviewConfig.apiKey&&reviewConfig.provider!=='ollama') throw new Error('OIOL_REVIEW_API_KEY is required when a separate remote reviewer is configured.');
   const provider=createProvider(planningConfig);
   const reviewer=reviewConfig?createProvider(reviewConfig):provider;
+  const maxRepairRounds=Number(process.env.OIOL_MAX_REPAIR_ROUNDS||2);
+  if(!Number.isInteger(maxRepairRounds)||maxRepairRounds<0||maxRepairRounds>5) throw new Error('OIOL_MAX_REPAIR_ROUNDS must be an integer from 0 to 5');
   const records=[];
   for(const scenario of chosen){
     const started=Date.now();
@@ -265,8 +267,22 @@ export async function main() {
   const out=path.resolve(arg('out','benchmarks/results/run-'+Date.now()+'.json'));
   await fs.mkdir(path.dirname(out),{recursive:true});
   await fs.writeFile(out,JSON.stringify(output,null,2)+'\n');
-  const csv=['scenario_id,category,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
-  for(const row of scores) csv.push([row.scenarioId,row.category,...Array(12).fill('')].join(','));
+  const reviewPlanDir=out.replace(/\.json$/,'-review-plans');
+  await fs.mkdir(reviewPlanDir,{recursive:true});
+  const reviewPlanByScenario=new Map();
+  for(const record of records) {
+    if(!record.plan) continue;
+    const {review,providerUsage,validation,...blindPlan}=record.plan;
+    const reviewPlanFile=path.join(reviewPlanDir,record.scenarioId+'.json');
+    await fs.writeFile(reviewPlanFile,JSON.stringify(blindPlan,null,2)+'\n');
+    reviewPlanByScenario.set(record.scenarioId,path.relative(path.dirname(out),reviewPlanFile).split(path.sep).join('/'));
+  }
+  const csvCell=value=>'"'+String(value??'').replaceAll('"','""')+'"';
+  const csv=['scenario_id,category,run_id,plan_file,reviewer_slot,technical_correctness_1_5,requirement_understanding_1_5,task_decomposition_1_5,acceptance_criteria_1_5,scope_and_safety_1_5,clarification_quality_1_5,nfr_coverage_1_5,test_strategy_1_5,rollback_strategy_1_5,unknowns_transparency_1_5,risk_estimation_1_5,overall_1_5,reviewer_id,highest_finding_severity,evidence_notes,adjudicated_overall_1_5,adjudication_notes'];
+  for(const row of scores) {
+    const reviewPlanFile=reviewPlanByScenario.get(row.scenarioId)||'';
+    for(const reviewerSlot of [1,2]) csv.push([row.scenarioId,row.category,runId,reviewPlanFile,reviewerSlot,...Array(17).fill('')].map(csvCell).join(','));
+  }
   const humanPath=out.replace(/\.json$/,'-human-review.csv');
   await fs.writeFile(humanPath,csv.join('\n')+'\n');
   console.log(JSON.stringify({summary,resultFile:out,humanReviewFile:humanPath},null,2));

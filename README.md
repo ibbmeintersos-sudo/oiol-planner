@@ -34,7 +34,7 @@ A task's write scope, dependencies, outputs, and acceptance criteria are plannin
 
 - Node.js 22 or newer.
 - An LLM provider endpoint for plan generation. Ollama can be used locally.
-- One pinned runtime dependency: `@xberg-io/tree-sitter-language-pack-wasm` 1.25.0. Its curated grammar subset is bundled in the package; scanning does not download parser grammars at runtime.
+- An optional pinned AST dependency: `@xberg-io/tree-sitter-language-pack-wasm` 1.25.0. When installed, the scanner uses bundled Tree-sitter grammars where available. If the package or a grammar is unavailable, bounded lexical analysis remains available; no parser grammar is downloaded at scan time.
 
 ## Quick start
 
@@ -66,7 +66,6 @@ Supported providers:
 | Ollama | ollama | Local /api/chat endpoint |
 
 Configuration is read from .env when supported by the Node runtime, or from shell environment variables. For a distinct reviewer configuration, configure OIOL_REVIEW_PROVIDER and optional reviewer model, base URL, API key, and timeout variables. A critique using the same provider configuration cannot certify readiness. A distinct reviewer approval can move a structurally valid plan to ready_for_review; this means ready for human review, not implementation authorization or evidence of implementation.
-
 ## GitHub Action
 
 OIOL can review pull requests as a planning-only GitHub Action. It scans the repository, generates a plan, uploads `plan.json` and `plan.md` as artifacts, and optionally posts a short summary comment. It does not run the target project's tests, builds, or scripts.
@@ -109,7 +108,7 @@ Never put an API key in \`oiol.config.json\`; \`apiKeyEnv\` names the environmen
 
 ## Plan contract and validation
 
-The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. Every newly generated plan declares schemaVersion: "1.0.0".
+The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. New plans declare `schemaVersion: "1.1.0"` and `contractVersion: "1.1"`; plans at `1.0.0` remain validated against their frozen schema snapshot. The built-in validator supports a documented keyword subset; exact semantics, unsupported keywords, and the migration policy are in `schemas/README.md`.
 
 Validate an existing plan without calling a model:
 
@@ -129,15 +128,23 @@ The report explicitly distinguishes planned work from completed or verified work
 
 ## Existing repository analysis
 
-The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. Each included excerpt has a stable evidence ID, a SHA-256 fingerprint of the original file, and a separate SHA-256 fingerprint of the redacted excerpt; the same evidence ID and fingerprints are propagated into analyzer evidence and the structural scan's `sourceEvidence` references. The structural pass uses Tree-sitter concrete syntax trees for languages available in the pinned WebAssembly grammar bundle. It extracts syntax-aware declarations and import references, records parser-recovery diagnostics, resolves supported relative imports against files included in the scan, and retains bounded lexical fallback for unsupported languages or files that cannot be parsed. It also reports framework signals from manifests, conventional/manifest-declared entry points, route-like files, test-like files, and explicit AST/lexical coverage counts. Each structural result is marked as untrusted repository-derived metadata. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
+The scanner collects Git branch/commit/dirty state, bounded file candidates, manifests, scripts, test/config paths, and bounded source context. The structural scan now has a separate budget from the prompt-context budget: when maxContextChars is reached, the scanner continues analyzing the selected source files and reports which excerpts could not be added to model context. Source selection is bounded by maxFiles, maxDepth, maxFileBytes, and maxSourceFiles (default 100); test/config excerpts do not bypass the source-analysis cap. TypeScript path mapping files accept JSONC comments and trailing commas. Coverage counts report discovered, included, selected, read, and omitted files. Each read excerpt has a stable evidence ID, a SHA-256 fingerprint of the original file, and a separate SHA-256 fingerprint of the redacted excerpt. Symbol and import findings carry the evidence ID and fingerprints for their source file. The structural pass uses Tree-sitter concrete syntax trees when the optional WebAssembly language-pack dependency is installed and a bundled grammar is available; bounded lexical fallback remains available with analysisMode: lexical. It records parser-recovery diagnostics, resolves supported relative imports and direct tsconfig.json/jsconfig.json path mappings, and reports inherited path configuration that it did not load. It also inventories declared npm-style workspaces, package-manager signals, and manifest-declared dependencies between workspace packages. Workspace edges and path aliases are configuration evidence, not proof of runtime dependency use. The scanner reports framework signals, entry points, route-like files, test-like files, and AST/lexical coverage. Every structural result is marked as untrusted repository-derived metadata. It skips common dependency/build/cache folders, does not follow symlinks, avoids likely secret files, and applies heuristic redaction. It does not run project scripts, tests, builds, hooks, or arbitrary repository code.
 
-Tree-sitter produces concrete syntax trees, not type checking, complete symbol resolution, or proof of runtime behavior. The bundled WASM grammar set is curated; unsupported languages use lexical fallback. Package aliases, tsconfig/path aliases, workspace resolution, dynamic imports, generated code, reflection, and runtime dependency injection may remain unresolved. Parser errors are retained as diagnostics rather than treated as proof that the whole file is unusable. Coverage counts distinguish source files discovered, source files read, and files parsed by AST. Repository claims should be grounded in scanner evidence; absence from the bounded scan is not proof that a file, dependency, or behavior does not exist.
+Tree-sitter produces concrete syntax trees, not type checking, complete symbol resolution, or proof of runtime behavior. The bundled WASM grammar set is curated; unsupported languages use lexical fallback. Direct tsconfig.json/jsconfig.json path mappings are resolved only when both the config and target file are inside the bounded scan; inherited configurations are reported but not loaded. Workspace package edges are derived from declared package manifests and workspace patterns, and do not prove runtime use. Package-manager resolution, package exports, dynamic imports, generated code, reflection, and runtime dependency injection may remain unresolved. Parser errors are retained as diagnostics rather than treated as proof that the whole file is unusable. Coverage counts distinguish source files discovered, selected, read, and parsed by AST. Repository claims should be grounded in scanner evidence; absence from the bounded scan is not proof that a file, dependency, or behavior does not exist.
 
-Repository text is untrusted input. Prompt-injection patterns and secret redaction require further hardening; neither should be treated as a security boundary.
+Repository content is passed to the planner in a structured JSON input envelope that separates trusted user requests from explicitly labeled untrusted repository payloads. Planner and reviewer instructions treat repository fields and prior generated plans as data, not instructions. This is defense in depth, not a guaranteed isolation boundary: model behavior can still be influenced by adversarial content, so repository evidence remains untrusted and requires human review. Secret redaction is heuristic and must not be treated as a security boundary.
+
+## Change Impact Analysis
+
+For existing-project requests, OIOL runs a deterministic, read-only impact estimate over the bounded Scanner evidence before planning. It identifies direct candidate files by matching request terms against file paths and extracted symbol names, then follows reverse import edges to identify likely dependents. It also follows declared workspace dependency edges in reverse to identify consumer packages and associates test files with impacted source through resolved imports. When only test-path naming overlap exists, the relationship is marked lower confidence.
+
+The result distinguishes direct matches from transitive files, affected workspace packages, and potentially affected tests. It includes evidence IDs, matched terms, dependency depth, an overall confidence estimate, and explicit penalties/risks for scan truncation, omitted files, parser issues, unresolved imports, and result limits. The natural-language matching is intentionally deterministic and bounded; it does not use an LLM to invent dependency edges.
+
+**Interpretation:** this is a planning aid, not a complete semantic or runtime impact proof. It can miss dynamic imports, reflection, generated code, dependency injection, conditional paths, and relationships outside the bounded scan. A missing match does not establish zero impact. Listed tests are candidates for the downstream implementer to consider; OIOL does not execute or verify them. OIOL does not alter target files or run project commands.
 
 ## Planning quality benchmark
 
-The ten-scenario benchmark covers Greenfield, Existing Project, multi-component architecture, and ambiguous requirements. Read benchmarks/README.md. The P12 real-world repository intake registry and status are tracked in benchmarks/REAL_WORLD_CORPUS.md; candidate collection is not counted as a completed scan or benchmark. External local Git checkout input is supported for Existing Project benchmark scenarios; see the external real-repository mode in benchmarks/README.md.
+The ten-scenario benchmark covers Greenfield, Existing Project, multi-component architecture, and ambiguous requirements. Read benchmarks/README.md.
 
 List scenarios or validate a selection without provider calls:
 
@@ -148,7 +155,13 @@ Live planning benchmark calls can incur provider charges and require explicit op
 
     OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:planner
 
-The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. Filled review sheets can be combined with npm run benchmark:human-review; the gate requires two reviewers per scenario, documented evidence, adjudication of large disagreements, and no critical findings. No live provider quality score or superiority claim is made until those experiments have actually been completed.
+Run a full repeated 3 × 10-scenario series and create blinded review packets:
+
+    OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:series -- --runs 3 --out-dir benchmarks/results/series-2026-11-07
+
+The series writes raw runs, aggregate medians/min/max/spread, one sanitized review-plan file per scenario/run (provider and automatic-review metadata removed), and a consolidated CSV with two reviewer slots per plan. Every one of the 30 plans requires two independent blind human reviews (60 completed rows). Reviewers fill separate slots in the same sheet, use distinct reviewer IDs, and cite plan evidence. Human review remains pending until actual reviewers complete the rows; the runner does not invent scores.
+
+The automated rubric is a screening heuristic, not proof of planning quality. The benchmark protocol requires repeated runs, blinded human review, and transparent reporting. Filled consolidated review sheets can be combined with `npm run benchmark:human-review`; the gate requires two distinct reviewers per scenario/run plan, documented evidence, adjudication of large disagreements, and no high or critical findings. No live provider quality score or superiority claim is made until those experiments have actually been completed. Run `npm run benchmark:scanner` to measure function-symbol and import precision/recall against manually reviewed fixture goldens in both `auto` and `lexical` modes.
 
 An OpenCode planning-only baseline adapter and paired comparison scripts are available for evaluation. They are benchmark tooling, not OIOL execution features. Configure the receiving OpenCode plan agent with read-only permissions; the adapter's diff check is not a sandbox.
 
@@ -161,13 +174,56 @@ CI tests Node.js 22 and 24.
 
 ## Current limitations
 
-- No live provider benchmark or blinded human evaluation has been completed.
+- Live provider results and blinded human evaluation are not committed by default; use the opt-in repeated benchmark and retain its raw outputs and completed review aggregate.
 - The starter benchmark contains ten scenarios and compact synthetic repository fixtures; it is not statistically representative.
 - Automated concept matching is lexical and can miss valid paraphrases or reward superficial keyword inclusion.
-- Repository analysis is bounded and uses Tree-sitter AST where a bundled grammar is available, with lexical fallback elsewhere; it is not type-aware or a complete semantic dependency graph.
-- Prompt-injection isolation, provenance, and secret redaction need stronger evidence and tests.
+- Repository analysis is bounded and uses optional Tree-sitter AST where a bundled grammar is available, with lexical fallback elsewhere. `npm run benchmark:scanner` reports precision/recall on compact manually reviewed fixtures; these measurements do not establish production-repository accuracy or a complete semantic dependency graph.
+- Prompt-injection handling uses structured trusted/untrusted input fields and explicit system instructions, but is not a model isolation guarantee; provenance and heuristic redaction still require adversarial evaluation.
 - Provider-reported usage may be available, but pricing is not estimated.
 
 ## License
 
 MIT
+
+
+## Plan quality evidence (schema 1.1.0)
+
+OIOL reports measurable quality evidence for non-functional requirements, test-strategy completeness, rollback-plan completeness, explicit unknown review, assumption validation, and risk estimation. These deterministic completeness metrics are not proof that future implementation will pass tests or meet production targets. A plan can mark rollback as not applicable only with a rationale.
+
+## Optional delivery adapters
+
+The GitHub Issues and Linear adapters sit outside the planning core. They can produce a local JSON preview without network access. Publishing is a separate explicit CLI action using a user-supplied token; neither adapter runs code, changes repository files, or marks a planned task as complete.
+
+
+### Create external planning tickets
+
+Preview planned tasks as local JSON; neither command makes a network request by default:
+
+~~~sh
+node src/cli.mjs --export github-issues --input plan.json --owner OWNER --repo REPO --out issues-preview.json
+node src/cli.mjs --export linear --input plan.json --team-id TEAM_UUID --out linear-preview.json
+~~~
+
+Review the preview and destination before publishing. External writes require the additional `--publish` flag and credentials supplied through environment variables (GitHub: `OIOL_GITHUB_TOKEN` or `GITHUB_TOKEN`; Linear: `LINEAR_API_KEY`, optionally `LINEAR_AUTH_MODE=oauth`). These adapters create issue descriptions only. They do not implement tasks or track completion.
+
+
+## Independent Change Impact benchmark
+
+The deterministic Change Impact Analyzer has a separate offline regression benchmark at `npm run benchmark:change-impact`. It measures direct-file, reverse-dependency, test-association, workspace-package, and API-consumer predictions against manually curated synthetic goldens using precision, recall, and F1. It is deliberately separate from the LLM engineering-plan quality score: these are distinct capabilities and must not be combined into one score.
+
+The benchmark does not call an LLM provider and does not run any target-project commands. Its synthetic graph cases measure algorithm behavior against authored expected sets; they do not establish semantic or runtime completeness. See [benchmarks/README.md](benchmarks/README.md) for the protocol, limitations, and expansion requirements.
+
+
+## P12 real-world benchmark intake
+
+P12 adds a separate corpus protocol, pinned-snapshot fingerprinting, independent annotation requirements, and an offline runner for Scanner + Change Impact evaluation. The initial corpus manifest is deliberately empty: **no real-world accuracy result is claimed yet**. See [the corpus protocol](benchmarks/real-world/README.md).
+
+Validate a locally curated corpus:
+
+    npm run benchmark:real-world:validate -- --corpus-root /absolute/path/to/corpus
+
+Run the benchmark after at least two independent reviews have been frozen for every case:
+
+    npm run benchmark:real-world -- --corpus-root /absolute/path/to/corpus --out benchmarks/results/real-world-benchmark.json
+
+The runner performs bounded filesystem scanning only. It does not invoke Git, package managers, scripts, builds, tests, migrations, or application code in target snapshots. OIOL's own tests remain runnable in CI.

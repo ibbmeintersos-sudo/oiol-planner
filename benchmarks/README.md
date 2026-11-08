@@ -147,12 +147,17 @@ Do not commit API keys or private benchmark results containing sensitive reposit
 
 | Dimension | Weight | Evidence |
 |---|---:|---|
-| Structural validity | 25 | Deterministic plan validator, including exact evidence-ID/source/fingerprint matching against the actual scanned project and schema validity when recorded |
-| Requirement signal coverage | 25 | Expected scenario concepts found in plan JSON |
-| Clarification discipline | 20 | Required blocking clarification appears for ambiguous cases; no unnecessary blocker for clear cases |
-| Acceptance criteria | 15 | At least two criteria per task reaches full credit |
-| Scoped tasks | 10 | Each task has a non-empty write scope |
-| Reviewer configuration separation | 5 | Planner and reviewer have different provider/model/endpoint configuration; this is not proof of independent judgment |
+| Structural validity | 20 | Deterministic semantic and schema checks, exact evidence provenance, dependency consistency |
+| Requirement signal coverage | 15 | Expected scenario concepts found in plan JSON |
+| Clarification discipline | 15 | Required blocking clarification appears for ambiguous cases; no unnecessary blocker for clear cases |
+| Acceptance criteria | 10 | At least two criteria per task reaches full credit |
+| Scoped tasks | 5 | Each task has a non-empty write scope |
+| Reviewer configuration separation | 5 | Planner and reviewer have different provider/model/endpoint configuration; not proof of independent judgment |
+| Measurable NFRs | 10 | Quality attribute, metric, target, unit, measurement method, and acceptance criterion |
+| Test strategy | 5 | Approach, levels, coverage, entry/exit criteria, and test-data plan |
+| Rollback strategy | 5 | Applicability/rationale or strategy, triggers, steps, verification, and data compatibility |
+| Unknown transparency | 5 | Explicit unknownsReviewed state and unknown impact/resolution/blocking fields |
+| Risk estimation | 5 | Likelihood × impact estimates, confidence, assessment basis, and mitigation completeness |
 
 This rubric is intentionally transparent and imperfect. Signal matching is lexical, not semantic; it can miss good paraphrases and reward superficial keyword inclusion. Treat automated scores as screening signals, not a final quality verdict. The current score does not measure code correctness, architecture novelty, real test execution, or factual grounding beyond the scenario fixtures.
 
@@ -170,7 +175,12 @@ Score each dimension from 1 to 5:
 4. **Acceptance criteria:** Are outcomes observable, testable, and sufficiently complete?
 5. **Scope and safety:** Are write scopes bounded, destructive actions avoided, and existing-project conventions respected?
 6. **Clarification quality:** Does it ask only necessary questions and block decisions that cannot safely be assumed?
-7. **Overall:** Would you approve this plan for a supervised implementation stage?
+7. **NFR coverage:** Are relevant quality attributes measurable, and are missing targets identified as unknowns rather than invented?
+8. **Test strategy:** Does the plan define levels, coverage, entry/exit criteria, and representative test data?
+9. **Rollback strategy:** Is rollback applicable, reasoned as not applicable, or sufficiently planned for the change?
+10. **Unknown transparency:** Are unresolved unknowns and their impact/resolution approach explicit?
+11. **Risk estimation:** Are likelihood and impact plausible, confidence calibrated, assessment basis recorded, and mitigation linked to the risk?
+12. **Overall:** Would you approve this plan for a supervised implementation stage?
 
 Anchors: 1 = materially unsafe or unusable; 2 = major omissions or rework required; 3 = usable only with meaningful revision; 4 = strong with minor corrections; 5 = precise, complete, and implementation-ready.
 
@@ -198,3 +208,64 @@ Do not certify based on a single model run or aggregate score. Minimum evidence 
 - Automated concept matching is lexical and requires human review.
 - Human-review CSV is a blank collection template; scores must be entered by reviewers.
 - Provider-reported token usage is aggregated when available; pricing is not estimated. A paired planning-only baseline harness is available; comparable runs still require identical models, inputs, reviewer configuration, and resource budgets.
+
+## Repeated 3 × 10 benchmark and blinded human review
+
+Use the series runner instead of manually launching the single-run command three times:
+
+```sh
+OIOL_BENCHMARK_ALLOW_LIVE=1 npm run benchmark:series -- --runs 3 --out-dir benchmarks/results/series-<date>
+```
+
+The runner requires 3–5 repetitions and executes all ten scenarios per repetition. It stores each raw JSON run, a `repeat-aggregate.json` with per-scenario and overall median/min/max/spread, sanitized plan files for human review (provider identity, automated review, and validation metadata are removed), and one consolidated review CSV.
+
+The CSV contains two review slots for every scenario/run plan. Two independent reviewers must fill one slot each, set their own stable `reviewer_id`, record the highest finding severity, and cite concrete plan evidence in `evidence_notes`. Do not use the same reviewer identity in both slots. Open the `plan_file` listed in the row; it intentionally omits provider and automated-review metadata to reduce bias.
+
+After all review slots are complete, aggregate the human-entered scores:
+
+```sh
+npm run benchmark:human-review -- --inputs benchmarks/results/series-<date>/human-review-all-runs.csv --out benchmarks/results/series-<date>/human-review-aggregate.json
+```
+
+Incomplete blank rows remain missing coverage and cannot pass. A high or critical finding blocks the human gate; large scoring disagreements require a documented adjudicated score. Keep raw plans, review packets, aggregate JSON, and the completed human review artifact together when publishing results.
+
+Live provider calls may incur cost. Do not describe a benchmark or human review as completed until the generated artifacts exist and the reviewer rows have actually been completed.
+
+## Scanner precision and recall
+
+Run the fixture accuracy benchmark without provider calls:
+
+```sh
+npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
+```
+
+The report evaluates named function symbols, import specifiers, and manifest-declared workspace package dependencies against manually reviewed goldens for the customer, invoice, order, adversarial, and synthetic workspace-platform fixtures. It reports TP/FP/FN, precision, recall, and F1 for Tree-sitter-auto and lexical-only modes. The workspace fixture also checks a `tsconfig.json` path mapping. These metrics are compact regression signals; they do not establish accuracy across production repositories, complete type resolution, or runtime dependency use.
+
+
+### P2 human review gate
+
+Each completed review CSV includes five additional 1–5 dimensions: NFR coverage, test strategy, rollback strategy, unknowns transparency, and risk estimation. The human aggregator requires the median for each of these five dimensions to be at least 3 for every scenario/run, in addition to the existing overall score, coverage, reviewer independence, disagreement adjudication, and severity gates. Blank template rows are not counted as submitted reviews.
+
+
+## Change Impact Analysis benchmark
+
+P11 adds a separate, offline benchmark for the deterministic Change Impact Analyzer. It is intentionally distinct from the LLM plan-quality benchmark above: the two measure different product capabilities and their scores must not be combined into one headline score.
+
+Run without provider credentials or live model calls:
+
+```sh
+npm run benchmark:change-impact -- --out benchmarks/results/change-impact-benchmark.json
+```
+
+The curated suite covers:
+- Existing-project direct file matching and reverse dependency propagation.
+- Test-file association through resolved imports.
+- Multi-component workspace dependency propagation.
+- API contract export and consumer evidence.
+- Ambiguous/unmatched requests where the analyzer must not invent a target.
+
+For direct files, affected files, tests, and packages, the report includes TP/FP/FN, precision, recall, and F1. API contract cases additionally score whether export metadata and consumer evidence were correctly identified. Category-level and dimension-level aggregates are reported; every case remains visible.
+
+The goldens are manually curated synthetic dependency graphs. They are deterministic regression fixtures, not an unbiased external benchmark and not evidence of runtime behavior. Before using results to claim general accuracy, expand the corpus with independently authored and adjudicated real-world repository snapshots, include multiple languages/frameworks and intentionally incomplete scans, and blind the expected impact sets from benchmark implementers.
+
+A passing result means the analyzer matched this small golden suite; it does not certify complete semantic impact analysis, test assertion coverage, or safe implementation. The benchmark runner only analyzes in-memory scanner-shaped evidence and does not execute target-project commands, tests, builds, scripts, or migrations.

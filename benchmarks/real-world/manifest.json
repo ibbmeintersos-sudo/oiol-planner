@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "corpusVersion": "0.1.0",
+  "status": "collection_pending",
+  "cases": [],
+  "notes": [
+    "No real-world cases are included yet. This is an explicit pending state, not a passing benchmark.",
+    "Populate cases only after snapshots are pinned and independent annotations are frozen."
+  ]
+}

@@ -20,6 +20,8 @@ test('Tree-sitter AST extracts JavaScript declarations and ignores import-like c
       "export function boot() { return helper(); }",
       "export const make = () => ({ ok: true });",
       "export class Engine {}",
+      "// export ",
+      "function internalHelper() { return false; }",
       ""
     ].join('\n'));
     await writeFile(path.join(f.root, 'src', 'helper.js'), 'export function helper() { return true; }\n');
@@ -29,9 +31,10 @@ test('Tree-sitter AST extracts JavaScript declarations and ignores import-like c
     assert.equal(structure.astFileCount, 2, JSON.stringify(structure.parserDiagnostics));
     assert.ok(structure.availableGrammarLanguages.includes('javascript'));
     assert.ok(structure.imports.some(item => item.specifier === './helper.js' && item.line === 2 && item.trustLevel === 'untrusted_repository_metadata'));
-    assert.ok(structure.symbols.some(item => item.name === 'boot' && item.kind === 'function' && item.source === 'tree_sitter_ast'));
+    assert.ok(structure.symbols.some(item => item.name === 'boot' && item.kind === 'function' && item.source === 'tree_sitter_ast' && item.exported === true));
     assert.ok(structure.symbols.some(item => item.name === 'make' && item.kind === 'function'));
-    assert.ok(structure.symbols.some(item => item.name === 'Engine' && item.kind === 'class'));
+    assert.ok(structure.symbols.some(item => item.name === 'Engine' && item.kind === 'class' && item.exported === true));
+    assert.ok(structure.symbols.some(item => item.name === 'internalHelper' && item.exported === false));
     assert.equal(structure.imports.some(item => item.specifier === './ghost.js'), false);
     assert.ok(structure.imports.some(item => item.specifier === './helper.js' && item.to === 'src/helper.js'));
     assert.equal(structure.dependencyGraph.edgeCount, 1);
@@ -82,6 +85,27 @@ test('Tree-sitter syntax recovery is surfaced as evidence instead of crashing th
   }
 });
 
+test('Tree-sitter distinguishes exported and module-local TypeScript contract declarations', async () => {
+  const f = await fixture('oiol-ast-ts-exports-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    await writeFile(path.join(f.root, 'src', 'contracts.ts'), [
+      'export interface UserProfileResponse { userId: string; }',
+      'export type PublicUserId = string;',
+      'interface InternalProfile { secret: boolean; }',
+      ''
+    ].join('\n'));
+
+    const result = await scanRepository(f.root);
+    const symbols = result.structure.symbols.filter(item => item.file === 'src/contracts.ts');
+    assert.ok(symbols.some(item => item.name === 'UserProfileResponse' && item.kind === 'interface' && item.exported === true));
+    assert.ok(symbols.some(item => item.name === 'PublicUserId' && item.kind === 'type' && item.exported === true));
+    assert.ok(symbols.some(item => item.name === 'InternalProfile' && item.exported === false));
+  } finally {
+    await f.cleanup();
+  }
+});
+
 test('scanner prioritizes root manifests and application source over metadata and documentation', async () => {
   const f = await fixture('oiol-scan-priority-');
   try {
@@ -126,7 +150,7 @@ test('AST analysis continues across bounded source files after prompt context is
     const result = await scanRepository(f.root, { maxContextChars: 1000 });
     assert.equal(result.structure.astFileCount, 4);
     assert.equal(result.contextTruncated, true);
-    assert.ok(result.snippets.length < 4);
+    assert.ok(result.snippets.filter(snippet => snippet.contextIncluded).length < 4);
     assert.ok(result.structure.symbols.some(item => item.name === 'module3'));
   } finally {
     await f.cleanup();

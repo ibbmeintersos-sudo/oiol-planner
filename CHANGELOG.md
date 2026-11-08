@@ -1,10 +1,25 @@
 # Changelog
 
-## Unreleased
+## [Unreleased]
 
 ### Added
 - Added `oiol report` for standalone HTML, Markdown, or JSON review reports from an existing plan.
 - Added a self-contained HTML report renderer with inline CSS, no scripts or external assets, and full HTML escaping.
+- Added deterministic plan-quality metrics for measurable NFRs, test strategy completeness, rollback strategy completeness, reviewed unknowns, validated assumptions, and likelihood × impact risk exposure.
+- Added plan schema 1.1.0 with immutable version snapshots while retaining validation support for schema 1.0.0 plans.
+- Added optional GitHub Issues and Linear handoff adapters with local preview as the default and explicit publishing as an opt-in.
+- Added measurable risk confidence and assessment-basis coverage, plus blocking-unknown validation.
+- Added architecture, contribution, security, and release-process documentation.
+- Added explicit Scanner coverage accounting, structural analysis independent of prompt-context truncation, per-finding source fingerprints, workspace dependency inventory, and direct TypeScript path-alias resolution.
+- Prevented repository snippet bodies from bypassing the bounded prompt context; snippets outside that context now carry provenance metadata only.
+- Added manually reviewed Monorepo fixtures and precision/recall/F1 coverage for manifest-declared workspace dependency edges.
+- Enforced the source-analysis file cap independently of test/config context selection; added JSONC parsing for TypeScript path maps, alias-config provenance, and diagnostics for unresolved declared workspace dependencies.
+- Added deterministic Change Impact Analysis for direct request matches, reverse import dependents, workspace consumer packages, and potentially affected tests, with evidence links, confidence penalties, and bounded traversal.
+
+### Changed
+- Extended benchmark and blinded human-review rubrics with NFR, test strategy, rollback, unknown transparency, and risk-estimation dimensions.
+- Added CLI commands for local issue-payload previews and explicitly requested external publishing.
+
 
 ## 0.5.0 — Tree-sitter AST repository analysis
 

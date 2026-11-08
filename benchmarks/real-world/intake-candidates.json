@@ -1,0 +1,1348 @@
+{
+  "schemaVersion": "1.0.0",
+  "batchId": "p12-initial-12-repositories",
+  "status": "36_historical_change_candidates_snapshots_acquired_annotations_pending",
+  "collectionNotes": [
+    "Repository tracked-file counts were computed from the exact PR base commit Git tree using the recursive Git Trees API; all 12 responses reported truncated=false.",
+    "Change commit is the merged PR commit. Historical changed paths are evidence only and are not treated as the complete impact ground truth.",
+    "All 36 historical change cases now map to 34 unique immutable base snapshots. Snapshot tree parity, license-file hashes, content fingerprints, and artifact upload digests are recorded in acquisition-report.json and additional-acquisition-report.json. Independent annotations remain pending.",
+    "Each case requires two independent blinded reviewers and adjudication where needed before it can enter manifest.json.",
+    "The first large-project candidate batch was adjusted after exact base-tree counting: VS Code has 19,119 tracked files and is therefore medium under the strict >20,000 large threshold; Home Assistant Core (30,403 tracked files at its PR base) replaces it in the large cohort.",
+    "VS Code is retained as a medium-size reserve candidate (19,119 tracked files) and is excluded from the 12-repository first batch so the required 4/4/4 strata remain balanced.",
+    "An additional 24 merged pull-request candidates were identified across the same 12 repositories. Their PR metadata, exact base/merge SHAs, changed-file counts, changed paths, and license file availability at each exact base SHA were checked. These remain candidate evidence only, not independently adjudicated gold labels.",
+    "Additional-candidate tracked-file counts were independently recomputed from each exact base commit Git tree after acquisition validation detected stale copied counts; all 24 additional candidates now carry per-revision counts."
+  ],
+  "targetDistribution": {
+    "small": 4,
+    "medium": 4,
+    "large": 4
+  },
+  "candidates": [
+    {
+      "caseId": "ky-dispatcher-option-ignored",
+      "source": {
+        "repository": "sindresorhus/ky",
+        "repositoryUrl": "https://github.com/sindresorhus/ky",
+        "license": "MIT",
+        "licenseFile": "license",
+        "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/0f2f00a55592ccfe08c9a82a4d2db2a511f78e9b/license",
+        "baseCommit": "0f2f00a55592ccfe08c9a82a4d2db2a511f78e9b",
+        "changeCommit": "5a3fc90ccba78d10809e48fa89cef722543c9597",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 56,
+        "primaryLanguages": [
+          "TypeScript",
+          "JavaScript"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 757,
+        "url": "https://github.com/sindresorhus/ky/pull/757",
+        "mergedAt": "2025-10-13T03:58:18Z",
+        "title": "Fix dispatcher option being ignored",
+        "category": "source_change",
+        "candidateRequest": "Correct the request option handling so fetch-only dispatcher options are preserved when creating and sending requests.",
+        "historicalChangedPaths": [
+          "source/core/constants.ts",
+          "source/types/request.ts",
+          "test/fetch.ts"
+        ],
+        "changedFileCount": 3
+      }
+    },
+    {
+      "caseId": "itsdangerous-drop-eol-python",
+      "source": {
+        "repository": "pallets/itsdangerous",
+        "repositoryUrl": "https://github.com/pallets/itsdangerous",
+        "license": "BSD-3-Clause",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/LICENSE.txt",
+        "baseCommit": "117218e006641644a038772e557a3ae6cb1448a1",
+        "changeCommit": "4dffa1963f896a0a311dec3c14f003a5f382c446",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 49,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 405,
+        "url": "https://github.com/pallets/itsdangerous/pull/405",
+        "mergedAt": "2025-05-28T20:57:10Z",
+        "title": "Drop end of life Python versions",
+        "category": "cross_component",
+        "candidateRequest": "Raise the minimum supported Python version and align package metadata, CI, type-checker configuration, and tests with the new support policy.",
+        "historicalChangedPaths": [
+          ".github/workflows/tests.yaml",
+          "CHANGES.rst",
+          "pyproject.toml",
+          "src/itsdangerous/serializer.py",
+          "tests/test_itsdangerous/test_serializer.py",
+          "uv.lock"
+        ],
+        "changedFileCount": 6
+      }
+    },
+    {
+      "caseId": "chi-suppress-not-found-route-context",
+      "source": {
+        "repository": "go-chi/chi",
+        "repositoryUrl": "https://github.com/go-chi/chi",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/go-chi/chi/blob/60755706125129a9f9dfb99ac22f7ba016a1b60c/LICENSE",
+        "baseCommit": "60755706125129a9f9dfb99ac22f7ba016a1b60c",
+        "changeCommit": "3a33ba578e0dd93444e0ff386cc26e665d92e31e",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 108,
+        "primaryLanguages": [
+          "Go"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 1220,
+        "url": "https://github.com/go-chi/chi/pull/1220",
+        "mergedAt": "2026-10-14T13:20:04Z",
+        "title": "SupressNotFound must not mutate request route context",
+        "category": "source_change",
+        "candidateRequest": "Prevent the not-found suppression middleware from mutating a live request route context, preserving mounted-router parameters and middleware behavior.",
+        "historicalChangedPaths": [
+          "middleware/supress_notfound.go",
+          "middleware/supress_notfound_test.go"
+        ],
+        "changedFileCount": 2
+      }
+    },
+    {
+      "caseId": "ripgrep-basename-regex-matching",
+      "source": {
+        "repository": "BurntSushi/ripgrep",
+        "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
+        "license": "MIT OR Unlicense",
+        "licenseFile": "LICENSE-MIT",
+        "licenseFileUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/LICENSE-MIT",
+        "baseCommit": "9d07a922605313dc47b78b802c7b0616fd76d409",
+        "changeCommit": "d19650f4fca84c0f65f4ec024b16200bf3d41c33",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 226,
+        "primaryLanguages": [
+          "Rust"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 3561,
+        "url": "https://github.com/BurntSushi/ripgrep/pull/3561",
+        "mergedAt": "2026-10-27T18:13:02Z",
+        "title": "Match filename-only regexes against basenames",
+        "category": "source_change",
+        "candidateRequest": "Optimize filename-only regular-expression matching so eligible patterns are evaluated against the basename without changing matching semantics.",
+        "historicalChangedPaths": [
+          "crates/globset/src/glob.rs",
+          "crates/globset/src/lib.rs"
+        ],
+        "changedFileCount": 2
+      }
+    },
+    {
+      "caseId": "pydantic-decimal-json-schema-pattern",
+      "source": {
+        "repository": "pydantic/pydantic",
+        "repositoryUrl": "https://github.com/pydantic/pydantic",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/LICENSE",
+        "baseCommit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+        "changeCommit": "dabcc6461dafa4337c52faf3e9941431ea41ce4a",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 3579,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 14244,
+        "url": "https://github.com/pydantic/pydantic/pull/14244",
+        "mergedAt": "2026-11-06T21:28:06Z",
+        "title": "Fix Decimal JSON Schema patterns accepting bare zero",
+        "category": "api_change",
+        "candidateRequest": "Correct generated Decimal JSON Schema patterns when no whole-number digits are permitted, keeping schema acceptance aligned with runtime validation.",
+        "historicalChangedPaths": [
+          "pydantic/json_schema.py",
+          "tests/test_json_schema.py"
+        ],
+        "changedFileCount": 2
+      }
+    },
+    {
+      "caseId": "nestjs-node-adapter-req-route",
+      "source": {
+        "repository": "nestjs/nest",
+        "repositoryUrl": "https://github.com/nestjs/nest",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/LICENSE",
+        "baseCommit": "9430227544b0e11b249a55123b1bea77e9e46094",
+        "changeCommit": "4d63dc2d02c2fb7f178ca71c85e1cc412e5e5711",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 2748,
+        "primaryLanguages": [
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 18439,
+        "url": "https://github.com/nestjs/nest/pull/18439",
+        "mergedAt": "2026-11-06T20:52:41Z",
+        "title": "Set req.route on the node adapter like Express",
+        "category": "api_change",
+        "candidateRequest": "Expose route-template metadata on the Node adapter request object consistently with the Express adapter, including route methods and global prefixes.",
+        "historicalChangedPaths": [
+          "integration/http-adapters/e2e/request-route.spec.ts",
+          "integration/http-adapters/src/request-route/request-route.module.ts",
+          "packages/platform-node/adapters/node-request.ts",
+          "packages/platform-node/router/node-router.ts",
+          "packages/platform-node/test/router/node-router.spec.ts"
+        ],
+        "changedFileCount": 5
+      }
+    },
+    {
+      "caseId": "laravel-migration-failed-event",
+      "source": {
+        "repository": "laravel/framework",
+        "repositoryUrl": "https://github.com/laravel/framework",
+        "license": "MIT",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/laravel/framework/blob/288b3b4b85b1d28802dd439d2cec5516c513c31e/LICENSE.md",
+        "baseCommit": "288b3b4b85b1d28802dd439d2cec5516c513c31e",
+        "changeCommit": "fdaba1b7c005dd88e093861bae4017074e43229c",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 3502,
+        "primaryLanguages": [
+          "PHP"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 62342,
+        "url": "https://github.com/laravel/framework/pull/62342",
+        "mergedAt": "2026-11-07T13:21:44Z",
+        "title": "Add MigrationFailed event",
+        "category": "migration_change",
+        "candidateRequest": "Introduce a MigrationFailed event and dispatch it when a database migration throws, preserving existing migration lifecycle behavior.",
+        "historicalChangedPaths": [
+          "src/Illuminate/Database/Events/MigrationFailed.php",
+          "src/Illuminate/Database/Migrations/Migrator.php",
+          "tests/Integration/Database/Fixtures/FailingMigrations/2014_10_14_000000_failing_migration.php",
+          "tests/Integration/Database/MigratorEventsTest.php"
+        ],
+        "changedFileCount": 4
+      }
+    },
+    {
+      "caseId": "spring-boot-duration-micros-overflow",
+      "source": {
+        "repository": "spring-projects/spring-boot",
+        "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/LICENSE.txt",
+        "baseCommit": "7c1bef5e4d7d74642eca5defe24beec37f57810f",
+        "changeCommit": "9ef5b48b9a077778763fc95224136c3aec843144",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 11383,
+        "primaryLanguages": [
+          "Java"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 52557,
+        "url": "https://github.com/spring-projects/spring-boot/pull/52557",
+        "mergedAt": "2026-11-03T00:33:15Z",
+        "title": "Avoid premature overflow converting durations to microseconds",
+        "category": "source_change",
+        "candidateRequest": "Avoid intermediate nanosecond overflow when converting large Duration values to microseconds while preserving exact conversion behavior.",
+        "historicalChangedPaths": [
+          "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+          "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+          "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationToNumberConverterTests.java"
+        ],
+        "changedFileCount": 3
+      }
+    },
+    {
+      "caseId": "kubernetes-spdy-upgrade-failure-close",
+      "source": {
+        "repository": "kubernetes/kubernetes",
+        "repositoryUrl": "https://github.com/kubernetes/kubernetes",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/LICENSE",
+        "baseCommit": "dd17674001a6e7649c7e5ec69a8617b779a131f2",
+        "changeCommit": "776432e660634388d82e866341df0f35cf0e82c4",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 31452,
+        "primaryLanguages": [
+          "Go"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 143073,
+        "url": "https://github.com/kubernetes/kubernetes/pull/143073",
+        "mergedAt": "2026-11-08T01:19:38Z",
+        "title": "Close underlying connection when SPDY upgrade fails",
+        "category": "source_change",
+        "candidateRequest": "Ensure the raw connection is closed when a streaming SPDY upgrade fails, while retaining the response error handling behavior.",
+        "historicalChangedPaths": [
+          "staging/src/k8s.io/streaming/pkg/httpstream/spdy/roundtripper.go",
+          "staging/src/k8s.io/streaming/pkg/httpstream/spdy/roundtripper_test.go"
+        ],
+        "changedFileCount": 2
+      }
+    },
+    {
+      "caseId": "tensorflow-release-gil-device-context",
+      "source": {
+        "repository": "tensorflow/tensorflow",
+        "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/LICENSE",
+        "baseCommit": "dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af",
+        "changeCommit": "27ee80feff7896ab55b35a4dec09317fc2849a23",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 37712,
+        "primaryLanguages": [
+          "C++",
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 129352,
+        "url": "https://github.com/tensorflow/tensorflow/pull/129352",
+        "mergedAt": "2026-11-07T03:16:48Z",
+        "title": "Release Python GIL during physical-device listing and context creation",
+        "category": "cross_component",
+        "candidateRequest": "Release the Python GIL around synchronous C++ device discovery and context creation so unrelated Python threads are not blocked.",
+        "historicalChangedPaths": [
+          "tensorflow/python/tfe_wrapper.cc"
+        ],
+        "changedFileCount": 1
+      }
+    },
+    {
+      "caseId": "grafana-provisioning-job-tracing",
+      "source": {
+        "repository": "grafana/grafana",
+        "repositoryUrl": "https://github.com/grafana/grafana",
+        "license": "AGPL-3.0-only",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/grafana/grafana/blob/e381a87421a65c3415e9d72c14038a1b32271296/LICENSE",
+        "baseCommit": "e381a87421a65c3415e9d72c14038a1b32271296",
+        "changeCommit": "03106fa29ab5c49996b6e9742c41c94486af0db5",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 24718,
+        "primaryLanguages": [
+          "Go",
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 137251,
+        "url": "https://github.com/grafana/grafana/pull/137251",
+        "mergedAt": "2026-11-07T09:03:26Z",
+        "title": "Start a root span for each provisioning job",
+        "category": "cross_component",
+        "candidateRequest": "Create a root tracing span for each provisioning job and wire the tracer into the concurrent job driver.",
+        "historicalChangedPaths": [
+          "pkg/operators/provisioning/jobs.go",
+          "pkg/registry/apis/provisioning/jobs/concurrent_driver.go",
+          "pkg/registry/apis/provisioning/jobs/driver.go",
+          "pkg/registry/apis/provisioning/jobs/driver_tracing_test.go",
+          "pkg/registry/apis/provisioning/register.go"
+        ],
+        "changedFileCount": 5
+      }
+    },
+    {
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "source": {
+        "repository": "home-assistant/core",
+        "repositoryUrl": "https://github.com/home-assistant/core",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/LICENSE.md",
+        "baseCommit": "cbf2c02c9bff331537c19bff69da8dc11c3fbfbf",
+        "changeCommit": "f4e3a420d981b8a523fad8614923ffbc18494741",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 30403,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 190773,
+        "url": "https://github.com/home-assistant/core/pull/190773",
+        "mergedAt": "2026-11-06T23:01:43Z",
+        "title": "Forget disabled UniFi entities when their registry entry is removed",
+        "category": "cross_component",
+        "candidateRequest": "Ensure disabled UniFi entities are removed from the integration's entity state when their registry entry is deleted, consistently across entity loading and sensor handling.",
+        "historicalChangedPaths": [
+          "homeassistant/components/unifi/__init__.py",
+          "homeassistant/components/unifi/entity.py",
+          "homeassistant/components/unifi/hub/entity_loader.py",
+          "homeassistant/components/unifi/sensor.py",
+          "tests/components/unifi/test_init.py"
+        ],
+        "changedFileCount": 5
+      }
+    }
+  ],
+  "reserveCandidates": [
+    {
+      "caseId": "vscode-agent-host-shell-output",
+      "source": {
+        "repository": "microsoft/vscode",
+        "repositoryUrl": "https://github.com/microsoft/vscode",
+        "license": "MIT",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/microsoft/vscode/blob/eb47bf7592b0412fb056dbe631cdaa9bfeed9d17/LICENSE.txt",
+        "baseCommit": "eb47bf7592b0412fb056dbe631cdaa9bfeed9d17",
+        "changeCommit": "95dce80d5e39707263b26d7c3b6884a57582fd48",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 19119,
+        "primaryLanguages": [
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 335016,
+        "url": "https://github.com/microsoft/vscode/pull/335016",
+        "mergedAt": "2026-09-23T23:06:02Z",
+        "title": "Retain full Copilot shell output through terminal subscriptions",
+        "category": "cross_component",
+        "candidateRequest": "Preserve complete non-PTY agent shell output through subscription-backed terminal resources so users can inspect the full command output.",
+        "historicalChangedPaths": [
+          "src/vs/base/common/network.ts",
+          "src/vs/platform/agentHost/common/agentHostSubscriptionService.ts",
+          "src/vs/platform/agentHost/common/nonPtyShellTerminalUri.ts",
+          "src/vs/platform/agentHost/common/sessionDataService.ts",
+          "src/vs/platform/agentHost/common/state/protocol/.ahp-version",
+          "src/vs/platform/agentHost/common/state/protocol/channels-chat/state.ts",
+          "src/vs/platform/agentHost/node/agentHostTerminalManager.ts",
+          "src/vs/platform/agentHost/node/agentService.ts",
+          "src/vs/platform/agentHost/node/copilot/copilotAgentSession.ts",
+          "src/vs/platform/agentHost/node/copilot/copilotNonPtyShellTerminals.ts",
+          "src/vs/platform/agentHost/node/copilot/mapSessionEvents.ts",
+          "src/vs/platform/agentHost/node/sessionDatabase.ts",
+          "src/vs/platform/agentHost/test/common/agentSubscription.test.ts",
+          "src/vs/platform/agentHost/test/common/nonPtyShellTerminalUri.test.ts",
+          "src/vs/platform/agentHost/test/common/sessionTestHelpers.ts",
+          "src/vs/platform/agentHost/test/node/agentHostTerminalManager.test.ts",
+          "src/vs/platform/agentHost/test/node/agentService.test.ts",
+          "src/vs/platform/agentHost/test/node/agentSessionResidency.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotAgent.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotAgentSession.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotNonPtyShellTerminals.test.ts",
+          "src/vs/platform/agentHost/test/node/copilotShellTools.test.ts",
+          "src/vs/platform/agentHost/test/node/e2e/captures/copilotcli-shell-full-output-is-readable-through-its-historical-terminal-resource.yaml",
+          "src/vs/platform/agentHost/test/node/e2e/suites/copilotCoverageSuite.ts",
+          "src/vs/platform/agentHost/test/node/mapSessionEvents.test.ts",
+          "src/vs/platform/agentHost/test/node/sessionDataService.test.ts",
+          "src/vs/platform/agentHost/test/node/sessionDatabase.test.ts",
+          "src/vs/platform/agentHost/test/node/testAgentHostTerminalManager.ts",
+          "src/vs/workbench/contrib/chat/browser/accessibility/chatTerminalOutputAccessibleView.ts",
+          "src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts",
+          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler.ts",
+          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/chatTerminalOutputTextModelContentProvider.ts",
+          "src/vs/workbench/contrib/chat/browser/agentSessions/agentHost/stateToProgressAdapter.ts",
+          "src/vs/workbench/contrib/chat/browser/chat.shared.contribution.ts",
+          "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/media/chatTerminalToolProgressPart.css",
+          "src/vs/workbench/contrib/chat/browser/widget/chatContentParts/toolInvocationParts/chatTerminalToolProgressPart.ts",
+          "src/vs/workbench/contrib/chat/common/chatService/chatService.ts",
+          "src/vs/workbench/contrib/chat/common/model/chatModel.ts",
+          "src/vs/workbench/contrib/chat/common/widget/chatResponseResourceFileSystemProvider.ts",
+          "src/vs/workbench/contrib/chat/test/browser/accessibility/chatAccessibilityHelp.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/accessibility/chatTerminalOutputAccessibleView.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/agentSessions/agentHostChatContribution.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/agentSessions/chatTerminalOutputTextModelContentProvider.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/agentSessions/stateToProgressAdapter.test.ts",
+          "src/vs/workbench/contrib/chat/test/browser/widget/chatContentParts/chatTerminalToolProgressPart.test.ts",
+          "src/vs/workbench/contrib/chat/test/common/model/chatModel.test.ts",
+          "src/vs/workbench/contrib/chat/test/common/widget/chatResponseResourceFileSystemProvider.test.ts",
+          "src/vs/workbench/contrib/terminal/browser/terminal.ts",
+          "src/vs/workbench/test/browser/componentFixtures/chat/chatTerminalFullOutput.fixture.ts"
+        ],
+        "changedFileCount": 49
+      }
+    }
+  ],
+  "additionalChangeCandidates": [
+    {
+      "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "source": {
+        "repository": "sindresorhus/ky",
+        "repositoryUrl": "https://github.com/sindresorhus/ky",
+        "license": "MIT",
+        "licenseFile": "license",
+        "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/license",
+        "baseCommit": "c2ac4a1ac858cd8b423756c6c686b64071e834eb",
+        "changeCommit": "e68ea7ad3080fa25ce2eba6a367c00dfff74f0f3",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 70,
+        "primaryLanguages": [
+          "TypeScript",
+          "JavaScript"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 883,
+        "url": "https://github.com/sindresorhus/ky/pull/883",
+        "mergedAt": "2026-09-05T23:23:00Z",
+        "title": "Preserve caller stack for schema validation errors",
+        "category": "source_change",
+        "candidateRequest": "Preserve the original caller stack when schema validation fails, while keeping the validation error contract consistent.",
+        "historicalChangedPaths": [
+          "source/core/Ky.ts",
+          "test/hooks.ts",
+          "test/main.ts"
+        ],
+        "changedFileCount": 3
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "source": {
+        "repository": "sindresorhus/ky",
+        "repositoryUrl": "https://github.com/sindresorhus/ky",
+        "license": "MIT",
+        "licenseFile": "license",
+        "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/license",
+        "baseCommit": "0bda554d448c1b57c17a5c18114432c02465d467",
+        "changeCommit": "99644d0169138eb0c42718f06862061288f05a96",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 70,
+        "primaryLanguages": [
+          "TypeScript",
+          "JavaScript"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 881,
+        "url": "https://github.com/sindresorhus/ky/pull/881",
+        "mergedAt": "2026-08-28T03:13:25Z",
+        "title": "Fix progress callbacks for empty request and response bodies",
+        "category": "source_change",
+        "candidateRequest": "Ensure progress callbacks behave consistently for empty request and response bodies, including stream handling and browser tests.",
+        "historicalChangedPaths": [
+          "readme.md",
+          "source/types/options.ts",
+          "source/utils/body.ts",
+          "test/browser.ts",
+          "test/stream.ts"
+        ],
+        "changedFileCount": 5
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "source": {
+        "repository": "pallets/itsdangerous",
+        "repositoryUrl": "https://github.com/pallets/itsdangerous",
+        "license": "BSD-3-Clause",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/LICENSE.txt",
+        "baseCommit": "1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4",
+        "changeCommit": "09a8e058a9cca4cae9fb993d936957278cbec151",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 58,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 404,
+        "url": "https://github.com/pallets/itsdangerous/pull/404",
+        "mergedAt": "2025-05-28T20:49:24Z",
+        "title": "Update project to use uv for dependency management",
+        "category": "cross_component",
+        "candidateRequest": "Migrate the project's dependency and development workflow to uv, keeping build, documentation, publishing, pre-commit, and CI configuration aligned.",
+        "historicalChangedPaths": [
+          ".devcontainer/on-create-command.sh",
+          ".github/workflows/lock.yaml",
+          ".github/workflows/pre-commit.yaml",
+          ".github/workflows/publish.yaml",
+          ".github/workflows/tests.yaml",
+          ".gitignore",
+          ".pre-commit-config.yaml",
+          ".readthedocs.yaml",
+          "pyproject.toml",
+          "requirements/build.in",
+          "requirements/build.txt",
+          "requirements/dev.in",
+          "requirements/dev.txt",
+          "requirements/docs.in",
+          "requirements/docs.txt",
+          "requirements/tests.in",
+          "requirements/tests.txt",
+          "requirements/typing.in",
+          "requirements/typing.txt",
+          "src/itsdangerous/timed.py",
+          "tox.ini",
+          "uv.lock"
+        ],
+        "changedFileCount": 22
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "pallets-406-remove-previously-deprecated-code",
+      "source": {
+        "repository": "pallets/itsdangerous",
+        "repositoryUrl": "https://github.com/pallets/itsdangerous",
+        "license": "BSD-3-Clause",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/LICENSE.txt",
+        "baseCommit": "4dffa1963f896a0a311dec3c14f003a5f382c446",
+        "changeCommit": "31f46a3469dbfb2ecf83dd0c4297c1efc508fcca",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 49,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 406,
+        "url": "https://github.com/pallets/itsdangerous/pull/406",
+        "mergedAt": "2025-05-28T21:03:54Z",
+        "title": "remove previously deprecated code",
+        "category": "source_change",
+        "candidateRequest": "Remove the previously deprecated public API and update package exports and release notes to reflect the removal.",
+        "historicalChangedPaths": [
+          "CHANGES.rst",
+          "src/itsdangerous/__init__.py"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "source": {
+        "repository": "go-chi/chi",
+        "repositoryUrl": "https://github.com/go-chi/chi",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/LICENSE",
+        "baseCommit": "167e1e3bd039d060696b99c8da4e876ae04f42c1",
+        "changeCommit": "9f8adb1aabaa8a91180a821111d3f8e668d1c0bf",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 105,
+        "primaryLanguages": [
+          "Go"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 1213,
+        "url": "https://github.com/go-chi/chi/pull/1213",
+        "mergedAt": "2026-10-18T13:50:22Z",
+        "title": "middleware: preserve status after empty ReadFrom",
+        "category": "source_change",
+        "candidateRequest": "Preserve the response status when the wrapped writer receives an empty ReadFrom call, including the expected middleware writer behavior.",
+        "historicalChangedPaths": [
+          "middleware/wrap_writer.go",
+          "middleware/wrap_writer_readfrom_test.go"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "source": {
+        "repository": "go-chi/chi",
+        "repositoryUrl": "https://github.com/go-chi/chi",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/LICENSE",
+        "baseCommit": "46295d0582d9fe19194db1ab13ff74d01a02d7bb",
+        "changeCommit": "60755706125129a9f9dfb99ac22f7ba016a1b60c",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 108,
+        "primaryLanguages": [
+          "Go"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 1218,
+        "url": "https://github.com/go-chi/chi/pull/1218",
+        "mergedAt": "2026-10-13T23:23:37Z",
+        "title": "middleware: parse quoted ContentCharset media parameters",
+        "category": "api_change",
+        "candidateRequest": "Parse quoted charset values in Content-Type media parameters without changing middleware behavior for valid unquoted values.",
+        "historicalChangedPaths": [
+          "middleware/content_charset.go",
+          "middleware/content_charset_test.go"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "source": {
+        "repository": "BurntSushi/ripgrep",
+        "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
+        "license": "MIT OR Unlicense",
+        "licenseFile": "LICENSE-MIT",
+        "licenseFileUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/LICENSE-MIT",
+        "baseCommit": "6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30",
+        "changeCommit": "65e072fab262fdaaa19ef788bbb468ae6f8e4f8e",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 226,
+        "primaryLanguages": [
+          "Rust"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 3578,
+        "url": "https://github.com/BurntSushi/ripgrep/pull/3578",
+        "mergedAt": "2026-10-27T18:30:54Z",
+        "title": "ignore: respect linked worktree excludes without requiring Git",
+        "category": "source_change",
+        "candidateRequest": "Respect exclude rules associated with linked worktrees during ignore matching without invoking Git commands from the scanned target project.",
+        "historicalChangedPaths": [
+          "crates/ignore/src/dir.rs"
+        ],
+        "changedFileCount": 1
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+      "source": {
+        "repository": "BurntSushi/ripgrep",
+        "repositoryUrl": "https://github.com/BurntSushi/ripgrep",
+        "license": "MIT OR Unlicense",
+        "licenseFile": "LICENSE-MIT",
+        "licenseFileUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/LICENSE-MIT",
+        "baseCommit": "6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30",
+        "changeCommit": "9d07a922605313dc47b78b802c7b0616fd76d409",
+        "sizeClass": "small",
+        "trackedFileCountAtBase": 226,
+        "primaryLanguages": [
+          "Rust"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 3560,
+        "url": "https://github.com/BurntSushi/ripgrep/pull/3560",
+        "mergedAt": "2026-10-27T17:30:40Z",
+        "title": "ignore: reuse incremental matchers for directories without rules",
+        "category": "source_change",
+        "candidateRequest": "Reuse incremental ignore matchers for directories without local rules while preserving parent-rule matching semantics.",
+        "historicalChangedPaths": [
+          "crates/ignore/src/dir.rs",
+          "crates/ignore/src/incremental.rs"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "source": {
+        "repository": "pydantic/pydantic",
+        "repositoryUrl": "https://github.com/pydantic/pydantic",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/LICENSE",
+        "baseCommit": "1400371ea83dd5b94ce995411278d1d8d7af2f03",
+        "changeCommit": "b947584cc89eb0f4e57ba6efd0debdcccdcd3515",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 3579,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 14249,
+        "url": "https://github.com/pydantic/pydantic/pull/14249",
+        "mergedAt": "2026-11-07T11:29:48Z",
+        "title": "Support list and DecimalTuple inputs for Decimal",
+        "category": "api_change",
+        "candidateRequest": "Extend Decimal input conversion to support list and DecimalTuple representations, keeping documented conversions and runtime validation consistent.",
+        "historicalChangedPaths": [
+          "docs/api/standard_library_types.md",
+          "docs/plugins/conversion_table.py",
+          "pydantic-core/src/input/input_python.rs",
+          "tests/types/test_decimal.py"
+        ],
+        "changedFileCount": 4
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+      "source": {
+        "repository": "pydantic/pydantic",
+        "repositoryUrl": "https://github.com/pydantic/pydantic",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/LICENSE",
+        "baseCommit": "9895381aa55eb2a1e74079f0b4fb745d1ea12d12",
+        "changeCommit": "62c615a375b1d41d60d72bb98b56a9862a029c3d",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 3579,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 14246,
+        "url": "https://github.com/pydantic/pydantic/pull/14246",
+        "mergedAt": "2026-11-06T20:57:56Z",
+        "title": "Change the arguments schema for validate_call",
+        "category": "api_change",
+        "candidateRequest": "Update the generated arguments schema for validate_call and keep core validation, JSON Schema generation, error types, and public documentation consistent.",
+        "historicalChangedPaths": [
+          "docs/errors/validation_errors.md",
+          "pydantic-core/python/pydantic_core/core_schema.py",
+          "pydantic-core/src/errors/types.rs",
+          "pydantic-core/src/validators/arguments_v3.rs",
+          "pydantic-core/tests/benchmarks/test_micro_benchmarks.py",
+          "pydantic-core/tests/serializers/test_model.py",
+          "pydantic-core/tests/test_errors.py",
+          "pydantic-core/tests/test_schema_functions.py",
+          "pydantic-core/tests/validators/test_arguments.py",
+          "pydantic-core/tests/validators/test_call.py",
+          "pydantic-core/tests/validators/test_with_default.py",
+          "pydantic/_internal/_generate_schema.py",
+          "pydantic/experimental/arguments_schema.py",
+          "pydantic/json_schema.py",
+          "tests/test_experimental_arguments_schema.py",
+          "tests/test_json_schema.py",
+          "tests/test_schema_gather.py",
+          "tests/test_validate_call.py"
+        ],
+        "changedFileCount": 18
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "source": {
+        "repository": "nestjs/nest",
+        "repositoryUrl": "https://github.com/nestjs/nest",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/LICENSE",
+        "baseCommit": "206a5ccd302739a552ce000c1193c606c1ca58ad",
+        "changeCommit": "0fd8642c2bbea1a541cb490ea6f890ab8ca29d95",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 2729,
+        "primaryLanguages": [
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 18385,
+        "url": "https://github.com/nestjs/nest/pull/18385",
+        "mergedAt": "2026-11-06T20:40:40Z",
+        "title": "roll back modules on failed lazy load",
+        "category": "cross_component",
+        "candidateRequest": "Ensure module discovery and container state are rolled back consistently when a lazy module load fails, including scanner and loader behavior.",
+        "historicalChangedPaths": [
+          "packages/core/discovery/discoverable-meta-host-collection.ts",
+          "packages/core/injector/container.ts",
+          "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+          "packages/core/scanner.ts",
+          "packages/core/test/injector/container.spec.ts",
+          "packages/core/test/injector/lazy-module-loader/lazy-module-loader.spec.ts"
+        ],
+        "changedFileCount": 6
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "source": {
+        "repository": "nestjs/nest",
+        "repositoryUrl": "https://github.com/nestjs/nest",
+        "license": "MIT",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/LICENSE",
+        "baseCommit": "6e83cc83c99cbac0108384392902e7230ed94843",
+        "changeCommit": "ca790a95825ddf4f4fc99ef63ec42a919d836051",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 2743,
+        "primaryLanguages": [
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 18419,
+        "url": "https://github.com/nestjs/nest/pull/18419",
+        "mergedAt": "2026-11-06T08:04:39Z",
+        "title": "keep the fields of grouped item errors in parse array pipe",
+        "category": "api_change",
+        "candidateRequest": "Preserve item-level validation fields in grouped errors emitted by ParseArrayPipe, maintaining the observable error contract and associated tests.",
+        "historicalChangedPaths": [
+          "packages/common/pipes/parse-array.pipe.ts",
+          "packages/common/test/pipes/parse-array.pipe.spec.ts"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "laravel-62326-add-origin-to-uri-class",
+      "source": {
+        "repository": "laravel/framework",
+        "repositoryUrl": "https://github.com/laravel/framework",
+        "license": "MIT",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/LICENSE.md",
+        "baseCommit": "21719b7b765c01d4bb19fd0c4304f3292322ae3d",
+        "changeCommit": "f8080dd48e34ad9d4bdfa91a38e987db6a3b87b7",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 3500,
+        "primaryLanguages": [
+          "PHP"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 62326,
+        "url": "https://github.com/laravel/framework/pull/62326",
+        "mergedAt": "2026-11-07T13:38:14Z",
+        "title": "Add origin() to Uri class",
+        "category": "api_change",
+        "candidateRequest": "Expose an origin() accessor on the URI value object and keep package metadata and URI tests aligned with the public API.",
+        "historicalChangedPaths": [
+          "composer.json",
+          "src/Illuminate/Support/Uri.php",
+          "src/Illuminate/Support/composer.json",
+          "tests/Support/SupportUriTest.php"
+        ],
+        "changedFileCount": 4
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "laravel-62360-include-identical-belongstomany-reso",
+      "source": {
+        "repository": "laravel/framework",
+        "repositoryUrl": "https://github.com/laravel/framework",
+        "license": "MIT",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/laravel/framework/blob/3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee/LICENSE.md",
+        "baseCommit": "3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee",
+        "changeCommit": "aca3cc22f3dcdbff47468ce046a959f71db79fd4",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 3502,
+        "primaryLanguages": [
+          "PHP"
+        ],
+        "repositoryKind": "library"
+      },
+      "change": {
+        "pullRequest": 62360,
+        "url": "https://github.com/laravel/framework/pull/62360",
+        "mergedAt": "2026-11-07T13:34:22Z",
+        "title": "Include identical BelongsToMany resources once in JSON:API compound documents",
+        "category": "api_change",
+        "candidateRequest": "Deduplicate identical BelongsToMany resources in JSON:API compound documents while preserving lazy relationship resolution and serialization behavior.",
+        "historicalChangedPaths": [
+          "src/Illuminate/Http/Resources/JsonApi/Concerns/ResolvesJsonApiElements.php",
+          "tests/Integration/Http/Resources/JsonApi/Fixtures/TeamWithLazyAttributeResource.php",
+          "tests/Integration/Http/Resources/JsonApi/Fixtures/UserWithLazyTeamAttributeResource.php",
+          "tests/Integration/Http/Resources/JsonApi/JsonApiCollectionTest.php"
+        ],
+        "changedFileCount": 4
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "source": {
+        "repository": "spring-projects/spring-boot",
+        "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/LICENSE.txt",
+        "baseCommit": "39b546e7425ecd5e4fc4325bf33974d43a62d1a2",
+        "changeCommit": "6a7c795c8cf624283e371f68aa251d95902a7bb6",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 11978,
+        "primaryLanguages": [
+          "Java"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 52619,
+        "url": "https://github.com/spring-projects/spring-boot/pull/52619",
+        "mergedAt": "2026-11-04T17:16:39Z",
+        "title": "OpenTelemetry semantic conventions setting enables neither convention",
+        "category": "cross_component",
+        "candidateRequest": "Correct the management observation convention selection so enabling OpenTelemetry conventions activates the intended semantic convention and its tests.",
+        "historicalChangedPaths": [
+          "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+          "module/spring-boot-micrometer-observation/src/test/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventionsTests.java"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "source": {
+        "repository": "spring-projects/spring-boot",
+        "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.txt",
+        "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/LICENSE.txt",
+        "baseCommit": "eed334dc6992755673503c742708f8e37f1ac928",
+        "changeCommit": "66414bcff6f16cf3a632c187b60c52303f6f19a0",
+        "sizeClass": "medium",
+        "trackedFileCountAtBase": 11384,
+        "primaryLanguages": [
+          "Java"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 52585,
+        "url": "https://github.com/spring-projects/spring-boot/pull/52585",
+        "mergedAt": "2026-11-03T22:12:34Z",
+        "title": "PushGatewayTaskScheduler shutdown on context close",
+        "category": "source_change",
+        "candidateRequest": "Ensure the PushGateway task scheduler shuts down correctly when the application context closes, preserving lifecycle cleanup semantics.",
+        "historicalChangedPaths": [
+          "module/spring-boot-micrometer-metrics/src/main/java/org/springframework/boot/micrometer/metrics/export/prometheus/PrometheusPushGatewayManager.java",
+          "module/spring-boot-micrometer-metrics/src/test/java/org/springframework/boot/micrometer/metrics/export/prometheus/PrometheusPushGatewayManagerTests.java"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "source": {
+        "repository": "kubernetes/kubernetes",
+        "repositoryUrl": "https://github.com/kubernetes/kubernetes",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/LICENSE",
+        "baseCommit": "59332646f342a3e2c485e4f9e4b776eb2f79042f",
+        "changeCommit": "6b5d04cd0bf7e9aa953dc4a13028878a8a48bd6a",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 31744,
+        "primaryLanguages": [
+          "Go"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 143816,
+        "url": "https://github.com/kubernetes/kubernetes/pull/143816",
+        "mergedAt": "2026-11-07T19:25:38Z",
+        "title": "Enforce ResourceSlice object size budget",
+        "category": "api_change",
+        "candidateRequest": "Document and enforce the ResourceSlice object size budget, including validation and integration coverage for the API resource.",
+        "historicalChangedPaths": [
+          "test/integration/dra/core.go",
+          "test/integration/dra/objects.go"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "source": {
+        "repository": "kubernetes/kubernetes",
+        "repositoryUrl": "https://github.com/kubernetes/kubernetes",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/LICENSE",
+        "baseCommit": "5ef140c09dc653e642e6e06ee9c5bea9a5383c67",
+        "changeCommit": "adc24a78c7f38d82faeb7eb544bbccfaa1788181",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 31499,
+        "primaryLanguages": [
+          "Go"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 143291,
+        "url": "https://github.com/kubernetes/kubernetes/pull/143291",
+        "mergedAt": "2026-10-22T14:01:57Z",
+        "title": "Decorate Service and PVC objects on storage decode",
+        "category": "database_change",
+        "candidateRequest": "Apply the storage decode decoration consistently to Service and PersistentVolumeClaim objects, including generic registry integration and storage tests.",
+        "historicalChangedPaths": [
+          "pkg/registry/core/persistentvolumeclaim/storage/storage.go",
+          "pkg/registry/core/service/storage/storage.go",
+          "pkg/registry/core/service/storage/storage_test.go",
+          "staging/src/k8s.io/apiserver/pkg/registry/generic/options.go",
+          "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_decoder.go",
+          "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/store.go",
+          "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/store_test.go",
+          "test/integration/service/upgrade_test.go",
+          "test/integration/servicecidr/allocator_test.go"
+        ],
+        "changedFileCount": 9
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "source": {
+        "repository": "tensorflow/tensorflow",
+        "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/LICENSE",
+        "baseCommit": "dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36",
+        "changeCommit": "c1f4588972ea4091cea94aee83e12222394394e4",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 37712,
+        "primaryLanguages": [
+          "C++",
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 129795,
+        "url": "https://github.com/tensorflow/tensorflow/pull/129795",
+        "mergedAt": "2026-11-07T03:03:13Z",
+        "title": "Optimize CheckpointReader HasTensor lookup",
+        "category": "source_change",
+        "candidateRequest": "Use the initialized in-memory shape map for HasTensor lookups and align Python binding lock behavior with the optimized reader path.",
+        "historicalChangedPaths": [
+          "tensorflow/c/checkpoint_reader.cc",
+          "tensorflow/python/util/py_checkpoint_reader_wrapper.cc"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "source": {
+        "repository": "tensorflow/tensorflow",
+        "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/LICENSE",
+        "baseCommit": "a867034f72b09350ffef56ee29cef3034a535deb",
+        "changeCommit": "d2ae0c42f788f1c66b6e453fbf3e4d4ebc6e98f5",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 37478,
+        "primaryLanguages": [
+          "C++",
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 129473,
+        "url": "https://github.com/tensorflow/tensorflow/pull/129473",
+        "mergedAt": "2026-11-06T20:27:36Z",
+        "title": "Skip UTF-8 BOM when make_csv_dataset reads column names",
+        "category": "source_change",
+        "candidateRequest": "Ignore a UTF-8 byte order mark when make_csv_dataset parses CSV column names, and preserve the behavior with a focused data-loading regression test.",
+        "historicalChangedPaths": [
+          "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+          "tensorflow/python/data/experimental/ops/readers.py"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "source": {
+        "repository": "grafana/grafana",
+        "repositoryUrl": "https://github.com/grafana/grafana",
+        "license": "AGPL-3.0-only",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/LICENSE",
+        "baseCommit": "b9e28156159bf92fd84a9051da2bf2eb2076b749",
+        "changeCommit": "560f3cab9ae748d4087b88f8242e32e899153a59",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 24713,
+        "primaryLanguages": [
+          "Go",
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 136907,
+        "url": "https://github.com/grafana/grafana/pull/136907",
+        "mergedAt": "2026-11-06T21:44:50Z",
+        "title": "Annotation permission mappings for Zanzana",
+        "category": "cross_component",
+        "candidateRequest": "Add annotation permission mappings to the authorization model and keep tuple translation, legacy permission parity, and authorization tests consistent.",
+        "historicalChangedPaths": [
+          "apps/dashvalidator/go.mod",
+          "pkg/services/authz/rbac/legacypermissions/zanzana_resolver_test.go",
+          "pkg/services/authz/zanzana/common/annotation_translations_test.go",
+          "pkg/services/authz/zanzana/common/translations.go",
+          "pkg/services/authz/zanzana/common/tuple.go",
+          "pkg/services/authz/zanzana/legacyscopes/formatter.go",
+          "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+          "pkg/services/authz/zanzana/server/reconciler/translators_test.go",
+          "pkg/services/authz/zanzana/server/server_test.go",
+          "pkg/services/authz/zanzana/tuple_helpers.go",
+          "pkg/services/authz/zanzana/tuple_helpers_test.go",
+          "pkg/tests/apis/annotations/annotations_test.go"
+        ],
+        "changedFileCount": 12
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "source": {
+        "repository": "grafana/grafana",
+        "repositoryUrl": "https://github.com/grafana/grafana",
+        "license": "AGPL-3.0-only",
+        "licenseFile": "LICENSE",
+        "licenseFileUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/LICENSE",
+        "baseCommit": "af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28",
+        "changeCommit": "c8edd31e90f871325fd09a73c84201365d273f49",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 24610,
+        "primaryLanguages": [
+          "Go",
+          "TypeScript"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 137046,
+        "url": "https://github.com/grafana/grafana/pull/137046",
+        "mergedAt": "2026-11-06T21:26:53Z",
+        "title": "Split folder has-rules label into alert and recording rule labels",
+        "category": "cross_component",
+        "candidateRequest": "Separate folder labels for alert rules and recording rules, updating synchronization, service behavior, persistence, and related tests.",
+        "historicalChangedPaths": [
+          "pkg/services/ngalert/metrics/folder_label_syncer.go",
+          "pkg/services/ngalert/rules/service.go",
+          "pkg/services/ngalert/rules/service_test.go",
+          "pkg/services/ngalert/store/folderlabelsyncer/fullsync.go",
+          "pkg/services/ngalert/store/folderlabelsyncer/fullsync_test.go",
+          "pkg/services/ngalert/store/folderlabelsyncer/service.go",
+          "pkg/services/ngalert/store/folderlabelsyncer/service_test.go",
+          "pkg/services/ngalert/store/rules/alert_rule.go",
+          "pkg/services/ngalert/store/rules/alert_rule_test.go",
+          "pkg/services/ngalert/store/rules/persist.go",
+          "pkg/setting/setting_unified_alerting.go"
+        ],
+        "changedFileCount": 11
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "source": {
+        "repository": "home-assistant/core",
+        "repositoryUrl": "https://github.com/home-assistant/core",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/LICENSE.md",
+        "baseCommit": "7c5eb2b0838093fa9d1357d5e7c81c607a95aa15",
+        "changeCommit": "c97172ccafa1672d9854d9b862598d4640999b0d",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 30386,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 189946,
+        "url": "https://github.com/home-assistant/core/pull/189946",
+        "mergedAt": "2026-11-08T03:41:10Z",
+        "title": "Prohibit Nest thermostat temperature changes in Eco mode",
+        "category": "source_change",
+        "candidateRequest": "Prevent temperature changes while the Nest thermostat is in Eco mode, keeping integration behavior and its climate tests aligned.",
+        "historicalChangedPaths": [
+          "homeassistant/components/nest/climate.py",
+          "tests/components/nest/test_climate.py"
+        ],
+        "changedFileCount": 2
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    },
+    {
+      "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "source": {
+        "repository": "home-assistant/core",
+        "repositoryUrl": "https://github.com/home-assistant/core",
+        "license": "Apache-2.0",
+        "licenseFile": "LICENSE.md",
+        "licenseFileUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/LICENSE.md",
+        "baseCommit": "185ff6043357ee966afd764391dda5476df41278",
+        "changeCommit": "3b21cee2a7016ee5fc87c26b190a52e09f6bcce0",
+        "sizeClass": "large",
+        "trackedFileCountAtBase": 30390,
+        "primaryLanguages": [
+          "Python"
+        ],
+        "repositoryKind": "workspace"
+      },
+      "change": {
+        "pullRequest": 189189,
+        "url": "https://github.com/home-assistant/core/pull/189189",
+        "mergedAt": "2026-11-06T16:43:46Z",
+        "title": "Add UniFi IPS engine update entity",
+        "category": "api_change",
+        "candidateRequest": "Add a UniFi IPS engine update entity and keep integration strings, update behavior, snapshots, and tests consistent.",
+        "historicalChangedPaths": [
+          "homeassistant/components/unifi/strings.json",
+          "homeassistant/components/unifi/update.py",
+          "tests/components/unifi/snapshots/test_update.ambr",
+          "tests/components/unifi/test_update.py"
+        ],
+        "changedFileCount": 4
+      },
+      "intakeStatus": "historical_candidate_not_adjudicated"
+    }
+  ],
+  "caseCandidateCount": 36,
+  "targetChangeCaseCount": 30
+}

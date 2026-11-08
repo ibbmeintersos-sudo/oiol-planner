@@ -2,7 +2,7 @@ name: OIOL CI
 
 on:
   push:
-    branches: [main, "hardening/**", "feature/**"]
+    branches: [main, "hardening/**", "feature/**", "quality/**"]
   pull_request:
   workflow_dispatch:
 
@@ -27,5 +27,54 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Static syntax checks
         run: npm run check
+      - name: Verify package, changelog, and schema release contracts
+        run: npm run release:check
+      - name: Measure scanner fixture precision and recall
+        run: npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy.json
+      - name: Validate pinned real-world candidate inventory
+        run: npm run benchmark:real-world:intake
+      - name: Validate real-world benchmark intake protocol
+        run: npm run benchmark:real-world:validate -- --corpus-root benchmarks/real-world --allow-empty
       - name: Unit and regression tests
         run: npm test
+      - name: Run independent Change Impact benchmark
+        run: npm run benchmark:change-impact -- --out benchmarks/results/change-impact-benchmark.json
+      - name: Upload scanner accuracy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanner-accuracy-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: benchmarks/results/scanner-accuracy.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Upload Change Impact benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: change-impact-benchmark-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: benchmarks/results/change-impact-benchmark.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+  lexical-fallback:
+    name: Lexical fallback without optional AST dependency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install required dependencies only
+        run: npm ci --omit=optional --ignore-scripts --no-audit --no-fund
+      - name: Verify scanner works without Tree-sitter
+        run: node --test test/scanner-optional-ast-fallback.test.mjs
+      - name: Measure lexical-only fallback accuracy
+        run: npm run benchmark:scanner -- --out benchmarks/results/scanner-accuracy-no-ast.json
+      - name: Upload lexical fallback report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanner-accuracy-no-optional-ast
+          path: benchmarks/results/scanner-accuracy-no-ast.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -1,0 +1,63 @@
+name: P12 additional snapshot acquisition
+
+on:
+  push:
+    branches:
+      - quality/p12-real-world-benchmark
+    paths:
+      - .github/workflows/p12-additional-snapshot-acquisition.yml
+      - benchmarks/real-world/additional-snapshot-batch.json
+      - benchmarks/real-world/intake-candidates.json
+      - scripts/acquire-real-world-snapshot.py
+      - test/p12_snapshot_acquisition_test.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p12-additional-snapshot-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    name: Acquire additional pinned snapshot ${{ matrix.case_index }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        case_index: [12, 13, 14, 15, 16, 17, 18, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+    steps:
+      - name: Checkout OIOL benchmark metadata only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            benchmarks/real-world/intake-candidates.json
+            scripts/acquire-real-world-snapshot.py
+            test/p12_snapshot_acquisition_test.py
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate snapshot acquisition path safety
+        run: python test/p12_snapshot_acquisition_test.py
+
+      - name: Download and fingerprint pinned source snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/acquire-real-world-snapshot.py --case-index "${{ matrix.case_index }}" --output acquired
+
+      - name: Upload immutable snapshot and provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-snapshot-${{ matrix.case_index }}
+          path: acquired/
+          if-no-files-found: error
+          compression-level: 1
+          include-hidden-files: true
+          retention-days: 30

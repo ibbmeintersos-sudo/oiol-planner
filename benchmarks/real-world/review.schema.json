@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oiol.dev/schemas/real-world-review-1.0.0.schema.json",
+  "title": "OIOL Independent Real-World Annotation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "reviewerId",
+    "independence",
+    "blinded",
+    "reviewedAt",
+    "scopeSummary",
+    "dimensionCoverage",
+    "groundTruth",
+    "evidenceNotes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "reviewerId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 64,
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]+$",
+      "description": "Stable pseudonymous reviewer ID. Never use a person's name, email, or employer identifier."
+    },
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attested",
+        "conflictOfInterest",
+        "declaration"
+      ],
+      "properties": {
+        "attested": {
+          "const": true
+        },
+        "conflictOfInterest": {
+          "const": false
+        },
+        "declaration": {
+          "type": "string",
+          "minLength": 20
+        }
+      }
+    },
+    "blinded": {
+      "const": true
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scopeSummary": {
+      "type": "string",
+      "minLength": 20
+    },
+    "dimensionCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "directFiles",
+        "affectedFiles",
+        "tests",
+        "packages",
+        "apiConsumers",
+        "databaseConsumers",
+        "migrationFiles",
+        "scannerSymbols",
+        "dependencyEdges",
+        "unknowns",
+        "risks"
+      ],
+      "properties": {
+        "directFiles": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "affectedFiles": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "tests": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "packages": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "apiConsumers": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "databaseConsumers": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "migrationFiles": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "scannerSymbols": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "dependencyEdges": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "unknowns": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        },
+        "risks": {
+          "enum": [
+            "complete",
+            "partial",
+            "unsupported"
+          ]
+        }
+      }
+    },
+    "groundTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "directFiles",
+        "affectedFiles",
+        "tests",
+        "packages",
+        "apiConsumers",
+        "databaseConsumers",
+        "migrationFiles",
+        "scannerSymbols",
+        "dependencyEdges",
+        "unknowns",
+        "risks"
+      ],
+      "properties": {
+        "directFiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "affectedFiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "tests": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "packages": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "apiConsumers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "databaseConsumers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "migrationFiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "scannerSymbols": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "name",
+              "kind"
+            ],
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "dependencyEdges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "severity",
+              "rationale"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ]
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 12
+              }
+            }
+          }
+        }
+      }
+    },
+    "evidenceNotes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dimension",
+          "claim",
+          "evidence"
+        ],
+        "properties": {
+          "dimension": {
+            "enum": [
+              "directFiles",
+              "affectedFiles",
+              "tests",
+              "packages",
+              "apiConsumers",
+              "databaseConsumers",
+              "migrationFiles",
+              "scannerSymbols",
+              "dependencyEdges",
+              "unknowns",
+              "risks",
+              "exclusions"
+            ]
+          },
+          "claim": {
+            "type": "string",
+            "minLength": 8
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 12
+          },
+          "path": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "lineRange": {
+            "type": "string"
+          },
+          "immutableUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,10 @@
-import * as TreeSitter from '@xberg-io/tree-sitter-language-pack-wasm';
+let TreeSitter = null;
+let treeSitterLoadError = null;
+try {
+  TreeSitter = await import('@xberg-io/tree-sitter-language-pack-wasm');
+} catch (error) {
+  treeSitterLoadError = String(error?.message || error).slice(0, 180);
+}
 import path from 'node:path';
 import { redact } from '../core/utils.mjs';
 
@@ -15,7 +21,7 @@ let grammarCatalogCache = null;
 function availableGrammarLanguages() {
   if (grammarCatalogCache) return grammarCatalogCache;
   try {
-    grammarCatalogCache = typeof TreeSitter.availableLanguages === 'function'
+    grammarCatalogCache = typeof TreeSitter?.availableLanguages === 'function'
       ? [...new Set(TreeSitter.availableLanguages())].sort()
       : [];
   } catch {
@@ -32,7 +38,7 @@ function safeFree(value) {
 
 function parserFor(language) {
   if (parserCache.has(language)) return parserCache.get(language);
-  if (typeof TreeSitter.getParser !== 'function') throw new Error('Tree-sitter WASM getParser API is unavailable');
+  if (typeof TreeSitter?.getParser !== 'function') throw new Error('Tree-sitter optional runtime is unavailable' + (treeSitterLoadError ? ': ' + treeSitterLoadError : ''));
   const parser = TreeSitter.getParser(language);
   parserCache.set(language, parser);
   return parser;
@@ -81,6 +87,13 @@ function byteLine(lineStarts, byteOffset) {
     else high = middle;
   }
   return low;
+}
+
+function exportedDeclaration(language, node, sourceBytes) {
+  if (!['javascript', 'typescript', 'tsx'].includes(language)) return null;
+  const lineStart = sourceBytes.lastIndexOf(0x0a, Math.max(0, node.startByte() - 1)) + 1;
+  const prefix = sourceBytes.subarray(lineStart, node.startByte()).toString('utf8');
+  return /\bexport\s+(?:(?:default|declare|abstract|async)\s+)*(?:(?:const|let|var)\s+)?$/.test(prefix);
 }
 
 function classifySymbol(language, node, sourceBytes, lineStarts) {
@@ -144,7 +157,16 @@ function classifySymbol(language, node, sourceBytes, lineStarts) {
   if (!symbolKind) return null;
   const name = nodeName(node, sourceBytes);
   if (!name) return null;
-  return { name, kind: symbolKind, line: byteLine(lineStarts, node.startByte()), source: 'tree_sitter_ast', trustLevel: 'untrusted_repository_metadata' };
+  return {
+    name,
+    kind: symbolKind,
+    line: byteLine(lineStarts, node.startByte()),
+    ...( ['javascript', 'typescript', 'tsx'].includes(language)
+      ? { exported: exportedDeclaration(language, node, sourceBytes), exportVisibilitySource: 'bounded_ast_declaration_prefix' }
+      : {}),
+    source: 'tree_sitter_ast',
+    trustLevel: 'untrusted_repository_metadata'
+  };
 }
 
 function importSpecifiers(language, nodeKind, text) {
@@ -342,6 +364,8 @@ export function analyzeWithTreeSitter({ files = [], contents = {}, maxFileBytes 
     parseCounts,
     visitedNodeCount: visitedNodes,
     method: 'tree_sitter_ast',
+    runtimeAvailable: Boolean(TreeSitter && typeof TreeSitter.getParser === 'function'),
+    runtimeLoadError: treeSitterLoadError,
     availableLanguages: availableGrammarLanguages()
   };
 }

@@ -1,17 +1,18 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import { redact } from '../core/utils.mjs';
 import { analyzeRepositoryStructure } from './static-analysis.mjs';
 
-const exec = promisify(execFile);
 export const SCANNER_VERSION = '1.7.0';
 export const EXTERNAL_REPOSITORY_SCAN_OPTIONS = Object.freeze({ maxFiles: 5000, maxFileBytes: 32000, maxPriorityFileBytes: 256000, maxContextChars: 150000, maxPriorityExcerptChars: 10000, maxDepth: 16, maxSourceFiles: 500, maxTestFiles: 25, maxConfigFiles: 25 });
 const IGNORE = new Set(['node_modules', '.git', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', 'vendor', 'target', '.cache']);
 const SENSITIVE = /(^|\/)(\.env(?:\..*)?|id_rsa|id_ed25519|.*\.(?:pem|key|p12|pfx|jks|keystore)|(?:credentials|secrets)\.(?:json|ya?ml)|\.npmrc|\.pypirc|\.netrc)$/i;
-const MANIFESTS = ['package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'composer.json'];
+const MANIFESTS = [
+  'package.json', 'pyproject.toml', 'requirements.txt', 'Cargo.toml', 'go.mod',
+  'pom.xml', 'build.gradle', 'composer.json', 'pnpm-workspace.yaml', 'lerna.json',
+  'nx.json', 'turbo.json', 'tsconfig.json', 'jsconfig.json', 'angular.json'
+];
 const SUPPORTED_SOURCE_FILE = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift)$/i;
 const SOURCE_FILE = /\.(?:mjs|cjs|js|jsx|ts|tsx|py|go|rs|java|kt|php|rb|dart|swift|m|mm|h|hpp|c|cc|cpp|cs|scala|sql|sh|ex|exs|erl|hrl|clj|cljs|cljc|fs|fsx|hs|ml|mli|vue|svelte)$/i;
 const TEST_FILE = /(^|\/)(?:__tests__|tests?|spec)(\/|$)|\.(?:test|spec)\.[^.]+$|(?:^|\/)[^/]+_test\.[^.]+$/i;
@@ -103,7 +104,21 @@ async function walkBounded(root, { maxFiles, maxDepth }) {
   return { files, discovered, truncated, depthTruncated, skipped };
 }
 
-export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 16000, maxPriorityFileBytes = 128000, maxContextChars = 50000, maxPriorityExcerptChars = 10000, maxDepth = 12, maxSourceFiles = 100, maxTestFiles = 15, maxConfigFiles = 15, priorityPaths = [], priorityRanges = [] } = {}) {
+export async function scanRepository(repoPath, {
+  maxFiles = 250,
+  maxFileBytes = 16000,
+  maxPriorityFileBytes = 128000,
+  maxContextChars = 50000,
+  maxPriorityExcerptChars = 10000,
+  maxDepth = 12,
+  maxSourceFiles = 100,
+  maxTestFiles = 15,
+  maxConfigFiles = 15,
+  analysisMode = 'auto',
+  priorityPaths = [],
+  priorityRanges = []
+} = {}) {
+  if (!['auto', 'lexical'].includes(analysisMode)) throw new Error('analysisMode must be auto or lexical');
   for (const [name, value] of Object.entries({ maxFiles, maxFileBytes, maxPriorityFileBytes, maxContextChars, maxPriorityExcerptChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles })) {
     if (!Number.isInteger(value) || value < 1) throw new Error(name + ' must be a positive integer');
   }
@@ -130,15 +145,9 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
   const stat = await fs.stat(root);
   if (!stat.isDirectory()) throw new Error('Repository path is not a directory');
 
-  let git = { isRepo: false, branch: null, commit: null, dirty: null };
-  try {
-    const [branch, commit, status] = await Promise.all([
-      exec('git', ['branch', '--show-current'], { cwd: root }),
-      exec('git', ['rev-parse', 'HEAD'], { cwd: root }),
-      exec('git', ['status', '--porcelain=v1', '-z'], { cwd: root })
-    ]);
-    git = { isRepo: true, branch: branch.stdout.trim(), commit: commit.stdout.trim(), dirty: status.stdout.length > 0 };
-  } catch {}
+  // Scanner is filesystem-read-only: repository metadata is supplied by trusted caller context.
+  // Never invoke Git or any other target-project command during repository analysis.
+  const git = { isRepo: false, branch: null, commit: null, dirty: null, status: 'not_collected' };
 
   const scan = await walkBounded(root, { maxFiles, maxDepth });
   const files = scan.files;
@@ -155,19 +164,23 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     }
   }
 
+  const sourceCandidates = files.filter(file => SUPPORTED_SOURCE_FILE.test(file));
   const matchedPriorityPaths = normalizedPriorityPaths.filter(file => files.includes(file));
   const prioritySourceFiles = matchedPriorityPaths.filter(file => SUPPORTED_SOURCE_FILE.test(file));
-  const sourceFiles = [...new Set([...prioritySourceFiles, ...files.filter(file => SUPPORTED_SOURCE_FILE.test(file)).slice(0, maxSourceFiles)])];
+  const selectedSources = [...new Set([...prioritySourceFiles, ...sourceCandidates.slice(0, maxSourceFiles)])];
+  const readmes = files.filter(file => /^readme(?:\.[^.]+)?$/i.test(path.posix.basename(file))).slice(0, 5);
   const selected = [...new Set([
     ...matchedPriorityPaths,
-    ...interleaveGroups([
-      manifests,
-      sourceFiles,
-      tests.slice(0, maxTestFiles),
-      configs.slice(0, maxConfigFiles)
-    ])
+    ...manifests,
+    ...tests.slice(0, maxTestFiles),
+    ...configs.slice(0, maxConfigFiles),
+    ...selectedSources,
+    ...readmes
   ])];
+
   let context = '', contextTruncated = false;
+  let contextIncludedExcerptCount = 0, contextOmittedExcerptCount = 0;
+  let readFailureCount = 0, oversizedFileCount = 0, binaryFileCount = 0;
   const snippets = [];
   const sourceContents = Object.create(null);
   const excerptedRangeKeys = new Set();
@@ -177,7 +190,8 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
       const buffer = await fs.readFile(path.join(root, file));
       const fileRanges = priorityRangesByPath.get(file) || [];
       const allowedBytes = fileRanges.length ? maxPriorityFileBytes : maxFileBytes;
-      if (buffer.length > allowedBytes || buffer.includes(0)) continue;
+      if (buffer.length > allowedBytes) { oversizedFileCount++; continue; }
+      if (buffer.includes(0)) { binaryFileCount++; continue; }
       const sourceText = buffer.toString('utf8');
       sourceContents[file] = sourceText;
       const redactedText = redact(sourceText);
@@ -200,11 +214,9 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
         content = segments.join('\n\n');
       } else content = redactedText.slice(0, 5000);
       const id = evidenceId(file);
-      if (context.length + content.length > maxContextChars) { contextTruncated = true; continue; }
-      context += '\n\n--- [EVIDENCE: ' + id + '] ' + file + ' ---\n' + content;
       const sourceSha256 = sha256(buffer);
       for (const key of fileExcerptedRangeKeys) excerptedRangeKeys.add(key);
-      snippets.push({
+      const snippet = {
         id,
         path: file,
         sha256: sourceSha256,
@@ -216,12 +228,36 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
         trustLevel: 'untrusted_repository_content',
         redactionPassApplied: true,
         redactionChangedContent: redactedText !== sourceText,
+        contextIncluded: false,
         content
-      });
-    } catch {}
+      };
+      snippets.push(snippet);
+
+      const contextBlock = '\n\n--- [EVIDENCE: ' + id + '] ' + file + ' ---\n' + content;
+      if (context.length + contextBlock.length <= maxContextChars) {
+        context += contextBlock;
+        snippet.contextIncluded = true;
+        contextIncludedExcerptCount++;
+      } else {
+        contextTruncated = true;
+        contextOmittedExcerptCount++;
+      }
+    } catch {
+      readFailureCount++;
+    }
   }
 
-  const structure = analyzeRepositoryStructure({ files, contents: sourceContents, manifests, maxFileBytes });
+  // Context-only selections (for example test/config excerpts) must not expand the source-analysis cap.
+  const analysisContents = Object.assign(Object.create(null), sourceContents);
+  const selectedSourceSet = new Set(selectedSources);
+  for (const file of sourceCandidates) if (!selectedSourceSet.has(file)) delete analysisContents[file];
+
+  const sourceEvidence = snippets.map(({ id, path, sourceSha256, excerptSha256 }) => ({
+    id, path, sourceSha256, excerptSha256, trustLevel: 'untrusted_repository_content'
+  }));
+  const structure = analyzeRepositoryStructure({
+    files, contents: analysisContents, manifests, sourceEvidence, maxFileBytes, analysisMode
+  });
   const excerptedPriorityPaths = matchedPriorityPaths.filter(file => snippets.some(snippet => snippet.path === file));
   const excerptedRanges = normalizedPriorityRanges.filter(range => excerptedRangeKeys.has(rangeKey(range)));
   const evidenceSelection = {
@@ -236,20 +272,32 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     unexcerptedRanges: normalizedPriorityRanges.filter(range => files.includes(range.path) && !excerptedRangeKeys.has(rangeKey(range)))
   };
   const structureSummary = [
-    'Repository structure analysis (Tree-sitter AST where bundled grammars are available; bounded lexical fallback otherwise; evidence, not certainty):',
-    'Languages: ' + (Object.entries(structure.languages).map(([name,count]) => name + ':' + count).join(', ') || 'not detected'),
+    'Repository structure analysis (bounded static evidence; not proof of runtime behavior):',
+    'Languages: ' + (Object.entries(structure.languages).map(([name, count]) => name + ':' + count).join(', ') || 'not detected'),
     'Frameworks: ' + (structure.frameworks.join(', ') || 'not detected'),
+    'Package manager: ' + (structure.workspaceGraph.packageManager || 'not detected'),
+    'Declared monorepo: ' + structure.workspaceGraph.isMonorepo,
+    'Workspace packages: ' + structure.workspaceGraph.packages.length,
+    'Workspace dependency edges: ' + structure.workspaceGraph.dependencies.length,
     'Entry points: ' + (structure.entryPoints.join(', ') || 'not detected'),
+    'Scanner analysis mode: ' + structure.analysisMode,
+    'AST runtime available: ' + structure.astRuntimeAvailable,
     'AST-parsed source files: ' + structure.astFileCount,
     'Lexical fallback source files: ' + structure.lexicalFallbackFileCount,
     'Syntax-error files: ' + structure.syntaxErrorFileCount,
-    'Bundled Tree-sitter grammars: ' + (structure.availableGrammarLanguages.slice(0, 24).join(', ') || 'not exposed'),
+    'Path-alias imports resolved: ' + structure.pathAliases.resolvedImportCount,
     'Local import edges: ' + structure.dependencyGraph.edgeCount,
-    'Unresolved relative imports: ' + structure.unresolvedLocalImportCount,
-    'Route-like files: ' + structure.routeFiles.length,
-    'Test-like files: ' + structure.testFiles.length
-  ].join('\\n');
-  const boundedContext = context.length + structureSummary.length <= maxContextChars ? context + '\\n\\n' + structureSummary : context;
+    'Database schema objects: ' + (structure.databaseSchema?.tables?.length || 0),
+    'Database DDL change candidates: ' + (structure.databaseSchema?.changes?.length || 0),
+    'Database schema consumer candidates: ' + (structure.databaseSchema?.consumers?.length || 0),
+    'Unresolved local imports: ' + structure.unresolvedLocalImportCount,
+    'Fingerprint coverage of structural findings: ' + structure.evidenceCoverage.fingerprintedFindingRate
+  ].join('\n');
+  const summaryBlock = '\n\n' + structureSummary;
+  const boundedContext = context.length + summaryBlock.length <= maxContextChars
+    ? context + summaryBlock
+    : context;
+
   return {
     kind: 'existing',
     scannerVersion: SCANNER_VERSION,
@@ -267,10 +315,30 @@ export async function scanRepository(repoPath, { maxFiles = 250, maxFileBytes = 
     tests,
     configs,
     context: boundedContext,
-    structure: { ...structure, sourceEvidence: snippets.map(({id,path,sourceSha256,excerptSha256}) => ({id,path,sourceSha256,excerptSha256,trustLevel:'untrusted_repository_content'})) },
+    structure: {
+      ...structure,
+      sourceEvidence: sourceEvidence
+    },
     snippets,
+    contextTruncated: contextTruncated || context.length + summaryBlock.length > maxContextChars,
+    coverage: {
+      discoveredFiles: scan.discovered,
+      includedFiles: files.length,
+      fileSelectionTruncated: scan.truncated,
+      depthTruncated: scan.depthTruncated,
+      sourceCandidates: sourceCandidates.length,
+      selectedSourceFiles: selectedSources.length,
+      sourceFilesOmittedBySelectionLimit: Math.max(0, sourceCandidates.length - selectedSources.length),
+      selectedFiles: selected.length,
+      filesRead: Object.keys(sourceContents).length,
+      readFailureCount,
+      oversizedFileCount,
+      binaryFileCount,
+      contextIncludedExcerptCount,
+      contextOmittedExcerptCount,
+      contextBudgetIndependentOfStructuralAnalysis: true
+    },
     evidenceSelection,
-    contextTruncated,
-    scanLimits: { maxFiles, maxFileBytes, maxPriorityFileBytes, maxContextChars, maxPriorityExcerptChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles }
+    scanLimits: { maxFiles, maxFileBytes, maxPriorityFileBytes, maxContextChars, maxPriorityExcerptChars, maxDepth, maxSourceFiles, maxTestFiles, maxConfigFiles, analysisMode }
   };
 }

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:oiol:schemas:plan:1.0.0",
+  "$id": "urn:oiol:schemas:plan:1.1.0",
   "title": "OIOL Engineering Plan",
-  "description": "Portable planning artifact. It describes proposed engineering work and does not represent execution state.",
+  "description": "Portable planning artifact. It describes proposed engineering work and does not represent execution state. Optional quality-evidence sections describe NFR measurement, test strategy, rollback planning, assumptions, unknowns, and risk estimation.",
   "type": "object",
   "required": [
     "schemaVersion",
@@ -19,10 +19,10 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "1.0.0"
+      "const": "1.1.0"
     },
     "contractVersion": {
-      "const": "1.0"
+      "const": "1.1"
     },
     "id": {
       "type": "string",
@@ -145,13 +145,103 @@
       "type": "object"
     },
     "assumptions": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assumption"
+      }
     },
     "unknowns": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/unknown"
+      }
     },
     "constraints": {
       "type": "array"
+    },
+    "testStrategy": {
+      "type": "object",
+      "properties": {
+        "approach": {
+          "type": "string"
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coverage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entryCriteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exitCriteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "testData": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "rollbackPlan": {
+      "type": "object",
+      "properties": {
+        "applicability": {
+          "enum": [
+            "applicable",
+            "not_applicable"
+          ]
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "strategy": {
+          "type": "string"
+        },
+        "triggerConditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataCompatibility": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "unknownsReviewed": {
+      "type": "boolean"
     }
   },
   "$defs": {
@@ -194,6 +284,44 @@
           "items": {
             "type": "string"
           }
+        },
+        "qualityAttribute": {
+          "enum": [
+            "performance",
+            "reliability",
+            "security",
+            "privacy",
+            "accessibility",
+            "maintainability",
+            "observability",
+            "scalability",
+            "operability",
+            "compatibility"
+          ]
+        },
+        "measurement": {
+          "type": "object",
+          "properties": {
+            "metric": {
+              "type": "string",
+              "minLength": 1
+            },
+            "target": {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "measurementMethod": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
         }
       },
       "additionalProperties": true
@@ -499,6 +627,34 @@
             "high",
             "critical"
           ]
+        },
+        "likelihood": {
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "impact": {
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "assessmentBasis": {
+          "type": "string"
         }
       },
       "additionalProperties": true
@@ -573,6 +729,53 @@
           "type": "boolean"
         },
         "redactionChangedContent": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "assumption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "validationApproach": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "unknown": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "string"
+        },
+        "resolutionApproach": {
+          "type": "string"
+        },
+        "blocking": {
           "type": "boolean"
         }
       },

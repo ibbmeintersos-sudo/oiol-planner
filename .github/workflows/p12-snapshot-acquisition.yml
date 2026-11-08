@@ -1,0 +1,61 @@
+name: P12 snapshot acquisition
+
+on:
+  push:
+    branches:
+      - quality/p12-real-world-benchmark
+    paths:
+      - scripts/acquire-real-world-snapshot.py
+      - .github/workflows/p12-snapshot-acquisition.yml
+      - benchmarks/real-world/intake-candidates.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p12-snapshot-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    name: Acquire pinned snapshot ${{ matrix.case_index }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        case_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - name: Checkout OIOL benchmark metadata only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            benchmarks/real-world/intake-candidates.json
+            scripts/acquire-real-world-snapshot.py
+            test/p12_snapshot_acquisition_test.py
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate snapshot acquisition path safety
+        run: python test/p12_snapshot_acquisition_test.py
+
+      - name: Download and fingerprint pinned source snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/acquire-real-world-snapshot.py --case-index "${{ matrix.case_index }}" --output acquired
+
+      - name: Upload immutable snapshot and provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-snapshot-${{ matrix.case_index }}
+          path: acquired/
+          if-no-files-found: error
+          compression-level: 1
+          include-hidden-files: true
+          retention-days: 30
