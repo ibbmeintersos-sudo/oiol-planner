@@ -126,7 +126,7 @@ test('external repository input uses the actual scanner and does not leak the op
   assert.equal(project.kind, 'existing');
   assert.equal(project.repository.root, 'external-repository');
   const scannerSummary = summarizeRepositoryEvidence(project);
-  assert.equal(scannerSummary.scannerVersion, '1.5.0');
+  assert.equal(scannerSummary.scannerVersion, '1.6.0');
   assert.equal(scannerSummary.scanLimits.maxFiles, 5000);
   assert.equal(scannerSummary.scanLimits.maxSourceFiles, 500);
   assert.equal(scannerSummary.scanLimits.maxTestFiles, 25);
