@@ -194,3 +194,31 @@ test('scanner descends into application source before large low-priority root di
     await f.cleanup();
   }
 });
+
+test('scanner excludes common credential and private-key file formats from evidence collection', async () => {
+  const f = await fixture('oiol-sensitive-files-');
+  try {
+    await mkdir(path.join(f.root, 'src'), { recursive: true });
+    await writeFile(path.join(f.root, 'src', 'app.js'), 'export const safe = true;\\n');
+    const sensitive = [
+      '.env.production', '.npmrc', '.pypirc', '.netrc',
+      'credentials.json', 'credentials.yaml', 'secrets.yml',
+      'server.p12', 'server.pfx', 'signing.jks', 'private.keystore',
+      'id_rsa', 'id_ed25519', 'tls/private-key.pem'
+    ];
+    for (const relative of sensitive) {
+      const destination = path.join(f.root, relative);
+      await mkdir(path.dirname(destination), { recursive: true });
+      await writeFile(destination, 'DO_NOT_INCLUDE_THIS_SECRET_MATERIAL');
+    }
+    const result = await scanRepository(f.root);
+    const included = result.files.map(file => file.path);
+    for (const relative of sensitive) {
+      assert.equal(included.includes(relative), false, 'sensitive file included: ' + relative);
+    }
+    assert.ok(result.snippets.some(snippet => snippet.path === 'src/app.js'));
+    assert.equal(JSON.stringify(result.snippets).includes('DO_NOT_INCLUDE_THIS_SECRET_MATERIAL'), false);
+  } finally {
+    await f.cleanup();
+  }
+});
