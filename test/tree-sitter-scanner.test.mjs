@@ -217,7 +217,29 @@ test('scanner excludes common credential and private-key file formats from evide
       assert.equal(included.includes(relative), false, 'sensitive file included: ' + relative);
     }
     assert.ok(result.snippets.some(snippet => snippet.path === 'src/app.js'));
+    assert.equal(result.skipped.counts.sensitive, sensitive.length);
+    assert.ok(result.skipped.paths.some(item => item.path === '.npmrc' && item.reason === 'sensitive'));
     assert.equal(JSON.stringify(result.snippets).includes('DO_NOT_INCLUDE_THIS_SECRET_MATERIAL'), false);
+  } finally {
+    await f.cleanup();
+  }
+});
+
+test('scanner reports file-limit and depth-limit exclusions without claiming complete coverage', async () => {
+  const f = await fixture('oiol-scan-exclusion-report-');
+  try {
+    await mkdir(path.join(f.root, 'src', 'nested', 'deeper'), { recursive: true });
+    await writeFile(path.join(f.root, 'a.txt'), 'a');
+    await writeFile(path.join(f.root, 'b.txt'), 'b');
+    await writeFile(path.join(f.root, 'src', 'nested', 'deeper', 'module.js'), 'export const nested = true;');
+    const fileLimited = await scanRepository(f.root, { maxFiles: 1 });
+    assert.equal(fileLimited.truncated, true);
+    assert.equal(fileLimited.skipped.counts.fileLimit, 1);
+    assert.ok(fileLimited.skipped.fileLimitReachedAt);
+    const depthLimited = await scanRepository(f.root, { maxDepth: 1 });
+    assert.equal(depthLimited.depthTruncated, true);
+    assert.equal(depthLimited.skipped.counts.depthLimit, 1);
+    assert.ok(depthLimited.skipped.paths.some(item => item.path === 'src/nested' && item.reason === 'depthLimit'));
   } finally {
     await f.cleanup();
   }
