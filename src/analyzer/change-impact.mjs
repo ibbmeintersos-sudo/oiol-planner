@@ -637,7 +637,7 @@ export function analyzeChangeImpact({
   const nodeLimitReached = fileReachability.nodeLimitReached || packageReachabilityResult.nodeLimitReached;
   const directMatchConfidence = directSeeds.length
     ? round(directSeeds.reduce((sum, item) => sum + item.score, 0) / directSeeds.length)
-    : packageSeeds.length ? 0.4 : 0;
+    : packageSeeds.length ? 0.4 : databaseSchemaImpact.status === 'analyzed' ? 0.55 : 0;
   const overallConfidence = {
     ...coverageConfidence,
     penalties: [
@@ -655,7 +655,7 @@ export function analyzeChangeImpact({
     ],
     score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0) - (apiContractImpact.status === 'unavailable' ? 0.06 : apiContractImpact.status === 'insufficient_symbol_match' ? 0.04 : 0) - (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? 0.04 : 0)))
   };
-  if (!directSeeds.length && !packageSeeds.length) {
+  if (!directSeeds.length && !packageSeeds.length && databaseSchemaImpact.status !== 'analyzed') {
     overallConfidence.score = Math.min(overallConfidence.score, 0.35);
     overallConfidence.penalties.push('no_direct_request_match_found');
   }
