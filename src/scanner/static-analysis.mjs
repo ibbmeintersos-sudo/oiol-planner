@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { redact } from '../core/utils.mjs';
-import { analyzeWithTreeSitter } from './tree-sitter-ast.mjs';
+import { analyzeWithTreeSitter, resolveLocalImport } from './tree-sitter-ast.mjs';
 
 const EXT = new Map([
   ['.js','javascript'],['.jsx','javascript'],['.mjs','javascript'],['.cjs','javascript'],
@@ -66,22 +66,6 @@ function frameworksFor(text) {
   return defs.filter(([, needles]) => needles.some(needle => lower.includes(needle))).map(([name]) => name);
 }
 
-function resolveRelativeImport(file, language, specifier, fileSet) {
-  if (language === 'python' && /^\.+/.test(specifier)) {
-    const dots = specifier.match(/^\.+/)[0].length, rest = specifier.slice(dots).replaceAll('.', '/');
-    let baseDir = path.posix.dirname(file);
-    for (let i = 1; i < dots; i++) baseDir = path.posix.dirname(baseDir);
-    const base = norm(path.posix.join(baseDir, rest));
-    return [base + '.py', path.posix.join(base, '__init__.py')].find(candidate => fileSet.has(candidate)) || null;
-  }
-  if (specifier.startsWith('.')) {
-    const base = norm(path.posix.normalize(path.posix.join(path.posix.dirname(file), specifier)));
-    const candidates = [base, ...[...EXT.keys()].map(ext => base + ext), ...['index.js','index.ts','index.tsx','index.mjs','__init__.py'].map(name => path.posix.join(base, name))];
-    return candidates.find(candidate => fileSet.has(candidate)) || null;
-  }
-  return null;
-}
-
 export function analyzeRepositoryStructure({ files = [], contents = {}, manifests = [], maxFileBytes = 16000 } = {}) {
   const normalized = files.map(norm);
   const fileSet = new Set(normalized);
@@ -96,7 +80,12 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     analyzed.push(file);
   }
 
-  const ast = analyzeWithTreeSitter({ files: analyzed, contents, maxFileBytes });
+  const goModFile = manifests.find(file => path.posix.basename(file) === 'go.mod');
+  const goModulePath = typeof contents[goModFile] === 'string'
+    ? contents[goModFile].match(/^\\s*module\\s+([^\\s]+)\\s*$/m)?.[1] || null
+    : null;
+  const pythonRoots = ['', 'src', 'lib', 'app'];
+  const ast = analyzeWithTreeSitter({ files: normalized, contents, maxFileBytes, goModulePath, pythonRoots });
   const astFiles = new Set(ast.parsedFiles.map(item => item.file));
   const symbols = [...ast.symbols], imports = [...ast.imports];
   const lexicalFallbackFiles = [];
@@ -109,10 +98,10 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     for (const symbol of symbolsFor(source, language)) symbols.push({ file, ...symbol, trustLevel: 'untrusted_repository_metadata' });
     for (const specifier of importsFor(source, language)) {
       const safeSpecifier = redact(specifier.split(/[?#]/, 1)[0]).slice(0, 200);
-      const target = resolveRelativeImport(file, language, safeSpecifier, fileSet);
+      const target = resolveLocalImport(file, language, safeSpecifier, fileSet, { goModulePath, pythonRoots });
       imports.push({
-        from: file, to: target, specifier: safeSpecifier, resolved: Boolean(target),
-        trustLevel: 'untrusted_repository_metadata', source: 'bounded_lexical_heuristic'
+        from: file, to: target, specifier: safeSpecifier, language, resolved: Boolean(target),
+        trustLevel: 'untrusted_repository_metadata', source: 'bounded_lexical_heuristic', resolution: target ? (language === 'go' ? 'go-module-package-representative' : language === 'python' && !safeSpecifier.startsWith('.') ? 'python-module-root' : 'relative-path') : null
       });
     }
   }
@@ -142,8 +131,19 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     const key = [item.from, item.specifier, item.to || ''].join('\0');
     if (!seenImports.has(key)) { seenImports.add(key); uniqueImports.push(item); }
   }
-  const edges = uniqueImports.filter(item => item.resolved).map(item => ({ from: item.from, to: item.to, kind: 'imports' }));
-  const unresolved = uniqueImports.filter(item => item.specifier.startsWith('.') && !item.resolved);
+  const edges = uniqueImports.filter(item => item.resolved).map(item => ({ from: item.from, to: item.to, kind: 'imports', resolution: item.resolution || (item.language === 'go' ? 'go-module-package-representative' : item.language === 'python' && !item.specifier.startsWith('.') ? 'python-module-root' : 'relative-path') }));
+  const localPythonModules = new Set();
+  for (const file of normalized) if (file.endsWith('.py')) {
+    const parts = file.split('/');
+    localPythonModules.add(parts[0] === 'src' && parts.length > 2 ? parts[1] : parts[0]);
+  }
+  const unresolved = uniqueImports.filter(item => {
+    if (item.resolved) return false;
+    if (item.specifier.startsWith('.')) return true;
+    if (item.language === 'go' && goModulePath && (item.specifier === goModulePath || item.specifier.startsWith(goModulePath + '/'))) return true;
+    if (item.language === 'python' && localPythonModules.has(item.specifier.split('.')[0])) return true;
+    return false;
+  });
   const manifestTexts = manifests.map(file => contents[file]).filter(value => typeof value === 'string');
 
   return {
@@ -167,7 +167,7 @@ export function analyzeRepositoryStructure({ files = [], contents = {}, manifest
     symbolCount: symbols.length,
     imports: uniqueImports.slice(0, 6000),
     importCount: uniqueImports.length,
-    dependencyGraph: { nodes: analyzed, edges: edges.slice(0, 6000), edgeCount: edges.length },
+    dependencyGraph: { nodes: [...new Set([...analyzed, ...edges.map(edge => edge.to)])].sort(), edges: edges.slice(0, 6000), edgeCount: edges.length },
     unresolvedLocalImports: unresolved.slice(0, 1000),
     unresolvedLocalImportCount: unresolved.length,
     frameworks: frameworksFor(manifestTexts.join('\n')),
