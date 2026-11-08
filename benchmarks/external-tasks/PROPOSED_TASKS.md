@@ -1,15 +1,15 @@
 # P12 external task blueprints — draft pending scanner evidence
 
-Status: **ten candidate prompts have been reconciled with expanded scanner evidence and targeted source-file inspection; they are not yet runnable task JSON and have not been scored**.
+Status: **ten candidate prompts are grounded in five pinned GitHub Actions scanner intakes and targeted source-file inspection; ten draft JSON definitions pass the runner contract tests, but they are not approved or scored**.
 
-These blueprints are deliberately separate from runnable task-definition JSON. The selected repositories have not yet been checked out and scanned in the local filesystem environment. Before turning any blueprint into a runnable task file:
+These blueprints are deliberately separate from runnable task-definition JSON. The five prioritized repositories were checked out at pinned commits and scanned by the P12 GitHub Actions workflow (run [42461012821](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461012821)). The reports are available as per-repository workflow artifacts; the workflow runner, not this chat's local filesystem, performed the checkouts. Before promoting any draft into a scored task:
 
-1. Pin the repository to a clean local Git commit.
-2. Run `npm run benchmark:scan-external` and inspect the complete scan report.
-3. Confirm that the scanner included the relevant manifests, application source, tests, and cross-component paths.
-4. Revise the task request and expected signals to match actual repository evidence; remove any unsupported assumptions.
-5. Add a human-review rubric naming concrete paths/symbols from the scan.
-6. Only then promote the task into a versioned `*.json` task definition and use it for OIOL/OpenCode runs.
+1. Retrieve the corresponding scanner artifact from the P12 workflow and verify its repository commit SHA and scanner version.
+2. Inspect the full report, including truncation, selected source paths, test/config coverage, AST versus lexical fallback, unsupported languages, and parser diagnostics.
+3. Reconfirm each cited code path against the pinned repository commit; do not infer architecture from filenames alone.
+4. Revise the request and expected signals to remove unsupported assumptions and avoid rewarding keyword stuffing.
+5. Obtain two independent human approvals for the task wording, evidence paths, clarification requirements, and rubric.
+6. Only then promote the draft to task version `1.0.0` and use the exact same file bytes for OIOL/OpenCode runs.
 
 The source blob SHAs below identify the public README and root manifest versions inspected on 2026-11-08. Each task section also identifies the exact repository commit scanned. These are immutable evidence snapshots, not a substitute for retaining the scanner report and its diagnostics.
 
