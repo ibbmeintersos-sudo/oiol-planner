@@ -52,6 +52,8 @@ function makeRepository({ truncated = false } = {}) {
         { file: files[0], name: 'userSession', kind: 'class' },
         { file: files[1], name: 'readProfile', kind: 'function' },
         { file: files[2], name: 'loadAdminDashboard', kind: 'function' },
+        { file: files[1], name: 'UserProfileResponse', kind: 'interface', line: 14, source: 'tree_sitter_ast', exported: true },
+        { file: files[0], name: 'userSession', kind: 'class', line: 3, source: 'tree_sitter_ast', exported: true },
         { file: files[6], name: 'findUserReviews', kind: 'function' }
       ],
       imports,
@@ -215,4 +217,48 @@ test('depth limit is not reported when the frontier has no unseen dependents', (
   assert.equal(result.graph.traversalLimits.depthLimitReached, false);
   assert.equal(result.graph.traversalLimits.fileDepthFrontierCount, 0);
   assert.equal(result.graph.traversalLimits.packageDepthFrontierCount, 0);
+});
+
+test('API contract analysis matches exported symbols and identifies file-level consumers', () => {
+  const result = analyzeChangeImpact({
+    request: 'change public API response contract for user profile',
+    repository: makeRepository()
+  });
+
+  assert.equal(result.apiContractImpact.status, 'analyzed');
+  assert.ok(result.apiContractImpact.contractSymbols.some(item =>
+    item.name === 'UserProfileResponse' &&
+    item.kind === 'interface' &&
+    item.exported === true &&
+    item.matchedTerms.includes('user') &&
+    item.matchedTerms.includes('profile')
+  ));
+  assert.ok(result.apiContractImpact.potentiallyAffectedConsumers.some(item =>
+    item.path === 'apps/portal/src/portal-route.ts' &&
+    item.relationship === 'imports_contract_candidate_file' &&
+    item.confidence === 'medium' &&
+    item.proofLevel === 'file_import_edge_not_symbol_binding'
+  ));
+  assert.ok(result.apiContractImpact.limitations.some(item => /not that the consumer imports or calls the specific changed symbol/.test(item)));
+});
+
+test('API contract analysis does not run for requests without contract intent', () => {
+  const result = analyzeChangeImpact({
+    request: 'update user profile validation',
+    repository: makeRepository()
+  });
+
+  assert.equal(result.apiContractImpact.status, 'not_requested');
+});
+
+test('API contract analysis reports unavailable when export metadata is absent', () => {
+  const repository = makeRepository();
+  repository.structure.symbols = repository.structure.symbols.map(({ exported, ...symbol }) => symbol);
+  const result = analyzeChangeImpact({
+    request: 'change public API response contract for user profile',
+    repository
+  });
+
+  assert.equal(result.apiContractImpact.status, 'unavailable');
+  assert.equal(result.apiContractImpact.diagnostics.exportMetadataFileCount, 0);
 });
