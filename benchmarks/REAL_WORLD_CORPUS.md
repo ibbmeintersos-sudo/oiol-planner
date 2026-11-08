@@ -129,6 +129,18 @@ The local environment used for this development could not clone GitHub after thr
 
 **Current P12 state:** external-repository input plumbing is implemented and committed; the seven candidate repositories still need clean local checkouts, repository-specific task definitions, actual scanner runs, repeated model runs, and blinded human reviews. The candidate corpus is not a completed benchmark. Five repositories now have two draft task blueprints each; none has passed the scanner-evidence promotion gate.
 
+## Harness validation snapshot (2026-11-08)
+
+The benchmark and scanner harness passed the repository CI matrix at commit `69d8cc7124d1c506ca9922db08692502aae48bd3`:
+
+- Linux and Windows.
+- Node.js 22 and 24.
+- Static syntax check: 32 JavaScript modules passed.
+- Unit/regression suite: 163 tests passed, 0 failed.
+- Coverage includes external-input validation against the checked-in scanner fixture, path redaction, sensitive-file exclusion, external-source consent, paired commit/task matching, and repeated-run configuration identity.
+
+This validates the harness implementation. It does **not** mean any of the seven external candidate repositories has been cloned, scanned, or benchmarked.
+
 ## P12 execution protocol
 
 1. Select an initial balanced subset of at least five candidates after confirming clone/checkout feasibility and license metadata.
