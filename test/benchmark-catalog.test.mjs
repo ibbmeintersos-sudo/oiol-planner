@@ -196,3 +196,38 @@ test('task files reject scenario mismatches and invalid scoring rubrics', async 
     await fs.rm(directory, { recursive: true, force: true });
   }
 });
+
+test('external benchmark dry-run requires and fingerprints the repository-specific task file', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'oiol-external-dry-run-'));
+  const taskPath = path.join(directory, 'task.json');
+  const task = {
+    scenarioId: 'EX-API-003', taskId: 'RW-DRY-RUN-001', taskVersion: '1.0.0',
+    projectName: 'Dry Run Repository', request: 'Assess a bounded architectural change.',
+    constraints: ['Preserve existing behavior'],
+    expectedSignals: [['architecture'], ['acceptance criteria']],
+    mustClarify: false
+  };
+  const previousArgv = process.argv;
+  const previousOptIn = process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+  const previousLog = console.log;
+  const lines = [];
+  try {
+    delete process.env.OIOL_BENCHMARK_ALLOW_LIVE;
+    process.argv = ['node', 'run-planner-benchmark.mjs', '--repo', '/unused/checkout', '--scenarios', 'EX-API-003'];
+    await assert.rejects(() => main(), /requires --task-file/);
+    await fs.writeFile(taskPath, JSON.stringify(task), 'utf8');
+    process.argv = ['node', 'run-planner-benchmark.mjs', '--repo', '/unused/checkout', '--task-file', taskPath, '--scenarios', 'EX-API-003', '--dry-run'];
+    console.log = value => lines.push(String(value));
+    assert.equal(await main(), 0);
+    const output = JSON.parse(lines.at(-1));
+    assert.equal(output.sourceMode, 'external-local-checkout');
+    assert.equal(output.taskDefinition.id, task.taskId);
+    assert.match(output.taskDefinition.sha256, /^[a-f0-9]{64}$/);
+    assert.equal(output.liveCalls, false);
+  } finally {
+    process.argv = previousArgv;
+    if (previousOptIn === undefined) delete process.env.OIOL_BENCHMARK_ALLOW_LIVE; else process.env.OIOL_BENCHMARK_ALLOW_LIVE = previousOptIn;
+    console.log = previousLog;
+    await fs.rm(directory, { recursive: true, force: true });
+  }
+});
