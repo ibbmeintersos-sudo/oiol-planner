@@ -23,7 +23,8 @@
     "benchmark:change-impact": "node scripts/run-change-impact-benchmark.mjs",
     "benchmark:real-world:validate": "node scripts/validate-real-world-corpus.mjs",
     "benchmark:real-world": "node scripts/run-real-world-benchmark.mjs",
-    "benchmark:real-world:intake": "node scripts/validate-real-world-intake.mjs"
+    "benchmark:real-world:intake": "node scripts/validate-real-world-intake.mjs",
+    "benchmark:real-world:worklist": "node scripts/validate-annotation-worklist.mjs"
   },
   "license": "MIT",
   "optionalDependencies": {
