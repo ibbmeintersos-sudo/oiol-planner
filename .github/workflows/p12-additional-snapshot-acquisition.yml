@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   acquire:
-    name: Acquire additional pinned snapshot \${{ matrix.case_index }}
+    name: Acquire additional pinned snapshot ${{ matrix.case_index }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
@@ -49,13 +49,13 @@ jobs:
 
       - name: Download and fingerprint pinned source snapshot
         env:
-          GH_TOKEN: \${{ github.token }}
-        run: python scripts/acquire-real-world-snapshot.py --case-index "\${{ matrix.case_index }}" --output acquired
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/acquire-real-world-snapshot.py --case-index "${{ matrix.case_index }}" --output acquired
 
       - name: Upload immutable snapshot and provenance
         uses: actions/upload-artifact@v4
         with:
-          name: p12-snapshot-\${{ matrix.case_index }}
+          name: p12-snapshot-${{ matrix.case_index }}
           path: acquired/
           if-no-files-found: error
           compression-level: 1
