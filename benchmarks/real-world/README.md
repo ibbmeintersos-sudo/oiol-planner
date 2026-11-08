@@ -105,7 +105,7 @@ Use --allow-empty only for CI protocol tests. It returns a not-ready status and 
 
 ## Initial repository intake — batch 1
 
-The first candidate batch contains 12 repositories and 12 historical merged pull requests. Each pull request's merged state, base SHA, merge commit SHA, merged timestamp, and changed-file count were checked against the GitHub Pull Requests API. Each referenced license file was retrieved at the exact base commit. The recursive Git tree counts are recorded in the machine-readable inventory; the 12 selected tree responses were complete.
+The first candidate batch contains 12 repositories and 36 historical merged pull-request candidates (three changes per repository). Each pull request's merged state, base SHA, merge commit SHA, merged timestamp, and changed-file count were checked against the GitHub Pull Requests API. Each referenced license file was retrieved at the exact base commit. The recursive Git tree counts are recorded in the machine-readable inventory; the 12 selected tree responses were complete.
 
 | Size class | Repository | Tracked files at base | Main language(s) | Historical change |
 |---|---|---:|---|---|
@@ -124,15 +124,33 @@ The first candidate batch contains 12 repositories and 12 historical merged pull
 
 The full machine-readable intake record, including exact 40-character base and merged-change commit IDs, license identifiers and file URLs, PR metadata, candidate change requests, and historical changed paths, is [intake-candidates.json](./intake-candidates.json). VS Code is retained as a medium-size reserve candidate (19,119 tracked files), not part of this balanced first batch.
 
+The 24 additional historical changes are distributed evenly across the same 12 repositories:
+
+| Repository | Additional merged PR candidates |
+|---|---|
+| sindresorhus/ky | [#883](https://github.com/sindresorhus/ky/pull/883), [#881](https://github.com/sindresorhus/ky/pull/881) |
+| pallets/itsdangerous | [#404](https://github.com/pallets/itsdangerous/pull/404), [#406](https://github.com/pallets/itsdangerous/pull/406) |
+| go-chi/chi | [#1213](https://github.com/go-chi/chi/pull/1213), [#1218](https://github.com/go-chi/chi/pull/1218) |
+| BurntSushi/ripgrep | [#3578](https://github.com/BurntSushi/ripgrep/pull/3578), [#3560](https://github.com/BurntSushi/ripgrep/pull/3560) |
+| pydantic/pydantic | [#14249](https://github.com/pydantic/pydantic/pull/14249), [#14246](https://github.com/pydantic/pydantic/pull/14246) |
+| nestjs/nest | [#18385](https://github.com/nestjs/nest/pull/18385), [#18419](https://github.com/nestjs/nest/pull/18419) |
+| laravel/framework | [#62326](https://github.com/laravel/framework/pull/62326), [#62360](https://github.com/laravel/framework/pull/62360) |
+| spring-projects/spring-boot | [#52619](https://github.com/spring-projects/spring-boot/pull/52619), [#52585](https://github.com/spring-projects/spring-boot/pull/52585) |
+| kubernetes/kubernetes | [#143816](https://github.com/kubernetes/kubernetes/pull/143816), [#143291](https://github.com/kubernetes/kubernetes/pull/143291) |
+| tensorflow/tensorflow | [#129795](https://github.com/tensorflow/tensorflow/pull/129795), [#129473](https://github.com/tensorflow/tensorflow/pull/129473) |
+| grafana/grafana | [#136907](https://github.com/grafana/grafana/pull/136907), [#137046](https://github.com/grafana/grafana/pull/137046) |
+| home-assistant/core | [#189946](https://github.com/home-assistant/core/pull/189946), [#189189](https://github.com/home-assistant/core/pull/189189) |
+
 ### Intake status
 
 - 12/12 repositories selected and pinned to immutable base commits.
 - 4 small, 4 medium, and 4 large repositories.
-- 12/12 historical PRs confirmed merged; base and merge commit IDs independently checked.
-- 12/12 license files retrieved at the exact pinned base revision.
+- 36/36 historical PRs confirmed merged; base and merge commit IDs independently checked.
+- 36/36 license files retrieved at each exact pinned base revision.
+- Three candidate changes per repository are identified; the 30-case numerical threshold is met at the candidate-intake stage.
 - Historical changed paths are provenance evidence only, **not** accepted as complete impact ground truth.
 - Snapshot archives and SHA-256 content fingerprints: pending.
 - Two independent blinded annotations per case: pending.
-- One candidate change per repository is identified; at least 18 additional change cases are needed to reach the 30-case first-report gate.
+- Cases may be excluded during independent review; collect a reserve set before freezing the final 30+ adjudicated cases.
 
 The corpus manifest remains empty until snapshots and independent annotations are complete. These entries are an intake shortlist, not completed benchmark cases.
