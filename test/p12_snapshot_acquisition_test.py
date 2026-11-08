@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import tempfile
 import unittest
@@ -9,7 +10,18 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-class LicensePathValidationTests(unittest.TestCase):
+class SnapshotAcquisitionSafetyTests(unittest.TestCase):
+    def test_fingerprint_uses_sorted_paths_and_nul_separators(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "a.txt").write_bytes(b"x")
+            expected = hashlib.sha256()
+            expected.update(b"a.txt")
+            expected.update(bytes([0]))
+            expected.update(b"x")
+            expected.update(bytes([0]))
+            self.assertEqual(MODULE.fingerprint(root)["sha256"], expected.hexdigest())
+
     def test_accepts_existing_regular_license_file(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

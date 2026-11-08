@@ -31,11 +31,11 @@ def fingerprint(root: Path) -> dict:
     digest = hashlib.sha256()
     for rel, path in files:
         digest.update(rel.encode("utf-8"))
-        digest.update(b"\\0")
+        digest.update(bytes([0]))
         with path.open("rb") as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 digest.update(chunk)
-        digest.update(b"\\0")
+        digest.update(bytes([0]))
     return {"sha256": digest.hexdigest(), "fileCount": len(files)}
 
 
@@ -134,7 +134,7 @@ def main() -> None:
         "archiveUrl": url, "acquiredAt": datetime.now(timezone.utc).isoformat(),
         "executionBoundary": "download-and-extract-only; target project code was not executed"
     }
-    (case_dir / "snapshot-metadata.json").write_text(json.dumps(metadata, indent=2) + "\\n", encoding="utf-8")
+    (case_dir / "snapshot-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(metadata, indent=2))
 
 
