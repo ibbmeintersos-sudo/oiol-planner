@@ -175,3 +175,22 @@ test('scanner reports source files in unsupported languages instead of silently 
     await f.cleanup();
   }
 });
+
+test('scanner descends into application source before large low-priority root directories', async () => {
+  const f = await fixture('oiol-scan-nested-priority-');
+  try {
+    await mkdir(path.join(f.root, 'server', 'src'), { recursive: true });
+    await mkdir(path.join(f.root, 'i18n'), { recursive: true });
+    await writeFile(path.join(f.root, 'package.json'), JSON.stringify({ name: 'nested-priority-fixture' }));
+    for (let index = 0; index < 12; index++) {
+      await writeFile(path.join(f.root, 'server', 'src', 'module-' + index + '.ts'), 'export const module' + index + ' = true;\n');
+      await writeFile(path.join(f.root, 'i18n', 'locale-' + index + '.json'), '{}\n');
+    }
+    const result = await scanRepository(f.root, { maxFiles: 15 });
+    const paths = result.files.map(file => file.path);
+    assert.equal(paths.filter(file => file.startsWith('server/src/')).length, 12);
+    assert.equal(paths.some(file => file.startsWith('i18n/')), false);
+  } finally {
+    await f.cleanup();
+  }
+});
