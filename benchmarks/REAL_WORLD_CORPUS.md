@@ -1,6 +1,6 @@
 # P12 — Real-world repository benchmark corpus
 
-Status: **candidate corpus assembled; repository scans and benchmark runs not yet completed**.
+Status: **candidate corpus assembled; scanner intake completed for five prioritized repositories; live planning benchmarks and independent human adjudication remain pending**.
 
 This registry is the intake list for P12. It is separate from the ten synthetic starter scenarios. A repository is not considered benchmarked merely because its README was inspected or its URL was collected.
 
@@ -150,6 +150,12 @@ Interpretation and limitations:
 - A completed scan is not a completed planning benchmark. No live model runs or human scores have been claimed.
 
 The expanded reports are scanner-only artifacts. They do not contain raw source excerpts; they retain bounded paths, hashes, manifest metadata, AST/lexical coverage, diagnostics, and scan limits.
+
+### Scanner follow-up after language coverage improvements
+
+A subsequent scanner intake completed successfully for all five pinned repositories in [P12 scanner follow-up](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461012821). This run included the Dart/Swift selection changes: Swift files are parsed with the bundled Tree-sitter grammar; Dart files are read and analyzed through bounded lexical fallback because the pinned WASM grammar pack does not expose a Dart parser. These are different evidence levels and must remain distinguishable in any plan or review.
+
+The follow-up run's per-repository artifacts are the authoritative reports for the updated scanner behavior. The quantitative table above describes the earlier expanded profile run and must not be reused as if it were the new run's coverage numbers. Refresh the table only after inspecting and comparing all five follow-up artifacts.
 
 ## Required intake record before a repository can enter a scored run
 
