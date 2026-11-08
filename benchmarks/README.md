@@ -60,6 +60,8 @@ npm run benchmark:scan-external -- \
 
 This command uses the existing `analyzeProject` and `scanRepository` implementation. It records the pinned Git commit, bounded file coverage, manifests, discovered tests/configuration, AST-versus-lexical coverage, import-graph statistics, diagnostics, and evidence fingerprints. It does not include source excerpts or the operator's absolute local path in the report. It does not execute project commands, tests, builds, package scripts, or modify the checkout. Reject or investigate reports with missing evidence, parser failures, truncation, or unexpectedly low AST coverage before creating scored planning tasks.
 
+P12 has completed scanner-only intake for the five prioritized real-world repositories at pinned commits using scanner version `1.5.0` in [workflow run 42461297388](https://github.com/ibbmeintersos-sudo/oiol-planner/actions/runs/42461297388). Per-repository reports are workflow artifacts. Ten repository-specific task definitions exist as `0.2.0-draft` files and pass runner-contract tests; they still require two independent human approvals before promotion. No live model benchmark or human score is claimed.
+
 ## External real-repository mode
 
 The benchmark runners accept an operator-supplied **local Git checkout** for Existing Project scenarios. OIOL does not clone repositories, install dependencies, execute project scripts, run tests, build artifacts, or modify the target checkout.
