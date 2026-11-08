@@ -102,6 +102,10 @@ def main() -> None:
             safe_extract(archive, snapshot)
 
     result = fingerprint(snapshot)
+    license_path = snapshot / source["licenseFile"]
+    if not license_path.is_file():
+        raise SystemExit("Declared license file missing from pinned snapshot: " + source["licenseFile"])
+    license_sha256 = hashlib.sha256(license_path.read_bytes()).hexdigest()
     metadata = {
         "schemaVersion": "1.0.0",
         "caseId": candidate["caseId"],
@@ -120,8 +124,10 @@ def main() -> None:
         "snapshotPath": "snapshot",
         "snapshotSha256": result["sha256"],
         "snapshotFileCount": result["fileCount"],
+        "trackedFileCountDelta": result["fileCount"] - source["trackedFileCountAtBase"],
+        "licenseFileSha256": license_sha256,
         "archiveUrl": url,
-        "acquiredAt": os.environ.get("SOURCE_DATE_EPOCH", "workflow-runtime"),
+        "acquiredAt": datetime.now(timezone.utc).isoformat(),
         "executionBoundary": "download-and-extract-only; target project code was not executed"
     }
     (case_dir / "snapshot-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
