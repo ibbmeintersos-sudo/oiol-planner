@@ -1,7 +1,7 @@
 {
   "scenarioId": "EX-MONOLITH-004",
   "taskId": "RW-IM-01",
-  "taskVersion": "0.2.0-draft",
+  "taskVersion": "0.3.0-draft",
   "projectName": "Immich",
   "request": "Plan a separate per-user external-library storage-usage metric for administrator-facing user/server statistics. Keep it distinct from the existing upload quota and do not change quota enforcement. Use a clearly documented logical-size measurement based on indexed external-library assets; do not claim physical disk usage or deduplicated storage usage unless repository evidence supports it.",
   "constraints": [
@@ -31,8 +31,12 @@
       "separate from upload quota"
     ],
     [
-      "server stats",
-      "admin UI",
+      "server stats"
+    ],
+    [
+      "admin UI"
+    ],
+    [
       "DTO"
     ],
     [
@@ -42,7 +46,9 @@
       "no quota enforcement change"
     ],
     [
-      "tests",
+      "tests"
+    ],
+    [
       "documentation"
     ]
   ],
