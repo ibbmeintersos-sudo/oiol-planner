@@ -106,7 +106,8 @@ The earlier fixture-only input gap has been addressed in the benchmark harness:
 - The OIOL runner calls the existing `analyzeProject` and bounded read-only `scanRepository` path. It does not clone, install, build, test, execute project scripts, or modify the target checkout.
 - External checkouts must have a clean working tree and a resolvable 40-character Git commit SHA. The commit and task-file SHA-256 are recorded and included in the run configuration fingerprint.
 - The OpenCode baseline receives a disposable workspace containing only bounded, redacted scanner excerpts; it does not copy the raw external checkout.
-- Paired comparisons reject different repository commit sets, task-definition hashes, or source modes. Unit tests cover input validation, path redaction, sanitized baseline materialization, and paired-snapshot matching.
+- Paired comparisons reject different repository commit sets, task-definition hashes, or source modes. Repeated paired aggregation also rejects drift in repository commit sets, task hashes, or either runner's configuration fingerprint.
+- External live runs require the separate `OIOL_BENCHMARK_ALLOW_EXTERNAL_SOURCE=1` consent flag because bounded source excerpts are sent to the configured model provider. Scanner redaction and sensitive-file exclusion are best-effort safeguards, not a guarantee that every secret is detected.
 
 The local environment used for this development could not clone GitHub after three attempts because DNS resolution failed. GitHub's connected repository API remained usable for metadata and file inspection, but no full local scanner run or live external benchmark is claimed.
 
