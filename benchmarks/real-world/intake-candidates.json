@@ -9,7 +9,8 @@
     "Each case requires two independent blinded reviewers and adjudication where needed before it can enter manifest.json.",
     "The first large-project candidate batch was adjusted after exact base-tree counting: VS Code has 19,119 tracked files and is therefore medium under the strict >20,000 large threshold; Home Assistant Core (30,403 tracked files at its PR base) replaces it in the large cohort.",
     "VS Code is retained as a medium-size reserve candidate (19,119 tracked files) and is excluded from the 12-repository first batch so the required 4/4/4 strata remain balanced.",
-    "An additional 24 merged pull-request candidates were identified across the same 12 repositories. Their PR metadata, exact base/merge SHAs, changed-file counts, changed paths, and license file availability at each exact base SHA were checked. These remain candidate evidence only, not independently adjudicated gold labels."
+    "An additional 24 merged pull-request candidates were identified across the same 12 repositories. Their PR metadata, exact base/merge SHAs, changed-file counts, changed paths, and license file availability at each exact base SHA were checked. These remain candidate evidence only, not independently adjudicated gold labels.",
+    "Additional-candidate tracked-file counts were independently recomputed from each exact base commit Git tree after acquisition validation detected stale copied counts; all 24 additional candidates now carry per-revision counts."
   ],
   "targetDistribution": {
     "small": 4,
@@ -501,7 +502,7 @@
         "baseCommit": "c2ac4a1ac858cd8b423756c6c686b64071e834eb",
         "changeCommit": "e68ea7ad3080fa25ce2eba6a367c00dfff74f0f3",
         "sizeClass": "small",
-        "trackedFileCountAtBase": 56,
+        "trackedFileCountAtBase": 70,
         "primaryLanguages": [
           "TypeScript",
           "JavaScript"
@@ -535,7 +536,7 @@
         "baseCommit": "0bda554d448c1b57c17a5c18114432c02465d467",
         "changeCommit": "99644d0169138eb0c42718f06862061288f05a96",
         "sizeClass": "small",
-        "trackedFileCountAtBase": 56,
+        "trackedFileCountAtBase": 70,
         "primaryLanguages": [
           "TypeScript",
           "JavaScript"
@@ -571,7 +572,7 @@
         "baseCommit": "1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4",
         "changeCommit": "09a8e058a9cca4cae9fb993d936957278cbec151",
         "sizeClass": "small",
-        "trackedFileCountAtBase": 49,
+        "trackedFileCountAtBase": 58,
         "primaryLanguages": [
           "Python"
         ],
@@ -655,7 +656,7 @@
         "baseCommit": "167e1e3bd039d060696b99c8da4e876ae04f42c1",
         "changeCommit": "9f8adb1aabaa8a91180a821111d3f8e668d1c0bf",
         "sizeClass": "small",
-        "trackedFileCountAtBase": 108,
+        "trackedFileCountAtBase": 105,
         "primaryLanguages": [
           "Go"
         ],
@@ -864,7 +865,7 @@
         "baseCommit": "206a5ccd302739a552ce000c1193c606c1ca58ad",
         "changeCommit": "0fd8642c2bbea1a541cb490ea6f890ab8ca29d95",
         "sizeClass": "medium",
-        "trackedFileCountAtBase": 2748,
+        "trackedFileCountAtBase": 2729,
         "primaryLanguages": [
           "TypeScript"
         ],
@@ -900,7 +901,7 @@
         "baseCommit": "6e83cc83c99cbac0108384392902e7230ed94843",
         "changeCommit": "ca790a95825ddf4f4fc99ef63ec42a919d836051",
         "sizeClass": "medium",
-        "trackedFileCountAtBase": 2748,
+        "trackedFileCountAtBase": 2743,
         "primaryLanguages": [
           "TypeScript"
         ],
@@ -932,7 +933,7 @@
         "baseCommit": "21719b7b765c01d4bb19fd0c4304f3292322ae3d",
         "changeCommit": "f8080dd48e34ad9d4bdfa91a38e987db6a3b87b7",
         "sizeClass": "medium",
-        "trackedFileCountAtBase": 3502,
+        "trackedFileCountAtBase": 3500,
         "primaryLanguages": [
           "PHP"
         ],
@@ -1000,7 +1001,7 @@
         "baseCommit": "39b546e7425ecd5e4fc4325bf33974d43a62d1a2",
         "changeCommit": "6a7c795c8cf624283e371f68aa251d95902a7bb6",
         "sizeClass": "medium",
-        "trackedFileCountAtBase": 11383,
+        "trackedFileCountAtBase": 11978,
         "primaryLanguages": [
           "Java"
         ],
@@ -1032,7 +1033,7 @@
         "baseCommit": "eed334dc6992755673503c742708f8e37f1ac928",
         "changeCommit": "66414bcff6f16cf3a632c187b60c52303f6f19a0",
         "sizeClass": "medium",
-        "trackedFileCountAtBase": 11383,
+        "trackedFileCountAtBase": 11384,
         "primaryLanguages": [
           "Java"
         ],
@@ -1064,7 +1065,7 @@
         "baseCommit": "59332646f342a3e2c485e4f9e4b776eb2f79042f",
         "changeCommit": "6b5d04cd0bf7e9aa953dc4a13028878a8a48bd6a",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 31452,
+        "trackedFileCountAtBase": 31744,
         "primaryLanguages": [
           "Go"
         ],
@@ -1096,7 +1097,7 @@
         "baseCommit": "5ef140c09dc653e642e6e06ee9c5bea9a5383c67",
         "changeCommit": "adc24a78c7f38d82faeb7eb544bbccfaa1788181",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 31452,
+        "trackedFileCountAtBase": 31499,
         "primaryLanguages": [
           "Go"
         ],
@@ -1168,7 +1169,7 @@
         "baseCommit": "a867034f72b09350ffef56ee29cef3034a535deb",
         "changeCommit": "d2ae0c42f788f1c66b6e453fbf3e4d4ebc6e98f5",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 37712,
+        "trackedFileCountAtBase": 37478,
         "primaryLanguages": [
           "C++",
           "Python"
@@ -1201,7 +1202,7 @@
         "baseCommit": "b9e28156159bf92fd84a9051da2bf2eb2076b749",
         "changeCommit": "560f3cab9ae748d4087b88f8242e32e899153a59",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 24718,
+        "trackedFileCountAtBase": 24713,
         "primaryLanguages": [
           "Go",
           "TypeScript"
@@ -1244,7 +1245,7 @@
         "baseCommit": "af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28",
         "changeCommit": "c8edd31e90f871325fd09a73c84201365d273f49",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 24718,
+        "trackedFileCountAtBase": 24610,
         "primaryLanguages": [
           "Go",
           "TypeScript"
@@ -1286,7 +1287,7 @@
         "baseCommit": "7c5eb2b0838093fa9d1357d5e7c81c607a95aa15",
         "changeCommit": "c97172ccafa1672d9854d9b862598d4640999b0d",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 30403,
+        "trackedFileCountAtBase": 30386,
         "primaryLanguages": [
           "Python"
         ],
@@ -1318,7 +1319,7 @@
         "baseCommit": "185ff6043357ee966afd764391dda5476df41278",
         "changeCommit": "3b21cee2a7016ee5fc87c26b190a52e09f6bcce0",
         "sizeClass": "large",
-        "trackedFileCountAtBase": 30403,
+        "trackedFileCountAtBase": 30390,
         "primaryLanguages": [
           "Python"
         ],
