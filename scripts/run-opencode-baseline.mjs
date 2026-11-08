@@ -12,7 +12,7 @@ import { validatePlan } from '../src/core/validator.mjs';
 import { validatePlanSchema } from '../src/core/schema-validator.mjs';
 import { scenarios } from '../benchmarks/scenarios.mjs';
 import { scoreScenario, summarizeBenchmark } from '../benchmarks/scoring.mjs';
-import { selectScenarios, applyScenarioTaskFile, resolveScenarioProject, assertExternalRepositorySnapshot, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
+import { selectScenarios, applyScenarioTaskFile, resolveScenarioProject, assertExternalRepositorySnapshot, summarizeRepositoryEvidence, providerConfig, benchmarkConfigFingerprint, aggregateUsage } from './run-planner-benchmark.mjs';
 
 function arg(name,fallback){const i=process.argv.indexOf('--'+name);return i>=0?process.argv[i+1]:fallback;}
 
@@ -129,7 +129,7 @@ export async function main(){
    usage.planner.calls.push({model:baseline.messageInfo?.model||baseConfig.modelRef?.modelID||null,usage:baseline.usage||null});
    await attachReviewer(plan,project,reviewer,reviewConfig,baseConfig.modelRef,usage);
    plan.providerUsage=usage;
-   record={scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:project.repository?{root:project.repository.root,fileCount:project.repository.fileCount,includedFileCount:project.repository.includedFileCount,fileCountIsLowerBound:project.repository.fileCountIsLowerBound,manifests:project.repository.manifests,tests:project.repository.tests,git:project.repository.git,evidence:project.evidence}:null,plan,cleanupWarning:baseline.cleanupWarning,diffCount:baseline.diffCount};
+   record={scenarioId:scenario.id,elapsedMs:Date.now()-started,projectEvidence:summarizeRepositoryEvidence(project),plan,cleanupWarning:baseline.cleanupWarning,diffCount:baseline.diffCount};
   }catch(error){
    record={scenarioId:scenario.id,elapsedMs:Date.now()-started,error:{name:error.name,message:error.message,cleanupWarning:error.cleanupWarning||null}};
   }finally{
