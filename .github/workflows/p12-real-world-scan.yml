@@ -1,0 +1,79 @@
+name: P12 Real-world scanner intake
+
+on:
+  push:
+    paths:
+      - .github/workflows/p12-real-world-scan.yml
+      - scripts/run-external-corpus-scan.mjs
+      - src/analyzer/**
+      - src/scanner/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Scan ${{ matrix.id }} — ${{ matrix.repository }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: RW-TS-02
+            repository: better-auth/better-auth
+            ref: main
+          - id: RW-PY-05
+            repository: paperless-ngx/paperless-ngx
+            ref: dev
+          - id: RW-PY-07
+            repository: PrefectHQ/prefect
+            ref: main
+          - id: RW-TS-06
+            repository: immich-app/immich
+            ref: main
+          - id: RW-GO-01
+            repository: go-gitea/gitea
+            ref: main
+    steps:
+      - name: Check out OIOL planner
+        uses: actions/checkout@v4
+        with:
+          path: planner
+          persist-credentials: false
+
+      - name: Check out public candidate repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: candidate
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: planner/package-lock.json
+
+      - name: Install OIOL dependencies only
+        working-directory: planner
+        run: npm ci
+
+      - name: Run bounded read-only scanner
+        working-directory: planner
+        run: |
+          node scripts/run-external-corpus-scan.mjs \
+            --repo ../candidate \
+            --id "${{ matrix.id }}" \
+            --out "../scan-results/${{ matrix.id }}.json"
+
+      - name: Upload scanner evidence report
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-scan-${{ matrix.id }}
+          path: scan-results/${{ matrix.id }}.json
+          if-no-files-found: error
+          retention-days: 30
