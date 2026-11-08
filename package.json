@@ -7,10 +7,22 @@
   "engines": {
     "node": ">=22"
   },
+  "bin": {
+    "oiol": "src/bin.mjs"
+  },
+  "files": [
+    "src/",
+    "schemas/",
+    "examples/",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "test": "node --test",
     "check": "node scripts/check.mjs",
     "plan": "node src/cli.mjs",
+    "init": "node src/bin.mjs init",
+    "doctor": "node src/bin.mjs doctor",
     "benchmark:planner": "node scripts/run-planner-benchmark.mjs",
     "benchmark:aggregate": "node scripts/aggregate-benchmark-runs.mjs",
     "benchmark:human-review": "node scripts/aggregate-human-reviews.mjs",
@@ -20,6 +32,9 @@
     "benchmark:scan-external": "node scripts/run-external-corpus-scan.mjs"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@xberg-io/tree-sitter-language-pack-wasm": "1.25.0"
   }
