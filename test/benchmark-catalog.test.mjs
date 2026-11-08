@@ -5,6 +5,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scenarios } from '../benchmarks/scenarios.mjs';
+import { scanExternalRepository } from '../scripts/run-external-corpus-scan.mjs';
 import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig, assertExternalRepositorySnapshot, applyScenarioTaskFile } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
@@ -230,4 +231,17 @@ test('external benchmark dry-run requires and fingerprints the repository-specif
     console.log = previousLog;
     await fs.rm(directory, { recursive: true, force: true });
   }
+});
+
+test('external corpus scan report uses the existing read-only scanner and redacts local paths', async () => {
+  const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../benchmarks/fixtures/customer-api');
+  const report = await scanExternalRepository({ repositoryRoot, repositoryId: 'RW-TEST-SCAN' });
+  assert.equal(report.repositoryId, 'RW-TEST-SCAN');
+  assert.match(report.git.commit, /^[a-f0-9]{40}$/i);
+  assert.equal(report.git.dirty, false);
+  assert.ok(report.fileCount > 0);
+  assert.ok(report.structure.astFileCount + report.structure.lexicalFallbackFileCount > 0);
+  assert.ok(report.evidence.length > 0);
+  assert.equal(JSON.stringify(report).includes(repositoryRoot), false);
+  assert.equal(report.root, 'external-repository');
 });
