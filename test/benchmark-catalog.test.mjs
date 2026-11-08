@@ -6,7 +6,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scenarios } from '../benchmarks/scenarios.mjs';
 import { scanExternalRepository } from '../scripts/run-external-corpus-scan.mjs';
-import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, providerConfig, assertExternalRepositorySnapshot, applyScenarioTaskFile } from '../scripts/run-planner-benchmark.mjs';
+import { selectScenarios, benchmarkConfigFingerprint, aggregateUsage, main, resolveScenarioProject, summarizeRepositoryEvidence, providerConfig, assertExternalRepositorySnapshot, applyScenarioTaskFile } from '../scripts/run-planner-benchmark.mjs';
 
 test('benchmark catalog has six unique versioned scenarios across required categories',()=>{
   assert.equal(scenarios.length,10);
@@ -125,6 +125,12 @@ test('external repository input uses the actual scanner and does not leak the op
   const project = await resolveScenarioProject(scenario, { repositoryRoot });
   assert.equal(project.kind, 'existing');
   assert.equal(project.repository.root, 'external-repository');
+  const scannerSummary = summarizeRepositoryEvidence(project);
+  assert.equal(scannerSummary.scannerVersion, '1.1.0');
+  assert.ok(scannerSummary.scanLimits.maxFiles > 0);
+  assert.ok(scannerSummary.skipped.counts);
+  assert.ok(scannerSummary.structure.astFileCount + scannerSummary.structure.lexicalFallbackFileCount > 0);
+  assert.ok(scannerSummary.includedPaths.includes('src/routes/customers.mjs'));
   assert.ok(project.repository.files.some(file => file.path === 'src/routes/customers.mjs'));
   assert.ok(project.repository.snippets.some(file => file.path === 'package.json'));
   assert.ok(project.evidence.some(item => item.type === 'repository_scan'));
@@ -244,6 +250,9 @@ test('external corpus scan report uses the existing read-only scanner and redact
   assert.ok(report.evidence.length > 0);
   assert.equal(JSON.stringify(report).includes(repositoryRoot), false);
   assert.equal(report.root, 'external-repository');
+  assert.equal(report.scannerVersion, '1.1.0');
+  assert.ok(report.skipped.counts);
+  assert.ok(report.scanLimits.maxFiles > 0);
 });
 
 test('external live planning requires explicit consent before sending repository excerpts', async () => {
