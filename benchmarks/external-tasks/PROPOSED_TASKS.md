@@ -111,8 +111,14 @@ The source blob SHAs below identify the public README and root manifest versions
 - Confirmed code evidence: existing per-user quota fields and enforcement paths; external-library service/repository; server stats documentation explaining the current exclusion.
 - Required clarification areas: logical versus physical bytes; shared mount ownership; duplicate assets and deduplication; symlinks and custom mount points; whether imported and external assets both count; behavior for users already over quota; hard rejection versus warning/grace period.
 - Human review focus: Does OIOL identify why external libraries are currently excluded? Does it ask about ownership and storage measurement before proposing a schema or enforcement change?
+## Draft JSON task files
+
+Ten draft task-definition JSON files have been created under [`drafts/`](drafts/). They use task version `0.2.0-draft`, map to the existing Existing Project benchmark scenarios, and are intended for contract validation only. They are not yet included in any benchmark run.
+
+The test suite validates that all ten files parse through `applyScenarioTaskFile`, have valid task IDs/versions/hashes, and use the expected clarification metadata. Passing schema validation does not equal reviewer approval or benchmark readiness.
+
 ## Promotion gate
 
 None of these ten prompts is a completed benchmark task. The five pinned repositories have now been scanned with the expanded profile, and the code paths listed above were checked against the scanner output and targeted source-file reads. Gitea and Prefect remain file-limit truncated, while Immich has a substantial unsupported-language gap; task wording must not imply those unseen components were analyzed. Before scoring, convert each prompt to the versioned JSON contract, preserve the exact task hash, and have reviewers approve its evidence paths and rubric. For ambiguous cases, reviewers must verify that the model produces a blocking clarification and does not invent a protocol, policy, or destructive behavior.
 
-After promotion, create one task JSON per task using the contract in [EXTERNAL_TASK_SCHEMA.md](../EXTERNAL_TASK_SCHEMA.md), increment the version to `1.0.0`, and use the exact same bytes for all OIOL and OpenCode repetitions.
+Before promotion, have two reviewers independently approve the task wording, evidence paths, expected-signal groups, and human-review rubric. Then move the approved JSON files out of `drafts/`, increment each version to `1.0.0`, and use the exact same bytes for all OIOL and OpenCode repetitions.
