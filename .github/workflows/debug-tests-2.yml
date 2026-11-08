@@ -11,19 +11,12 @@ permissions:
 
 jobs:
   test:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Install dependencies
@@ -34,11 +27,14 @@ jobs:
           set +e
           node --test --test-reporter=tap > test-output.tap 2>&1
           code=$?
-          echo "exit=$code" > test-failures.txt
-          wc -l test-output.tap >> test-failures.txt
-          grep -n -E "^not ok|^# fail|AssertionError|Error:|expected:|actual:|^# Subtest" test-output.tap | head -300 >> test-failures.txt
-          echo "--- tail ---" >> test-failures.txt
-          tail -n 400 test-output.tap >> test-failures.txt
+          {
+            echo "exit=${code}"
+            wc -l < test-output.tap | sed 's/^/lines=/'
+            echo "--- failures ---"
+            grep -n -A 40 -E "^not ok" test-output.tap | head -400 || true
+            echo "--- tail ---"
+            tail -n 400 test-output.tap
+          } > test-failures.txt
           exit 0
       - name: Publish captured output
         shell: bash
