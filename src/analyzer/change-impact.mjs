@@ -229,7 +229,7 @@ function reverseReachability(seeds, reverseEdges, { maxDepth, maxNodes }) {
 }
 
 function hasApiContractIntent(requestText) {
-  return /\b(?:api|apis|contract|interface|dto|schema|endpoint|request\s*\/\s*response|public\s+api|breaking\s+change|backward\s+compatib(?:le|ility))\b|واجه(?:ة|ات)|عقد(?:\s+ال)?واجه|مخطط(?:\s+ال)?بيانات|نقط(?:ة|ه)\s+نهاي/u.test(requestText);
+  return /\b(?:api|apis|contract|interface|dto|schema|endpoint|request\s*\/\s*response|public\s+api|breaking\s+change|backward\s+compatib(?:le|ility))\b|واجه(?:ة|ات)|عقد\s+(?:ال)?واجه|مخطط(?:\s+ال)?بيانات|نقط(?:ة|ه)\s+نهاي/u.test(requestText);
 }
 
 function analyzeApiContractImpact({
@@ -273,6 +273,9 @@ function analyzeApiContractImpact({
         matchedTerms,
         evidenceId: item.evidenceId || null,
         sourceSha256: item.sourceSha256 || null,
+        excerptSha256: item.excerptSha256 || null,
+        trustLevel: item.trustLevel || 'untrusted_repository_metadata',
+        exportVisibilitySource: item.exportVisibilitySource || null,
         exported: true,
         source: item.source
       };
@@ -302,7 +305,7 @@ function analyzeApiContractImpact({
 
   const contractFiles = sorted(new Set(contractSymbols.map(item => item.file)));
   const reachability = reverseReachability(contractFiles, reverseImports, { maxDepth, maxNodes });
-  const potentiallyAffectedConsumers = [...reachability.reached.values()]
+  const allConsumerCandidates = [...reachability.reached.values()]
     .filter(item => !testPathSet.has(normPath(item.path)))
     .map(item => ({
       path: normPath(item.path),
@@ -313,8 +316,8 @@ function analyzeApiContractImpact({
       confidence: 'medium',
       proofLevel: 'file_import_edge_not_symbol_binding'
     }))
-    .sort((a, b) => a.depth - b.depth || a.path.localeCompare(b.path))
-    .slice(0, 250);
+    .sort((a, b) => a.depth - b.depth || a.path.localeCompare(b.path));
+  const potentiallyAffectedConsumers = allConsumerCandidates.slice(0, 250);
 
   return {
     status: contractSymbols.length ? 'analyzed' : 'insufficient_symbol_match',
@@ -326,7 +329,9 @@ function analyzeApiContractImpact({
       matchedContractSymbolCount: contractSymbols.length,
       exportMetadataFileCount,
       contractSeedFileCount: contractFiles.length,
-      consumerCandidateCountBeforeLimit: reachability.reached.size,
+      consumerCandidateCountBeforeLimit: allConsumerCandidates.length,
+      consumerResultLimit: 250,
+      consumerResultLimitReached: allConsumerCandidates.length > 250,
       depthLimitReached: reachability.depthLimitReached,
       depthFrontierCount: reachability.depthFrontierCount,
       nodeLimitReached: reachability.nodeLimitReached
@@ -635,9 +640,10 @@ export function analyzeChangeImpact({
       ...(nodeLimitReached || affectedFilesTruncated || affectedPackagesTruncated ? ['impact_graph_node_or_output_limit_reached'] : []),
       ...(directMatches.length > maxDirectMatches ? ['direct_match_result_limit_reached'] : []),
       ...(apiContractImpact.status === 'unavailable' ? ['api_contract_export_metadata_unavailable'] : []),
-      ...(apiContractImpact.status === 'insufficient_symbol_match' ? ['api_contract_symbol_match_not_found'] : [])
+      ...(apiContractImpact.status === 'insufficient_symbol_match' ? ['api_contract_symbol_match_not_found'] : []),
+      ...(apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? ['api_contract_consumer_graph_truncated'] : [])
     ],
-    score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0) - (apiContractImpact.status === 'unavailable' ? 0.06 : apiContractImpact.status === 'insufficient_symbol_match' ? 0.04 : 0)))
+    score: round(Math.max(0.25, coverageConfidence.score * (0.65 + 0.35 * directMatchConfidence) - (reverseTruncated ? 0.08 : 0) - (directMatches.length > maxDirectMatches ? 0.04 : 0) - (apiContractImpact.status === 'unavailable' ? 0.06 : apiContractImpact.status === 'insufficient_symbol_match' ? 0.04 : 0) - (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached ? 0.04 : 0)))
   };
   if (!directSeeds.length && !packageSeeds.length) {
     overallConfidence.score = Math.min(overallConfidence.score, 0.35);
@@ -655,7 +661,7 @@ export function analyzeChangeImpact({
   if (nodeLimitReached || affectedFilesTruncated || affectedPackagesTruncated) risks.push('impact_graph_node_or_output_limit_reached');
   if (apiContractImpact.status === 'unavailable') risks.push('api_contract_analysis_unavailable');
   if (apiContractImpact.status === 'insufficient_symbol_match') risks.push('api_contract_symbol_match_not_found');
-  if (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached) risks.push('api_contract_consumer_graph_truncated');
+  if (apiContractImpact.diagnostics?.depthLimitReached || apiContractImpact.diagnostics?.nodeLimitReached || apiContractImpact.diagnostics?.consumerResultLimitReached) risks.push('api_contract_consumer_graph_truncated');
   if (potentiallyAffectedFiles.length >= 20 || affectedPackages.length >= 6) risks.push('broad_change_impact_scope');
   if (affectedTests.length === 0 && (repository.tests?.length || structure.testFiles?.length)) risks.push('no_test_file_could_be_linked_to_the_current_impact_evidence');
 
