@@ -38,18 +38,23 @@ A task's write scope, dependencies, outputs, and acceptance criteria are plannin
 
 ## Quick start
 
-    cp .env.example .env
-    # Configure provider settings in .env
-    npm test
-    node src/cli.mjs --mode greenfield --name "Inventory Service" \
+Install the package or run it directly with npx:
+
+    npx oiol-planner init
+    # Add your provider API key to .env
+    npx oiol-planner doctor
+
+    npx oiol-planner plan --mode greenfield --name "Inventory Service" \
       --request "Design an inventory API with products, stock adjustments, and audit history" \
       --out plan.json
 
 Existing repository:
 
-    node src/cli.mjs --mode existing --repo /path/to/repository \
+    npx oiol-planner plan --mode existing --repo /path/to/repository \
       --request "Plan role-based access control without breaking existing API behavior" \
       --format md --out engineering-plan.md
+
+\`oiol init\` writes \`oiol.config.json\` without secrets and creates a \`.env\` template for the API key. Configuration precedence is: existing environment variables, then the selected profile, then built-in defaults. Use \`--config <path>\` (or \`OIOL_CONFIG\`) to select a different config file and \`--profile <name>\` to select a profile. The legacy \`node src/cli.mjs ...\` form remains supported.
 
 Supported providers:
 
@@ -62,17 +67,39 @@ Supported providers:
 
 Configuration is read from .env when supported by the Node runtime, or from shell environment variables. For a distinct reviewer configuration, configure OIOL_REVIEW_PROVIDER and optional reviewer model, base URL, API key, and timeout variables. A critique using the same provider configuration cannot certify readiness. A distinct reviewer approval can move a structurally valid plan to ready_for_review; this means ready for human review, not implementation authorization or evidence of implementation.
 
+## Configuration file
+
+\`oiol.config.json\` is optional; OIOL also works with environment variables only. Profiles keep provider settings in one place:
+
+    {
+      "$schema": "https://raw.githubusercontent.com/ibbmeintersos-sudo/oiol-planner/main/schemas/oiol-config.schema.json",
+      "version": 1,
+      "defaultProfile": "default",
+      "profiles": {
+        "default": {
+          "provider": "openai-compatible",
+          "model": "gpt-4o-mini",
+          "baseUrl": "https://api.openai.com/v1",
+          "apiKeyEnv": "OIOL_API_KEY",
+          "timeoutMs": 60000,
+          "maxRetries": 2
+        }
+      }
+    }
+
+Never put an API key in \`oiol.config.json\`; \`apiKeyEnv\` names the environment variable that holds it.
+
 ## Plan contract and validation
 
 The published JSON Schema is schemas/plan.schema.json (JSON Schema Draft 2020-12). A complete example is available at examples/plan.v1.json. Every newly generated plan declares schemaVersion: "1.0.0".
 
 Validate an existing plan without calling a model:
 
-    node src/cli.mjs --validate plan.json
+    npx oiol-planner validate plan.json
 
 Produce a review report from an existing plan:
 
-    node src/cli.mjs --validate plan.json --format md --out engineering-plan.md
+    npx oiol-planner validate plan.json --format md --out engineering-plan.md
 
 Both HybridPlanner and the CLI validate the current published plan schema; the CLI also applies OIOL's additional semantic checks for requirement coverage, unique IDs, task/component references, safe relative write-scope syntax, dependency graph consistency, cycles, and unresolved blocking clarifications. The built-in schema checker intentionally supports the keywords used by the published contract; it is not a general-purpose Draft 2020-12 implementation. External consumers should use a standards-compliant Draft 2020-12 validator against schemas/plan.schema.json.
 
