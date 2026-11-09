@@ -19,8 +19,6 @@ on:
         description: Provider timeout in milliseconds
         required: true
         default: "600000"
-  push:
-    branches: [feat/ollama-review-gate]
 
 permissions:
   contents: read
