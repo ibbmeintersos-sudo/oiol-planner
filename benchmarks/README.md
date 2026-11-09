@@ -101,7 +101,7 @@ The local environment running the command must have access to the checkout. GitH
 
 ## OpenCode baseline and paired comparison
 
-Run the OpenCode-only baseline against the same scenario set. Configure an explicit model reference and use the OpenCode `plan` agent (or another agent whose permissions are verified as read-only):
+Run the OpenCode-only baseline against the same scenario set using **OpenCode V2.2.5 or newer within the V2 major line**. OIOL's baseline adapter targets the V2 HTTP contract (`/api/info`, `/api/session`, `/api/session/{id}/prompt`, message history, experimental wait, and session diff); it rejects V1 and older V2 servers before creating a session. V2 uses the fixed Basic-auth username `opencode`; set `OIOL_OPENCODE_PASSWORD` to the password configured for the server (prefer `OPENCODE_PASSWORD`, with `OPENCODE_SERVER_PASSWORD` retained by OpenCode as a compatibility alias). The `plan` agent must be configured with read-only permissions that deny edit and shell tools:
 
 ```sh
 OIOL_OPENCODE_MODEL=providerID/modelID \
@@ -131,7 +131,7 @@ Create a paired report:
 npm run benchmark:compare -- --oiol benchmarks/results/oiol.json --baseline benchmarks/results/opencode-baseline.json
 ```
 
-The OpenCode baseline runs in a disposable copy of each fixture workspace, inspects the session diff, rejects any file changes, and removes the temporary workspace afterwards. This is post-execution detection plus cleanup, not a sandbox; configure the OpenCode plan agent with read-only permissions. The paired report includes per-scenario score deltas and explicitly flags whether reviewer configuration matches. A positive automated score delta is not a quality claim. Repeat paired comparisons at least three times and complete blinded human review before drawing conclusions.
+The OpenCode V2 baseline runs in a disposable workspace containing only the scanner's bounded, redacted excerpts, waits for the V2 session execution to finish, reads the projected assistant messages, rejects tool/shell messages and any file changes, and removes the temporary workspace afterwards. This is a secondary detection gate, not a substitute for server-side read-only permissions; configure the OpenCode plan agent to deny edit and shell tools before running the benchmark. The adapter records the server version in the result so V1 and V2 results cannot be silently mixed. The paired report includes per-scenario score deltas and explicitly flags whether reviewer configuration matches. A positive automated score delta is not a quality claim. Repeat paired comparisons at least three times and complete blinded human review before drawing conclusions.
 
 Aggregate three or more paired comparison reports:
 

@@ -62,57 +62,82 @@ test('provider rejects successful HTTP responses without model text',async()=>{
   await assert.rejects(()=>provider.requestJson({system:'s',user:'u'}),/missing choices/);
 });
 
-test('OpenCode client applies auth, encodes session IDs and parses JSON',async()=>{
+test('OpenCode V2 client uses fixed Basic auth and the V2 API contract',async()=>{
   const calls=[];
-  const client=new OpenCodeClient({baseUrl:'http://127.0.0.1:4096',password:'secret',directory:'/workspace',fetchImpl:async(url,options)=>{calls.push({url,options});return new Response('{"id":"session"}',{status:200});}});
-  const result=await client.getSession('a/b');
+  const client=new OpenCodeClient({baseUrl:'http://127.0.0.1:4096',password:'secret',directory:'/workspace',fetchImpl:async(url,options)=>{calls.push({url,options});return response({data:{id:'session'}});}});
+  const result=await client.createSession('Planning baseline',{agent:'plan',model:{providerID:'test',modelID:'model'}});
   assert.equal(result.id,'session');
-  assert.equal(calls[0].url,'http://127.0.0.1:4096/session/a%2Fb');
+  assert.equal(calls[0].url,'http://127.0.0.1:4096/api/session');
   assert.equal(calls[0].options.headers.authorization,'Basic '+Buffer.from('opencode:secret').toString('base64'));
-  assert.equal(calls[0].options.headers['x-opencode-directory'],encodeURIComponent(path.resolve('/workspace')));
+  assert.deepEqual(JSON.parse(calls[0].options.body),{
+    title:'Planning baseline',
+    agent:'plan',
+    location:{directory:path.resolve('/workspace')},
+    model:{providerID:'test',id:'model'}
+  });
+  assert.equal(calls[0].options.headers['x-opencode-directory'],undefined);
 });
 
-test('OpenCode client rejects unsafe routes and malformed JSON',async()=>{
+test('OpenCode V2 client rejects non-API routes and malformed JSON',async()=>{
   const client=new OpenCodeClient({fetchImpl:async()=>new Response('not-json',{status:200})});
-  await assert.rejects(()=>client.request('//evil.example'),/configured server/);
+  await assert.rejects(()=>client.request('//evil.example'),/V2 route must start with \/api\//);
   await assert.rejects(()=>client.health(),/invalid JSON/);
 });
 
-test('OpenCode client reports request timeouts',async()=>{
+test('OpenCode V2 client reports request timeouts',async()=>{
   const client=new OpenCodeClient({timeoutMs:5,fetchImpl:(_url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError'))))});
   await assert.rejects(()=>client.health(),/timed out after 5ms/);
 });
 
-test('OpenCode client accepts empty 204 responses',async()=>{
+test('OpenCode V2 client accepts empty 204 responses',async()=>{
   const client=new OpenCodeClient({fetchImpl:async()=>new Response(null,{status:204})});
-  assert.equal(await client.request('/session',{method:'DELETE'}),null);
+  assert.equal(await client.request('/api/session/s1',{method:'DELETE'}),null);
 });
 
-test('OpenCode session creation sends only documented session fields',async()=>{
-  let body;
-  const client=new OpenCodeClient({fetchImpl:async(_url,options)=>{body=JSON.parse(options.body);return new Response('{"id":"s1"}',{status:200});}});
-  await client.createSession('Planning baseline');
-  assert.deepEqual(body,{title:'Planning baseline'});
+test('OpenCode V2 session creation requires an explicit isolated directory',async()=>{
+  const client=new OpenCodeClient({fetchImpl:async()=>response({data:{id:'s1'}})});
+  await assert.rejects(()=>client.createSession('Planning baseline'),/explicit isolated workspace directory/);
 });
 
-test('OpenCode client supports per-request timeout overrides',async()=>{
-  const client=new OpenCodeClient({timeoutMs:1000,fetchImpl:(_url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError'))))});
-  await assert.rejects(()=>client.request('/slow',{timeoutMs:5}),/timed out after 5ms/);
+test('OpenCode V2 server info is read from /api/info',async()=>{
+  let call;
+  const client=new OpenCodeClient({directory:'/workspace/project with spaces',fetchImpl:async(url,options)=>{call={url,options};return response({version:'2.2.5'});}});
+  const info=await client.health();
+  assert.equal(info.version,'2.2.5');
+  assert.equal(call.url,'http://127.0.0.1:4096/api/info');
+  assert.equal(call.options.headers['x-opencode-directory'],undefined);
 });
 
-test('OpenCode client routes requests to the configured project directory',async()=>{
-  const headers=[];
-  const client=new OpenCodeClient({directory:'/workspace/project with spaces',fetchImpl:async(_url,options)=>{headers.push(options.headers);return new Response('{"healthy":true}',{status:200});}});
-  await client.health();
-  await client.listSessions();
-  assert.equal(headers.length,2);
-  assert.ok(headers.every(value=>value['x-opencode-directory']===encodeURIComponent(path.resolve('/workspace/project with spaces'))));
+test('OpenCode V2 message pagination omits order when following a cursor',async()=>{
+  const calls=[];
+  let page=0;
+  const client=new OpenCodeClient({fetchImpl:async(url)=>{
+    calls.push(new URL(url));
+    page++;
+    return page===1
+      ? response({data:[{id:'m1'}],cursor:{next:'cursor-2'}})
+      : response({data:[{id:'m2'}],cursor:{}});
+  }});
+  const messages=await client.getSessionMessages('session-1');
+  assert.deepEqual(messages.map(message=>message.id),['m1','m2']);
+  assert.equal(calls.length,2);
+  assert.equal(calls[0].searchParams.get('order'),'asc');
+  assert.equal(calls[0].searchParams.has('cursor'),false);
+  assert.equal(calls[1].searchParams.get('cursor'),'cursor-2');
+  assert.equal(calls[1].searchParams.has('order'),false);
 });
 
+test('OpenCode V2 deletes only the requested session ID',async()=>{
+  let call;
+  const client=new OpenCodeClient({fetchImpl:async(url,options)=>{call={url,options};return new Response(null,{status:204});}});
+  assert.equal(await client.deleteSession('session/a'),null);
+  assert.equal(call.url,'http://127.0.0.1:4096/api/session/session%2Fa');
+  assert.equal(call.options.method,'DELETE');
+});
 test('OpenCode client deletes only the requested session ID',async()=>{
   let call;
   const client=new OpenCodeClient({fetchImpl:async(url,options)=>{call={url,options};return new Response('true',{status:200});}});
   assert.equal(await client.deleteSession('session/a'),true);
-  assert.equal(call.url,'http://127.0.0.1:4096/session/session%2Fa');
+  assert.equal(call.url,'http://127.0.0.1:4096/api/session/session%2Fa');
   assert.equal(call.options.method,'DELETE');
 });
