@@ -1,0 +1,86 @@
+name: OIOL self review (Ollama, quality gate)
+
+on:
+  workflow_dispatch:
+    inputs:
+      request:
+        description: Planning request
+        required: true
+        default: Produce a planning-only engineering plan for a small inventory API change to this fixture. Do not implement anything.
+      planner_model:
+        description: Ollama planner model
+        required: true
+        default: qwen2.5:3b
+      reviewer_model:
+        description: Ollama reviewer model (must differ from planner)
+        required: true
+        default: llama3.2:3b
+      timeout_ms:
+        description: Provider timeout in milliseconds
+        required: true
+        default: "600000"
+  push:
+    branches: [feat/ollama-review-gate]
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OIOL_TIMEOUT_MS: ${{ inputs.timeout_ms || '600000' }}
+      OIOL_REVIEW_TIMEOUT_MS: ${{ inputs.timeout_ms || '600000' }}
+      PLANNER_MODEL: ${{ inputs.planner_model || 'qwen2.5:3b' }}
+      REVIEWER_MODEL: ${{ inputs.reviewer_model || 'llama3.2:3b' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+      - name: Start Ollama and pull models
+        run: |
+          nohup ollama serve > /tmp/ollama.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:11434/api/tags > /dev/null; then break; fi
+            sleep 2
+          done
+          ollama pull "$PLANNER_MODEL"
+          ollama pull "$REVIEWER_MODEL"
+      - name: Run OIOL planning review
+        id: plan
+        uses: ./.github/actions/oiol-review
+        with:
+          request: ${{ inputs.request || 'Produce a planning-only engineering plan for a small inventory API change to this fixture. Do not implement anything.' }}
+          mode: existing
+          path: benchmarks/fixtures/customer-api
+          provider: ollama
+          model: ${{ inputs.planner_model || 'qwen2.5:3b' }}
+          base-url: http://127.0.0.1:11434
+          review-provider: ollama
+          review-model: ${{ inputs.reviewer_model || 'llama3.2:3b' }}
+          review-base-url: http://127.0.0.1:11434
+          api-key: ollama
+          comment: false
+          artifact-name: oiol-plan-ollama
+      - name: Enforce plan quality gate
+        if: always()
+        run: |
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          const file = 'oiol-plan/plan.json';
+          if (!fs.existsSync(file)) { console.error('OIOL plan file is missing'); process.exit(1); }
+          const plan = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const valid = plan.validation?.valid === true;
+          console.log(JSON.stringify({ status: plan.status, valid, metrics: plan.evaluation?.metrics ?? null, quality: plan.evaluation?.qualityDiagnostics ?? null }, null, 2));
+          if (plan.status === 'blocked' || !valid) { console.error('OIOL plan quality gate failed'); process.exit(1); }
+          "
+      - name: Upload plan artifacts (direct)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oiol-plan-ollama-direct
+          path: oiol-plan
+          if-no-files-found: warn
