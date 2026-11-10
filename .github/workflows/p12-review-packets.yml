@@ -2,8 +2,6 @@ name: P12 review packet distribution
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ci/p12-review-packets]
 
 permissions:
   contents: write
