@@ -133,7 +133,8 @@ async function main() {
     baseUrl: process.env.OIOL_BASE_URL || 'https://api.openai.com/v1',
     apiKey: process.env.OIOL_API_KEY,
     timeoutMs: Number(process.env.OIOL_TIMEOUT_MS || 60000),
-    maxRetries: Number(process.env.OIOL_MAX_RETRIES || 2)
+    maxRetries: Number(process.env.OIOL_MAX_RETRIES || 2),
+    maxTokens: Number(process.env.OIOL_MAX_OUTPUT_TOKENS || 8192)
   });
   const reviewer = process.env.OIOL_REVIEW_PROVIDER ? createProvider({
     provider: process.env.OIOL_REVIEW_PROVIDER,
@@ -141,7 +142,8 @@ async function main() {
     baseUrl: process.env.OIOL_REVIEW_BASE_URL || process.env.OIOL_BASE_URL || 'https://api.openai.com/v1',
     apiKey: process.env.OIOL_REVIEW_API_KEY || process.env.OIOL_API_KEY,
     timeoutMs: Number(process.env.OIOL_REVIEW_TIMEOUT_MS || process.env.OIOL_TIMEOUT_MS || 60000),
-    maxRetries: Number(process.env.OIOL_MAX_RETRIES || 2)
+    maxRetries: Number(process.env.OIOL_MAX_RETRIES || 2),
+    maxTokens: Number(process.env.OIOL_REVIEW_MAX_OUTPUT_TOKENS || process.env.OIOL_MAX_OUTPUT_TOKENS || 8192)
   }) : provider;
   const planner = new HybridPlanner({ provider, reviewer, maxRepairRounds: Number(options.repairs ?? 2) });
   const plan = await planner.createPlan(project);
