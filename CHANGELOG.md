@@ -29,9 +29,11 @@
 
 ### Changed
 - Updated the OpenCode benchmark baseline adapter to the V2.2.5 `/api/*` contract, including an `/api/info` version preflight, V2 session and history calls, message pagination, and rejection of tool/shell messages or file changes.
+- Normalized provider plan shapes before validation: object dependencies and outputs, task input references, dependency graphs, and wrapped evidence maps are canonicalized without accepting unknown evidence IDs.
 
 ### Validation
 - CI passed for #33 (42884201242), #34 (42884879214), and `main` after merge (42885204402) on Ubuntu and Windows with Node.js 22 and 24.
+- A live OpenRouter self-review (42891800253) produced a schema-valid plan with status `needs_revision` using `openai/gpt-4o-mini` and `anthropic/claude-3.5-haiku`; the quality gate passed.
 
 ## 0.5.0 — Tree-sitter AST repository analysis
 
