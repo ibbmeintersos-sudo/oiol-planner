@@ -58,7 +58,9 @@
     "benchmark:real-world:intake": "node scripts/validate-real-world-intake.mjs",
     "benchmark:real-world:worklist": "node scripts/validate-annotation-worklist.mjs",
     "benchmark:real-world:review": "node scripts/validate-independent-review.mjs",
-    "benchmark:scan-external": "node scripts/run-external-corpus-scan.mjs"
+    "benchmark:scan-external": "node scripts/run-external-corpus-scan.mjs",
+    "benchmark:real-world:packets": "node scripts/generate-review-packets.mjs",
+    "benchmark:real-world:freeze": "node scripts/freeze-independent-reviews.mjs"
   },
   "license": "MIT",
   "publishConfig": {
