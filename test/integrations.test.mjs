@@ -28,6 +28,13 @@ test('OpenAI-compatible provider accepts a custom output token cap',async()=>{
   assert.equal(body.max_tokens,4096);
 });
 
+test('OpenAI-compatible provider can disable reasoning',async()=>{
+  let body;
+  const provider=new OpenAICompatibleProvider({baseUrl:'https://llm.example',model:'m',reasoningEffort:'none',fetchImpl:async(_url,options)=>{body=JSON.parse(options.body);return response({choices:[{message:{content:'{"ok":true}'}}]});}});
+  await provider.requestJson({system:'s',user:'u'});
+  assert.deepEqual(body.reasoning,{effort:'none'});
+});
+
 test('Anthropic provider extracts text blocks and sets required headers',async()=>{
   let call;
   const provider=new AnthropicProvider({apiKey:'key',model:'claude-test',fetchImpl:async(url,options)=>{call={url,options};return response({content:[{type:'thinking',thinking:'hidden'},{type:'text',text:'{"ok":true}'}]});}});

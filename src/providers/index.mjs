@@ -3,7 +3,7 @@ import { AnthropicProvider } from './anthropic.mjs';
 import { GeminiProvider } from './gemini.mjs';
 import { OllamaProvider } from './ollama.mjs';
 export function createProvider(config={}) {
-  const common={apiKey:config.apiKey,baseUrl:config.baseUrl,model:config.model,timeoutMs:config.timeoutMs,maxRetries:config.maxRetries,maxTokens:config.maxTokens,fetchImpl:config.fetchImpl};
+  const common={apiKey:config.apiKey,baseUrl:config.baseUrl,model:config.model,timeoutMs:config.timeoutMs,maxRetries:config.maxRetries,maxTokens:config.maxTokens,reasoningEffort:config.reasoningEffort,fetchImpl:config.fetchImpl};
   switch(config.provider||'openai-compatible') {
     case 'openai-compatible': return new OpenAICompatibleProvider(common);
     case 'anthropic': return new AnthropicProvider(common);
