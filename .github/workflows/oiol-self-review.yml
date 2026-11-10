@@ -1,4 +1,4 @@
-name: OIOL self review
+name: OIOL self review (OpenRouter, quality gate)
 
 on:
   workflow_dispatch:
@@ -7,6 +7,22 @@ on:
         description: Planning request for the manual self-review
         required: false
         default: Review this repository as an engineering planning task. Identify requirement gaps, architecture and dependency risks, missing acceptance criteria, and verification a human must perform. Do not implement or execute any project task.
+      planner_model:
+        description: OpenRouter planner model id
+        required: true
+        default: openai/gpt-4o-mini
+      reviewer_model:
+        description: OpenRouter reviewer model id (must differ from the planner)
+        required: true
+        default: anthropic/claude-3.5-haiku
+      base_url:
+        description: OpenAI-compatible base URL
+        required: true
+        default: https://openrouter.ai/api/v1
+      timeout_ms:
+        description: Provider timeout in milliseconds
+        required: true
+        default: "600000"
 
 permissions:
   contents: read
@@ -14,6 +30,10 @@ permissions:
 jobs:
   oiol-review:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OIOL_TIMEOUT_MS: ${{ inputs.timeout_ms || '600000' }}
+      OIOL_REVIEW_TIMEOUT_MS: ${{ inputs.timeout_ms || '600000' }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -24,5 +44,40 @@ jobs:
         uses: ./.github/actions/oiol-review
         with:
           request: ${{ inputs.request }}
+          provider: openai-compatible
+          model: ${{ inputs.planner_model || 'openai/gpt-4o-mini' }}
+          base-url: ${{ inputs.base_url || 'https://openrouter.ai/api/v1' }}
+          review-provider: openai-compatible
+          review-model: ${{ inputs.reviewer_model || 'anthropic/claude-3.5-haiku' }}
+          review-base-url: ${{ inputs.base_url || 'https://openrouter.ai/api/v1' }}
           api-key: ${{ secrets.OIOL_API_KEY }}
+          review-api-key: ${{ secrets.OIOL_API_KEY }}
           comment: false
+          artifact-name: oiol-plan-openrouter
+
+      - name: Enforce plan quality gate
+        if: always()
+        run: |
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          const file = 'oiol-plan/plan.json';
+          if (!fs.existsSync(file)) { console.error('OIOL plan file is missing'); process.exit(1); }
+          const plan = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const valid = plan.validation?.valid === true;
+          const metrics = plan.evaluation?.metrics ?? null;
+          const quality = plan.evaluation?.qualityDiagnostics ?? null;
+          console.log(JSON.stringify({ status: plan.status, valid, metrics, quality }, null, 2));
+          const lines = [
+            '## OIOL plan quality',
+            '',
+            '| field | value |',
+            '| --- | --- |',
+            '| status | ' + String(plan.status) + ' |',
+            '| validation.valid | ' + valid + ' |',
+            '| metrics | ' + (metrics ? '`' + JSON.stringify(metrics) + '`' : 'n/a') + ' |',
+            '| qualityDiagnostics | ' + (quality ? '`' + JSON.stringify(quality) + '`' : 'n/a') + ' |',
+            ''
+          ];
+          if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n'));
+          if (plan.status === 'blocked' || !valid) { console.error('OIOL plan quality gate failed'); process.exit(1); }
+          "
