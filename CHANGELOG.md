@@ -20,6 +20,18 @@
 - Extended benchmark and blinded human-review rubrics with NFR, test strategy, rollback, unknown transparency, and risk-estimation dimensions.
 - Added CLI commands for local issue-payload previews and explicitly requested external publishing.
 
+## 0.5.1 — P12 packet distribution, CI quality gates, OpenCode V2.2.5 baseline
+
+### Added
+- Distributed the 36-case P12 corpus as 72 blinded review packets with `review-assignments.json`, plus a hash-only freeze gate that requires two valid independent reviews per case before any benchmark run.
+- Added plan-level quality gates to both self-review workflows: a job fails when `plan.json` is missing, the plan status is `blocked`, or validation is invalid, and plan metrics and diagnostics are written to the job summary.
+- Added an OpenRouter self-review workflow with dispatch-selectable planner and reviewer models while keeping the local Ollama workflow.
+
+### Changed
+- Updated the OpenCode benchmark baseline adapter to the V2.2.5 `/api/*` contract, including an `/api/info` version preflight, V2 session and history calls, message pagination, and rejection of tool/shell messages or file changes.
+
+### Validation
+- CI passed for #33 (42884201242), #34 (42884879214), and `main` after merge (42885204402) on Ubuntu and Windows with Node.js 22 and 24.
 
 ## 0.5.0 — Tree-sitter AST repository analysis
 
