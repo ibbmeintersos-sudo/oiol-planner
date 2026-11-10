@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+  "reviewerId": "R2",
+  "independence": {
+    "attested": false,
+    "conflictOfInterest": false,
+    "declaration": ""
+  },
+  "blinded": false,
+  "reviewedAt": "",
+  "scopeSummary": "",
+  "dimensionCoverage": {
+    "directFiles": "partial",
+    "affectedFiles": "partial",
+    "tests": "partial",
+    "packages": "partial",
+    "apiConsumers": "partial",
+    "databaseConsumers": "partial",
+    "migrationFiles": "partial",
+    "scannerSymbols": "partial",
+    "dependencyEdges": "partial",
+    "unknowns": "partial",
+    "risks": "partial"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [],
+    "dependencyEdges": [],
+    "unknowns": [],
+    "risks": []
+  },
+  "evidenceNotes": []
+}
