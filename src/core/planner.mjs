@@ -86,10 +86,79 @@ function normalize(raw,project) {
   const plan={...emptyPlan(project),...raw,project};
   if(!Array.isArray(plan.requirements)||!isObject(plan.architecture)||!Array.isArray(plan.architecture.components)||!Array.isArray(plan.tasks)) throw new Error('Planner response does not match the required plan structure');
   if(!Array.isArray(plan.architecture.decisions)) plan.architecture.decisions=[];
-  if(!isObject(plan.dependencyGraph)) plan.dependencyGraph={nodes:plan.tasks.map(t=>t?.id).filter(Boolean),edges:dependencyEdgesFromTasks(plan.tasks)};
+  plan.tasks=plan.tasks.map(normalizeTask);
+  resolveTaskInputs(plan.tasks);
+  plan.dependencyGraph={nodes:plan.tasks.map(task=>task?.id).filter(id=>typeof id==='string'),edges:dependencyEdgesFromTasks(plan.tasks)};
+  plan.evidence=normalizeEvidence(plan.evidence,project);
   if(!Array.isArray(plan.risks)) plan.risks=[];
   if(!Array.isArray(plan.clarifications)) plan.clarifications=[];
   return plan;
+}
+function normalizeTask(task) {
+  if(!isObject(task)) return task;
+  const normalized={...task};
+  if(typeof normalized.dependencies==='string'&&normalized.dependencies.trim()) normalized.dependencies=[normalized.dependencies];
+  if(Array.isArray(normalized.dependencies)) normalized.dependencies=[...new Set(normalized.dependencies.map(resolveDependencyId).filter(Boolean))];
+  if(typeof normalized.outputs==='string'&&normalized.outputs.trim()) normalized.outputs=[normalized.outputs];
+  if(Array.isArray(normalized.outputs)) normalized.outputs=normalized.outputs.map(normalizeOutput);
+  if(Array.isArray(normalized.inputs)) normalized.inputs=normalized.inputs.map(input=>isObject(input)?{...input}:input);
+  return normalized;
+}
+function resolveDependencyId(dependency) {
+  if(typeof dependency==='string') return dependency;
+  if(!isObject(dependency)) return null;
+  return [dependency.id,dependency.taskId,dependency.dependencyId,dependency.task,dependency.dependsOn,dependency.from].find(value=>typeof value==='string'&&value.trim())??null;
+}
+function normalizeOutput(output,index) {
+  if(typeof output==='string') return output;
+  if(!isObject(output)) return output;
+  if(typeof output.name==='string'&&output.name.trim()) return output;
+  const fallback=[output.description,output.id,output.path,output.artifact].find(value=>typeof value==='string'&&value.trim());
+  return {...output,name:fallback??('output-'+(index+1))};
+}
+function resolveTaskInputs(tasks) {
+  const outputsByTask=new Map(tasks.filter(task=>isObject(task)&&typeof task.id==='string').map(task=>[task.id,(Array.isArray(task.outputs)?task.outputs:[]).map(output=>typeof output==='string'?output:output?.name).filter(name=>typeof name==='string'&&name.trim())]));
+  for(const task of tasks) {
+    if(!isObject(task)||!Array.isArray(task.inputs)) continue;
+    for(const input of task.inputs) {
+      if(!isObject(input)||typeof input.fromTaskId!=='string'||typeof input.outputName!=='string') continue;
+      const available=outputsByTask.get(input.fromTaskId)??[];
+      if(available.includes(input.outputName)) continue;
+      const match=available.find(name=>normalizeOutputName(name)===normalizeOutputName(input.outputName));
+      if(match) input.outputName=match;
+    }
+  }
+}
+function normalizeOutputName(value) {
+  return value.trim().toLowerCase().replace(/[.\s]+$/,'');
+}
+function normalizeEvidence(evidence,project) {
+  if(evidence===undefined||evidence===null) return [];
+  let items=[];
+  if(Array.isArray(evidence)) items=evidence;
+  else if(typeof evidence==='string') items=evidence.trim()?[{id:evidence.trim()}]:[];
+  else if(isObject(evidence)) {
+    const arrays=Object.values(evidence).filter(Array.isArray);
+    if(arrays.length===1) items=arrays[0];
+    else if(!Object.hasOwn(evidence,'id')&&Object.keys(evidence).length&&Object.values(evidence).every(isObject)) items=Object.entries(evidence).map(([id,value])=>({id,...value}));
+    else items=[evidence];
+  }
+  const known=new Map((Array.isArray(project?.evidence)?project.evidence:[]).filter(item=>isObject(item)&&typeof item.id==='string').map(item=>[item.id,item]));
+  const provenance=['type','description','source','trustLevel','sha256','sourceSha256','excerptSha256','sourceBytes','excerptBytes','excerptTruncated','redactionPassApplied','redactionChangedContent'];
+  const seen=new Set(), normalized=[];
+  for(const item of items) {
+    const rawItem=typeof item==='string'?{id:item}:item;
+    if(!isObject(rawItem)||typeof rawItem.id!=='string'||!rawItem.id.trim()||seen.has(rawItem.id)) continue;
+    seen.add(rawItem.id);
+    const entry={...rawItem}, reference=known.get(rawItem.id);
+    if(reference) for(const field of provenance) if(reference[field]!==undefined) entry[field]=reference[field];
+    if(typeof entry.type!=='string'||!entry.type.trim()) entry.type='repository_file_excerpt';
+    if(typeof entry.description!=='string'||!entry.description.trim()) entry.description=typeof entry.path==='string'&&entry.path.trim()?entry.path:entry.id;
+    if(typeof entry.source!=='string'||!entry.source.trim()) entry.source=typeof entry.path==='string'&&entry.path.trim()?entry.path:entry.id;
+    if(typeof entry.trustLevel!=='string'||!entry.trustLevel.trim()) entry.trustLevel='untrusted_repository_content';
+    normalized.push(entry);
+  }
+  return normalized;
 }
 function validateReview(review, plan) {
   if(!isObject(review)||!['approved','needs_revision','blocked'].includes(review.status)||!Array.isArray(review.findings)) throw new Error('Reviewer returned an invalid review contract');
