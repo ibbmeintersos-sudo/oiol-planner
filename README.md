@@ -72,6 +72,15 @@ OIOL can review pull requests as a planning-only GitHub Action. It scans the rep
 
 Copy [`examples/github-actions/oiol-review.yml`](examples/github-actions/oiol-review.yml) to `.github/workflows/`, add an `OIOL_API_KEY` repository secret, and adjust the planning request. See [`docs/GITHUB_ACTION.md`](docs/GITHUB_ACTION.md) for inputs, permissions, and the security model. Never use `pull_request_target` with a checkout of pull request code.
 
+### Self-review workflows
+
+Two dispatch-only workflows exercise the action without leaving the repository:
+
+- `.github/workflows/oiol-self-review.yml` uses an OpenAI-compatible endpoint, defaults to OpenRouter (`openai/gpt-4o-mini` planner, `anthropic/claude-3.5-haiku` reviewer), and requires the `OIOL_API_KEY` secret.
+- `.github/workflows/oiol-self-review-ollama.yml` runs locally with Ollama and accepts planner and reviewer model inputs.
+
+Both end with a plan quality gate that reads `oiol-plan/plan.json` and fails the job when the plan is missing, its `status` is `blocked`, or `validation.valid` is not `true`. The gate prints `status`, `validation.valid`, `evaluation.metrics`, and `evaluation.qualityDiagnostics` to the job summary, so a green run means the plan passed the measured gate, not only that the step executed.
+
 ## HTML review report
 
 Render an existing plan as a self-contained, print-ready HTML report:
@@ -221,6 +230,14 @@ P12 adds a separate corpus protocol, pinned-snapshot fingerprinting, independent
 Validate a locally curated corpus:
 
     npm run benchmark:real-world:validate -- --corpus-root /absolute/path/to/corpus
+
+The worklist is distributed as 72 blinded packets under `benchmarks/real-world/reviews/<case-id>/`, two per case (`R1.json`, `R2.json`), with `benchmarks/real-world/review-assignments.json` recording case and snapshot provenance. Packet skeletons are intentionally incomplete and fail the review schema until independent reviewers attest them.
+
+Freeze completed reviews before any benchmark run:
+
+    npm run benchmark:real-world:freeze
+
+The freeze command exits non-zero until all 72 reviews are valid and writes a hash-only `benchmarks/real-world/review-freeze.json`; ground-truth content is not published before adjudication.
 
 Run the benchmark after at least two independent reviews have been frozen for every case:
 
