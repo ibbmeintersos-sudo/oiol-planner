@@ -1,0 +1,33 @@
+name: P12 review packet distribution
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ci/p12-review-packets]
+
+permissions:
+  contents: write
+
+jobs:
+  packets:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the branch
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate independent review packets
+        run: node scripts/generate-review-packets.mjs
+      - name: Commit generated packets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks/real-world/reviews benchmarks/real-world/review-assignments.json
+          if git diff --cached --quiet; then
+            echo "No review packet changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(p12): generate 72 independent review packets [skip ci]"
+          git push
