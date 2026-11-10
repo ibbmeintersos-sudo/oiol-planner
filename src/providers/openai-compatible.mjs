@@ -1,10 +1,16 @@
 import { BaseProvider } from './base.mjs';
 import { ProviderError } from '../core/errors.mjs';
 export class OpenAICompatibleProvider extends BaseProvider {
+ constructor(options={}) {
+  super(options);
+  const {maxTokens=8192}=options;
+  if(!Number.isInteger(maxTokens)||maxTokens<=0) throw new Error('maxTokens must be a positive integer');
+  this.maxTokens=maxTokens;
+ }
  async call({system,user,temperature,signal}) {
   const base=this.baseUrl||'https://api.openai.com/v1';
   const url=base.replace(/\/$/,'')+'/chat/completions';
-  const response=await this.fetchImpl(url,{method:'POST',signal,headers:{'content-type':'application/json',...(this.apiKey?{authorization:`Bearer ${this.apiKey}`}:{})},body:JSON.stringify({model:this.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature,response_format:{type:'json_object'}})});
+  const response=await this.fetchImpl(url,{method:'POST',signal,headers:{'content-type':'application/json',...(this.apiKey?{authorization:`Bearer ${this.apiKey}`}:{})},body:JSON.stringify({model:this.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature,response_format:{type:'json_object'},max_tokens:this.maxTokens})});
   const body=await response.json().catch(()=>({}));
   if(!response.ok) throw new ProviderError(body.error?.message||`Provider HTTP ${response.status}`,response.status,response.status===408||response.status===429||response.status>=500);
   const text=body.choices?.[0]?.message?.content;
