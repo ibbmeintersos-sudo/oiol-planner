@@ -16,7 +16,16 @@ test('OpenAI-compatible provider sends JSON mode and parses the model response',
   assert.equal(result.data.ok,true);
   assert.equal(call.url,'https://llm.example/v1/chat/completions');
   assert.equal(call.options.headers.authorization,'Bearer test-key');
-  assert.deepEqual(JSON.parse(call.options.body).response_format,{type:'json_object'});
+  const body=JSON.parse(call.options.body);
+  assert.deepEqual(body.response_format,{type:'json_object'});
+  assert.equal(body.max_tokens,8192);
+});
+
+test('OpenAI-compatible provider accepts a custom output token cap',async()=>{
+  let body;
+  const provider=new OpenAICompatibleProvider({baseUrl:'https://llm.example',model:'m',maxTokens:4096,fetchImpl:async(_url,options)=>{body=JSON.parse(options.body);return response({choices:[{message:{content:'{"ok":true}'}}]});}});
+  await provider.requestJson({system:'s',user:'u'});
+  assert.equal(body.max_tokens,4096);
 });
 
 test('Anthropic provider extracts text blocks and sets required headers',async()=>{
