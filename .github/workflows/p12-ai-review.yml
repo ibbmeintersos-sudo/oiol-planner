@@ -52,6 +52,7 @@ jobs:
           P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
           P12_MODEL_R2: mistralai/mistral-large-4-1t-a52b
           P12_MAX_TOKENS_R2: '8000'
+          P12_CALL_TIMEOUT: '300000'
           P12_SKIP_EXISTING: '1'
         run: |
           OFFSET="${{ inputs.offset || '0' }}"
