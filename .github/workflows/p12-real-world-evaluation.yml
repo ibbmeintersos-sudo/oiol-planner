@@ -1,0 +1,95 @@
+name: P12 real-world evaluation
+
+on:
+  push:
+    branches:
+      - p12/**
+    paths:
+      - .p12/evaluate
+      - .github/workflows/p12-real-world-evaluation.yml
+      - scripts/adjudicate-independent-reviews.mjs
+      - scripts/assemble-real-world-corpus.mjs
+      - scripts/freeze-independent-reviews.mjs
+      - scripts/validate-real-world-corpus.mjs
+      - scripts/run-real-world-benchmark.mjs
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p12-real-world-evaluation
+  cancel-in-progress: false
+
+env:
+  CORPUS_ROOT: ${{ github.workspace }}/.p12-corpus
+
+jobs:
+  evaluate:
+    name: Freeze, adjudicate and score
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout P12 branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Freeze the blinded review set
+        run: npm run benchmark:real-world:freeze
+
+      - name: Adjudicate frozen reviews into a corpus
+        shell: bash
+        run: set -o pipefail; node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" | tee "$CORPUS_ROOT/adjudication-summary.json"
+
+      - name: Download pinned source snapshots
+        uses: actions/download-artifact@v4
+        with:
+          pattern: p12-snapshot-*
+          path: acquired
+          merge-multiple: true
+
+      - name: Assemble corpus snapshots
+        run: node scripts/assemble-real-world-corpus.mjs --artifacts-root acquired --corpus-root "$CORPUS_ROOT"
+
+      - name: Validate corpus before scoring
+        run: npm run benchmark:real-world:validate -- --corpus-root "$CORPUS_ROOT"
+
+      - name: Score OIOL against the adjudicated ground truth
+        run: npm run benchmark:real-world -- --corpus-root "$CORPUS_ROOT" --out benchmarks/results/real-world-benchmark.json
+
+      - name: Upload evaluation outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-real-world-evaluation
+          path: |
+            benchmarks/results/real-world-benchmark.json
+            benchmarks/real-world/review-freeze.json
+            ${{ env.CORPUS_ROOT }}/manifest.json
+            ${{ env.CORPUS_ROOT }}/cases
+            ${{ env.CORPUS_ROOT }}/adjudication-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Commit the freeze record and adjudication
+        if: success()
+        shell: bash
+        run: |
+          git config user.name "oiol-p12-bot"
+          git config user.email "oiol-p12-bot@users.noreply.github.com"
+          git fetch origin "$GITHUB_REF_NAME"
+          git rebase "origin/$GITHUB_REF_NAME"
+          mkdir -p benchmarks/real-world/adjudication
+          cp "$CORPUS_ROOT/manifest.json" benchmarks/real-world/adjudication/corpus-manifest.json
+          cp -r "$CORPUS_ROOT/cases" benchmarks/real-world/adjudication/cases
+          git add benchmarks/real-world/review-freeze.json benchmarks/real-world/adjudication
+          git diff --cached --quiet || git commit -m "chore(p12): freeze reviews and record adjudicated corpus"
+          git push origin "HEAD:$GITHUB_REF_NAME"
