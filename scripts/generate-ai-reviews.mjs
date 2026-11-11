@@ -238,6 +238,15 @@ async function main() {
       }
     }
   }
+  const report = {
+    schemaVersion: '1.0.0',
+    generatedAt: new Date().toISOString(),
+    cases: cases.length,
+    slots,
+    written,
+    failures
+  };
+  await fs.writeFile(path.join(root, 'benchmarks/real-world/reviews/.p12-run.json'), JSON.stringify(report, null, 2) + '\n');
   console.log('DONE written=' + written + ' failures=' + failures.length);
   if (failures.length) process.exitCode = 1;
 }
