@@ -76,11 +76,26 @@ export function buildReviewPackets({ worklist, reviewerIds = ['R1', 'R2'] }) {
   };
 }
 
-export async function main(argv = process.argv.slice(2)) {
+export function parseReviewerIds(argv) {
+  const index = argv.indexOf('--reviewers');
+  if (index === -1) return ['R1', 'R2'];
+  const value = argv[index + 1];
+  if (!value) throw new Error('--reviewers requires two comma-separated reviewer IDs');
+  const ids = value.split(',').map(id => id.trim());
+  if (ids.length !== 2 || new Set(ids).size !== 2) {
+    throw new Error('--reviewers requires exactly two distinct reviewer IDs');
+  }
+  if (!ids.every(id => /^[a-zA-Z0-9][a-zA-Z0-9._-]{1,63}$/.test(id))) {
+    throw new Error('--reviewers IDs must match ^[a-zA-Z0-9][a-zA-Z0-9._-]{1,63}$');
+  }
+  return ids;
+}
+
+async function main(argv = process.argv.slice(2)) {
   const checkOnly = argv.includes('--check');
   const base = path.join(root, 'benchmarks/real-world');
   const worklist = JSON.parse(await fs.readFile(path.join(base, 'annotation-worklist.json'), 'utf8'));
-  const result = buildReviewPackets({ worklist });
+  const result = buildReviewPackets({ worklist, reviewerIds: parseReviewerIds(argv) });
   if (!result.ready) {
     process.stdout.write(JSON.stringify({ ready: false, errors: result.errors }, null, 2) + '\n');
     return 2;
