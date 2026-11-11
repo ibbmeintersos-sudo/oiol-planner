@@ -30,6 +30,8 @@ jobs:
         env:
           P12_API_KEY_R1: ${{ secrets.OIOL_API_KEY }}
           P12_API_KEY_R2: ${{ secrets.OIOL_REVIEW_API_KEY }}
+          P12_MODELS_BASE_R1: https://integrate.api.nvidia.com/v1
+          P12_MODELS_BASE_R2: https://openrouter.ai/api/v1
         run: node scripts/probe-model-providers.mjs
 
       - name: Commit probe report
