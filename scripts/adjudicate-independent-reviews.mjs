@@ -33,7 +33,7 @@ function indexBy(dimension, values) {
 
 const sorted = map => [...map.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([, value]) => value);
 
-export function adjudicateDimension(dimension, first, second) {
+export function adjudicateDimension(dimension, first, second, mode = 'intersection') {
   const a = indexBy(dimension, first);
   const b = indexBy(dimension, second);
   const accepted = new Map();
@@ -44,7 +44,7 @@ export function adjudicateDimension(dimension, first, second) {
     else onlyFirst.set(key, value);
   }
   for (const [key, value] of b) if (!a.has(key)) onlySecond.set(key, value);
-  const union = dimension === 'unknowns' || dimension === 'risks';
+  const union = mode === 'union' || dimension === 'unknowns' || dimension === 'risks';
   const agreed = union ? new Map([...a, ...b]) : accepted;
   return {
     accepted: sorted(agreed),
@@ -70,11 +70,16 @@ function reviewerRecord(review) {
   };
 }
 
-export function buildAdjudicatedCase(item, first, second, snapshotPrefix) {
+function adjudicationRationale(mode) {
+  if (mode === 'union') return 'Automated adjudication kept every item accepted by either blinded slot and recorded every slot-only item as a disagreement; no silent averaging.';
+  return 'Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.';
+}
+
+export function buildAdjudicatedCase(item, first, second, snapshotPrefix, mode = 'intersection') {
   const truth = {};
   const disagreements = [];
   for (const dimension of dimensions) {
-    const result = adjudicateDimension(dimension, first.groundTruth?.[dimension], second.groundTruth?.[dimension]);
+    const result = adjudicateDimension(dimension, first.groundTruth?.[dimension], second.groundTruth?.[dimension], mode);
     truth[dimension] = result.accepted;
     if (result.onlyFirst.length || result.onlySecond.length || result.contested) {
       disagreements.push({
@@ -119,9 +124,9 @@ export function buildAdjudicatedCase(item, first, second, snapshotPrefix) {
         required: disagreements.length > 0,
         status: disagreements.length ? 'completed' : 'not_needed',
         reviewerId: 'automated-adjudicator',
-        method: 'set intersection for scored dimensions; union for unknowns and risks',
+        method: mode === 'union' ? 'set union of both blinded slots for every dimension' : 'set intersection for scored dimensions; union for unknowns and risks',
         rationale: disagreements.length
-          ? 'Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.'
+          ? adjudicationRationale(mode)
           : 'Both blinded slots produced identical accepted sets, so no adjudication was required.',
         disagreements
       }
@@ -135,6 +140,8 @@ export async function main() {
   const reviewsRoot = path.resolve(option('reviews-root', path.join(base, 'reviews')));
   const outRoot = path.resolve(option('out', path.join(root, 'benchmarks/real-world-corpus')));
   const snapshotPrefix = option('snapshot-prefix', 'snapshots');
+  const mode = option('mode', 'intersection');
+  if (mode !== 'intersection' && mode !== 'union') throw new Error('--mode must be intersection or union');
   const freezeFile = path.resolve(option('freeze', path.join(base, 'review-freeze.json')));
   const worklist = JSON.parse(await fs.readFile(path.join(base, 'annotation-worklist.json'), 'utf8'));
   const assignments = JSON.parse(await fs.readFile(path.join(base, 'review-assignments.json'), 'utf8'));
@@ -144,7 +151,7 @@ export async function main() {
   if (!freeze) throw new Error('run the freeze gate before adjudication');
   const freezeIndex = new Map((freeze.cases || []).map(entry => [entry.caseId, new Map((entry.reviews || []).map(review => [review.reviewerId, review.sha256]))]));
   const records = [];
-  const report = { schemaVersion: '1.0.0', createdAt: new Date().toISOString(), caseCount: 0, contested: [], errors: [] };
+  const report = { schemaVersion: '1.0.0', mode, createdAt: new Date().toISOString(), caseCount: 0, contested: [], errors: [] };
   for (const item of worklist.cases) {
     try {
       const reviews = [];
@@ -156,7 +163,7 @@ export async function main() {
         if (expected && hashReview(review) !== expected) throw new Error(item.caseId + '/' + slot + ': review changed after freeze');
         reviews.push(review);
       }
-      const built = buildAdjudicatedCase(item, reviews[0], reviews[1], snapshotPrefix);
+      const built = buildAdjudicatedCase(item, reviews[0], reviews[1], snapshotPrefix, mode);
       for (const dimension of dimensions) {
         if (!Array.isArray(built.caseJson.groundTruth[dimension])) throw new Error(item.caseId + ': missing dimension ' + dimension);
       }
@@ -173,7 +180,7 @@ export async function main() {
   const manifest = {
     schemaVersion: '1.0.0',
     corpusVersion: worklist.schemaVersion + '-' + (freeze.frozenAt || 'unfrozen'),
-    annotationProvenance: 'AI-generated blinded slots with automated intersection adjudication; not human review',
+    annotationProvenance: 'AI-generated blinded slots with automated ' + (mode === 'union' ? 'union' : 'intersection') + ' adjudication; not human review',
     cases: records.map(record => ({ caseId: record.caseId, caseFile: record.caseFile }))
   };
   await fs.writeFile(path.join(outRoot, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
