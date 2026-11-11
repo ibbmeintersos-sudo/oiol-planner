@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-11-11T04:41:19.325Z",
+  "cases": 3,
+  "slots": [
+    "R1",
+    "R2"
+  ],
+  "written": 0,
+  "failures": [
+    "ky-dispatcher-option-ignored/R1: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
+    "ky-dispatcher-option-ignored/R2: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
+    "itsdangerous-drop-eol-python/R1: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
+    "itsdangerous-drop-eol-python/R2: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
+    "chi-suppress-not-found-route-context/R1: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
+    "chi-suppress-not-found-route-context/R2: Unexpected token 'O', \"OK\r\n\" is not valid JSON"
+  ]
+}
