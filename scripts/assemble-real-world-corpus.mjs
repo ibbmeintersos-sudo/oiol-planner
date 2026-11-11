@@ -1,3 +1,7 @@
+File: scripts/assemble-real-world-corpus.mjs
+Size: 4833 bytes
+SHA: 7c93018ff829f6d5102490c30f8a14b9f4d30ea6
+
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -16,10 +20,6 @@ export function sourceCaseIdFor(cases, item) {
   if (typeof sharedIndex !== "number") return item.caseId;
   const source = cases.find(candidate => candidate.caseIndex === sharedIndex);
   return source ? source.caseId : item.caseId;
-}
-
-export function snapshotDirectoriesByCase(artifactsRoot) {
-  return collectSnapshotDirs(artifactsRoot);
 }
 
 async function collectSnapshotDirs(directory, found = new Map()) {
