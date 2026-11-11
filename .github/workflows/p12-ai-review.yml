@@ -15,6 +15,9 @@ on:
       offset:
         description: 'Zero-based case offset'
         default: '0'
+      budget:
+        description: 'Maximum model calls for this run (0 = uncapped)'
+        default: '0'
 
 permissions:
   contents: write
@@ -50,12 +53,16 @@ jobs:
         run: |
           OFFSET="${{ inputs.offset || '0' }}"
           LIMIT="${{ inputs.limit || '0' }}"
+          BUDGET="${{ inputs.budget || '0' }}"
           if [ "${{ github.event_name }}" = "push" ] && [ -f .p12/trigger ]; then
             TRIGGER=$(head -n1 .p12/trigger)
             OFFSET="${TRIGGER%%:*}"
             LIMIT="${TRIGGER##*:}"
+            SECOND=$(sed -n '2p' .p12/trigger | tr -d '[:space:]')
+            if printf '%s' "$SECOND" | grep -Eq '^[0-9]+$'; then BUDGET="$SECOND"; fi
           fi
-          node scripts/generate-ai-reviews.mjs --offset "$OFFSET" --limit "$LIMIT"
+          echo "annotating offset=$OFFSET limit=$LIMIT call_budget=$BUDGET"
+          P12_CALL_BUDGET="$BUDGET" node scripts/generate-ai-reviews.mjs --offset "$OFFSET" --limit "$LIMIT"
 
       - name: Commit generated reviews
         if: always()
