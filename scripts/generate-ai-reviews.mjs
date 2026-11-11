@@ -153,7 +153,7 @@ async function callModel(model, messages) {
           'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner',
           'X-Title': 'OIOL P12 annotation'
         },
-        body: JSON.stringify({ model, temperature: 0.2, max_tokens: 6000, messages })
+        body: JSON.stringify({ model, temperature: 0.2, max_tokens: 8000, reasoning: { effort: 'none' }, messages })
       });
       status = response.status;
       const text = await response.text();
