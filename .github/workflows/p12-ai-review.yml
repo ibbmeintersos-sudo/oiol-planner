@@ -41,8 +41,13 @@ jobs:
           P12_MODEL_R1: openai/gpt-4o-mini
           P12_MODEL_R2: meta/llama-3.3-70b-instruct
           P12_SKIP_EXISTING: '0'
-          LIMIT: ${{ inputs.limit || '0' }}
-        run: node scripts/generate-ai-reviews.mjs --limit "$LIMIT"
+        run: |
+          LIMIT="${{ inputs.limit || '0' }}"
+          if [ "${{ github.event_name }}" = "push" ] && [ -f .p12/trigger ]; then
+            FILE_LIMIT=$(tr -dc '0-9' < .p12/trigger)
+            if [ -n "$FILE_LIMIT" ]; then LIMIT="$FILE_LIMIT"; fi
+          fi
+          node scripts/generate-ai-reviews.mjs --limit "$LIMIT"
 
       - name: Commit generated reviews
         run: |
