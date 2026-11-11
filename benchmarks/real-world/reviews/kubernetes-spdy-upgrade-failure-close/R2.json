@@ -3,38 +3,134 @@
   "caseId": "kubernetes-spdy-upgrade-failure-close",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:21:09.674Z",
+  "scopeSummary": "Ensure the raw connection is closed when a streaming SPDY upgrade fails while retaining response error handling behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go"
+    ],
+    "affectedFiles": [
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection_test.go",
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go",
+      "pkg/client/tests/cri_streaming_spdy_compat_test.go"
+    ],
+    "tests": [
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go",
+      "pkg/client/tests/cri_streaming_spdy_compat_test.go"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "pkg/client/tests/cri_streaming_spdy_compat_test.go"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "responseUpgrader.UpgradeResponse",
+        "kind": "method"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "connWrapper",
+        "kind": "type"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "NewServerConnectionWithPings",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+        "name": "connection.Close",
+        "kind": "method"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+        "name": "NewServerConnectionWithPings",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "to": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go"
+      },
+      {
+        "from": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "to": "staging/src/k8s.io/streaming/pkg/runtime"
+      },
+      {
+        "from": "pkg/client/tests/cri_streaming_spdy_compat_test.go",
+        "to": "staging/src/k8s.io/streaming/pkg/httpstream/spdy"
+      }
+    ],
+    "unknowns": [
+      "Whether the pinned base commit already contains a partial fix for closing the raw connection on SPDY upgrade failure."
+    ],
+    "risks": [
+      {
+        "id": "risk-connection-leak-on-upgrade-failure",
+        "severity": "medium",
+        "rationale": "If the raw hijacked connection is not closed when SPDY upgrade fails, the connection may leak and exhaust file descriptors under repeated failed upgrade attempts."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "UpgradeResponse in upgrade.go handles SPDY upgrade failure paths and returns nil without closing the hijacked connection.",
+      "evidence": "In UpgradeResponse, when NewServerConnectionWithPings returns an error, the function calls runtime.HandleErrorWithContext and returns nil without closing connWithBuf.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+      "symbol": "responseUpgrader.UpgradeResponse",
+      "lineRange": "100-130",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go#L100-L130"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "connection.go defines NewServerConnectionWithPings and connection.Close which manage the underlying SPDY connection lifecycle.",
+      "evidence": "NewServerConnectionWithPings closes conn on spdystream.NewConnection failure, and connection.Close resets streams and closes the underlying spdystream.Connection.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+      "symbol": "NewServerConnectionWithPings",
+      "lineRange": "60-90",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go#L60-L90"
+    },
+    {
+      "dimension": "tests",
+      "claim": "upgrade_test.go tests UpgradeResponse behavior including error cases.",
+      "evidence": "TestUpgradeResponse verifies that missing upgrade headers result in nil connection and error responses.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go",
+      "symbol": "TestUpgradeResponse",
+      "lineRange": "1-80",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go#L1-L80"
+    },
+    {
+      "dimension": "tests",
+      "claim": "cri_streaming_spdy_compat_test.go exercises end-to-end SPDY streaming compatibility between client-go and cri-streaming server.",
+      "evidence": "TestCRIStreamingSPDYExecAttachCompatibility uses remoteclient.NewSPDYExecutor against a test server backed by streaming.Server.",
+      "path": "pkg/client/tests/cri_streaming_spdy_compat_test.go",
+      "symbol": "TestCRIStreamingSPDYExecAttachCompatibility",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/pkg/client/tests/cri_streaming_spdy_compat_test.go#L1-L200"
+    }
+  ]
 }

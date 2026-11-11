@@ -3,38 +3,113 @@
   "caseId": "spring-boot-duration-micros-overflow",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:20:37.445Z",
+  "scopeSummary": "Modify DurationStyle.MICROS conversion in core/spring-boot to avoid intermediate nanosecond overflow when converting large Duration values to microseconds while preserving exact conversion behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+    ],
+    "affectedFiles": [
+      "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java",
+      "core/spring-boot/src/main/java/org/springframework/boot/context/properties/ConversionServiceDeducer.java"
+    ],
+    "tests": [
+      "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.MICROS",
+        "kind": "enum constant"
+      },
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.Unit.longValue",
+        "kind": "function"
+      },
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.Unit.MICROS",
+        "kind": "enum constant"
+      },
+      {
+        "file": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+        "name": "DurationStyleTests",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java",
+        "to": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+      },
+      {
+        "from": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+        "to": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+      }
+    ],
+    "unknowns": [
+      "Whether callers outside the provided tree sample rely on the exact string representation produced by DurationStyle.print for microsecond values."
+    ],
+    "risks": [
+      {
+        "id": "duration-micros-print-change",
+        "severity": "medium",
+        "rationale": "Changing the MICROS conversion logic may alter printed output for large durations, affecting configuration property display and logging."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "DurationStyle.java contains the MICROS unit conversion logic that divides nanoseconds by 1000, which can overflow for large Duration values.",
+      "evidence": "File core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java defines Unit.MICROS with (duration) -> duration.toNanos() / 1000L.",
+      "path": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+      "symbol": "DurationStyle.Unit.MICROS",
+      "lineRange": "130-140",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java#L130-L140"
+    },
+    {
+      "dimension": "tests",
+      "claim": "DurationStyleTests.java tests DurationStyle parsing and printing behavior including microsecond values.",
+      "evidence": "File core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java contains test methods for detectAndParse and detect behavior with various duration units.",
+      "path": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+      "symbol": "DurationStyleTests",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java#L1-L200"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "WebConversionService.java consumes DurationStyle for web formatting conversion and may be affected by changes to Duration printing behavior.",
+      "evidence": "File core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java is part of the web format auto-configuration that uses DurationStyle.",
+      "path": "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java",
+      "symbol": "WebConversionService",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java#L1-L100"
+    }
+  ]
 }

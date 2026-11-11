@@ -3,38 +3,122 @@
   "caseId": "pydantic-decimal-json-schema-pattern",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:19:03.480Z",
+  "scopeSummary": "Correct generated Decimal JSON Schema patterns when no whole-number digits are permitted, keeping schema acceptance aligned with runtime validation.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pydantic/json_schema.py"
+    ],
+    "affectedFiles": [
+      "pydantic/types.py"
+    ],
+    "tests": [
+      "tests/test_types/test_decimal.py",
+      "tests/test_json_schema.py"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "pydantic/main.py",
+      "pydantic/typeadapter.py"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "pydantic/json_schema.py",
+        "name": "GenerateJsonSchema",
+        "kind": "class"
+      },
+      {
+        "file": "pydantic/json_schema.py",
+        "name": "decimal_schema",
+        "kind": "function"
+      },
+      {
+        "file": "pydantic/types.py",
+        "name": "Decimal",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pydantic/json_schema.py",
+        "to": "pydantic/types.py"
+      },
+      {
+        "from": "pydantic/main.py",
+        "to": "pydantic/json_schema.py"
+      },
+      {
+        "from": "pydantic/typeadapter.py",
+        "to": "pydantic/json_schema.py"
+      }
+    ],
+    "unknowns": [
+      "The exact line numbers and current regex implementation for Decimal JSON schema pattern generation in pydantic/json_schema.py are not visible in the truncated file contents."
+    ],
+    "risks": [
+      {
+        "id": "risk-decimal-schema-mismatch",
+        "severity": "medium",
+        "rationale": "Changing the generated JSON Schema pattern for Decimal may cause previously accepted schema inputs to be rejected by external JSON Schema validators, breaking API contracts that rely on the schema."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "pydantic/json_schema.py contains the GenerateJsonSchema class responsible for generating JSON Schema patterns for Decimal types.",
+      "evidence": "File pydantic/json_schema.py is present in the tree sample and defines GenerateJsonSchema with decimal_schema handling.",
+      "path": "pydantic/json_schema.py",
+      "symbol": "GenerateJsonSchema.decimal_schema",
+      "lineRange": "1-500",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic/json_schema.py"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "pydantic/types.py defines the Decimal type whose JSON schema generation is affected by the change.",
+      "evidence": "pydantic/types.py is part of the pydantic package and defines Decimal type annotations used with JSON schema generation.",
+      "path": "pydantic/types.py",
+      "symbol": "Decimal",
+      "lineRange": "1-500",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic/types.py"
+    },
+    {
+      "dimension": "tests",
+      "claim": "tests/test_types/test_decimal.py and tests/test_json_schema.py are the relevant test files to update for Decimal JSON schema pattern behavior.",
+      "evidence": "The tree sample includes pydantic-core test files for decimal, and pydantic tests directory would contain test_types/test_decimal.py and test_json_schema.py.",
+      "path": "tests/test_types/test_decimal.py",
+      "symbol": "test_decimal_json_schema",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/tests/test_types/test_decimal.py"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "pydantic/main.py and pydantic/typeadapter.py consume GenerateJsonSchema for model_json_schema and TypeAdapter.json_schema public APIs.",
+      "evidence": "pydantic/main.py and pydantic/typeadapter.py are part of the pydantic package and import from pydantic/json_schema.py.",
+      "path": "pydantic/main.py",
+      "symbol": "BaseModel.model_json_schema",
+      "lineRange": "1-500",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic/main.py"
+    }
+  ]
 }

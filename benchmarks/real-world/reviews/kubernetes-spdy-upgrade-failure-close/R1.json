@@ -3,38 +3,166 @@
   "caseId": "kubernetes-spdy-upgrade-failure-close",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:20:59.799Z",
+  "scopeSummary": "Ensure the raw hijacked connection is closed when a streaming SPDY upgrade fails in responseUpgrader.UpgradeResponse, while retaining existing HTTP error handling behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go"
+    ],
+    "affectedFiles": [
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection_test.go",
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go",
+      "pkg/client/tests/cri_streaming_spdy_compat_test.go"
+    ],
+    "tests": [
+      "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "pkg/client/tests/cri_streaming_spdy_compat_test.go"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "responseUpgrader",
+        "kind": "type"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "UpgradeResponse",
+        "kind": "method"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "connWrapper",
+        "kind": "type"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "NewServerConnectionWithPings",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "name": "runtime.HandleErrorWithContext",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+        "name": "connection",
+        "kind": "type"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+        "name": "NewServerConnectionWithPings",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+        "name": "Close",
+        "kind": "method"
+      },
+      {
+        "file": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+        "name": "CloseChan",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "to": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go"
+      },
+      {
+        "from": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "to": "staging/src/k8s.io/streaming/pkg/runtime"
+      },
+      {
+        "from": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+        "to": "staging/src/k8s.io/streaming/pkg/httpstream"
+      },
+      {
+        "from": "pkg/client/tests/cri_streaming_spdy_compat_test.go",
+        "to": "staging/src/k8s.io/streaming/pkg/httpstream/spdy"
+      }
+    ],
+    "unknowns": [
+      "Whether the historical PR modified connection.go itself or only upgrade.go and tests."
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Closing the raw connection on SPDY upgrade failure may terminate in-flight requests that were partially processed before the failure."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "upgrade.go contains UpgradeResponse which creates SPDY server connection and handles errors without closing the hijacked connection.",
+      "evidence": "UpgradeResponse calls NewServerConnectionWithPings and returns nil on error after runtime.HandleErrorWithContext, leaving conn open.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+      "symbol": "UpgradeResponse",
+      "lineRange": "100-140",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go#L100-L140"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "connWrapper wraps net.Conn and bufio.Reader with a Close method that closes the underlying connection.",
+      "evidence": "connWrapper.Close calls w.Conn.Close and sets closed flag, providing the mechanism to close the raw connection.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go",
+      "symbol": "connWrapper",
+      "lineRange": "55-75",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade.go#L55-L75"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "connection.go defines NewServerConnectionWithPings and connection.Close which are invoked by upgrade.go.",
+      "evidence": "NewServerConnectionWithPings returns error when spdystream.NewConnection fails, and connection.Close closes underlying spdystream connection.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go",
+      "symbol": "NewServerConnectionWithPings",
+      "lineRange": "70-90",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/connection.go#L70-L90"
+    },
+    {
+      "dimension": "tests",
+      "claim": "upgrade_test.go tests UpgradeResponse behavior and must be updated to verify connection closure on failure.",
+      "evidence": "TestUpgradeResponse checks shouldError and conn nil but does not verify the underlying connection is closed.",
+      "path": "staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go",
+      "symbol": "TestUpgradeResponse",
+      "lineRange": "1-80",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/staging/src/k8s.io/streaming/pkg/httpstream/spdy/upgrade_test.go#L1-L80"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "cri_streaming_spdy_compat_test.go consumes the SPDY streaming stack and may be affected by connection lifecycle changes.",
+      "evidence": "TestCRIStreamingSPDYExecAttachCompatibility uses client-go SPDY executor against cri-streaming server.",
+      "path": "pkg/client/tests/cri_streaming_spdy_compat_test.go",
+      "symbol": "TestCRIStreamingSPDYExecAttachCompatibility",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/dd17674001a6e7649c7e5ec69a8617b779a131f2/pkg/client/tests/cri_streaming_spdy_compat_test.go#L1-L200"
+    }
+  ]
 }

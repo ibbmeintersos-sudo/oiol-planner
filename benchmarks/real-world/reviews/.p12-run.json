@@ -1,11 +1,26 @@
 {
+  "quota": {
+    "R1": {
+      "limit": null,
+      "usage": 0.181973742,
+      "limit_remaining": null,
+      "is_free_tier": true
+    },
+    "R2": {
+      "limit": null,
+      "usage": 0.181973742,
+      "limit_remaining": null,
+      "is_free_tier": true
+    }
+  },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T05:09:33.516Z",
-  "cases": 3,
+  "generatedAt": "2026-11-11T05:21:58.175Z",
+  "cases": 11,
+  "offset": 0,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 4,
+  "written": 16,
   "failures": []
 }

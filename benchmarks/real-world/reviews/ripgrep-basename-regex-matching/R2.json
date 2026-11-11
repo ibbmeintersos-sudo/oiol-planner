@@ -3,38 +3,193 @@
   "caseId": "ripgrep-basename-regex-matching",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:18:45.896Z",
+  "scopeSummary": "Optimize filename-only regular-expression matching so eligible patterns are evaluated against the basename without changing matching semantics.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "crates/regex/src/config.rs",
+      "crates/regex/src/matcher.rs",
+      "crates/cli/src/pattern.rs"
+    ],
+    "affectedFiles": [
+      "crates/grep/src/lib.rs",
+      "crates/core/search.rs"
+    ],
+    "tests": [
+      "tests/tests.rs",
+      "crates/matcher/tests/test_matcher.rs"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "crates/grep/src/lib.rs",
+      "crates/core/search.rs"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "crates/regex/src/config.rs",
+        "name": "Config",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/config.rs",
+        "name": "ConfiguredHIR",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/matcher.rs",
+        "name": "RegexMatcherBuilder",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/matcher.rs",
+        "name": "RegexMatcher",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/cli/src/pattern.rs",
+        "name": "Pattern",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/cli/src/pattern.rs",
+        "name": "PatternMatcher",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/grep/src/lib.rs",
+        "name": "grep_searcher",
+        "kind": "function"
+      },
+      {
+        "file": "crates/core/search.rs",
+        "name": "search",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "crates/cli/src/pattern.rs",
+        "to": "crates/regex/src/matcher.rs"
+      },
+      {
+        "from": "crates/regex/src/matcher.rs",
+        "to": "crates/regex/src/config.rs"
+      },
+      {
+        "from": "crates/core/search.rs",
+        "to": "crates/grep/src/lib.rs"
+      }
+    ],
+    "unknowns": [
+      "Exact location of basename extraction logic in crates/cli/src/pattern.rs is not visible in provided snippets.",
+      "Whether the change introduces a new public API field or only internal optimization is not established by the tree sample.",
+      "Which test files contain filename-only regex cases is not confirmed by provided snippets."
+    ],
+    "risks": [
+      {
+        "id": "basename-semantics-mismatch",
+        "severity": "high",
+        "rationale": "Evaluating regexes against basename instead of full path can alter matching results for patterns containing path separators or directory components."
+      },
+      {
+        "id": "eligibility-detection-incorrect",
+        "severity": "medium",
+        "rationale": "Incorrectly classifying a pattern as filename-only eligible could cause matches that should apply to full paths to be missed or vice versa."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "crates/regex/src/config.rs defines matcher configuration used to build HIR and regex matchers.",
+      "evidence": "Config struct with fields like word, whole_line, fixed_strings in crates/regex/src/config.rs.",
+      "path": "crates/regex/src/config.rs",
+      "symbol": "Config",
+      "lineRange": "1-120",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/regex/src/config.rs"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "crates/regex/src/matcher.rs builds RegexMatcher from configured HIR and contains matching logic.",
+      "evidence": "RegexMatcherBuilder::build_many constructs regex and fast_line_regex in crates/regex/src/matcher.rs.",
+      "path": "crates/regex/src/matcher.rs",
+      "symbol": "RegexMatcherBuilder",
+      "lineRange": "1-120",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/regex/src/matcher.rs"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "crates/cli/src/pattern.rs likely contains pattern parsing and matcher construction for CLI.",
+      "evidence": "Path present in tree sample; expected to contain Pattern and PatternMatcher types based on naming conventions.",
+      "path": "crates/cli/src/pattern.rs",
+      "symbol": "Pattern",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/cli/src/pattern.rs"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "crates/grep/src/lib.rs consumes regex matcher APIs and may be affected by matching semantics changes.",
+      "evidence": "crates/grep/src/lib.rs present in tree sample and is core search library.",
+      "path": "crates/grep/src/lib.rs",
+      "symbol": "grep_searcher",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/grep/src/lib.rs"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "crates/core/search.rs orchestrates search and may be affected by filename-only matching changes.",
+      "evidence": "crates/core/main.rs is binary entry point; search.rs likely contains search orchestration.",
+      "path": "crates/core/search.rs",
+      "symbol": "search",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/core/search.rs"
+    },
+    {
+      "dimension": "tests",
+      "claim": "tests/tests.rs is the integration test file for ripgrep.",
+      "evidence": "Cargo.toml declares [[test]] name = \"integration\" path = \"tests/tests.rs\".",
+      "path": "tests/tests.rs",
+      "symbol": "integration tests",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/tests/tests.rs"
+    },
+    {
+      "dimension": "tests",
+      "claim": "crates/matcher/tests/test_matcher.rs contains matcher unit tests.",
+      "evidence": "File present in tree sample with matcher test cases.",
+      "path": "crates/matcher/tests/test_matcher.rs",
+      "symbol": "matcher tests",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/matcher/tests/test_matcher.rs"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Config struct in crates/regex/src/config.rs is a concrete code identifier to annotate.",
+      "evidence": "struct Config defined in crates/regex/src/config.rs.",
+      "path": "crates/regex/src/config.rs",
+      "symbol": "Config",
+      "lineRange": "30-90",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/regex/src/config.rs#L30-L90"
+    }
+  ]
 }

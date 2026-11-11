@@ -3,38 +3,262 @@
   "caseId": "ripgrep-basename-regex-matching",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:18:25.072Z",
+  "scopeSummary": "Optimize filename-only regular-expression matching so eligible patterns are evaluated against the basename without changing matching semantics.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "crates/cli/src/pattern.rs"
+    ],
+    "affectedFiles": [
+      "crates/core/search.rs",
+      "crates/grep/src/lib.rs",
+      "crates/matcher/src/lib.rs",
+      "crates/regex/src/matcher.rs",
+      "crates/regex/src/config.rs",
+      "crates/regex/src/ast.rs",
+      "crates/regex/src/non_matching.rs",
+      "crates/regex/src/ban.rs",
+      "crates/regex/src/strip.rs",
+      "crates/regex/src/literal.rs",
+      "crates/regex/src/error.rs"
+    ],
+    "tests": [
+      "tests/tests.rs",
+      "tests/misc.rs",
+      "tests/regression.rs",
+      "crates/matcher/tests/test_matcher.rs"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "crates/core/search.rs",
+      "crates/cli/src/pattern.rs"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "crates/cli/src/pattern.rs",
+        "name": "Pattern",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/cli/src/pattern.rs",
+        "name": "PatternBuilder",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/cli/src/pattern.rs",
+        "name": "PatternBuilder::build",
+        "kind": "method"
+      },
+      {
+        "file": "crates/core/search.rs",
+        "name": "Searcher",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/core/search.rs",
+        "name": "Searcher::search_path",
+        "kind": "method"
+      },
+      {
+        "file": "crates/grep/src/lib.rs",
+        "name": "grep_searcher",
+        "kind": "module"
+      },
+      {
+        "file": "crates/matcher/src/lib.rs",
+        "name": "Matcher",
+        "kind": "trait"
+      },
+      {
+        "file": "crates/matcher/src/lib.rs",
+        "name": "Matcher::find",
+        "kind": "method"
+      },
+      {
+        "file": "crates/regex/src/matcher.rs",
+        "name": "RegexMatcherBuilder",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/matcher.rs",
+        "name": "RegexMatcherBuilder::build",
+        "kind": "method"
+      },
+      {
+        "file": "crates/regex/src/config.rs",
+        "name": "Config",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/config.rs",
+        "name": "Config::build_many",
+        "kind": "method"
+      },
+      {
+        "file": "crates/regex/src/ast.rs",
+        "name": "AstAnalysis",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/non_matching.rs",
+        "name": "non_matching_bytes",
+        "kind": "function"
+      },
+      {
+        "file": "crates/regex/src/ban.rs",
+        "name": "check",
+        "kind": "function"
+      },
+      {
+        "file": "crates/regex/src/strip.rs",
+        "name": "strip_from_match",
+        "kind": "function"
+      },
+      {
+        "file": "crates/regex/src/literal.rs",
+        "name": "InnerLiterals",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/regex/src/error.rs",
+        "name": "Error",
+        "kind": "struct"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "crates/cli/src/pattern.rs",
+        "to": "crates/regex/src/matcher.rs"
+      },
+      {
+        "from": "crates/core/search.rs",
+        "to": "crates/grep/src/lib.rs"
+      },
+      {
+        "from": "crates/grep/src/lib.rs",
+        "to": "crates/matcher/src/lib.rs"
+      },
+      {
+        "from": "crates/regex/src/matcher.rs",
+        "to": "crates/regex/src/config.rs"
+      },
+      {
+        "from": "crates/regex/src/config.rs",
+        "to": "crates/regex/src/ast.rs"
+      },
+      {
+        "from": "crates/regex/src/config.rs",
+        "to": "crates/regex/src/non_matching.rs"
+      },
+      {
+        "from": "crates/regex/src/config.rs",
+        "to": "crates/regex/src/ban.rs"
+      },
+      {
+        "from": "crates/regex/src/config.rs",
+        "to": "crates/regex/src/strip.rs"
+      },
+      {
+        "from": "crates/regex/src/config.rs",
+        "to": "crates/regex/src/literal.rs"
+      },
+      {
+        "from": "crates/regex/src/config.rs",
+        "to": "crates/regex/src/error.rs"
+      }
+    ],
+    "unknowns": [
+      "Exact location and name of the basename extraction helper in crates/cli/src/pattern.rs are not visible in the provided tree sample.",
+      "Whether the change introduces a new public API or only modifies internal pattern construction logic cannot be determined from the tree sample alone.",
+      "The precise set of test cases requiring updates in tests/tests.rs, tests/misc.rs, and tests/regression.rs is not established by the provided evidence.",
+      "Whether crates/grep/src/lib.rs exposes a filename-matching entry point that needs modification is unknown from the tree sample."
+    ],
+    "risks": [
+      {
+        "id": "risk-basename-semantics",
+        "severity": "high",
+        "rationale": "Evaluating filename-only regexes against basenames instead of full paths may alter matching semantics for patterns that rely on directory components, causing false negatives or positives."
+      },
+      {
+        "id": "risk-eligibility-detection",
+        "severity": "medium",
+        "rationale": "Incorrect detection of eligible filename-only patterns could cause patterns that should match full paths to be restricted to basenames, breaking existing user workflows."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "crates/cli/src/pattern.rs is the primary file for pattern construction and must be edited to implement filename-only regex basename optimization.",
+      "evidence": "Path crates/cli/src/pattern.rs appears in the tree sample and is the CLI pattern module where pattern eligibility and matching logic would be implemented.",
+      "path": "crates/cli/src/pattern.rs",
+      "symbol": "PatternBuilder",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/cli/src/pattern.rs"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "crates/core/search.rs consumes the pattern API and its search_path behavior may be materially affected by basename-only matching changes.",
+      "evidence": "Path crates/core/search.rs appears in the tree sample and contains the Searcher struct responsible for coordinating search over file paths.",
+      "path": "crates/core/search.rs",
+      "symbol": "Searcher::search_path",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/core/search.rs"
+    },
+    {
+      "dimension": "tests",
+      "claim": "tests/tests.rs is the integration test file and must be updated with test cases for filename-only regex basename matching.",
+      "evidence": "Path tests/tests.rs appears in the tree sample and is the main integration test entry point for ripgrep.",
+      "path": "tests/tests.rs",
+      "symbol": "integration tests",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/tests/tests.rs"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "RegexMatcherBuilder::build in crates/regex/src/matcher.rs constructs regex matchers and may need awareness of filename-only matching mode.",
+      "evidence": "File crates/regex/src/matcher.rs appears in the tree sample and contains RegexMatcherBuilder with build method that constructs RegexMatcher from patterns.",
+      "path": "crates/regex/src/matcher.rs",
+      "symbol": "RegexMatcherBuilder::build",
+      "lineRange": "40-80",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/regex/src/matcher.rs#L40-L80"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "crates/cli/src/pattern.rs depends on crates/regex/src/matcher.rs for regex construction.",
+      "evidence": "Both paths appear in the tree sample; pattern.rs is the CLI pattern module and matcher.rs provides RegexMatcherBuilder used for building regex matchers.",
+      "from": "crates/cli/src/pattern.rs",
+      "to": "crates/regex/src/matcher.rs",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/cli/src/pattern.rs"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Changing filename-only regex matching to basename-only evaluation risks altering matching semantics for patterns involving directory components.",
+      "evidence": "The change request explicitly states eligible patterns should be evaluated against the basename without changing matching semantics, implying a behavioral boundary that must be carefully preserved.",
+      "path": "crates/cli/src/pattern.rs",
+      "symbol": "Pattern",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/9d07a922605313dc47b78b802c7b0616fd76d409/crates/cli/src/pattern.rs"
+    }
+  ]
 }
