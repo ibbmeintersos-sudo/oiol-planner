@@ -47,7 +47,10 @@ jobs:
 
       - name: Adjudicate frozen reviews into a corpus
         shell: bash
-        run: set -o pipefail; node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" | tee "$CORPUS_ROOT/adjudication-summary.json"
+        run: |
+          mkdir -p "$CORPUS_ROOT"
+          set -o pipefail
+          node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" 2>&1 \ | tee "$CORPUS_ROOT/adjudication-summary.json"
 
       - name: Download pinned source snapshots
         uses: actions/download-artifact@v4
