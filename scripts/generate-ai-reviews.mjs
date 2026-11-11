@@ -170,6 +170,7 @@ function promptFor(item, evidence, slot) {
 // A hard per-run cap keeps a retry storm from consuming the daily free-tier quota
 // that the remaining P12 batches still need.
 const callBudget = Number(process.env.P12_CALL_BUDGET || 0);
+const callTimeoutMs = Math.max(30000, Number(process.env.P12_CALL_TIMEOUT || 300000));
 let callsUsed = 0;
 
 async function callModel(model, messages, slot) {
@@ -183,7 +184,7 @@ async function callModel(model, messages, slot) {
     try {
       const response = await fetch(slotEndpoints[slot] || slotEndpoints.R1, {
         method: 'POST',
-        signal: AbortSignal.timeout(120000),
+        signal: AbortSignal.timeout(callTimeoutMs),
         headers: {
           Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1),
           'Content-Type': 'application/json',
