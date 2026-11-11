@@ -1,7 +1,3 @@
-File: scripts/assemble-real-world-corpus.mjs
-Size: 4833 bytes
-SHA: 7c93018ff829f6d5102490c30f8a14b9f4d30ea6
-
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
