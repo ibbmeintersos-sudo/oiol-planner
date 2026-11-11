@@ -1,18 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T04:41:19.325Z",
-  "cases": 3,
+  "generatedAt": "2026-11-11T04:53:35.159Z",
+  "cases": 2,
   "slots": [
     "R1",
     "R2"
   ],
   "written": 0,
   "failures": [
-    "ky-dispatcher-option-ignored/R1: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
-    "ky-dispatcher-option-ignored/R2: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
-    "itsdangerous-drop-eol-python/R1: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
-    "itsdangerous-drop-eol-python/R2: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
-    "chi-suppress-not-found-route-context/R1: Unexpected token 'O', \"OK\r\n\" is not valid JSON",
-    "chi-suppress-not-found-route-context/R2: Unexpected token 'O', \"OK\r\n\" is not valid JSON"
+    "ky-dispatcher-option-ignored/R1: Model nvidia/nemotron-3.5-super-vl:free returned no content (finish_reason=length)",
+    "ky-dispatcher-option-ignored/R2: Expected ',' or '}' after property value in JSON at position 363 (line 8 column 4)",
+    "itsdangerous-drop-eol-python/R1: Model nvidia/nemotron-3.5-super-vl:free returned no content (finish_reason=length)",
+    "itsdangerous-drop-eol-python/R2: Model nvidia/nemotron-3.5-super-vl:free returned no content (finish_reason=length)"
   ]
 }
