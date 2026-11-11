@@ -170,8 +170,12 @@ async function callModel(model, messages, slot) {
         lastError = 'Model ' + model + ' returned no content (finish_reason=' + (payload.choices?.[0]?.finish_reason || 'unknown') + ')';
       } else {
         lastError = 'Model ' + model + ' HTTP ' + response.status + ': ' + text.slice(0, 300);
+        if (response.status === 429 && /free-models-per-day|openrouter_free_tier_daily/.test(text)) {
+          throw new Error('QUOTA_EXHAUSTED: ' + lastError.slice(0, 160));
+        }
       }
     } catch (error) {
+      if (error.message.startsWith('QUOTA_EXHAUSTED')) throw error;
       lastError = 'Model ' + model + ' request failed: ' + error.message;
     }
     if (![429, 500, 502, 503, 504].includes(status) || attempt === 4) break;
@@ -251,6 +255,7 @@ async function annotate(item, slot, worklist) {
       if (result.ready) return review;
       lastError = result.errors.join('; ');
     } catch (error) {
+      if (error.message.startsWith('QUOTA_EXHAUSTED')) throw error;
       lastError = error.message;
     }
   }
@@ -262,6 +267,8 @@ async function main() {
   const cases = worklist.cases.slice(offset, limit > 0 ? offset + limit : undefined);
   let written = 0;
   const failures = [];
+  let quotaExhausted = false;
+  outer:
   for (const [index, item] of cases.entries()) {
     for (const slot of slots) {
       const target = path.join(root, 'benchmarks/real-world/reviews', item.caseId, slot + '.json');
@@ -282,6 +289,10 @@ async function main() {
       } catch (error) {
         failures.push(error.message);
         console.error('FAILED ' + error.message);
+        if (error.message.startsWith('QUOTA_EXHAUSTED')) {
+          quotaExhausted = true;
+          break outer;
+        }
       }
     }
   }
@@ -293,7 +304,8 @@ async function main() {
     offset,
     slots,
     written,
-    failures
+    failures,
+    quotaExhausted
   };
   await fs.writeFile(path.join(root, 'benchmarks/real-world/reviews/.p12-run.json'), JSON.stringify(report, null, 2) + '\n');
   console.log('DONE written=' + written + ' failures=' + failures.length);
