@@ -3,38 +3,194 @@
   "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by minimaxai/minimax-m3.1-flash from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T23:27:47.238Z",
+  "scopeSummary": "Capture the original caller stack when Standard Schema validation fails and attach it to SchemaValidationError while preserving its name, message, and issues contract.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "source/core/Ky.ts",
+      "source/errors/SchemaValidationError.ts"
+    ],
+    "affectedFiles": [
+      "source/index.ts"
+    ],
+    "tests": [
+      "test/main.ts"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "source/index.ts"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "source/core/Ky.ts",
+        "name": "Ky",
+        "kind": "class"
+      },
+      {
+        "file": "source/core/Ky.ts",
+        "name": "json",
+        "kind": "method"
+      },
+      {
+        "file": "source/core/Ky.ts",
+        "name": "SchemaValidationError",
+        "kind": "class"
+      },
+      {
+        "file": "source/errors/SchemaValidationError.ts",
+        "name": "SchemaValidationError",
+        "kind": "class"
+      },
+      {
+        "file": "source/errors/SchemaValidationError.ts",
+        "name": "issues",
+        "kind": "property"
+      },
+      {
+        "file": "source/errors/SchemaValidationError.ts",
+        "name": "name",
+        "kind": "property"
+      },
+      {
+        "file": "source/index.ts",
+        "name": "SchemaValidationError",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "source/core/Ky.ts",
+        "to": "source/errors/SchemaValidationError.ts"
+      },
+      {
+        "from": "source/errors/SchemaValidationError.ts",
+        "to": "source/types/standard-schema.ts"
+      },
+      {
+        "from": "source/index.ts",
+        "to": "source/errors/SchemaValidationError.ts"
+      },
+      {
+        "from": "test/main.ts",
+        "to": "source/index.ts"
+      }
+    ],
+    "unknowns": [
+      "The exact stack-capture point (Ky constructor versus the json response method) is not established by the provided snapshot.",
+      "Whether SchemaValidationError gains a stack or cause constructor option, or receives the stack by assignment at the throw site, is not shown in the provided file contents.",
+      "The precise location of existing schema-validation assertions inside test/main.ts is not visible in the provided snippets.",
+      "Whether readme.md documents schema validation stack behavior and would require a documentation update is not shown."
+    ],
+    "risks": [
+      {
+        "id": "risk-stack-diagnostics",
+        "severity": "medium",
+        "rationale": "Replacing the error stack with the caller stack can hide the internal validation failure frame and reduce failure-locality diagnostics."
+      },
+      {
+        "id": "risk-constructor-contract",
+        "severity": "medium",
+        "rationale": "Changing the exported SchemaValidationError constructor signature could break consumers that instantiate the class directly."
+      },
+      {
+        "id": "risk-request-overhead",
+        "severity": "low",
+        "rationale": "Capturing a stack trace on each request adds allocation and serialization overhead even when validation succeeds."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "SchemaValidationError currently builds the error without any caller-stack input.",
+      "evidence": "The constructor calls super('Response schema validation failed') and only assigns this.issues; no stack or cause parameter is accepted.",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "25-33",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L25-L33"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "The Ky core module owns the response parsing path that raises schema validation failures.",
+      "evidence": "source/core/Ky.ts is the core Ky request/response implementation in the pinned tree, and the error class documents that failures originate from the .json(schema) response path.",
+      "path": "source/core/Ky.ts",
+      "symbol": "Ky",
+      "lineRange": "1-400",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/core/Ky.ts#L1-L400"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "SchemaValidationError is part of the package public API surface.",
+      "evidence": "The class documentation shows the supported public import form: import ky, {SchemaValidationError} from 'ky';.",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "10-10",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L10-L10"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "The error class depends on the local Standard Schema issue type.",
+      "evidence": "Line 1 imports type {StandardSchemaV1Issue} from '../types/standard-schema.js'.",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "StandardSchemaV1Issue",
+      "lineRange": "1-1",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L1-L1"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "The validation error contract is name, message, and readonly issues.",
+      "evidence": "The class declares override name = 'SchemaValidationError', readonly issues, and a fixed message passed to super.",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "issues",
+      "lineRange": "26-31",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L26-L31"
+    },
+    {
+      "dimension": "tests",
+      "claim": "The pinned tree has no dedicated schema-validation test module, so assertions belong in an existing test file.",
+      "evidence": "The tree sample lists test/main.ts and other test modules but no schema-specific test path.",
+      "path": "test/main.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "1-1",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/test/main.ts#L1-L1"
+    },
+    {
+      "dimension": "risks",
+      "claim": "The current constructor signature is the observable contract that a stack-carrying change could alter.",
+      "evidence": "The constructor accepts only issues: readonly StandardSchemaV1Issue[] and forwards a fixed message to Error.",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "29-32",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L29-L32"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "The snapshot does not reveal how the caller stack will be threaded to the error.",
+      "evidence": "No stack, cause, or caller-frame parameter exists in the pinned SchemaValidationError constructor.",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "29-32",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L29-L32"
+    }
+  ]
 }

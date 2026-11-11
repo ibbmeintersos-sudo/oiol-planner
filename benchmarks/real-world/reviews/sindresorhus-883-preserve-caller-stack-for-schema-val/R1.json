@@ -3,38 +3,116 @@
   "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T23:18:15.888Z",
+  "scopeSummary": "Preserve original caller stack in SchemaValidationError while keeping error contract consistent.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "source/errors/SchemaValidationError.ts"
+    ],
+    "affectedFiles": [
+      "source/index.ts"
+    ],
+    "tests": [
+      "test/main.ts"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "test/main.ts"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "source/errors/SchemaValidationError.ts",
+        "name": "SchemaValidationError",
+        "kind": "class"
+      },
+      {
+        "file": "source/errors/SchemaValidationError.ts",
+        "name": "constructor",
+        "kind": "constructor"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "source/errors/SchemaValidationError.ts",
+        "to": "source/types/standard-schema.ts"
+      }
+    ],
+    "unknowns": [
+      "exact line numbers for stack capture implementation in Ky's json method"
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Adding stack traces may increase error object size and affect performance in high-throughput scenarios."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "SchemaValidationError.ts must be edited to preserve caller stack",
+      "evidence": "File defines SchemaValidationError class used for schema validation errors",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "27-29",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L27-L29"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "SchemaValidationError class and constructor identified for modification",
+      "evidence": "Class definition and constructor in SchemaValidationError.ts",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "SchemaValidationError",
+      "lineRange": "23-30",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L23-L30"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "SchemaValidationError imports StandardSchemaV1Issue from standard-schema",
+      "evidence": "Import statement at top of file",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "import StandardSchemaV1Issue",
+      "lineRange": "1-1",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts#L1-L1"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Exact line numbers for stack capture in Ky's json method are not known from base snapshot",
+      "evidence": "No stack capture implementation visible in base commit",
+      "path": "source/core/Ky.ts",
+      "symbol": "json method",
+      "lineRange": "unknown",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/core/Ky.ts"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Adding stack traces may increase error size",
+      "evidence": "Risk identified for performance impact",
+      "path": "source/errors/SchemaValidationError.ts",
+      "symbol": "risk-1",
+      "lineRange": "N/A",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/c2ac4a1ac858cd8b423756c6c686b64071e834eb/source/errors/SchemaValidationError.ts"
+    }
+  ]
 }

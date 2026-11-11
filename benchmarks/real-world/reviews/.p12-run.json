@@ -10,19 +10,17 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T23:10:04.611Z",
+  "generatedAt": "2026-11-11T23:27:47.240Z",
   "cases": 1,
-  "offset": 11,
+  "offset": 12,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 1,
-  "failures": [
-    "home-assistant-unifi-disabled-entities/R1: Model deepseek-ai/deepseek-v4.1-flash request failed: The operation was aborted due to timeout"
-  ],
-  "callsUsed": 4,
-  "callBudget": 6,
+  "written": 2,
+  "failures": [],
+  "callsUsed": 3,
+  "callBudget": 4,
   "quotaExhausted": false,
   "budgetExhausted": false
 }
