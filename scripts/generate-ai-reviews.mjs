@@ -57,16 +57,16 @@ function ghHeaders() {
 }
 
 async function ghJson(url) {
-  const response = await fetch(url, { headers: ghHeaders() });
+  const response = await fetch(url, { headers: ghHeaders(), signal: AbortSignal.timeout(90000) });
   if (!response.ok) throw new Error('GitHub API ' + response.status + ' for ' + url);
   return response.json();
 }
 
 async function rawFile(repository, sha, file) {
-  const response = await fetch('https://raw.githubusercontent.com/' + repository + '/' + sha + '/' + file, { headers: { 'User-Agent': 'oiol-p12-ai-review' } });
+  const response = await fetch('https://raw.githubusercontent.com/' + repository + '/' + sha + '/' + file, { headers: { 'User-Agent': 'oiol-p12-ai-review' }, signal: AbortSignal.timeout(45000) });
   if (!response.ok) return null;
   const text = await response.text();
-  return text.length > 6000 ? text.slice(0, 6000) + '\n... [truncated]' : text;
+  return text.length > evidenceCharCap ? text.slice(0, evidenceCharCap) + '\n... [truncated]' : text;
 }
 
 const binaryOrNoise = file => /(^|\/)(node_modules|vendor|dist|build|target|\.git|docs?|website|fixtures?|snapshots?|__snapshots__)\//i.test(file) ||
@@ -96,7 +96,7 @@ async function buildEvidence(item) {
     .sort((a, b) => b.score - a.score || a.file.localeCompare(b.file));
   const manifests = files.filter(file => /^(package\.json|pyproject\.toml|go\.mod|Cargo\.toml|composer\.json|pom\.xml|build\.gradle|setup\.py)$/.test(file));
   const tests = files.filter(file => /(^|\/)(test|tests|spec|__tests__)\//i.test(file) || /\.(test|spec)\.[a-z]+$/i.test(file)).slice(0, 40);
-  const chosen = [...new Set([...manifests, ...ranked.slice(0, 14).map(entry => entry.file), ...tests.slice(0, 6)])].slice(0, 22);
+  const chosen = [...new Set([...manifests, ...ranked.slice(0, evidenceFileCap).map(entry => entry.file), ...tests.slice(0, 4)])].slice(0, evidenceFileCap);
   const contents = [];
   for (const file of chosen) {
     const text = await rawFile(item.repository, item.baseCommit, file);
@@ -104,7 +104,7 @@ async function buildEvidence(item) {
   }
   return {
     keywords,
-    treeSample: files.filter(file => !binaryOrNoise(file)).slice(0, 250),
+    treeSample: files.filter(file => !binaryOrNoise(file)).slice(0, treeSampleCap),
     contents: contents.join('\n\n')
   };
 }
@@ -155,6 +155,7 @@ function promptFor(item, evidence, slot) {
     '- risks: at least one concrete risk when the change alters runtime behavior or public contracts.',
     '- Mark a dimension unsupported only when the repository evidence cannot establish it.',
     '- Evidence notes must cite real paths and immutable commit URLs.',
+    '- Keep the JSON compact: at most twenty items in any groundTruth array, short strings, no commentary.',
     '',
     'Return ONLY a JSON object matching this shape (no markdown fences):',
     JSON.stringify(schemaExample, null, 2),
@@ -163,14 +164,18 @@ function promptFor(item, evidence, slot) {
     evidence.treeSample.join('\n'),
     '',
     'FILE CONTENTS:',
-    evidence.contents
+    evidence.contents.slice(0, evidenceTotalCap)
   ].join('\n');
 }
 
 // A hard per-run cap keeps a retry storm from consuming the daily free-tier quota
 // that the remaining P12 batches still need.
+const evidenceFileCap = Math.max(4, Number(process.env.P12_MAX_EVIDENCE_FILES || 14));
+const evidenceCharCap = Math.max(1200, Number(process.env.P12_FILE_CHARS || 3000));
+const evidenceTotalCap = Math.max(12000, Number(process.env.P12_MAX_EVIDENCE_CHARS || 45000));
+const treeSampleCap = Math.max(40, Number(process.env.P12_TREE_SAMPLE || 150));
 const callBudget = Number(process.env.P12_CALL_BUDGET || 0);
-const callTimeoutMs = Math.max(30000, Number(process.env.P12_CALL_TIMEOUT || 300000));
+const callTimeoutMs = Math.max(30000, Number(process.env.P12_CALL_TIMEOUT || 600000));
 let callsUsed = 0;
 
 async function callModel(model, messages, slot) {
