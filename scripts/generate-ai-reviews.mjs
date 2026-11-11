@@ -11,17 +11,33 @@ const apiKeys = {
   R2: process.env.P12_API_KEY_R2 || process.env.P12_API_KEY || process.env.OIOL_API_KEY || ''
 };
 const apiBase = 'https://api.github.com';
-const modelsUrl = process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions';
-// Provider request shapes differ: OpenRouter takes attribution headers and a large output
-cap, while NVIDIA NIM documents max_tokens at 4096 and treats reasoning effort as model specific.
-const isOpenRouter = modelsUrl.includes('openrouter.ai');
-const maxTokens = Number(process.env.P12_MAX_TOKENS || (isOpenRouter ? 8000 : 4096));
-const reasoningEffort = String(process.env.P12_REASONING_EFFORT ?? (isOpenRouter ? 'none' : '')).trim();
-const requestTemperature = Math.min(1, Math.max(0, Number(process.env.P12_TEMPERATURE || 0.2)));
+const slotEndpoints = {
+  R1: process.env.P12_MODELS_URL_R1 || process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions',
+  R2: process.env.P12_MODELS_URL_R2 || process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions'
+};
 const models = {
   R1: process.env.P12_MODEL_R1 || 'nvidia/nemotron-3.5-super-vl:free',
   R2: process.env.P12_MODEL_R2 || 'nvidia/nemotron-3.5-super-vl:free'
 };
+// Provider request shapes differ: OpenRouter takes attribution headers and a large output
+// cap, while NVIDIA NIM documents max_tokens at 4096 and treats reasoning effort as model
+// specific, so both are derived per slot from the endpoint host.
+function providerOption(name, slot, fallback) {
+  const scoped = process.env['P12_' + name + '_' + slot];
+  return scoped === undefined || scoped === '' ? (process.env['P12_' + name] ?? fallback) : scoped;
+}
+function isOpenRouterSlot(slot) {
+  return slotEndpoints[slot].includes('openrouter.ai');
+}
+function maxTokensFor(slot) {
+  return Number(providerOption('MAX_TOKENS', slot, isOpenRouterSlot(slot) ? 8000 : 4096));
+}
+function reasoningFor(slot) {
+  return String(providerOption('REASONING_EFFORT', slot, isOpenRouterSlot(slot) ? 'none' : '')).trim();
+}
+function temperatureFor() {
+  return Math.min(1, Math.max(0, Number(process.env.P12_TEMPERATURE || 0.2)));
+}
 const slots = (process.env.P12_SLOTS || 'R1,R2').split(',').map(value => value.trim()).filter(Boolean);
 const limitIndex = process.argv.indexOf('--limit');
 const limit = limitIndex === -1 ? 0 : Number(process.argv[limitIndex + 1]) || 0;
@@ -165,19 +181,19 @@ async function callModel(model, messages, slot) {
     }
     callsUsed += 1;
     try {
-      const response = await fetch(modelsUrl, {
+      const response = await fetch(slotEndpoints[slot] || slotEndpoints.R1, {
         method: 'POST',
         signal: AbortSignal.timeout(120000),
         headers: {
           Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1),
           'Content-Type': 'application/json',
-          ...(isOpenRouter ? { 'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner', 'X-Title': 'OIOL P12 annotation' } : {})
+          ...(isOpenRouterSlot(slot) ? { 'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner', 'X-Title': 'OIOL P12 annotation' } : {})
         },
         body: JSON.stringify({
           model,
-          temperature: requestTemperature,
-          max_tokens: maxTokens,
-          ...(reasoningEffort ? { reasoning: { effort: reasoningEffort } } : {}),
+          temperature: temperatureFor(),
+          max_tokens: maxTokensFor(slot),
+          ...(reasoningFor(slot) ? { reasoning: { effort: reasoningFor(slot) } } : {}),
           messages
         })
       });
@@ -245,7 +261,7 @@ function normalize(review, item, slot, model) {
 }
 
 async function keyQuota() {
-  if (!isOpenRouter) return { provider: new URL(modelsUrl).host, note: 'key quota probe is OpenRouter specific' };
+    if (!isOpenRouterSlot(slot)) { out[slot] = { provider: new URL(slotEndpoints[slot]).host, note: 'key quota probe is OpenRouter specific' }; continue; }
   const out = {};
   for (const slot of ['R1', 'R2']) {
     try {
