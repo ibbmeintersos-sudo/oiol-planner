@@ -10,7 +10,7 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T22:15:13.558Z",
+  "generatedAt": "2026-11-11T22:46:58.376Z",
   "cases": 1,
   "offset": 11,
   "slots": [
@@ -19,8 +19,8 @@
   ],
   "written": 0,
   "failures": [
-    "home-assistant-unifi-disabled-entities/R1: Model deepseek-ai/deepseek-v4.1-flash request failed: The operation was aborted due to timeout",
-    "home-assistant-unifi-disabled-entities/R2: Model mistralai/mistral-large-4-1t-a52b request failed: The operation was aborted due to timeout"
+    "home-assistant-unifi-disabled-entities/R1: Model deepseek-ai/deepseek-v4.1-flash returned no content (finish_reason=length)",
+    "home-assistant-unifi-disabled-entities/R2: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
   ],
   "callsUsed": 6,
   "callBudget": 6,
