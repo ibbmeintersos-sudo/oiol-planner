@@ -9,7 +9,7 @@ coverage/
 .plan-cache/
 
 # Ephemeral P12 evaluation workspace
-.p12-corpus/
+.p12-corpus*/
 acquired/
 
 
