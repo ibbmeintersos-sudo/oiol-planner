@@ -13,7 +13,7 @@ const option = (name, fallback = null) => {
 const unique = values => [...new Set(values.filter(value => typeof value === 'string' && value))].sort();
 const pathValues = values => unique((values || []).map(item => typeof item === 'string' ? item : item?.path || item?.file || item?.migrationPath));
 const edgeValues = values => unique((values || []).map(item => typeof item === 'string' ? item : item?.from && item?.to ? item.from + ' -> ' + item.to : null));
-const symbolValues = values => unique((values || []).map(item => item?.file && item?.name ? item.file + '::' + (item.kind || 'unknown') + '::' + item.name : null));
+const symbolValues = values => unique((values || []).map(item => typeof item === 'string' ? item : item?.file && item?.name ? item.file + '::' + (item.kind || 'unknown') + '::' + item.name : null));
 
 export function scoreSet(expectedValues = [], actualValues = []) {
   const expected = new Set(unique(expectedValues));
@@ -43,8 +43,19 @@ export function scoreRealWorldCase(item, repositoryScan, impact) {
     scannerSymbols: symbolValues(repositoryScan.structure?.symbols),
     dependencyEdges: edgeValues(repositoryScan.structure?.dependencyGraph?.edges)
   };
+  const expected = {
+    directFiles: pathValues(truth.directFiles),
+    affectedFiles: pathValues(truth.affectedFiles),
+    tests: pathValues(truth.tests),
+    packages: pathValues(truth.packages),
+    apiConsumers: pathValues(truth.apiConsumers),
+    databaseConsumers: pathValues(truth.databaseConsumers),
+    migrationFiles: pathValues(truth.migrationFiles),
+    scannerSymbols: symbolValues(truth.scannerSymbols),
+    dependencyEdges: edgeValues(truth.dependencyEdges)
+  };
   const dimensions = {};
-  for (const key of Object.keys(actual)) dimensions[key] = scoreSet(truth[key] || [], actual[key]);
+  for (const key of Object.keys(actual)) dimensions[key] = scoreSet(expected[key], actual[key]);
   return {
     caseId: item.caseId,
     category: item.change.category,
