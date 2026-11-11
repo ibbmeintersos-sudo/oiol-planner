@@ -100,39 +100,4 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Commit evaluation diagnostics
-        if: failure()
-        shell: bash
-        run: |
-          git config user.name "oiol-p12-bot"
-          git config user.email "oiol-p12-bot@users.noreply.github.com"
-          git fetch origin "$GITHUB_REF_NAME"
-          git rebase "origin/$GITHUB_REF_NAME"
-          mkdir -p benchmarks/real-world/evaluation-diagnostics
-          cp "$CORPUS_ROOT/adjudication-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
-          cp "$CORPUS_ROOT/assemble-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
-          cp "$CORPUS_ROOT/acquire-summary.txt" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
-          cp "$CORPUS_ROOT/validate-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
-          cp "$CORPUS_ROOT/score-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
-          cp "$CORPUS_ROOT/manifest.json" benchmarks/real-world/evaluation-diagnostics/corpus-manifest.json 2>/dev/null || true
-          git add benchmarks/real-world/evaluation-diagnostics
-          git diff --cached --quiet || git commit -m "chore(p12): record evaluation diagnostics"
-          git push origin "HEAD:$GITHUB_REF_NAME"
 
-      - name: Commit the freeze record and adjudication
-        if: success()
-        shell: bash
-        run: |
-          git config user.name "oiol-p12-bot"
-          git config user.email "oiol-p12-bot@users.noreply.github.com"
-          git fetch origin "$GITHUB_REF_NAME"
-          git rebase "origin/$GITHUB_REF_NAME"
-          mkdir -p benchmarks/real-world/adjudication
-          cp "$CORPUS_ROOT/manifest.json" benchmarks/real-world/adjudication/corpus-manifest.json
-          cp -r "$CORPUS_ROOT/cases" benchmarks/real-world/adjudication/cases
-          cp "$CORPUS_ROOT/validate-summary.json" benchmarks/real-world/adjudication/corpus-validation.json
-          cp "$CORPUS_ROOT/score-summary.json" benchmarks/real-world/adjudication/scoring-log.json
-          cp benchmarks/results/real-world-benchmark.json benchmarks/real-world/adjudication/real-world-benchmark.json
-          git add benchmarks/real-world/review-freeze.json benchmarks/real-world/adjudication
-          git diff --cached --quiet || git commit -m "chore(p12): freeze reviews and record adjudicated corpus"
-          git push origin "HEAD:$GITHUB_REF_NAME"
