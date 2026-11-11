@@ -219,6 +219,20 @@ function normalize(review, item, slot, model) {
   return output;
 }
 
+async function keyQuota() {
+  const out = {};
+  for (const slot of ['R1', 'R2']) {
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/key', { headers: { Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1) } });
+      const payload = await response.json();
+      out[slot] = payload?.data ? { limit: payload.data.limit, usage: payload.data.usage, limit_remaining: payload.data.limit_remaining, is_free_tier: payload.data.is_free_tier } : payload;
+    } catch (error) {
+      out[slot] = { error: error.message };
+    }
+  }
+  return out;
+}
+
 async function annotate(item, slot, worklist) {
   const model = models[slot];
   const evidence = await buildEvidence(item);
@@ -271,6 +285,7 @@ async function main() {
     }
   }
   const report = {
+    quota: await keyQuota(),
     schemaVersion: '1.0.0',
     generatedAt: new Date().toISOString(),
     cases: cases.length,
