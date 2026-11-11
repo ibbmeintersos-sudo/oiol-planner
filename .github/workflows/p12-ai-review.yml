@@ -37,9 +37,11 @@ jobs:
       - name: Generate AI reviews
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          P12_API_KEY: ${{ secrets.OIOL_API_KEY }}
           P12_SLOTS: ${{ inputs.slots || 'R1,R2' }}
-          P12_MODEL_R1: openai/gpt-4o-mini
-          P12_MODEL_R2: meta/llama-3.3-70b-instruct
+          P12_MODELS_URL: https://openrouter.ai/api/v1/chat/completions
+          P12_MODEL_R1: nvidia/nemotron-3.5-super-vl:free
+          P12_MODEL_R2: nvidia/nemotron-3.5-super-vl:free
           P12_SKIP_EXISTING: '0'
         run: |
           LIMIT="${{ inputs.limit || '0' }}"
