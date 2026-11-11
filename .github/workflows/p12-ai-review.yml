@@ -12,6 +12,9 @@ on:
       limit:
         description: 'Number of cases to annotate (0 = all)'
         default: '0'
+      offset:
+        description: 'Zero-based case offset'
+        default: '0'
 
 permissions:
   contents: write
@@ -37,19 +40,22 @@ jobs:
       - name: Generate AI reviews
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          P12_API_KEY: ${{ secrets.OIOL_API_KEY }}
+          P12_API_KEY_R1: ${{ secrets.OIOL_API_KEY }}
+          P12_API_KEY_R2: ${{ secrets.OIOL_REVIEW_API_KEY }}
           P12_SLOTS: ${{ inputs.slots || 'R1,R2' }}
           P12_MODELS_URL: https://openrouter.ai/api/v1/chat/completions
           P12_MODEL_R1: nvidia/nemotron-3.5-super-vl:free
           P12_MODEL_R2: nvidia/nemotron-3.5-super-vl:free
           P12_SKIP_EXISTING: '1'
         run: |
+          OFFSET="${{ inputs.offset || '0' }}"
           LIMIT="${{ inputs.limit || '0' }}"
           if [ "${{ github.event_name }}" = "push" ] && [ -f .p12/trigger ]; then
-            FILE_LIMIT=$(tr -dc '0-9' < .p12/trigger)
-            if [ -n "$FILE_LIMIT" ]; then LIMIT="$FILE_LIMIT"; fi
+            TRIGGER=$(cat .p12/trigger)
+            OFFSET="${TRIGGER%%:*}"
+            LIMIT="${TRIGGER##*:}"
           fi
-          node scripts/generate-ai-reviews.mjs --limit "$LIMIT"
+          node scripts/generate-ai-reviews.mjs --offset "$OFFSET" --limit "$LIMIT"
 
       - name: Commit generated reviews
         if: always()
