@@ -340,7 +340,10 @@ async function main() {
       const existing = await fs.readFile(target, 'utf8').catch(() => null);
       if (existing && process.env.P12_SKIP_EXISTING === '1') {
         try {
-          if (validateReview(JSON.parse(existing), worklist).ready) continue;
+          const prior = JSON.parse(existing);
+          const scoredDims = ['directFiles', 'affectedFiles', 'tests', 'packages', 'apiConsumers', 'databaseConsumers', 'migrationFiles', 'scannerSymbols', 'dependencyEdges'];
+          const hasEvidence = scoredDims.some((dimension) => (prior.groundTruth?.[dimension] || []).length > 0);
+          if (validateReview(prior, worklist).ready && hasEvidence) continue;
         } catch {
           // Invalid skeleton packets are regenerated.
         }
