@@ -5,12 +5,13 @@ import { fileURLToPath } from 'node:url';
 import { validateReview } from './validate-independent-review.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
+const ghToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
+const apiKey = process.env.P12_API_KEY || process.env.OIOL_API_KEY || '';
 const apiBase = 'https://api.github.com';
-const modelsUrl = process.env.P12_MODELS_URL || 'https://models.github.ai/inference/chat/completions';
+const modelsUrl = process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions';
 const models = {
-  R1: process.env.P12_MODEL_R1 || 'openai/gpt-4o-mini',
-  R2: process.env.P12_MODEL_R2 || 'meta/llama-3.3-70b-instruct'
+  R1: process.env.P12_MODEL_R1 || 'nvidia/nemotron-3.5-super-vl:free',
+  R2: process.env.P12_MODEL_R2 || 'nvidia/nemotron-3.5-super-vl:free'
 };
 const slots = (process.env.P12_SLOTS || 'R1,R2').split(',').map(value => value.trim()).filter(Boolean);
 const limitIndex = process.argv.indexOf('--limit');
@@ -21,7 +22,7 @@ const tokenize = value => [...new Set(String(value || '').toLowerCase().split(/[
 
 function ghHeaders() {
   return {
-    Authorization: 'Bearer ' + token,
+    Authorization: 'Bearer ' + ghToken,
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
     'User-Agent': 'oiol-p12-ai-review'
@@ -140,17 +141,37 @@ function promptFor(item, evidence, slot) {
 }
 
 async function callModel(model, messages) {
-  const response = await fetch(modelsUrl, {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 4000, messages })
-  });
-  const text = await response.text();
-  if (!response.ok) throw new Error('Model ' + model + ' HTTP ' + response.status + ': ' + text.slice(0, 300));
-  const payload = JSON.parse(text);
-  const content = payload.choices?.[0]?.message?.content;
-  if (!content) throw new Error('Model ' + model + ' returned no content');
-  return content;
+  let lastError = 'unknown model failure';
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    let status = 0;
+    try {
+      const response = await fetch(modelsUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + apiKey,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner',
+          'X-Title': 'OIOL P12 annotation'
+        },
+        body: JSON.stringify({ model, temperature: 0.2, max_tokens: 6000, messages })
+      });
+      status = response.status;
+      const text = await response.text();
+      if (response.ok) {
+        const payload = JSON.parse(text);
+        const content = payload.choices?.[0]?.message?.content;
+        if (content) return content;
+        lastError = 'Model ' + model + ' returned no content (finish_reason=' + (payload.choices?.[0]?.finish_reason || 'unknown') + ')';
+      } else {
+        lastError = 'Model ' + model + ' HTTP ' + response.status + ': ' + text.slice(0, 300);
+      }
+    } catch (error) {
+      lastError = 'Model ' + model + ' request failed: ' + error.message;
+    }
+    if (![429, 500, 502, 503, 504].includes(status) || attempt === 4) break;
+    await new Promise(resolve => setTimeout(resolve, attempt * 5000));
+  }
+  throw new Error(lastError);
 }
 
 const fence = String.fromCharCode(96, 96, 96);
