@@ -77,7 +77,7 @@ async function listModels(slot) {
     const response = await fetch(base.replace(/\/$/, '') + '/models', { headers: { authorization: 'Bearer ' + key }, signal: AbortSignal.timeout(30000) });
     const payload = await response.json().catch(() => null);
     const ids = Array.isArray(payload?.data) ? payload.data.map(item => item.id) : Array.isArray(payload?.models) ? payload.models.map(item => item.id || item) : Array.isArray(payload) ? payload.map(item => item.id || item) : [];
-    const needle = (value('P12_MODEL_FILTER', 'llama,qwen,deepseek,nemotron,phi,gpt-oss,gemini,mistral').split(',').filter(Boolean));
+    const needle = (value(['P12_MODEL_FILTER'], 'llama,qwen,deepseek,nemotron,phi,gpt-oss,gemini,mistral').split(',').filter(Boolean));
     return { sample: ids, instructCandidates: ids.filter(id => /instruct|-it\b|chat|flash|large|reason/i.test(id)),
       httpStatus: response.status,
       modelCount: ids.length,
@@ -89,11 +89,11 @@ async function listModels(slot) {
 }
 
 async function sweepCandidates() {
-  const slot = value('P12_SWEEP_SLOT', 'R1');
+  const slot = value(['P12_SWEEP_SLOT'], 'R1');
   const endpoint = value(['P12_MODELS_URL_' + slot, 'P12_MODELS_URL'], defaultEndpoints[slot]);
   const key = bearer(slot);
-  const candidates = String(value('P12_MODEL_CANDIDATES', '')).split(',').map(id => id.trim()).filter(Boolean);
-  const tokenCaps = String(value('P12_SWEEP_TOKENS', '1024')).split(',').map(v => Number(v)).filter(n => n > 0);
+  const candidates = String(value(['P12_MODEL_CANDIDATES'], '')).split(',').map(id => id.trim()).filter(Boolean);
+  const tokenCaps = String(value(['P12_SWEEP_TOKENS'], '1024')).split(',').map(v => Number(v)).filter(n => n > 0);
   if (!key || candidates.length === 0) return { skipped: true, reason: candidates.length === 0 ? 'no P12_MODEL_CANDIDATES' : 'no key', slot };
   const headers = { authorization: 'Bearer ' + key, 'content-type': 'application/json' };
   if (new URL(endpoint).host.includes('openrouter.ai')) {
