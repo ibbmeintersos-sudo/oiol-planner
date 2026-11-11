@@ -100,4 +100,39 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-
+      - name: Commit evaluation outputs
+        if: always()
+        shell: bash
+        env:
+          P12_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          stage="$RUNNER_TEMP/evidence"
+          clone="$RUNNER_TEMP/clone"
+          mkdir -p "$stage/cases" "$stage/diagnostics"
+          for f in manifest.json adjudication-summary.json assemble-summary.json acquire-summary.txt validate-summary.json score-summary.json commit-attempt.txt; do
+            if [ -f "$CORPUS_ROOT/$f" ]; then
+              if [ "$f" = "manifest.json" ]; then cp "$CORPUS_ROOT/$f" "$stage/corpus-manifest.json"; else cp "$CORPUS_ROOT/$f" "$stage/diagnostics/"; fi
+            fi
+          done
+          if [ -d "$CORPUS_ROOT/cases" ]; then cp -r "$CORPUS_ROOT/cases/." "$stage/cases/"; fi
+          if [ -f benchmarks/results/real-world-benchmark.json ]; then cp benchmarks/results/real-world-benchmark.json "$stage/real-world-benchmark.json"; fi
+          if [ -f benchmarks/real-world/review-freeze.json ]; then cp benchmarks/real-world/review-freeze.json "$stage/review-freeze.json"; fi
+          url=$(git config --get remote.origin.url)
+          git clone --quiet --depth 20 --branch "$P12_BRANCH" "$url" "$clone"
+          for key in $(git config --get-regexp "^http\." | cut -d" " -f1); do
+            git -C "$clone" config "$key" "$(git config --get "$key")"
+          done
+          mkdir -p "$clone/benchmarks/real-world/adjudication/cases" "$clone/benchmarks/real-world/evaluation-diagnostics"
+          if [ -f "$stage/review-freeze.json" ]; then cp "$stage/review-freeze.json" "$clone/benchmarks/real-world/review-freeze.json"; fi
+          if [ -f "$stage/corpus-manifest.json" ]; then cp "$stage/corpus-manifest.json" "$clone/benchmarks/real-world/adjudication/corpus-manifest.json"; fi
+          if [ -f "$stage/real-world-benchmark.json" ]; then cp "$stage/real-world-benchmark.json" "$clone/benchmarks/real-world/adjudication/real-world-benchmark.json"; fi
+          if [ -f "$stage/diagnostics/score-summary.json" ]; then cp "$stage/diagnostics/score-summary.json" "$clone/benchmarks/real-world/adjudication/scoring-log.json"; fi
+          if compgen -G "$stage/cases/*" > /dev/null; then cp -r "$stage/cases/." "$clone/benchmarks/real-world/adjudication/cases/"; fi
+          if compgen -G "$stage/diagnostics/*" > /dev/null; then cp -r "$stage/diagnostics/." "$clone/benchmarks/real-world/evaluation-diagnostics/"; fi
+          git -C "$clone" config user.name "oiol-p12-bot"
+          git -C "$clone" config user.email "oiol-p12-bot@users.noreply.github.com"
+          git -C "$clone" add -A benchmarks/real-world
+          if git -C "$clone" diff --cached --quiet; then echo "No evaluation outputs to commit"; exit 0; fi
+          git -C "$clone" commit --quiet -m "chore(p12): record freeze, adjudication and scoring outputs"
+          git -C "$clone" push --quiet origin "HEAD:refs/heads/$P12_BRANCH"
