@@ -1,21 +1,17 @@
 {
   "quota": {
     "R1": {
-      "limit": null,
-      "usage": 0.181973742,
-      "limit_remaining": null,
-      "is_free_tier": true
+      "provider": "integrate.api.nvidia.com",
+      "note": "key quota probe is OpenRouter specific"
     },
     "R2": {
-      "limit": null,
-      "usage": 0.181973742,
-      "limit_remaining": null,
-      "is_free_tier": true
+      "provider": "integrate.api.nvidia.com",
+      "note": "key quota probe is OpenRouter specific"
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T06:04:50.999Z",
-  "cases": 13,
+  "generatedAt": "2026-11-11T21:42:59.532Z",
+  "cases": 1,
   "offset": 11,
   "slots": [
     "R1",
@@ -23,31 +19,11 @@
   ],
   "written": 0,
   "failures": [
-    "home-assistant-unifi-disabled-entities/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "home-assistant-unifi-disabled-entities/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "sindresorhus-883-preserve-caller-stack-for-schema-val/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "sindresorhus-883-preserve-caller-stack-for-schema-val/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pallets-404-update-project-to-use-uv-for-depende/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pallets-404-update-project-to-use-uv-for-depende/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pallets-406-remove-previously-deprecated-code/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pallets-406-remove-previously-deprecated-code/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "go-chi-1213-middleware-preserve-status-after-emp/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "go-chi-1213-middleware-preserve-status-after-emp/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "go-chi-1218-middleware-parse-quoted-contentchars/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "go-chi-1218-middleware-parse-quoted-contentchars/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "burntsushi-3578-ignore-respect-linked-worktree-exclu/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "burntsushi-3578-ignore-respect-linked-worktree-exclu/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "burntsushi-3560-ignore-reuse-incremental-matchers-fo/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "burntsushi-3560-ignore-reuse-incremental-matchers-fo/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pydantic-14249-support-list-and-decimaltuple-inputs/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pydantic-14249-support-list-and-decimaltuple-inputs/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pydantic-14246-change-the-arguments-schema-for-vali/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "pydantic-14246-change-the-arguments-schema-for-vali/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "nestjs-18385-roll-back-modules-on-failed-lazy-loa/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "nestjs-18385-roll-back-modules-on-failed-lazy-loa/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "nestjs-18419-keep-the-fields-of-grouped-item-erro/R1: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi",
-    "nestjs-18419-keep-the-fields-of-grouped-item-erro/R2: Model nvidia/nemotron-3.5-super-vl:free HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day\",\"code\":429,\"metadata\":{\"headers\":{\"X-RateLimit-Limit\":\"50\",\"X-RateLimit-Remaining\":\"0\",\"X-RateLimit-Reset\":\"1794441600000\"},\"limit_source\":\"openrouter_free_tier_daily\",\"remedy_hi"
-  ]
+    "home-assistant-unifi-disabled-entities/R1: Model deepseek-ai/deepseek-v4.1-flash request failed: The operation was aborted due to timeout",
+    "CALL_BUDGET_EXHAUSTED: 4 calls used of a 4 budget"
+  ],
+  "callsUsed": 4,
+  "callBudget": 4,
+  "quotaExhausted": false,
+  "budgetExhausted": true
 }
