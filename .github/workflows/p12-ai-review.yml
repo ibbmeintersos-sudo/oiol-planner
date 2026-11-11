@@ -48,14 +48,14 @@ jobs:
           P12_SLOTS: ${{ inputs.slots || 'R1,R2' }}
           P12_MODELS_URL_R1: https://integrate.api.nvidia.com/v1/chat/completions
           P12_MODEL_R1: deepseek-ai/deepseek-v4.1-flash
-          P12_MAX_TOKENS_R1: '6000'
+          P12_MAX_TOKENS_R1: '12000'
           P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
           P12_MODEL_R2: minimaxai/minimax-m3.1-flash
-          P12_MAX_TOKENS_R2: '6000'
-          P12_MAX_EVIDENCE_FILES: '14'
-          P12_FILE_CHARS: '3000'
-          P12_MAX_EVIDENCE_CHARS: '45000'
-          P12_TREE_SAMPLE: '150'
+          P12_MAX_TOKENS_R2: '12000'
+          P12_MAX_EVIDENCE_FILES: '10'
+          P12_FILE_CHARS: '2500'
+          P12_MAX_EVIDENCE_CHARS: '30000'
+          P12_TREE_SAMPLE: '60'
           P12_CALL_TIMEOUT: '300000'
           P12_SKIP_EXISTING: '1'
         run: |
