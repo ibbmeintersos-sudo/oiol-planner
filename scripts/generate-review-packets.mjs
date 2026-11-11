@@ -86,51 +86,7 @@ export function parseReviewerIds(argv) {
     throw new Error('--reviewers requires exactly two distinct reviewer IDs');
   }
   if (!ids.every(id => /^[a-zA-Z0-9][a-zA-Z0-9._-]{1,63}$/.test(id))) {
-    throw new Error('--reviewers IDs must match ^[a-zA-Z0-9][a-zA-Z0-9._-]{1,63}argv = process.argv.slice(2)) {
-  const checkOnly = argv.includes('--check');
-  const base = path.join(root, 'benchmarks/real-world');
-  const worklist = JSON.parse(await fs.readFile(path.join(base, 'annotation-worklist.json'), 'utf8'));
-  const result = buildReviewPackets({ worklist, reviewerIds: parseReviewerIds(argv) });
-  if (!result.ready) {
-    process.stdout.write(JSON.stringify({ ready: false, errors: result.errors }, null, 2) + '\n');
-    return 2;
-  }
-  const mismatches = [];
-  for (const packet of result.packets) {
-    const target = path.join(root, packet.relativePath);
-    if (checkOnly) {
-      const existing = await fs.readFile(target, 'utf8').catch(() => null);
-      if (existing !== packet.content) mismatches.push(packet.relativePath);
-    } else {
-      await fs.mkdir(path.dirname(target), { recursive: true });
-      await fs.writeFile(target, packet.content);
-    }
-  }
-  const assignmentPath = path.join(base, 'review-assignments.json');
-  const assignmentContent = JSON.stringify(result.assignments, null, 2) + '\n';
-  if (checkOnly) {
-    const existing = await fs.readFile(assignmentPath, 'utf8').catch(() => null);
-    if (existing !== assignmentContent) mismatches.push('benchmarks/real-world/review-assignments.json');
-  } else {
-    await fs.writeFile(assignmentPath, assignmentContent);
-  }
-  const summary = {
-    ready: mismatches.length === 0,
-    mode: checkOnly ? 'check' : 'write',
-    caseCount: result.caseCount,
-    packetCount: result.packetCount,
-    reviewerSlots: result.assignments.reviewerSlots,
-    mismatches
-  };
-  process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
-  return summary.ready ? 0 : 2;
-}
-
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  try { process.exitCode = await main(); }
-  catch (error) { console.error('Review packet generation error: ' + error.message); process.exitCode = 1; }
-}
-);
+    throw new Error('--reviewers IDs must match ^[a-zA-Z0-9][a-zA-Z0-9._-]{1,63}$');
   }
   return ids;
 }
@@ -139,7 +95,7 @@ async function main(argv = process.argv.slice(2)) {
   const checkOnly = argv.includes('--check');
   const base = path.join(root, 'benchmarks/real-world');
   const worklist = JSON.parse(await fs.readFile(path.join(base, 'annotation-worklist.json'), 'utf8'));
-  const result = buildReviewPackets({ worklist });
+  const result = buildReviewPackets({ worklist, reviewerIds: parseReviewerIds(argv) });
   if (!result.ready) {
     process.stdout.write(JSON.stringify({ ready: false, errors: result.errors }, null, 2) + '\n');
     return 2;
