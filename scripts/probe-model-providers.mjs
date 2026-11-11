@@ -77,7 +77,7 @@ async function listModels(slot) {
     const payload = await response.json().catch(() => null);
     const ids = Array.isArray(payload?.data) ? payload.data.map(item => item.id) : Array.isArray(payload?.models) ? payload.models.map(item => item.id || item) : Array.isArray(payload) ? payload.map(item => item.id || item) : [];
     const needle = (value('P12_MODEL_FILTER', 'llama,qwen,deepseek,nemotron,phi,gpt-oss,gemini,mistral').split(',').filter(Boolean));
-    return {
+    return { sample: ids.slice(0, 40),
       httpStatus: response.status,
       modelCount: ids.length,
       candidates: ids.filter(id => needle.some(term => String(id).toLowerCase().includes(term))).slice(0, 60)
