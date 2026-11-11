@@ -44,6 +44,7 @@ async function probeSlot(slot) {
     try { payload = JSON.parse(text); } catch { record.nonJsonBodyPrefix = text.slice(0, 120); }
     const choice = payload?.choices?.[0];
     record.contentLength = (choice?.message?.content || '').length;
+    record.reasoningLength = (choice?.message?.reasoning_content || choice?.message?.reasoning || '').length;
     record.finishReason = choice?.finish_reason || null;
     record.ok = response.status < 400 && record.contentLength > 0;
     if (!record.ok) record.errorBodyPrefix = (payload?.error?.message || payload?.detail || text || '').slice(0, 200);
@@ -87,8 +88,45 @@ async function listModels(slot) {
   }
 }
 
+async function sweepCandidates() {
+  const slot = value('P12_SWEEP_SLOT', 'R1');
+  const endpoint = value(['P12_MODELS_URL_' + slot, 'P12_MODELS_URL'], defaultEndpoints[slot]);
+  const key = bearer(slot);
+  const candidates = String(value('P12_MODEL_CANDIDATES', '')).split(',').map(id => id.trim()).filter(Boolean);
+  const tokenCaps = String(value('P12_SWEEP_TOKENS', '1024')).split(',').map(v => Number(v)).filter(n => n > 0);
+  if (!key || candidates.length === 0) return { skipped: true, reason: candidates.length === 0 ? 'no P12_MODEL_CANDIDATES' : 'no key', slot };
+  const headers = { authorization: 'Bearer ' + key, 'content-type': 'application/json' };
+  if (new URL(endpoint).host.includes('openrouter.ai')) {
+    headers['http-referer'] = 'https://github.com/ibbmeintersos-sudo/oiol-planner';
+    headers['x-title'] = 'OIOL P12 probe';
+  }
+  const results = [];
+  for (const model of candidates.slice(0, 24)) {
+    for (const maxTokens of tokenCaps) {
+      const record = { slot, model, maxTokens };
+      const body = { model, temperature: 0.2, max_tokens: maxTokens, messages: [{ role: 'user', content: 'Reply with a JSON object on one line: {"ok":true}' }] };
+      try {
+        const response = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(body), signal: AbortSignal.timeout(90000) });
+        const text = await response.text();
+        record.httpStatus = response.status;
+        let payload = null;
+        try { payload = JSON.parse(text); } catch { record.nonJsonBodyPrefix = text.slice(0, 120); }
+        const choice = payload?.choices?.[0];
+        record.contentLength = (choice?.message?.content || '').length;
+        record.reasoningLength = (choice?.message?.reasoning_content || choice?.message?.reasoning || '').length;
+        record.finishReason = choice?.finish_reason || null;
+        record.ok = response.status < 400 && record.contentLength > 0;
+        if (!record.ok) record.errorBodyPrefix = (payload?.error?.message || payload?.detail || text || '').slice(0, 160);
+      } catch (error) {
+        record.error = String(error?.name || 'SweepError') + ': ' + String(error?.message || error).slice(0, 120);
+      }
+      results.push(record);
+    }
+  }
+  return { slot, endpoint: new URL(endpoint).host, results: results.slice(0, 80) };
+}
 export async function main() {
-  const report = { schemaVersion: '1.0.0', createdAt: new Date().toISOString(), slots: [], models: {} };
+  const report = { schemaVersion: '1.0.0', createdAt: new Date().toISOString(), slots: [], models: {}, sweep: await sweepCandidates() };
   for (const slot of ['R1', 'R2']) {
     report.slots.push(await probeSlot(slot));
     report.models[slot] = await listModels(slot);
