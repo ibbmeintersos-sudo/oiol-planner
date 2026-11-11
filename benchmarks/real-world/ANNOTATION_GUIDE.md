@@ -66,6 +66,22 @@ Compare the two frozen records dimension by dimension.
 
 The adjudication record must say whether adjudication was required, its final status, who adjudicated (stable ID only), and a rationale. A pending adjudication blocks the case from the accepted corpus.
 
+### Automated adjudication modes
+
+`scripts/adjudicate-independent-reviews.mjs` compares the two frozen records mechanically and can emit either corpus:
+
+- `--mode intersection` (default) keeps only items both slots accepted, while `unknowns` and `risks` always take the union. It is a strict lower bound: if one slot leaves a dimension empty, the intersection is empty no matter how confident the other slot was.
+- `--mode union` keeps every item either slot accepted. It is the coverage upper bound.
+
+Score both and report the pair as a range. While the slots disagree, neither mode alone is a definitive accuracy number, and automated adjudication is a bookkeeping step, not a substitute for a reviewer recording a judgement.
+
+Scoring conventions used by `scripts/run-real-world-benchmark.mjs`:
+
+- Path dimensions compare repo-relative path strings.
+- `scannerSymbols` compares `file::kind::name` and `dependencyEdges` compares `from -> to`. Ground truth may store objects (`{file,name,kind}`, `{from,to}`) or pre-joined strings; both sides are normalized before comparison.
+- Empty expected set with empty predicted set scores `1`; empty expected set with a non-empty predicted set scores precision `0`. Those are conventions, not evidence of correctness.
+- `dependencyEdges` covers resolved local import edges only, so unresolved specifiers and alias-only imports appear as misses.
+
 ## Prohibited shortcuts
 
 - Do not copy historical PR changed paths into `directFiles` or `affectedFiles` without independent reasoning.
