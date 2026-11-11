@@ -12,6 +12,12 @@ const apiKeys = {
 };
 const apiBase = 'https://api.github.com';
 const modelsUrl = process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions';
+// Provider request shapes differ: OpenRouter takes attribution headers and a large output
+cap, while NVIDIA NIM documents max_tokens at 4096 and treats reasoning effort as model specific.
+const isOpenRouter = modelsUrl.includes('openrouter.ai');
+const maxTokens = Number(process.env.P12_MAX_TOKENS || (isOpenRouter ? 8000 : 4096));
+const reasoningEffort = String(process.env.P12_REASONING_EFFORT ?? (isOpenRouter ? 'none' : '')).trim();
+const requestTemperature = Math.min(1, Math.max(0, Number(process.env.P12_TEMPERATURE || 0.2)));
 const models = {
   R1: process.env.P12_MODEL_R1 || 'nvidia/nemotron-3.5-super-vl:free',
   R2: process.env.P12_MODEL_R2 || 'nvidia/nemotron-3.5-super-vl:free'
@@ -165,10 +171,15 @@ async function callModel(model, messages, slot) {
         headers: {
           Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1),
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner',
-          'X-Title': 'OIOL P12 annotation'
+          ...(isOpenRouter ? { 'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner', 'X-Title': 'OIOL P12 annotation' } : {})
         },
-        body: JSON.stringify({ model, temperature: 0.2, max_tokens: 8000, reasoning: { effort: 'none' }, messages })
+        body: JSON.stringify({
+          model,
+          temperature: requestTemperature,
+          max_tokens: maxTokens,
+          ...(reasoningEffort ? { reasoning: { effort: reasoningEffort } } : {}),
+          messages
+        })
       });
       status = response.status;
       const text = await response.text();
@@ -234,6 +245,7 @@ function normalize(review, item, slot, model) {
 }
 
 async function keyQuota() {
+  if (!isOpenRouter) return { provider: new URL(modelsUrl).host, note: 'key quota probe is OpenRouter specific' };
   const out = {};
   for (const slot of ['R1', 'R2']) {
     try {
