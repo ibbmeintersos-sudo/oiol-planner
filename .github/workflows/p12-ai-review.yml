@@ -49,8 +49,9 @@ jobs:
           P12_MODELS_URL_R1: https://integrate.api.nvidia.com/v1/chat/completions
           P12_MODEL_R1: meta/llama-3.3-70b-instruct
           P12_MAX_TOKENS_R1: '4000'
-          P12_MODELS_URL_R2: https://openrouter.ai/api/v1/chat/completions
-          P12_MODEL_R2: nvidia/nemotron-3.5-super-vl:free
+          P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODEL_R2: deepseek-ai/deepseek-v4.1-flash
+          P12_MAX_TOKENS_R2: '4000'
           P12_SKIP_EXISTING: '1'
         run: |
           OFFSET="${{ inputs.offset || '0' }}"
