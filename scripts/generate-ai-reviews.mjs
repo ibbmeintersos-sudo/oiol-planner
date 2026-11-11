@@ -245,8 +245,14 @@ async function main() {
   for (const [index, item] of cases.entries()) {
     for (const slot of slots) {
       const target = path.join(root, 'benchmarks/real-world/reviews', item.caseId, slot + '.json');
-      const exists = await fs.readFile(target, 'utf8').then(() => true).catch(() => false);
-      if (exists && process.env.P12_SKIP_EXISTING === '1') continue;
+      const existing = await fs.readFile(target, 'utf8').catch(() => null);
+      if (existing && process.env.P12_SKIP_EXISTING === '1') {
+        try {
+          if (validateReview(JSON.parse(existing), worklist).ready) continue;
+        } catch {
+          // Invalid skeleton packets are regenerated.
+        }
+      }
       try {
         const review = await annotate(item, slot, worklist);
         await fs.mkdir(path.dirname(target), { recursive: true });
