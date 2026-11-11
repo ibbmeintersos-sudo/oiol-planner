@@ -47,10 +47,10 @@ jobs:
           P12_API_KEY_R2: ${{ secrets.OIOL_REVIEW_API_KEY }}
           P12_SLOTS: ${{ inputs.slots || 'R1,R2' }}
           P12_MODELS_URL_R1: https://integrate.api.nvidia.com/v1/chat/completions
-          P12_MODEL_R1: nvidia/llama-3.1-nemotron-70b-instruct
+          P12_MODEL_R1: deepseek-ai/deepseek-v4.1-flash
           P12_MAX_TOKENS_R1: '4000'
           P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
-          P12_MODEL_R2: deepseek-ai/deepseek-v4.1-flash
+          P12_MODEL_R2: mistralai/mistral-large-4-1t-a52b
           P12_MAX_TOKENS_R2: '4000'
           P12_SKIP_EXISTING: '1'
         run: |
