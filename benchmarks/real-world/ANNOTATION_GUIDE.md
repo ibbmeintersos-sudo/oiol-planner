@@ -2,12 +2,21 @@
 
 ## Purpose
 
-Create a defensible expected-impact record for one historical change against its exact pinned **base** snapshot. The current 36-case queue is in [annotation-worklist.json](./annotation-worklist.json); it is a reviewer worklist, not a validated corpus or source of ground-truth labels. The annotation is a human ground-truth artifact; it is not a transcription of the pull request's changed-file list and must never be seeded from OIOL output.
+Create a defensible expected-impact record for one historical change against its exact pinned **base** snapshot. The current 36-case queue is in [annotation-worklist.json](./annotation-worklist.json); it is a reviewer worklist, not a validated corpus or source of ground-truth labels. The annotation is a declared ground-truth artifact; it is not a transcription of the pull request's changed-file list and must never be seeded from OIOL output.
+
+## AI-generated annotation disclosure
+
+The current corpus annotations are **AI-generated, not human-reviewed**. Each reviewer slot (`R1`, `R2`) is an independent run of `nvidia/nemotron-3.5-super-vl:free` through OpenRouter, given the same change request and pinned base snapshot. The slots do not see OIOL output, scores, confidence, diagnostics, or each other's annotation before freezing.
+
+- `independence.attested: true` means the repository operator attests that the generation run was isolated from OIOL output and from the other slot. It does **not** assert human independence.
+- The model declaration, model ID, and generation timestamp are stored in every review file; the run manifest is `benchmarks/real-world/reviews/.p12-run.json`.
+- AI annotations can be over-inclusive and are weaker evidence than expert human review. Do not describe this corpus as human-annotated or expert-validated.
+- Disagreements between slots remain visible and adjudication stays `pending` until a reviewer records it.
 
 ## Blinding and reviewer independence
 
 - Assign two distinct stable reviewer IDs before annotation. Do not put names, email addresses, employer identifiers, or other personal data in the corpus.
-- Reviewers work independently and must not see OIOL plans, Scanner output, confidence values, diagnostics, or each other's annotation.
+- Reviewer slots work independently and must not see OIOL plans, Scanner output, confidence values, diagnostics, or each other's annotation.
 - Reviewers may inspect the natural-language request, the pinned base snapshot, the historical change commit/PR and its discussion, and public documentation needed to understand contracts.
 - A reviewer must disclose a conflict if they authored, implemented, or directly reviewed the historical change. A conflicted reviewer cannot serve as one of the two independent reviewers.
 - Record evidence notes as paths plus symbol/section names and, where practical, line ranges or immutable commit URLs. Avoid unsupported assertions.
@@ -72,7 +81,7 @@ A case is annotation-ready only when:
 - [ ] the exact base snapshot is acquired and fingerprinted;
 - [ ] Git tree path-set parity and license hash are verified;
 - [ ] the change request is written independently of OIOL output;
-- [ ] two non-conflicted reviewers are assigned;
+- [ ] two distinct, non-conflicted reviewer slots are assigned (human reviewers or declared AI runs);
 - [ ] both reviewers can access the same immutable evidence set;
 - [ ] OIOL output remains hidden until both records are frozen.
 
