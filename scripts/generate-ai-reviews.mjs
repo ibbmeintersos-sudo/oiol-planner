@@ -73,11 +73,11 @@ const binaryOrNoise = file => /(^|\/)(node_modules|vendor|dist|build|target|\.gi
   /\.(png|jpe?g|gif|svg|ico|pdf|zip|gz|tgz|lock|map|min\.js|min\.css|woff2?|ttf|eot|mp4|webm|jar|class|so|dylib|dll|exe|bin|wasm)$/i.test(file) ||
   /(^|\/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|Cargo\.lock|go\.sum|composer\.lock|Gemfile\.lock)$/i.test(file);
 
-function scoreFile(file, keywords) {
+function scoreFile(file, keywords, weights) {
   const lower = file.toLowerCase();
   let score = 0;
   for (const keyword of keywords) {
-    if (lower.includes(keyword)) score += keyword.length >= 6 ? 3 : 2;
+    if (lower.includes(keyword)) score += (keyword.length >= 6 ? 3 : 2) * (weights.get(keyword) || 1);
   }
   if (/(^|\/)(src|source|lib|app|pkg|packages|internal)\//.test(lower)) score += 1;
   if (/(test|spec)/.test(lower)) score += 1;
@@ -89,14 +89,26 @@ async function buildEvidence(item) {
   const tree = await ghJson(apiBase + '/repos/' + item.repository + '/git/trees/' + item.baseCommit + '?recursive=1');
   const files = (tree.tree || []).filter(entry => entry.type === 'blob').map(entry => entry.path);
   const keywords = tokenize(item.changeRequest + ' ' + item.pullRequestTitle + ' ' + item.caseId.replace(/-/g, ' '));
+  // Rare keywords (a component name such as "unifi") identify the change area
+  // better than generic ones such as "entity", so weight them by inverse tree frequency.
+  const weights = new Map(keywords.map(keyword => {
+    let matches = 0;
+    for (const file of files) if (file.toLowerCase().includes(keyword)) matches += 1;
+    return [keyword, 1 + (files.length ? (1 - matches / files.length) * 6 : 1)];
+  }));
   const ranked = files
     .filter(file => !binaryOrNoise(file))
-    .map(file => ({ file, score: scoreFile(file, keywords) }))
+    .map(file => ({ file, score: scoreFile(file, keywords, weights) }))
     .filter(entry => entry.score > 0)
     .sort((a, b) => b.score - a.score || a.file.localeCompare(b.file));
   const manifests = files.filter(file => /^(package\.json|pyproject\.toml|go\.mod|Cargo\.toml|composer\.json|pom\.xml|build\.gradle|setup\.py)$/.test(file));
   const tests = files.filter(file => /(^|\/)(test|tests|spec|__tests__)\//i.test(file) || /\.(test|spec)\.[a-z]+$/i.test(file)).slice(0, 40);
-  const chosen = [...new Set([...manifests, ...ranked.slice(0, evidenceFileCap).map(entry => entry.file), ...tests.slice(0, 4)])].slice(0, evidenceFileCap);
+  const rarest = keywords
+    .map(keyword => ({ keyword, weight: weights.get(keyword) || 1 }))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 4);
+  const seeds = rarest.flatMap(entry => ranked.filter(other => other.file.toLowerCase().includes(entry.keyword)).slice(0, 3).map(other => other.file));
+  const chosen = [...new Set([...manifests, ...seeds, ...ranked.slice(0, evidenceFileCap).map(entry => entry.file), ...tests.slice(0, 4)])].slice(0, evidenceFileCap);
   const contents = [];
   for (const file of chosen) {
     const text = await rawFile(item.repository, item.baseCommit, file);
@@ -104,7 +116,7 @@ async function buildEvidence(item) {
   }
   return {
     keywords,
-    treeSample: files.filter(file => !binaryOrNoise(file)).slice(0, treeSampleCap),
+    treeSample: [...new Set([...seeds, ...files.filter(file => !binaryOrNoise(file))])].slice(0, treeSampleCap),
     contents: contents.join('\n\n')
   };
 }
