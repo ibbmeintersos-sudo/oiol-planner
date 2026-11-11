@@ -261,9 +261,9 @@ function normalize(review, item, slot, model) {
 }
 
 async function keyQuota() {
-    if (!isOpenRouterSlot(slot)) { out[slot] = { provider: new URL(slotEndpoints[slot]).host, note: 'key quota probe is OpenRouter specific' }; continue; }
   const out = {};
   for (const slot of ['R1', 'R2']) {
+    if (!isOpenRouterSlot(slot)) { out[slot] = { provider: new URL(slotEndpoints[slot]).host, note: 'key quota probe is OpenRouter specific' }; continue; }
     try {
       const response = await fetch('https://openrouter.ai/api/v1/key', { headers: { Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1) } });
       const payload = await response.json();
