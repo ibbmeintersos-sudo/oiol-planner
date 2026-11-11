@@ -1,23 +1,24 @@
 {
   "schemaVersion": "1.0.0",
-  "createdAt": "2026-11-11T20:04:50.937Z",
+  "createdAt": "2026-11-11T21:17:35.566Z",
   "slots": [
     {
       "slot": "R1",
       "provider": "integrate.api.nvidia.com",
-      "model": "meta/llama-3.3-70b-instruct",
+      "model": "nvidia/llama-3.1-nemotron-70b-instruct",
       "keyPresent": true,
       "keyLength": 70,
-      "httpStatus": 410,
+      "httpStatus": 404,
       "contentLength": 0,
+      "reasoningLength": 0,
       "finishReason": null,
       "ok": false,
-      "errorBodyPrefix": "The model 'meta/llama-3.3-70b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+      "errorBodyPrefix": "Function '9b96341b-9791-4db9-a00d-4e43aa192a39': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
     },
     {
       "slot": "R2",
-      "provider": "openrouter.ai",
-      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "provider": "integrate.api.nvidia.com",
+      "model": "deepseek-ai/deepseek-v4.1-flash",
       "keyPresent": false,
       "keyLength": 0,
       "error": "no api key configured for this slot"
@@ -156,5 +157,10 @@
       "skipped": true,
       "reason": "no key"
     }
+  },
+  "sweep": {
+    "skipped": true,
+    "reason": "no key",
+    "slot": "/opt/hostedtoolcache/node/22.23.4/x64/bin/node"
   }
 }
