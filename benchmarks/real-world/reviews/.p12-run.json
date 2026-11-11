@@ -10,19 +10,18 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T22:46:58.376Z",
+  "generatedAt": "2026-11-11T23:10:04.611Z",
   "cases": 1,
   "offset": 11,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 0,
+  "written": 1,
   "failures": [
-    "home-assistant-unifi-disabled-entities/R1: Model deepseek-ai/deepseek-v4.1-flash returned no content (finish_reason=length)",
-    "home-assistant-unifi-disabled-entities/R2: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+    "home-assistant-unifi-disabled-entities/R1: Model deepseek-ai/deepseek-v4.1-flash request failed: The operation was aborted due to timeout"
   ],
-  "callsUsed": 6,
+  "callsUsed": 4,
   "callBudget": 6,
   "quotaExhausted": false,
   "budgetExhausted": false
