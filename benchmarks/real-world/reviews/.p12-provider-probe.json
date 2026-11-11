@@ -1,24 +1,24 @@
 {
   "schemaVersion": "1.0.0",
-  "createdAt": "2026-11-11T21:21:53.329Z",
+  "createdAt": "2026-11-11T21:32:22.089Z",
   "slots": [
     {
       "slot": "R1",
       "provider": "integrate.api.nvidia.com",
-      "model": "nvidia/llama-3.1-nemotron-51b-instruct",
+      "model": "deepseek-ai/deepseek-v4.1-flash",
       "keyPresent": true,
       "keyLength": 70,
-      "httpStatus": 404,
+      "httpStatus": 200,
       "contentLength": 0,
-      "reasoningLength": 0,
-      "finishReason": null,
+      "reasoningLength": 35,
+      "finishReason": "length",
       "ok": false,
-      "errorBodyPrefix": "Function '5beba52c-65a9-4f46-8cd9-656689a1b205': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
+      "errorBodyPrefix": "{\"id\":\"98ab060b755b4090\",\"choices\":[{\"index\":0,\"message\":{\"content\":null,\"refusal\":null,\"role\":\"assistant\",\"reasoning_content\":\"The user wants me to reply with the\"},\"finish_reason\":\"length\",\"logprobs"
     },
     {
       "slot": "R2",
       "provider": "integrate.api.nvidia.com",
-      "model": "deepseek-ai/deepseek-v4.1-flash",
+      "model": "mistralai/mistral-large-4-1t-a52b",
       "keyPresent": false,
       "keyLength": 0,
       "error": "no api key configured for this slot"
@@ -208,52 +208,8 @@
     "results": [
       {
         "slot": "R1",
-        "model": "nvidia/llama-3.1-nemotron-51b-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '5beba52c-65a9-4f46-8cd9-656689a1b205': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '84bf12ff-edbd-4435-baea-0fa6a7453d2e': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nvidia/nemotron-4-340b-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'b0fcd392-e905-4ab4-8eb9-aeae95c30b37': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nvidia/nemotron-3-super-120b-a12b",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'ac74040f-9fc9-4c5e-ac74-279ba5161d69': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
         "model": "nvidia/nemotron-3-ultra-550b-a55b",
-        "maxTokens": 1024,
+        "maxTokens": 4000,
         "httpStatus": 200,
         "contentLength": 11,
         "reasoningLength": 75,
@@ -262,193 +218,93 @@
       },
       {
         "slot": "R1",
-        "model": "nvidia/nemotron-nano-3-30b-a3b",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '2b2dcd47-c858-425a-9c04-4cacf2eac993': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-        "maxTokens": 1024,
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "maxTokens": 8000,
         "httpStatus": 200,
         "contentLength": 11,
-        "reasoningLength": 1264,
+        "reasoningLength": 75,
         "finishReason": "stop",
         "ok": true
       },
       {
         "slot": "R1",
-        "model": "openai/gpt-oss-20b",
-        "maxTokens": 1024,
-        "error": "TimeoutError: The operation was aborted due to timeout"
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "maxTokens": 4000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 1857,
+        "finishReason": "stop",
+        "ok": true
+      },
+      {
+        "slot": "R1",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "maxTokens": 8000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 1143,
+        "finishReason": "stop",
+        "ok": true
       },
       {
         "slot": "R1",
         "model": "deepseek-ai/deepseek-v4.1-flash",
-        "maxTokens": 1024,
+        "maxTokens": 4000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 169,
+        "finishReason": "stop",
+        "ok": true
+      },
+      {
+        "slot": "R1",
+        "model": "deepseek-ai/deepseek-v4.1-flash",
+        "maxTokens": 8000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 169,
+        "finishReason": "stop",
+        "ok": true
+      },
+      {
+        "slot": "R1",
+        "model": "mistralai/mistral-large-4-1t-a52b",
+        "maxTokens": 4000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 952,
+        "finishReason": "stop",
+        "ok": true
+      },
+      {
+        "slot": "R1",
+        "model": "mistralai/mistral-large-4-1t-a52b",
+        "maxTokens": 8000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 621,
+        "finishReason": "stop",
+        "ok": true
+      },
+      {
+        "slot": "R1",
+        "model": "minimaxai/minimax-m3.1-flash",
+        "maxTokens": 4000,
+        "httpStatus": 200,
+        "contentLength": 11,
+        "reasoningLength": 85,
+        "finishReason": "stop",
+        "ok": true
+      },
+      {
+        "slot": "R1",
+        "model": "minimaxai/minimax-m3.1-flash",
+        "maxTokens": 8000,
         "httpStatus": 200,
         "contentLength": 11,
         "reasoningLength": 72,
         "finishReason": "stop",
         "ok": true
-      },
-      {
-        "slot": "R1",
-        "model": "deepseek-ai/deepseek-coder-6.7b-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'e503b15c-62b0-4d69-b532-a88f0bfa2656': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "mistralai/mistral-large-2-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '7fadd4de-e22a-48e4-90e9-f02ef14a74b9': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "mistralai/mistral-large-4-1t-a52b",
-        "maxTokens": 1024,
-        "httpStatus": 200,
-        "contentLength": 11,
-        "reasoningLength": 593,
-        "finishReason": "stop",
-        "ok": true
-      },
-      {
-        "slot": "R1",
-        "model": "mistralai/mistral-7b-instruct-v0.3",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'cd89bd68-13e3-47a9-861e-9a62e6e14b05': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nv-mistralai/mistral-nemo-12b-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'f8c05193-d2e2-4f0f-bb4d-7ad70070002b': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nvidia/mistral-nemo-minitron-8b-8k-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '5aa06dd2-0a02-4a5d-be4c-bf88e956965d': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "google/gemma-3-12b-it",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'ee47df99-c92b-4dc9-b3a7-f3fb0f087b73': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "google/gemma-4-31b-it",
-        "maxTokens": 1024,
-        "error": "TimeoutError: The operation was aborted due to timeout"
-      },
-      {
-        "slot": "R1",
-        "model": "ibm/granite-3.0-8b-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '5a24a4f0-2d59-46b3-ac65-42307f2633d1': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "z-ai/glm-5.3-flash",
-        "maxTokens": 1024,
-        "error": "TimeoutError: The operation was aborted due to timeout"
-      },
-      {
-        "slot": "R1",
-        "model": "minimaxai/minimax-m3.1-flash",
-        "maxTokens": 1024,
-        "httpStatus": 200,
-        "contentLength": 11,
-        "reasoningLength": 88,
-        "finishReason": "stop",
-        "ok": true
-      },
-      {
-        "slot": "R1",
-        "model": "moonshotai/kimi-k2.6",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '23d4f03a-b8a6-4adb-a183-7daa083a09cc': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "microsoft/phi-3.5-moe-instruct",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'e6cab982-62f4-481e-9a7a-3dedb87dbd01': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "meta/codellama-70b",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function 'f6b06895-d073-4714-8bb2-26c09e9f6597': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
-      },
-      {
-        "slot": "R1",
-        "model": "nvidia/llama3-chatqa-1.5-70b",
-        "maxTokens": 1024,
-        "httpStatus": 404,
-        "contentLength": 0,
-        "reasoningLength": 0,
-        "finishReason": null,
-        "ok": false,
-        "errorBodyPrefix": "Function '46594287-38b9-481c-a37f-baa02f2d3ba1': Not found for account 'DYGwj6p7JNkXvHzhlGzF-ON5D5q3tKV2qIrloUPfKX8'"
       }
     ]
   }
