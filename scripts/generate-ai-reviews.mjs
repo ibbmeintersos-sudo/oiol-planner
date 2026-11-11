@@ -152,6 +152,7 @@ async function callModel(model, messages, slot) {
     try {
       const response = await fetch(modelsUrl, {
         method: 'POST',
+        signal: AbortSignal.timeout(120000),
         headers: {
           Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1),
           'Content-Type': 'application/json',
