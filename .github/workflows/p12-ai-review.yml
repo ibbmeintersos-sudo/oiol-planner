@@ -51,7 +51,7 @@ jobs:
           OFFSET="${{ inputs.offset || '0' }}"
           LIMIT="${{ inputs.limit || '0' }}"
           if [ "${{ github.event_name }}" = "push" ] && [ -f .p12/trigger ]; then
-            TRIGGER=$(cat .p12/trigger)
+            TRIGGER=$(head -n1 .p12/trigger)
             OFFSET="${TRIGGER%%:*}"
             LIMIT="${TRIGGER##*:}"
           fi
