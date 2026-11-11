@@ -9,6 +9,7 @@ on:
       - .github/workflows/p12-real-world-evaluation.yml
       - scripts/adjudicate-independent-reviews.mjs
       - scripts/assemble-real-world-corpus.mjs
+      - scripts/acquire-real-world-snapshot.py
       - scripts/freeze-independent-reviews.mjs
       - scripts/validate-real-world-corpus.mjs
       - scripts/run-real-world-benchmark.mjs
@@ -52,21 +53,36 @@ jobs:
           set -o pipefail
           node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/adjudication-summary.json"
 
-      - name: Download pinned source snapshots
-        uses: actions/download-artifact@v4
-        with:
-          pattern: p12-snapshot-*
-          path: acquired
-          merge-multiple: true
+      - name: Acquire pinned source snapshots
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          indices=$(jq -r '.cases[] | (.snapshot.sharedAcquisitionIndex // .caseIndex)' benchmarks/real-world/annotation-worklist.json | sort -un)
+          echo "acquiring unique case indices: $indices"
+          for index in $indices; do
+            python3 scripts/acquire-real-world-snapshot.py --case-index "$index" --output acquired 2>&1 | tee -a "$CORPUS_ROOT/acquire-summary.txt"
+          done
+          du -sh acquired | tee -a "$CORPUS_ROOT/acquire-summary.txt"
 
       - name: Assemble corpus snapshots
-        run: node scripts/assemble-real-world-corpus.mjs --artifacts-root acquired --corpus-root "$CORPUS_ROOT"
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/assemble-real-world-corpus.mjs --artifacts-root acquired --corpus-root "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/assemble-summary.json"
 
       - name: Validate corpus before scoring
-        run: npm run benchmark:real-world:validate -- --corpus-root "$CORPUS_ROOT"
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run benchmark:real-world:validate -- --corpus-root "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/validate-summary.json"
 
       - name: Score OIOL against the adjudicated ground truth
-        run: npm run benchmark:real-world -- --corpus-root "$CORPUS_ROOT" --out benchmarks/results/real-world-benchmark.json
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run benchmark:real-world -- --corpus-root "$CORPUS_ROOT" --out benchmarks/results/real-world-benchmark.json 2>&1 | tee "$CORPUS_ROOT/score-summary.json"
 
       - name: Upload evaluation outputs
         if: always()
@@ -79,8 +95,29 @@ jobs:
             ${{ env.CORPUS_ROOT }}/manifest.json
             ${{ env.CORPUS_ROOT }}/cases
             ${{ env.CORPUS_ROOT }}/adjudication-summary.json
+            ${{ env.CORPUS_ROOT }}/acquire-summary.txt
+            ${{ env.CORPUS_ROOT }}/validate-summary.json
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Commit evaluation diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          git config user.name "oiol-p12-bot"
+          git config user.email "oiol-p12-bot@users.noreply.github.com"
+          git fetch origin "$GITHUB_REF_NAME"
+          git rebase "origin/$GITHUB_REF_NAME"
+          mkdir -p benchmarks/real-world/evaluation-diagnostics
+          cp "$CORPUS_ROOT/adjudication-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
+          cp "$CORPUS_ROOT/assemble-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
+          cp "$CORPUS_ROOT/acquire-summary.txt" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
+          cp "$CORPUS_ROOT/validate-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
+          cp "$CORPUS_ROOT/score-summary.json" benchmarks/real-world/evaluation-diagnostics/ 2>/dev/null || true
+          cp "$CORPUS_ROOT/manifest.json" benchmarks/real-world/evaluation-diagnostics/corpus-manifest.json 2>/dev/null || true
+          git add benchmarks/real-world/evaluation-diagnostics
+          git diff --cached --quiet || git commit -m "chore(p12): record evaluation diagnostics"
+          git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Commit the freeze record and adjudication
         if: success()
@@ -93,6 +130,9 @@ jobs:
           mkdir -p benchmarks/real-world/adjudication
           cp "$CORPUS_ROOT/manifest.json" benchmarks/real-world/adjudication/corpus-manifest.json
           cp -r "$CORPUS_ROOT/cases" benchmarks/real-world/adjudication/cases
+          cp "$CORPUS_ROOT/validate-summary.json" benchmarks/real-world/adjudication/corpus-validation.json
+          cp "$CORPUS_ROOT/score-summary.json" benchmarks/real-world/adjudication/scoring-log.json
+          cp benchmarks/results/real-world-benchmark.json benchmarks/real-world/adjudication/real-world-benchmark.json
           git add benchmarks/real-world/review-freeze.json benchmarks/real-world/adjudication
           git diff --cached --quiet || git commit -m "chore(p12): freeze reviews and record adjudicated corpus"
           git push origin "HEAD:$GITHUB_REF_NAME"
