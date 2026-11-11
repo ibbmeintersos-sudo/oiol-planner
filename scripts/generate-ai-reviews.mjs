@@ -145,10 +145,19 @@ function promptFor(item, evidence, slot) {
   ].join('\n');
 }
 
+// A hard per-run cap keeps a retry storm from consuming the daily free-tier quota
+// that the remaining P12 batches still need.
+const callBudget = Number(process.env.P12_CALL_BUDGET || 0);
+let callsUsed = 0;
+
 async function callModel(model, messages, slot) {
   let lastError = 'unknown model failure';
   for (let attempt = 1; attempt <= 4; attempt += 1) {
     let status = 0;
+    if (callBudget > 0 && callsUsed >= callBudget) {
+      throw new Error('CALL_BUDGET_EXHAUSTED: ' + callsUsed + ' calls used of a ' + callBudget + ' budget');
+    }
+    callsUsed += 1;
     try {
       const response = await fetch(modelsUrl, {
         method: 'POST',
@@ -175,7 +184,7 @@ async function callModel(model, messages, slot) {
         }
       }
     } catch (error) {
-      if (error.message.startsWith('QUOTA_EXHAUSTED')) throw error;
+      if (error.message.startsWith('QUOTA_EXHAUSTED') || error.message.startsWith('CALL_BUDGET_EXHAUSTED')) throw error;
       lastError = 'Model ' + model + ' request failed: ' + error.message;
     }
     if (![429, 500, 502, 503, 504].includes(status) || attempt === 4) break;
@@ -255,7 +264,7 @@ async function annotate(item, slot, worklist) {
       if (result.ready) return review;
       lastError = result.errors.join('; ');
     } catch (error) {
-      if (error.message.startsWith('QUOTA_EXHAUSTED')) throw error;
+      if (error.message.startsWith('QUOTA_EXHAUSTED') || error.message.startsWith('CALL_BUDGET_EXHAUSTED')) throw error;
       lastError = error.message;
     }
   }
@@ -268,6 +277,7 @@ async function main() {
   let written = 0;
   const failures = [];
   let quotaExhausted = false;
+  let budgetExhausted = false;
   outer:
   for (const [index, item] of cases.entries()) {
     for (const slot of slots) {
@@ -293,6 +303,10 @@ async function main() {
           quotaExhausted = true;
           break outer;
         }
+        if (error.message.startsWith('CALL_BUDGET_EXHAUSTED')) {
+          budgetExhausted = true;
+          break outer;
+        }
       }
     }
   }
@@ -305,10 +319,13 @@ async function main() {
     slots,
     written,
     failures,
-    quotaExhausted
+    callsUsed,
+    callBudget,
+    quotaExhausted,
+    budgetExhausted
   };
   await fs.writeFile(path.join(root, 'benchmarks/real-world/reviews/.p12-run.json'), JSON.stringify(report, null, 2) + '\n');
-  console.log('DONE written=' + written + ' failures=' + failures.length);
+  console.log('DONE written=' + written + ' failures=' + failures.length + ' calls=' + callsUsed);
   if (failures.length) process.exitCode = 1;
 }
 
