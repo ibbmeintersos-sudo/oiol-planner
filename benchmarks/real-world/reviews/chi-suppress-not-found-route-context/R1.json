@@ -3,38 +3,166 @@
   "caseId": "chi-suppress-not-found-route-context",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:09:20.999Z",
+  "scopeSummary": "Prevent SupressNotFound middleware from mutating the live request route context by copying it before matching, preserving mounted-router parameters and middleware behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "middleware/supress_notfound.go"
+    ],
+    "affectedFiles": [
+      "context.go",
+      "middleware/supress_notfound_test.go"
+    ],
+    "tests": [
+      "middleware/supress_notfound_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "middleware/supress_notfound.go",
+        "name": "SupressNotFound",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/supress_notfound.go",
+        "name": "chi.RouteContext",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/supress_notfound.go",
+        "name": "rctx.Routes.Match",
+        "kind": "method"
+      },
+      {
+        "file": "context.go",
+        "name": "RouteContext",
+        "kind": "function"
+      },
+      {
+        "file": "context.go",
+        "name": "Context",
+        "kind": "struct"
+      },
+      {
+        "file": "context.go",
+        "name": "Context.RouteParams",
+        "kind": "field"
+      },
+      {
+        "file": "context.go",
+        "name": "Context.URLParams",
+        "kind": "field"
+      },
+      {
+        "file": "context.go",
+        "name": "Context.RoutePatterns",
+        "kind": "field"
+      },
+      {
+        "file": "context.go",
+        "name": "Context.Clone",
+        "kind": "method"
+      },
+      {
+        "file": "context.go",
+        "name": "Context.Reset",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "middleware/supress_notfound.go",
+        "to": "context.go"
+      },
+      {
+        "from": "middleware/supress_notfound.go",
+        "to": "chi.go"
+      },
+      {
+        "from": "middleware/supress_notfound.go",
+        "to": "mux.go"
+      },
+      {
+        "from": "middleware/supress_notfound_test.go",
+        "to": "middleware/supress_notfound.go"
+      },
+      {
+        "from": "middleware/supress_notfound_test.go",
+        "to": "context.go"
+      }
+    ],
+    "unknowns": [
+      "Whether the pinned base snapshot contains an existing middleware/supress_notfound_test.go file, as it is absent from the provided tree sample.",
+      "Whether chi.RouteContext returns nil for requests lacking a route context, and how SupressNotFound should handle that case without mutation.",
+      "Whether the fix should use Context.Clone or a shallow field copy to avoid mutating the live route context.",
+      "Whether mounted-router parameters are stored in Context.RouteParams or Context.URLParams, and which fields must be preserved."
+    ],
+    "risks": [
+      {
+        "id": "route-context-mutation-regression",
+        "severity": "high",
+        "rationale": "Mutating the live request route context can corrupt mounted-router parameters and alter downstream middleware behavior, causing incorrect route matching or parameter loss."
+      },
+      {
+        "id": "context-copy-performance",
+        "severity": "medium",
+        "rationale": "Copying the route context on every request through SupressNotFound introduces allocation overhead that may affect high-throughput servers."
+      },
+      {
+        "id": "nil-route-context-panic",
+        "severity": "medium",
+        "rationale": "If chi.RouteContext returns nil for requests without a route context, calling rctx.Routes.Match could panic unless nil handling is added."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "SupressNotFound retrieves the route context from the request and calls Routes.Match directly on it.",
+      "evidence": "middleware/supress_notfound.go calls chi.RouteContext(r.Context()) and rctx.Routes.Match(rctx, r.Method, r.URL.Path) without copying the context.",
+      "path": "middleware/supress_notfound.go",
+      "symbol": "SupressNotFound",
+      "lineRange": "14-27",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/60755706125129a9f9dfb99ac22f7ba016a1b60c/middleware/supress_notfound.go#L14-L27"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Context.Clone and Context.Reset exist in context.go and manage RouteParams, URLParams, RoutePatterns, and methodsAllowed.",
+      "evidence": "context_test.go tests Context.Clone and Context.Reset, showing these fields are mutable and cloned independently.",
+      "path": "context.go",
+      "symbol": "Context.Clone",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/60755706125129a9f9dfb99ac22f7ba016a1b60c/context.go#L1-L100"
+    },
+    {
+      "dimension": "tests",
+      "claim": "No supress_notfound_test.go appears in the provided tree sample, so a new test file must be added.",
+      "evidence": "The tree sample lists middleware/supress_notfound.go but no corresponding test file for it.",
+      "path": "middleware/supress_notfound_test.go",
+      "symbol": "SupressNotFound",
+      "lineRange": "1-1",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/60755706125129a9f9dfb99ac22f7ba016a1b60c/middleware/supress_notfound.go#L1-L1"
+    }
+  ]
 }
