@@ -32,6 +32,13 @@ jobs:
           P12_API_KEY_R2: ${{ secrets.OIOL_REVIEW_API_KEY }}
           P12_MODELS_BASE_R1: https://integrate.api.nvidia.com/v1
           P12_MODELS_BASE_R2: https://openrouter.ai/api/v1
+          P12_MODELS_URL_R1: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODEL_R1: nvidia/llama-3.1-nemotron-70b-instruct
+          P12_MODEL_R2: deepseek-ai/deepseek-v4.1-flash
+          P12_SWEEP_SLOT: R1
+          P12_SWEEP_TOKENS: '1024,4000'
+          P12_MODEL_CANDIDATES: nvidia/llama-3.1-nemotron-70b-instruct,nvidia/nemotron-4-340b-instruct,deepseek-ai/deepseek-v4.1-flash,mistralai/mistral-large-2-instruct,mistralai/mistral-large-4-1t-a52b,google/gemma-4-31b-it,z-ai/glm-5.3-flash,minimaxai/minimax-m3.1-flash,ibm/granite-34b-code-instruct,meta/codellama-70b
         run: node scripts/probe-model-providers.mjs
 
       - name: Commit probe report
