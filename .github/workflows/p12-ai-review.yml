@@ -21,7 +21,7 @@ permissions:
   models: read
 
 concurrency:
-  group: p12-ai-review
+  group: p12-ai-review-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -68,4 +68,6 @@ jobs:
             exit 0
           fi
           git commit -m "review(p12): generate AI annotations"
+          git fetch origin "${{ github.ref_name }}"
+          git rebase --autostash "origin/${{ github.ref_name }}"
           git push origin HEAD:${{ github.ref_name }}
