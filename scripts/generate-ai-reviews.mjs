@@ -233,15 +233,20 @@ async function callModel(model, messages, slot) {
 const fence = String.fromCharCode(96, 96, 96);
 
 function parseJson(content) {
-  let trimmed = content.trim();
-  if (trimmed.startsWith(fence)) trimmed = trimmed.slice(3);
-  if (/^json/i.test(trimmed)) trimmed = trimmed.slice(4);
-  if (trimmed.endsWith(fence)) trimmed = trimmed.slice(0, -3);
-  trimmed = trimmed.trim();
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
-  if (start === -1 || end === -1) throw new Error('No JSON object in model output');
-  return JSON.parse(trimmed.slice(start, end + 1));
+  const candidates = [content];
+  for (const block of content.matchAll(/`{3,}[ \t]*([A-Za-z]*)[ \t]*\r?\n([\s\S]*?)`{3,}/g)) candidates.unshift(block[2]);
+  for (const block of content.matchAll(/\{[\s\S]*\}/g)) candidates.push(block[0]);
+  const errors = [];
+  for (const candidate of candidates) {
+    const text = candidate.trim();
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start === -1 || end <= start) continue;
+    try { return JSON.parse(text.slice(start, end + 1)); }
+    catch (error) { errors.push(error.message); }
+  }
+  const preview = content.replace(/\s+/g, ' ').slice(0, 240);
+  throw new Error('No parseable JSON object in model output (' + (errors[0] || 'no braces') + ') :: ' + preview);
 }
 
 function normalize(review, item, slot, model) {
