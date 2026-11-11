@@ -6,7 +6,10 @@ import { validateReview } from './validate-independent-review.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ghToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
-const apiKey = process.env.P12_API_KEY || process.env.OIOL_API_KEY || '';
+const apiKeys = {
+  R1: process.env.P12_API_KEY_R1 || process.env.P12_API_KEY || process.env.OIOL_API_KEY || '',
+  R2: process.env.P12_API_KEY_R2 || process.env.P12_API_KEY || process.env.OIOL_API_KEY || ''
+};
 const apiBase = 'https://api.github.com';
 const modelsUrl = process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions';
 const models = {
@@ -16,6 +19,8 @@ const models = {
 const slots = (process.env.P12_SLOTS || 'R1,R2').split(',').map(value => value.trim()).filter(Boolean);
 const limitIndex = process.argv.indexOf('--limit');
 const limit = limitIndex === -1 ? 0 : Number(process.argv[limitIndex + 1]) || 0;
+const offsetIndex = process.argv.indexOf('--offset');
+const offset = offsetIndex === -1 ? 0 : Number(process.argv[offsetIndex + 1]) || 0;
 const stopwords = new Set(('the a an and or of to in on for with without when while from by as at is are be been it its this that these those into than then so not no all any each keep keeps keeping preserve preserving ensure ensuring update updates updating add adds adding remove removes removing change changes changing support supports supporting use uses using used make makes making new existing behavior behaviour consistent consistency include includes including based only also have has had can could should would may might will just more most less least same other another such via per between during before after over under').split(' '));
 
 const tokenize = value => [...new Set(String(value || '').toLowerCase().split(/[^a-z0-9]+/).filter(word => word.length > 2 && !stopwords.has(word)))];
@@ -140,7 +145,7 @@ function promptFor(item, evidence, slot) {
   ].join('\n');
 }
 
-async function callModel(model, messages) {
+async function callModel(model, messages, slot) {
   let lastError = 'unknown model failure';
   for (let attempt = 1; attempt <= 4; attempt += 1) {
     let status = 0;
@@ -148,7 +153,7 @@ async function callModel(model, messages) {
       const response = await fetch(modelsUrl, {
         method: 'POST',
         headers: {
-          Authorization: 'Bearer ' + apiKey,
+          Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1),
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner',
           'X-Title': 'OIOL P12 annotation'
@@ -225,7 +230,7 @@ async function annotate(item, slot, worklist) {
       const content = await callModel(model, [
         { role: 'system', content: 'You produce strict JSON only. Never wrap JSON in markdown fences.' },
         { role: 'user', content: prompt }
-      ]);
+      ], slot);
       const review = normalize(parseJson(content), item, slot, model);
       const result = validateReview(review, worklist);
       if (result.ready) return review;
@@ -239,7 +244,7 @@ async function annotate(item, slot, worklist) {
 
 async function main() {
   const worklist = JSON.parse(await fs.readFile(path.join(root, 'benchmarks/real-world/annotation-worklist.json'), 'utf8'));
-  const cases = limit > 0 ? worklist.cases.slice(0, limit) : worklist.cases;
+  const cases = worklist.cases.slice(offset, limit > 0 ? offset + limit : undefined);
   let written = 0;
   const failures = [];
   for (const [index, item] of cases.entries()) {
@@ -269,6 +274,7 @@ async function main() {
     schemaVersion: '1.0.0',
     generatedAt: new Date().toISOString(),
     cases: cases.length,
+    offset,
     slots,
     written,
     failures
