@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "createdAt": "2026-11-11T19:47:17.713Z",
+  "createdAt": "2026-11-11T19:51:11.872Z",
   "slots": [
     {
       "slot": "R1",
@@ -12,7 +12,7 @@
       "contentLength": 0,
       "finishReason": null,
       "ok": false,
-      "errorBodyPrefix": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'meta/llama-3.3-70b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available.\"}\n"
+      "errorBodyPrefix": "The model 'meta/llama-3.3-70b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
     },
     {
       "slot": "R2",
@@ -23,9 +23,15 @@
       "error": "no api key configured for this slot"
     }
   ],
-  "nvidiaModels": {
-    "httpStatus": 200,
-    "modelCount": 84,
-    "wantedAvailable": []
+  "models": {
+    "R1": {
+      "httpStatus": 200,
+      "modelCount": 84,
+      "candidates": []
+    },
+    "R2": {
+      "skipped": true,
+      "reason": "no key"
+    }
   }
 }
