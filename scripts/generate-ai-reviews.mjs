@@ -201,9 +201,13 @@ async function callModel(model, messages, slot) {
       const text = await response.text();
       if (response.ok) {
         const payload = JSON.parse(text);
-        const content = payload.choices?.[0]?.message?.content;
-        if (content) return content;
-        lastError = 'Model ' + model + ' returned no content (finish_reason=' + (payload.choices?.[0]?.finish_reason || 'unknown') + ')';
+        const message = payload.choices?.[0]?.message || {};
+        const finishReason = payload.choices?.[0]?.finish_reason || 'unknown';
+        const content = typeof message.content === 'string' ? message.content : '';
+        if (content.trim()) return content;
+        const reasoning = [message.reasoning_content, message.reasoning].find(value => typeof value === 'string' && value.includes('{')) || '';
+        if (reasoning) return reasoning;
+        lastError = 'Model ' + model + ' returned no content (finish_reason=' + finishReason + ')';
       } else {
         lastError = 'Model ' + model + ' HTTP ' + response.status + ': ' + text.slice(0, 300);
         if (response.status === 429 && /free-models-per-day|openrouter_free_tier_daily/.test(text)) {
