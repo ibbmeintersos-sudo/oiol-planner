@@ -130,12 +130,6 @@ export function buildAdjudicatedCase(item, first, second, snapshotPrefix) {
   return { caseJson, disagreements };
 }
 
-async function readReview(reviewsRoot, caseId, slot) {
-  const raw = await fs.readFile(path.join(reviewsRoot, caseId, slot + '.json'), 'utf8').catch(() => null);
-  if (raw === null) throw new Error(caseId + ': missing review ' + slot);
-  return JSON.parse(raw);
-}
-
 export async function main() {
   const base = path.join(root, 'benchmarks/real-world');
   const reviewsRoot = path.resolve(option('reviews-root', path.join(base, 'reviews')));
