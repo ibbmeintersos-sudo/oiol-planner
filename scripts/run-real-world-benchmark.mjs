@@ -83,7 +83,11 @@ function average(values) {
 
 export async function runRealWorldBenchmark({ corpusRoot, maxFiles = 250, maxDepth = 12, maxSourceFiles = 100, analysisMode = 'auto' } = {}) {
   const root = path.resolve(corpusRoot);
-  const validation = await validateCorpus(root);
+  const validation = await validateCorpus(root, {
+    minimumCases: Number(process.env.P12_MIN_CASES || 30),
+    minimumRepositories: Number(process.env.P12_MIN_REPOS || 12),
+    minimumPerSizeClass: Number(process.env.P12_MIN_PER_SIZE_CLASS || 4)
+  });
   if (!validation.ready) throw new Error('Corpus is not ready: ' + validation.errors.join('; '));
   const manifest = JSON.parse(await fs.readFile(path.join(root, 'manifest.json'), 'utf8'));
   const rows = [];
