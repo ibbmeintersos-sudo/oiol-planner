@@ -3,38 +3,118 @@
   "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T04:01:08.590Z",
+  "scopeSummary": "Prevent temperature setpoint changes on Nest thermostat when preset mode is Eco (MANUAL_ECO), aligning integration behavior and climate tests.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "homeassistant/components/nest/climate.py"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "tests/components/nest/test_climate.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "NestThermostat",
+        "kind": "class"
+      },
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "async_set_temperature",
+        "kind": "method"
+      },
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "async_set_preset_mode",
+        "kind": "method"
+      },
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "_attr_preset_mode",
+        "kind": "attribute"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "homeassistant/components/nest/climate.py",
+        "to": "homeassistant/components/climate/__init__.py"
+      },
+      {
+        "from": "tests/components/nest/test_climate.py",
+        "to": "homeassistant/components/nest/climate.py"
+      }
+    ],
+    "unknowns": [
+      "Exact test file path for Nest climate tests not visible in tree sample",
+      "Whether async_set_temperature currently checks preset mode before delegating to API"
+    ],
+    "risks": [
+      {
+        "id": "eco-temp-lock-breaking-change",
+        "severity": "medium",
+        "rationale": "Blocking temperature changes in Eco mode alters user-facing behavior; existing automations may fail silently or raise errors."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Nest climate entity defines Eco mode mapping and temperature setpoint handling",
+      "evidence": "THERMOSTAT_ECO_MODE = MANUAL_ECO and PRESET_MODE_MAP maps it to PRESET_ECO; async_set_temperature likely implemented in class",
+      "path": "homeassistant/components/nest/climate.py",
+      "symbol": "NestThermostat",
+      "lineRange": "1-150",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/homeassistant/components/nest/climate.py#L1-L150"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "async_set_temperature method must be modified to check preset mode",
+      "evidence": "ClimateEntity base class defines async_set_temperature; NestThermostat overrides it to call ThermostatTemperatureSetpointTrait",
+      "path": "homeassistant/components/nest/climate.py",
+      "symbol": "async_set_temperature",
+      "lineRange": "150-250",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/homeassistant/components/nest/climate.py#L150-L250"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Nest climate tests must verify Eco mode temperature change rejection",
+      "evidence": "Test file likely exists at tests/components/nest/test_climate.py based on HA test conventions",
+      "path": "tests/components/nest/test_climate.py",
+      "symbol": "test_eco_mode_temperature_change_rejected",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/tests/components/nest/test_climate.py#L1-L50"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Behavior change may break automations that adjust temperature during Eco mode",
+      "evidence": "Users may have scripts/automations calling climate.set_temperature while thermostat is in Eco preset; new validation will raise HomeAssistantError",
+      "path": "homeassistant/components/nest/climate.py",
+      "symbol": "async_set_temperature",
+      "lineRange": "150-250",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/homeassistant/components/nest/climate.py#L150-L250"
+    }
+  ]
 }

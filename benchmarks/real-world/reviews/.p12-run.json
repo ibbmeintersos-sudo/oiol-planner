@@ -10,19 +10,17 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-12T03:58:35.594Z",
-  "cases": 12,
-  "offset": 24,
+  "generatedAt": "2026-11-12T04:01:08.592Z",
+  "cases": 1,
+  "offset": 34,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 23,
-  "failures": [
-    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget"
-  ],
-  "callsUsed": 24,
-  "callBudget": 24,
+  "written": 1,
+  "failures": [],
+  "callsUsed": 1,
+  "callBudget": 4,
   "quotaExhausted": false,
-  "budgetExhausted": true
+  "budgetExhausted": false
 }
