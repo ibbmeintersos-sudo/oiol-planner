@@ -1,0 +1,346 @@
+{
+  "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+  "dimensions": {
+    "directFiles": {
+      "tp": 1,
+      "fp": 29,
+      "fn": 0,
+      "precision": 0.0333,
+      "recall": 1,
+      "f1": 0.0645,
+      "expectedCount": 1,
+      "actualCount": 30
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 38,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 38
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 312,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 312
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 54,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 54
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 103,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "go": 79
+      }
+    },
+    "symbols": {
+      "actualCount": 320,
+      "fpByKind": {
+        "function": 189,
+        "method": 80,
+        "struct": 38,
+        "interface": 8,
+        "type": 5
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 320
+      },
+      "fpTopNames": [
+        "function:main x12",
+        "function:init x6",
+        "method:Render x6",
+        "method:Flush x5",
+        "method:Hijack x5",
+        "struct:Article x5",
+        "function:NewArticleResponse x4",
+        "method:Handler x3",
+        "method:ServeHTTP x3",
+        "method:Write x3",
+        "struct:contextKey x2",
+        "method:String x2",
+        "function:TestPattern x2",
+        "method:WriteHeader x2",
+        "method:Push x2"
+      ],
+      "tp": 0,
+      "fp": 312,
+      "fn": 0,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 54,
+      "fpByResolutionKind": {
+        "parser_resolved": 54
+      },
+      "fpByResolution": {
+        "go-module-package-representative": 54
+      },
+      "tp": 0,
+      "fp": 54,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 30,
+      "termCountHistogram": {
+        "1": 22,
+        "2": 4,
+        "3": 2,
+        "4": 2
+      },
+      "signalsHistogram": {
+        "path_match": 20,
+        "path_match+symbol_match": 9,
+        "path_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [
+        5
+      ],
+      "tp": 1,
+      "fp": 29,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "middleware/wrap_writer_test.go",
+          "score": 0.713,
+          "terms": [
+            "middleware",
+            "read",
+            "response",
+            "status",
+            "when",
+            "writer"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/wrap_writer.go",
+          "score": 0.625,
+          "terms": [
+            "middleware",
+            "read",
+            "response",
+            "status",
+            "writer"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/compress.go",
+          "score": 0.313,
+          "terms": [
+            "middleware",
+            "response",
+            "writer"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/logger_test.go",
+          "score": 0.313,
+          "terms": [
+            "middleware",
+            "read",
+            "writer"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/middleware_test.go",
+          "score": 0.313,
+          "terms": [
+            "middleware",
+            "writer"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/compress_test.go",
+          "score": 0.225,
+          "terms": [
+            "middleware",
+            "response"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/content_encoding_test.go",
+          "score": 0.225,
+          "terms": [
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/recoverer.go",
+          "score": 0.225,
+          "terms": [
+            "call",
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/throttle_test.go",
+          "score": 0.225,
+          "terms": [
+            "middleware",
+            "status"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/client_ip_example_test.go",
+          "score": 0.163,
+          "terms": [
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "import_specifier_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 38,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 30,
+        "1": 8
+      },
+      "propagationHistogram": {
+        "direct_request_match": 30,
+        "reverse_import_dependency": 8
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 38,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

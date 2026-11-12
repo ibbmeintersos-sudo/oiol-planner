@@ -1,0 +1,395 @@
+{
+  "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 6,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 6
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 14,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 14
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 28,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 28
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 504,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 504
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 12,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 12
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "javascript": 1,
+        "python": 93
+      }
+    },
+    "symbols": {
+      "actualCount": 520,
+      "fpByKind": {
+        "function": 437,
+        "class": 83
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 520
+      },
+      "fpTopNames": [
+        "function:register x45",
+        "function:visit_module x27",
+        "function:visit_call x18",
+        "function:__init__ x8",
+        "function:visit_functiondef x8",
+        "function:visit_classdef x8",
+        "function:validate x4",
+        "function:__repr__ x4",
+        "function:visit_annassign x4",
+        "function:visit_assign x4",
+        "function:__str__ x3",
+        "function:main x2",
+        "function:run x2",
+        "function:add_error x2",
+        "function:load_dir x2"
+      ],
+      "tp": 0,
+      "fp": 504,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 12,
+      "fpByResolutionKind": {
+        "relative_path": 12
+      },
+      "fpByResolution": {
+        "relative-path": 12
+      },
+      "tp": 0,
+      "fp": 12,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 6,
+      "termCountHistogram": {
+        "1": 6
+      },
+      "signalsHistogram": {
+        "symbol_match": 3,
+        "path_match+symbol_match": 2,
+        "symbol_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 6,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/checkers/light_color_mode.py",
+          "score": 0.225,
+          "terms": [
+            "mode"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/helpers/integration.py",
+          "score": 0.225,
+          "terms": [
+            "integration"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/checkers/entity_unique_id_format.py",
+          "score": 0.112,
+          "terms": [
+            "integration"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "packages/hassfest/hassfest/model.py",
+          "score": 0.087,
+          "terms": [
+            "integration"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/const.py",
+          "score": 0.087,
+          "terms": [
+            "integration"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/helpers/module_info.py",
+          "score": 0.087,
+          "terms": [
+            "integration"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 14,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 6,
+        "1": 8
+      },
+      "propagationHistogram": {
+        "reverse_import_dependency": 8,
+        "direct_request_match": 6
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 14,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 28,
+      "byAssociation": {
+        "test_path_name_overlap": 28
+      },
+      "byConfidence": {
+        "low": 28
+      },
+      "overlapTermHistogram": {
+        "1": 2,
+        "2": 6,
+        "3": 9,
+        "4": 11
+      },
+      "tp": 0,
+      "fp": 28,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "packages/hassfest/tests/__init__.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "hassfest",
+            "packages",
+            "py"
+          ]
+        },
+        {
+          "path": "packages/hassfest/tests/check_package.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "hassfest",
+            "packages",
+            "py"
+          ]
+        },
+        {
+          "path": "packages/hassfest/tests/conftest.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "hassfest",
+            "packages",
+            "py"
+          ]
+        },
+        {
+          "path": "packages/hassfest/tests/ruff.toml",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "hassfest",
+            "packages"
+          ]
+        },
+        {
+          "path": "packages/hassfest/tests/test_brand_images.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "hassfest",
+            "packages",
+            "py"
+          ]
+        },
+        {
+          "path": "packages/hassfest/tests/test_runner.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "hassfest",
+            "packages",
+            "py"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/checkers/tests/__init__.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "assistant",
+            "checkers",
+            "home",
+            "packages",
+            "py",
+            "pylint"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/checkers/tests/config_flow_error_recovery.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "assistant",
+            "checkers",
+            "home",
+            "packages",
+            "py",
+            "pylint"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/checkers/tests/config_flow_unique_id.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "assistant",
+            "checkers",
+            "home",
+            "id",
+            "packages",
+            "py",
+            "pylint",
+            "unique"
+          ]
+        },
+        {
+          "path": "packages/pylint-home-assistant/pylint_home_assistant/checkers/tests/coordinator_async_refresh.py",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "assistant",
+            "checkers",
+            "home",
+            "packages",
+            "py",
+            "pylint"
+          ]
+        }
+      ]
+    }
+  }
+}

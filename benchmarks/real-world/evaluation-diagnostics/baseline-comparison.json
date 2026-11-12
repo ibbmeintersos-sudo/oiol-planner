@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-11-12T07:44:06.402Z",
+  "gate0": "PASS",
+  "note": "Gate-0 passes only when every dimension stays within +-0.005 F1 of the frozen P12 baseline.",
+  "dimensions": [
+    {
+      "dimension": "directFiles",
+      "baseline": {
+        "precision": 0.0182,
+        "recall": 0.4537,
+        "f1": 0.0312
+      },
+      "measured": {
+        "precision": 0.0182,
+        "recall": 0.4537,
+        "f1": 0.0312
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "affectedFiles",
+      "baseline": {
+        "precision": 0.0614,
+        "recall": 0.6944,
+        "f1": 0.0656
+      },
+      "measured": {
+        "precision": 0.0614,
+        "recall": 0.6944,
+        "f1": 0.0656
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "tests",
+      "baseline": {
+        "precision": 0.1209,
+        "recall": 0.4167,
+        "f1": 0.1293
+      },
+      "measured": {
+        "precision": 0.1209,
+        "recall": 0.4167,
+        "f1": 0.1293
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "packages",
+      "baseline": {
+        "precision": 0.9194,
+        "recall": 1,
+        "f1": 0.9217
+      },
+      "measured": {
+        "precision": 0.9194,
+        "recall": 1,
+        "f1": 0.9217
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "apiConsumers",
+      "baseline": {
+        "precision": 0.8333,
+        "recall": 0.8333,
+        "f1": 0.8333
+      },
+      "measured": {
+        "precision": 0.8333,
+        "recall": 0.8333,
+        "f1": 0.8333
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "databaseConsumers",
+      "baseline": {
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "measured": {
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "migrationFiles",
+      "baseline": {
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "measured": {
+        "precision": 1,
+        "recall": 1,
+        "f1": 1
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "baseline": {
+        "precision": 0.004,
+        "recall": 0.5069,
+        "f1": 0.0074
+      },
+      "measured": {
+        "precision": 0.004,
+        "recall": 0.5069,
+        "f1": 0.0074
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "baseline": {
+        "precision": 0.1346,
+        "recall": 0.5242,
+        "f1": 0.1349
+      },
+      "measured": {
+        "precision": 0.1346,
+        "recall": 0.5242,
+        "f1": 0.1349
+      },
+      "delta": {
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      },
+      "verdict": "neutral"
+    }
+  ]
+}

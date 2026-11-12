@@ -1,0 +1,314 @@
+{
+  "caseId": "laravel-62360-include-identical-belongstomany-reso",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 11,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 11
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 11,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 11
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 907,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 907
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "php": 92
+      }
+    },
+    "symbols": {
+      "actualCount": 907,
+      "fpByKind": {
+        "method": 807,
+        "class": 77,
+        "function": 11,
+        "trait": 10,
+        "interface": 2
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 907
+      },
+      "fpTopNames": [
+        "method:__construct x56",
+        "method:get x18",
+        "method:increment x16",
+        "method:decrement x16",
+        "method:flush x16",
+        "method:put x14",
+        "method:forever x13",
+        "method:touch x13",
+        "method:add x12",
+        "method:forget x12",
+        "method:getPrefix x12",
+        "method:acquire x11",
+        "method:release x11",
+        "method:getCurrentOwner x9",
+        "method:refresh x9"
+      ],
+      "tp": 0,
+      "fp": 907,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "trait"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 1,
+        "toMissingInWalk": 1,
+        "expectedEdgeCount": 1
+      }
+    },
+    "directFiles": {
+      "matchCount": 11,
+      "termCountHistogram": {
+        "1": 9,
+        "2": 1,
+        "3": 1
+      },
+      "signalsHistogram": {
+        "symbol_match": 9,
+        "symbol_match+import_specifier_match": 2
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 11,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "src/Illuminate/Cache/RedisStore.php",
+          "score": 0.2,
+          "terms": [
+            "lazy",
+            "many",
+            "serialization"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/RateLimiter.php",
+          "score": 0.175,
+          "terms": [
+            "many",
+            "serialization"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Bus/Batch.php",
+          "score": 0.112,
+          "terms": [
+            "json"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/DatabaseStore.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/FailoverStore.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/MemcachedStore.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/MemoizedStore.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/MemoizedTaggedCache.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/RetrievesMultipleKeys.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/TaggedCache.php",
+          "score": 0.087,
+          "terms": [
+            "many"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 11,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 11
+      },
+      "propagationHistogram": {
+        "direct_request_match": 11
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 11,
+      "fn": 2
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "caseCount": 36,
+  "placed": 36,
+  "uniqueSnapshots": 34,
+  "reused": [
+    {
+      "caseId": "ky-dispatcher-option-ignored",
+      "sourceCaseId": "ky-dispatcher-option-ignored",
+      "action": "moved"
+    },
+    {
+      "caseId": "itsdangerous-drop-eol-python",
+      "sourceCaseId": "itsdangerous-drop-eol-python",
+      "action": "moved"
+    },
+    {
+      "caseId": "chi-suppress-not-found-route-context",
+      "sourceCaseId": "chi-suppress-not-found-route-context",
+      "action": "moved"
+    },
+    {
+      "caseId": "ripgrep-basename-regex-matching",
+      "sourceCaseId": "ripgrep-basename-regex-matching",
+      "action": "moved"
+    },
+    {
+      "caseId": "pydantic-decimal-json-schema-pattern",
+      "sourceCaseId": "pydantic-decimal-json-schema-pattern",
+      "action": "copied"
+    },
+    {
+      "caseId": "nestjs-node-adapter-req-route",
+      "sourceCaseId": "nestjs-node-adapter-req-route",
+      "action": "moved"
+    },
+    {
+      "caseId": "laravel-migration-failed-event",
+      "sourceCaseId": "laravel-migration-failed-event",
+      "action": "moved"
+    },
+    {
+      "caseId": "spring-boot-duration-micros-overflow",
+      "sourceCaseId": "spring-boot-duration-micros-overflow",
+      "action": "moved"
+    },
+    {
+      "caseId": "kubernetes-spdy-upgrade-failure-close",
+      "sourceCaseId": "kubernetes-spdy-upgrade-failure-close",
+      "action": "moved"
+    },
+    {
+      "caseId": "tensorflow-release-gil-device-context",
+      "sourceCaseId": "tensorflow-release-gil-device-context",
+      "action": "moved"
+    },
+    {
+      "caseId": "grafana-provisioning-job-tracing",
+      "sourceCaseId": "grafana-provisioning-job-tracing",
+      "action": "moved"
+    },
+    {
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "sourceCaseId": "home-assistant-unifi-disabled-entities",
+      "action": "moved"
+    },
+    {
+      "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "sourceCaseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "action": "moved"
+    },
+    {
+      "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "sourceCaseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "action": "moved"
+    },
+    {
+      "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "sourceCaseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "action": "moved"
+    },
+    {
+      "caseId": "pallets-406-remove-previously-deprecated-code",
+      "sourceCaseId": "pallets-406-remove-previously-deprecated-code",
+      "action": "moved"
+    },
+    {
+      "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "sourceCaseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "action": "moved"
+    },
+    {
+      "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "sourceCaseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "action": "moved"
+    },
+    {
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "sourceCaseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "action": "copied"
+    },
+    {
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+      "sourceCaseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "action": "copied"
+    },
+    {
+      "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "sourceCaseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "action": "moved"
+    },
+    {
+      "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+      "sourceCaseId": "pydantic-decimal-json-schema-pattern",
+      "action": "copied"
+    },
+    {
+      "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "sourceCaseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "action": "moved"
+    },
+    {
+      "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "sourceCaseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "action": "moved"
+    },
+    {
+      "caseId": "laravel-62326-add-origin-to-uri-class",
+      "sourceCaseId": "laravel-62326-add-origin-to-uri-class",
+      "action": "moved"
+    },
+    {
+      "caseId": "laravel-62360-include-identical-belongstomany-reso",
+      "sourceCaseId": "laravel-62360-include-identical-belongstomany-reso",
+      "action": "moved"
+    },
+    {
+      "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "sourceCaseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "action": "moved"
+    },
+    {
+      "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "sourceCaseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "action": "moved"
+    },
+    {
+      "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "sourceCaseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "action": "moved"
+    },
+    {
+      "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "sourceCaseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "action": "moved"
+    },
+    {
+      "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "sourceCaseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "action": "moved"
+    },
+    {
+      "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "sourceCaseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "action": "moved"
+    },
+    {
+      "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "sourceCaseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "action": "moved"
+    },
+    {
+      "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "sourceCaseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "action": "moved"
+    },
+    {
+      "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "sourceCaseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "action": "moved"
+    },
+    {
+      "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "sourceCaseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "action": "moved"
+    }
+  ],
+  "errors": []
+}

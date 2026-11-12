@@ -1,0 +1,509 @@
+{
+  "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 21,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 21
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 21,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 21
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 88,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 88
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 555,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 555
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "java": 95,
+        "kotlin": 2
+      }
+    },
+    "symbols": {
+      "actualCount": 595,
+      "fpByKind": {
+        "method": 453,
+        "class": 118,
+        "interface": 20,
+        "enum": 3,
+        "record": 1
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 595
+      },
+      "fpTopNames": [
+        "method:run x7",
+        "method:printBanner x7",
+        "method:load x7",
+        "method:main x6",
+        "method:createEnvironment x5",
+        "method:getExitCode x5",
+        "method:get x5",
+        "method:getValues x5",
+        "method:getOptionValues x4",
+        "method:getNonOptionArgs x4",
+        "method:addAll x4",
+        "method:add x4",
+        "method:getInteger x4",
+        "method:getSet x4",
+        "method:containsOption x3"
+      ],
+      "tp": 0,
+      "fp": 555,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "enum",
+        "interface",
+        "method",
+        "record"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 21,
+      "termCountHistogram": {
+        "1": 8,
+        "2": 13
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match+import_specifier_match": 12,
+        "path_match+symbol_match": 6,
+        "symbol_match+import_specifier_match": 1,
+        "path_match+import_specifier_match": 1,
+        "symbol_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 0,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 21,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/ApplicationContextFactory.java",
+          "score": 0.5,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/DefaultApplicationContextFactory.java",
+          "score": 0.5,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/SpringApplicationAotProcessor.java",
+          "score": 0.362,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/SpringApplicationRunListener.java",
+          "score": 0.362,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/SpringApplicationRunListeners.java",
+          "score": 0.362,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/SpringApplicationShutdownHook.java",
+          "score": 0.362,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/ClearCachesApplicationListener.java",
+          "score": 0.275,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/SpringApplicationShutdownHandlers.java",
+          "score": 0.275,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/ApplicationEnvironment.java",
+          "score": 0.25,
+          "terms": [
+            "application",
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "core/spring-boot/src/main/java/org/springframework/boot/ApplicationInfoPropertySource.java",
+          "score": 0.25,
+          "terms": [
+            "application"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 21,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 21
+      },
+      "propagationHistogram": {
+        "direct_request_match": 21
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 21,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 88,
+      "byAssociation": {
+        "test_path_name_overlap": 88
+      },
+      "byConfidence": {
+        "low": 88
+      },
+      "overlapTermHistogram": {
+        "4": 88
+      },
+      "tp": 0,
+      "fp": 88,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/AutoConfigureAnnotationProcessorTests.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test",
+            "tests"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfiguration.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfigurationConfiguration.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfigurationOnlyConfiguration.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfigureAfter.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfigureAnnotationProcessor.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfigureBefore.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestAutoConfigureOrder.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestClassConfiguration.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        },
+        {
+          "path": "core/spring-boot-autoconfigure-processor/src/test/java/org/springframework/boot/autoconfigureprocessor/TestConditionalOnBean.java",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "boot",
+            "core",
+            "java",
+            "org",
+            "processor",
+            "spring",
+            "springframework",
+            "src",
+            "test"
+          ]
+        }
+      ]
+    }
+  }
+}

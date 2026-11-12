@@ -1,0 +1,430 @@
+{
+  "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+  "dimensions": {
+    "directFiles": {
+      "tp": 1,
+      "fp": 11,
+      "fn": 0,
+      "precision": 0.0833,
+      "recall": 1,
+      "f1": 0.1538,
+      "expectedCount": 1,
+      "actualCount": 12
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 12,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 12
+    },
+    "tests": {
+      "tp": 1,
+      "fp": 23,
+      "fn": 0,
+      "precision": 0.0417,
+      "recall": 1,
+      "f1": 0.08,
+      "expectedCount": 1,
+      "actualCount": 24
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 1,
+      "fp": 321,
+      "fn": 0,
+      "precision": 0.0031,
+      "recall": 1,
+      "f1": 0.0062,
+      "expectedCount": 1,
+      "actualCount": 322
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 69,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "typescript": 46
+      }
+    },
+    "symbols": {
+      "actualCount": 435,
+      "fpByKind": {
+        "variable": 298,
+        "function": 71,
+        "type": 43,
+        "method": 13,
+        "class": 7,
+        "interface": 2
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 434
+      },
+      "fpTopNames": [
+        "variable:server x46",
+        "variable:headers x19",
+        "function:customFetch x14",
+        "variable:body x8",
+        "method:constructor x8",
+        "variable:response x6",
+        "variable:formData x5",
+        "variable:form x5",
+        "variable:result x4",
+        "variable:original x4",
+        "variable:extended x4",
+        "variable:buffer x3",
+        "variable:array x3",
+        "variable:parameters x3",
+        "variable:size x3"
+      ],
+      "tp": 1,
+      "fp": 321,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "type",
+        "variable"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 1
+      }
+    },
+    "directFiles": {
+      "matchCount": 12,
+      "termCountHistogram": {
+        "1": 10,
+        "2": 1,
+        "3": 1
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match+import_specifier_match": 4,
+        "path_match+symbol_match": 4,
+        "symbol_match": 3,
+        "symbol_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [
+        3
+      ],
+      "tp": 1,
+      "fp": 11,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "source/errors/SchemaValidationError.ts",
+          "score": 0.7,
+          "terms": [
+            "error",
+            "schema",
+            "validation"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/utils/is-network-error.ts",
+          "score": 0.313,
+          "terms": [
+            "error",
+            "stack"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/errors/ForceRetryError.ts",
+          "score": 0.25,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/NetworkError.ts",
+          "score": 0.25,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/TimeoutError.ts",
+          "score": 0.25,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/KyError.ts",
+          "score": 0.225,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/errors/NonError.ts",
+          "score": 0.225,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/types/standard-schema.ts",
+          "score": 0.225,
+          "terms": [
+            "schema"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/utils/type-guards.ts",
+          "score": 0.112,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/types/hooks.ts",
+          "score": 0.087,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 12,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 12
+      },
+      "propagationHistogram": {
+        "direct_request_match": 12
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 12,
+      "fn": 1
+    },
+    "tests": {
+      "matchCount": 24,
+      "byAssociation": {
+        "test_path_name_overlap": 24
+      },
+      "byConfidence": {
+        "low": 24
+      },
+      "overlapTermHistogram": {
+        "1": 1,
+        "2": 20,
+        "3": 3
+      },
+      "tp": 1,
+      "fp": 23,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "test/base-url.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/body-size.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/browser.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/bytes.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/context.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/fetch.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/formdata-searchparams.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/headers.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/create-http-test-server.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/create-large-file.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "test",
+            "ts"
+          ]
+        }
+      ]
+    }
+  }
+}

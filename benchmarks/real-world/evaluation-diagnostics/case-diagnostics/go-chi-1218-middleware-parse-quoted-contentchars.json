@@ -1,0 +1,340 @@
+{
+  "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+  "dimensions": {
+    "directFiles": {
+      "tp": 1,
+      "fp": 29,
+      "fn": 0,
+      "precision": 0.0333,
+      "recall": 1,
+      "f1": 0.0645,
+      "expectedCount": 1,
+      "actualCount": 30
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 38,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 38
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 3,
+      "fp": 316,
+      "fn": 0,
+      "precision": 0.0094,
+      "recall": 1,
+      "f1": 0.0186,
+      "expectedCount": 3,
+      "actualCount": 319
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 55,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 55
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 106,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "go": 82
+      }
+    },
+    "symbols": {
+      "actualCount": 327,
+      "fpByKind": {
+        "function": 193,
+        "method": 80,
+        "struct": 38,
+        "interface": 8,
+        "type": 5
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 324
+      },
+      "fpTopNames": [
+        "function:main x12",
+        "function:init x6",
+        "method:Render x6",
+        "method:Flush x5",
+        "method:Hijack x5",
+        "struct:Article x5",
+        "function:NewArticleResponse x4",
+        "method:Handler x3",
+        "method:ServeHTTP x3",
+        "method:Write x3",
+        "struct:contextKey x2",
+        "method:String x2",
+        "function:TestPattern x2",
+        "method:WriteHeader x2",
+        "method:Push x2"
+      ],
+      "tp": 3,
+      "fp": 316,
+      "fn": 0,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 55,
+      "fpByResolutionKind": {
+        "parser_resolved": 55
+      },
+      "fpByResolution": {
+        "go-module-package-representative": 55
+      },
+      "tp": 0,
+      "fp": 55,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 30,
+      "termCountHistogram": {
+        "1": 22,
+        "2": 4,
+        "3": 4
+      },
+      "signalsHistogram": {
+        "path_match": 19,
+        "path_match+symbol_match": 10,
+        "path_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [
+        3
+      ],
+      "tp": 1,
+      "fp": 29,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "middleware/content_charset_test.go",
+          "score": 0.588,
+          "terms": [
+            "charset",
+            "content",
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/content_charset.go",
+          "score": 0.588,
+          "terms": [
+            "charset",
+            "content",
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/content_type_test.go",
+          "score": 0.588,
+          "terms": [
+            "content",
+            "middleware",
+            "type"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/content_type.go",
+          "score": 0.588,
+          "terms": [
+            "content",
+            "middleware",
+            "type"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/content_encoding_test.go",
+          "score": 0.45,
+          "terms": [
+            "content",
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/content_encoding.go",
+          "score": 0.363,
+          "terms": [
+            "content",
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/client_ip.go",
+          "score": 0.225,
+          "terms": [
+            "middleware",
+            "parse"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/maybe_test.go",
+          "score": 0.225,
+          "terms": [
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/middleware_test.go",
+          "score": 0.225,
+          "terms": [
+            "middleware"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/recoverer.go",
+          "score": 0.225,
+          "terms": [
+            "middleware",
+            "parse"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 38,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 30,
+        "1": 8
+      },
+      "propagationHistogram": {
+        "direct_request_match": 30,
+        "reverse_import_dependency": 8
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 38,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

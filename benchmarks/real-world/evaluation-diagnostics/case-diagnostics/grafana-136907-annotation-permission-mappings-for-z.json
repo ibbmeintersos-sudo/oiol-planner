@@ -1,0 +1,320 @@
+{
+  "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 9,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 9
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 9,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 9
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 7,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 7,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 436,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 4,
+      "actualCount": 436
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 1
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "javascript": 5,
+        "go": 65,
+        "typescript": 4
+      }
+    },
+    "symbols": {
+      "actualCount": 444,
+      "fpByKind": {
+        "function": 156,
+        "method": 153,
+        "struct": 84,
+        "variable": 33,
+        "type": 15,
+        "interface": 3
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 444
+      },
+      "fpTopNames": [
+        "method:Run x4",
+        "method:IsDisabled x3",
+        "function:InitializeModuleServer x3",
+        "function:InitializeZanzanaReconcilerState x3",
+        "function:InitializeSearchSupport x3",
+        "function:InitializeDashboardStats x3",
+        "method:Validate x3",
+        "struct:testCase x3",
+        "variable:baseConfig x2",
+        "variable:ext x2",
+        "variable:relativePath x2",
+        "variable:testDirRoot x2",
+        "function:Initialize x2",
+        "function:InitializeForTest x2",
+        "function:InitializeForCLI x2"
+      ],
+      "tp": 0,
+      "fp": 436,
+      "fn": 4,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type",
+        "variable"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 1,
+      "fpByResolutionKind": {
+        "relative_path": 1
+      },
+      "fpByResolution": {
+        "relative-path": 1
+      },
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 2,
+        "toMissingInWalk": 2,
+        "expectedEdgeCount": 2
+      }
+    },
+    "directFiles": {
+      "matchCount": 9,
+      "termCountHistogram": {
+        "1": 6,
+        "2": 3
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match": 3,
+        "path_match+symbol_match+import_specifier_match": 2,
+        "symbol_match": 2,
+        "path_match": 1,
+        "symbol_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 0,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 9,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "pkg/api/dashboard_permission.go",
+          "score": 0.25,
+          "terms": [
+            "model",
+            "permission"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pkg/api/folder_permission.go",
+          "score": 0.25,
+          "terms": [
+            "model",
+            "permission"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pkg/api/basic_auth_test.go",
+          "score": 0.225,
+          "terms": [
+            "auth"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "pkg/api/dashboard_permission_test.go",
+          "score": 0.225,
+          "terms": [
+            "permission"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "pkg/api/folder_permission_test.go",
+          "score": 0.225,
+          "terms": [
+            "permission"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "pkg/api/annotations_authz_test.go",
+          "score": 0.175,
+          "terms": [
+            "annotation",
+            "legacy"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "pkg/api/basic_auth.go",
+          "score": 0.138,
+          "terms": [
+            "auth"
+          ],
+          "signals": [
+            "path_match"
+          ]
+        },
+        {
+          "path": "pkg/server/wire_helpers_test.go",
+          "score": 0.112,
+          "terms": [
+            "legacy"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "playwright.config.ts",
+          "score": 0.087,
+          "terms": [
+            "auth"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 9,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 9
+      },
+      "propagationHistogram": {
+        "direct_request_match": 9
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 9,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 7,
+      "sample": []
+    }
+  }
+}

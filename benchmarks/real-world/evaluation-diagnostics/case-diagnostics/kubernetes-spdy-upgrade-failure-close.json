@@ -1,0 +1,252 @@
+{
+  "caseId": "kubernetes-spdy-upgrade-failure-close",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 4
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 5,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 4,
+      "actualCount": 5
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 338,
+      "fn": 3,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 3,
+      "actualCount": 338
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 38,
+      "fn": 3,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 3,
+      "actualCount": 38
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "go": 84
+      }
+    },
+    "symbols": {
+      "actualCount": 343,
+      "fpByKind": {
+        "function": 238,
+        "method": 61,
+        "struct": 35,
+        "type": 6,
+        "interface": 3
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 343
+      },
+      "fpTopNames": [
+        "function:main x23",
+        "function:initForOS x5",
+        "method:String x4",
+        "method:addOSFlags x3",
+        "method:platformApplyDefaults x3",
+        "method:platformSetup x3",
+        "method:platformCheckSupported x3",
+        "method:createProxier x3",
+        "function:platformCleanup x3",
+        "method:LogData x3",
+        "function:readFile x2",
+        "function:Run x2",
+        "method:Name x2",
+        "method:Run x2",
+        "function:GetDynamicPluginProber x2"
+      ],
+      "tp": 0,
+      "fp": 338,
+      "fn": 3,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 38,
+      "fpByResolutionKind": {
+        "parser_resolved": 38
+      },
+      "fpByResolution": {
+        "go-module-package-representative": 38
+      },
+      "tp": 0,
+      "fp": 38,
+      "fn": 3,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 3,
+        "toMissingInWalk": 3,
+        "expectedEdgeCount": 3
+      }
+    },
+    "directFiles": {
+      "matchCount": 4,
+      "termCountHistogram": {
+        "1": 4
+      },
+      "signalsHistogram": {
+        "symbol_match": 4
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "cmd/import-boss/main_test.go",
+          "score": 0.087,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "cmd/kube-controller-manager/app/controller_descriptor.go",
+          "score": 0.087,
+          "terms": [
+            "handling"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "cmd/kube-controller-manager/app/core_test.go",
+          "score": 0.087,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "cmd/prune-junit-xml/logparse/logparse.go",
+          "score": 0.087,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 5,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 4,
+        "1": 1
+      },
+      "propagationHistogram": {
+        "direct_request_match": 4,
+        "reverse_import_dependency": 1
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 5,
+      "fn": 4
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "caseId": "laravel-migration-failed-event",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 19,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 19
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 19,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 4,
+      "actualCount": 19
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 907,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 4,
+      "actualCount": 907
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 3,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "php": 92
+      }
+    },
+    "symbols": {
+      "actualCount": 907,
+      "fpByKind": {
+        "method": 807,
+        "class": 77,
+        "function": 11,
+        "trait": 10,
+        "interface": 2
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 907
+      },
+      "fpTopNames": [
+        "method:__construct x56",
+        "method:get x18",
+        "method:increment x16",
+        "method:decrement x16",
+        "method:flush x16",
+        "method:put x14",
+        "method:forever x13",
+        "method:touch x13",
+        "method:add x12",
+        "method:forget x12",
+        "method:getPrefix x12",
+        "method:acquire x11",
+        "method:release x11",
+        "method:getCurrentOwner x9",
+        "method:refresh x9"
+      ],
+      "tp": 0,
+      "fp": 907,
+      "fn": 4,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "trait"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 3,
+        "toMissingInWalk": 3,
+        "expectedEdgeCount": 3
+      }
+    },
+    "directFiles": {
+      "matchCount": 19,
+      "termCountHistogram": {
+        "1": 16,
+        "2": 2,
+        "3": 1
+      },
+      "signalsHistogram": {
+        "symbol_match": 11,
+        "path_match+symbol_match+import_specifier_match": 5,
+        "path_match+symbol_match": 3
+      },
+      "gtCoverage": {
+        "expectedCount": 2,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 19,
+      "fn": 2,
+      "sample": [
+        {
+          "path": "src/Illuminate/Broadcasting/BroadcastEvent.php",
+          "score": 0.338,
+          "terms": [
+            "event",
+            "failed",
+            "when"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Bus/DatabaseBatchRepository.php",
+          "score": 0.338,
+          "terms": [
+            "database",
+            "failed"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Auth/DatabaseUserProvider.php",
+          "score": 0.25,
+          "terms": [
+            "database"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/DatabaseLock.php",
+          "score": 0.25,
+          "terms": [
+            "database"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/DatabaseStore.php",
+          "score": 0.25,
+          "terms": [
+            "database"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Broadcasting/AnonymousEvent.php",
+          "score": 0.225,
+          "terms": [
+            "event"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Broadcasting/UniqueBroadcastEvent.php",
+          "score": 0.225,
+          "terms": [
+            "event"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Conditionable/HigherOrderWhenProxy.php",
+          "score": 0.225,
+          "terms": [
+            "when"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Cache/CacheManager.php",
+          "score": 0.175,
+          "terms": [
+            "database",
+            "event"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "src/Illuminate/Auth/AuthServiceProvider.php",
+          "score": 0.087,
+          "terms": [
+            "event"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 19,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 19
+      },
+      "propagationHistogram": {
+        "direct_request_match": 19
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 19,
+      "fn": 4
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

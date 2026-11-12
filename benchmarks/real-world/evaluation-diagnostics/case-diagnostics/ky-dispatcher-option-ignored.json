@@ -1,0 +1,426 @@
+{
+  "caseId": "ky-dispatcher-option-ignored",
+  "dimensions": {
+    "directFiles": {
+      "tp": 2,
+      "fp": 9,
+      "fn": 0,
+      "precision": 0.1818,
+      "recall": 1,
+      "f1": 0.3077,
+      "expectedCount": 2,
+      "actualCount": 11
+    },
+    "affectedFiles": {
+      "tp": 2,
+      "fp": 9,
+      "fn": 0,
+      "precision": 0.1818,
+      "recall": 1,
+      "f1": 0.3077,
+      "expectedCount": 2,
+      "actualCount": 11
+    },
+    "tests": {
+      "tp": 1,
+      "fp": 18,
+      "fn": 0,
+      "precision": 0.0526,
+      "recall": 1,
+      "f1": 0.1,
+      "expectedCount": 1,
+      "actualCount": 19
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 4,
+      "fp": 301,
+      "fn": 0,
+      "precision": 0.0131,
+      "recall": 1,
+      "f1": 0.0259,
+      "expectedCount": 4,
+      "actualCount": 305
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 3,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 55,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "typescript": 40
+      }
+    },
+    "symbols": {
+      "actualCount": 512,
+      "fpByKind": {
+        "variable": 386,
+        "function": 44,
+        "type": 40,
+        "method": 32,
+        "interface": 3,
+        "class": 3
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 508
+      },
+      "fpTopNames": [
+        "variable:server x86",
+        "variable:requestCount x32",
+        "variable:headers x18",
+        "variable:response x13",
+        "variable:error x12",
+        "variable:json x11",
+        "variable:request x8",
+        "variable:body x8",
+        "method:test x8",
+        "variable:result x7",
+        "function:customFetch x7",
+        "variable:data x5",
+        "method:onDownloadProgress x5",
+        "variable:formData x5",
+        "variable:fixture x5"
+      ],
+      "tp": 4,
+      "fp": 301,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "type",
+        "variable"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 3
+      }
+    },
+    "directFiles": {
+      "matchCount": 11,
+      "termCountHistogram": {
+        "1": 5,
+        "2": 4,
+        "3": 2
+      },
+      "signalsHistogram": {
+        "symbol_match+import_specifier_match": 6,
+        "path_match+symbol_match": 2,
+        "symbol_match": 2,
+        "path_match+symbol_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 2,
+        "presentInWalkedFiles": 2
+      },
+      "gtHitMatchedTermCounts": [
+        3,
+        1
+      ],
+      "tp": 2,
+      "fp": 9,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "source/types/options.ts",
+          "score": 0.313,
+          "terms": [
+            "option",
+            "options"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/core/constants.ts",
+          "score": 0.312,
+          "terms": [
+            "option",
+            "options",
+            "request"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/core/Ky.ts",
+          "score": 0.287,
+          "terms": [
+            "fetch",
+            "options",
+            "request"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/utils/options.ts",
+          "score": 0.25,
+          "terms": [
+            "options"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/types/request.ts",
+          "score": 0.225,
+          "terms": [
+            "request"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/utils/normalize.ts",
+          "score": 0.2,
+          "terms": [
+            "options",
+            "request"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/types/hooks.ts",
+          "score": 0.112,
+          "terms": [
+            "options",
+            "request"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/utils/body.ts",
+          "score": 0.112,
+          "terms": [
+            "options",
+            "request"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/utils/delay.ts",
+          "score": 0.112,
+          "terms": [
+            "options"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/types/retry.ts",
+          "score": 0.087,
+          "terms": [
+            "options"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 11,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 11
+      },
+      "propagationHistogram": {
+        "direct_request_match": 11
+      },
+      "gtHitDepth": [
+        0,
+        0
+      ],
+      "tp": 2,
+      "fp": 9,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 19,
+      "byAssociation": {
+        "test_path_name_overlap": 19
+      },
+      "byConfidence": {
+        "low": 19
+      },
+      "overlapTermHistogram": {
+        "1": 16,
+        "2": 3
+      },
+      "tp": 1,
+      "fp": 18,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "test/browser.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/bytes.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/fetch.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/formdata-searchparams.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/headers.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/create-http-test-server.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/create-large-file.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/index.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/parse-body.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "body",
+            "ts"
+          ]
+        },
+        {
+          "path": "test/helpers/with-page.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "ts"
+          ]
+        }
+      ]
+    }
+  }
+}
