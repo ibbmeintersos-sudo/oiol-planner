@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 8,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 9
+      "actualCount": 8
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 8,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 9
+      "actualCount": 8
     },
     "tests": {
       "tp": 0,
@@ -73,13 +73,13 @@
     },
     "scannerSymbols": {
       "tp": 0,
-      "fp": 437,
+      "fp": 409,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 437
+      "actualCount": 409
     },
     "dependencyEdges": {
       "tp": 0,
@@ -105,17 +105,17 @@
       }
     },
     "symbols": {
-      "actualCount": 445,
+      "actualCount": 415,
       "fpByKind": {
         "function": 156,
         "method": 154,
         "struct": 84,
-        "variable": 33,
         "type": 15,
+        "variable": 3,
         "interface": 3
       },
       "fpBySource": {
-        "tree_sitter_ast": 445
+        "tree_sitter_ast": 415
       },
       "fpTopNames": [
         "method:Run x4",
@@ -126,16 +126,16 @@
         "function:InitializeDashboardStats x3",
         "method:Validate x3",
         "struct:testCase x3",
-        "variable:baseConfig x2",
-        "variable:ext x2",
-        "variable:relativePath x2",
-        "variable:testDirRoot x2",
         "function:Initialize x2",
         "function:InitializeForTest x2",
-        "function:InitializeForCLI x2"
+        "function:InitializeForCLI x2",
+        "function:InitializeAPIServerFactory x2",
+        "function:InitializeRoutesLoader x2",
+        "method:start x2",
+        "method:running x2"
       ],
       "tp": 0,
-      "fp": 437,
+      "fp": 409,
       "fn": 2,
       "emittedKinds": [
         "function",
@@ -168,17 +168,17 @@
       }
     },
     "directFiles": {
-      "matchCount": 9,
+      "matchCount": 8,
       "termCountHistogram": {
-        "1": 5,
+        "1": 4,
         "2": 4
       },
       "signalsHistogram": {
         "path_match+import_specifier_match": 3,
         "path_match+symbol_match": 2,
-        "symbol_match": 2,
         "path_match+symbol_match+import_specifier_match": 1,
-        "path_match": 1
+        "path_match": 1,
+        "symbol_match": 1
       },
       "gtCoverage": {
         "expectedCount": 2,
@@ -186,7 +186,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 8,
       "fn": 2,
       "sample": [
         {
@@ -279,31 +279,21 @@
           "signals": [
             "symbol_match"
           ]
-        },
-        {
-          "path": "playwright.storybook.config.ts",
-          "score": 0.087,
-          "terms": [
-            "root"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 9,
+      "matchCount": 8,
       "truncated": false,
       "depthHistogram": {
-        "0": 9
+        "0": 8
       },
       "propagationHistogram": {
-        "direct_request_match": 9
+        "direct_request_match": 8
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 8,
       "fn": 2
     },
     "tests": {

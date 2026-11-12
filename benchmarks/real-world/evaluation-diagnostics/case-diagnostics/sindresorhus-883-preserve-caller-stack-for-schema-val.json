@@ -3,33 +3,33 @@
   "dimensions": {
     "directFiles": {
       "tp": 1,
-      "fp": 11,
+      "fp": 9,
       "fn": 0,
-      "precision": 0.0833,
+      "precision": 0.1,
       "recall": 1,
-      "f1": 0.1538,
+      "f1": 0.1818,
       "expectedCount": 1,
-      "actualCount": 12
+      "actualCount": 10
     },
     "affectedFiles": {
       "tp": 1,
-      "fp": 18,
+      "fp": 16,
       "fn": 0,
-      "precision": 0.0526,
+      "precision": 0.0588,
       "recall": 1,
-      "f1": 0.1,
+      "f1": 0.1111,
       "expectedCount": 1,
-      "actualCount": 19
+      "actualCount": 17
     },
     "tests": {
       "tp": 1,
-      "fp": 23,
+      "fp": 22,
       "fn": 0,
-      "precision": 0.0417,
+      "precision": 0.0435,
       "recall": 1,
-      "f1": 0.08,
+      "f1": 0.0833,
       "expectedCount": 1,
-      "actualCount": 24
+      "actualCount": 23
     },
     "packages": {
       "tp": 0,
@@ -73,13 +73,13 @@
     },
     "scannerSymbols": {
       "tp": 1,
-      "fp": 321,
+      "fp": 115,
       "fn": 0,
-      "precision": 0.0031,
+      "precision": 0.0086,
       "recall": 1,
-      "f1": 0.0062,
+      "f1": 0.0171,
       "expectedCount": 1,
-      "actualCount": 322
+      "actualCount": 116
     },
     "dependencyEdges": {
       "tp": 1,
@@ -103,37 +103,37 @@
       }
     },
     "symbols": {
-      "actualCount": 435,
+      "actualCount": 116,
       "fpByKind": {
-        "variable": 298,
-        "function": 71,
         "type": 43,
+        "function": 37,
         "method": 13,
+        "variable": 13,
         "class": 7,
         "interface": 2
       },
       "fpBySource": {
-        "tree_sitter_ast": 434
+        "tree_sitter_ast": 115
       },
       "fpTopNames": [
-        "variable:server x46",
-        "variable:headers x19",
-        "function:customFetch x14",
-        "variable:body x8",
         "method:constructor x8",
-        "variable:response x6",
-        "variable:formData x5",
-        "variable:form x5",
-        "variable:result x4",
-        "variable:original x4",
-        "variable:extended x4",
-        "variable:buffer x3",
-        "variable:array x3",
-        "variable:parameters x3",
-        "variable:size x3"
+        "method:onUploadProgress x1",
+        "function:isKyLeaking x1",
+        "function:isStreamLeaking x1",
+        "interface:Options x1",
+        "interface:NormalizedOptions x1",
+        "type:ExpectedNormalizedRetryOptions x1",
+        "type:ExpectedProgressCallbacks x1",
+        "variable:supportsRequestStreams x1",
+        "method:duplex x1",
+        "variable:supportsAbortController x1",
+        "variable:supportsAbortSignal x1",
+        "variable:supportsResponseStreams x1",
+        "variable:supportsFormData x1",
+        "variable:requestMethods x1"
       ],
       "tp": 1,
-      "fp": 321,
+      "fp": 115,
       "fn": 0,
       "emittedKinds": [
         "class",
@@ -166,17 +166,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 12,
+      "matchCount": 10,
       "termCountHistogram": {
-        "1": 10,
-        "2": 1,
+        "1": 9,
         "3": 1
       },
       "signalsHistogram": {
         "path_match+symbol_match+import_specifier_match": 4,
         "path_match+symbol_match": 4,
-        "symbol_match": 3,
-        "symbol_match+import_specifier_match": 1
+        "symbol_match+import_specifier_match": 1,
+        "symbol_match": 1
       },
       "gtCoverage": {
         "expectedCount": 1,
@@ -186,7 +185,7 @@
         3
       ],
       "tp": 1,
-      "fp": 11,
+      "fp": 9,
       "fn": 0,
       "sample": [
         {
@@ -201,18 +200,6 @@
             "path_match",
             "symbol_match",
             "import_specifier_match"
-          ]
-        },
-        {
-          "path": "source/utils/is-network-error.ts",
-          "score": 0.313,
-          "terms": [
-            "error",
-            "stack"
-          ],
-          "signals": [
-            "path_match",
-            "symbol_match"
           ]
         },
         {
@@ -285,6 +272,17 @@
           ]
         },
         {
+          "path": "source/utils/is-network-error.ts",
+          "score": 0.225,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
           "path": "source/utils/type-guards.ts",
           "score": 0.112,
           "terms": [
@@ -308,41 +306,40 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 19,
+      "matchCount": 17,
       "truncated": false,
       "depthHistogram": {
-        "0": 12,
+        "0": 10,
         "1": 5,
         "2": 2
       },
       "propagationHistogram": {
-        "direct_request_match": 12,
+        "direct_request_match": 10,
         "reverse_import_dependency": 7
       },
       "gtHitDepth": [
         1
       ],
       "tp": 1,
-      "fp": 18,
+      "fp": 16,
       "fn": 0
     },
     "tests": {
-      "matchCount": 24,
+      "matchCount": 23,
       "byAssociation": {
-        "test_path_name_overlap": 15,
+        "test_path_name_overlap": 14,
         "resolved_test_import_to_impacted_file": 9
       },
       "byConfidence": {
-        "low": 15,
+        "low": 14,
         "high": 9
       },
       "overlapTermHistogram": {
-        "1": 1,
-        "2": 11,
-        "3": 3
+        "1": 11,
+        "2": 3
       },
       "tp": 1,
-      "fp": 23,
+      "fp": 22,
       "fn": 0,
       "sample": [
         {
@@ -355,7 +352,6 @@
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
-            "test",
             "ts"
           ]
         },
@@ -364,7 +360,6 @@
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
-            "test",
             "ts"
           ]
         },
@@ -398,7 +393,6 @@
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
-            "test",
             "ts"
           ]
         },
@@ -407,7 +401,6 @@
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
-            "test",
             "ts"
           ]
         }

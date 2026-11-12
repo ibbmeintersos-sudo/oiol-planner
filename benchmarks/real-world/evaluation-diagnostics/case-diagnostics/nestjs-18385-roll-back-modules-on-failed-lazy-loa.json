@@ -3,13 +3,13 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 17,
+      "fp": 16,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 17
+      "actualCount": 16
     },
     "affectedFiles": {
       "tp": 0,
@@ -73,13 +73,13 @@
     },
     "scannerSymbols": {
       "tp": 0,
-      "fp": 973,
+      "fp": 611,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 973
+      "actualCount": 611
     },
     "dependencyEdges": {
       "tp": 0,
@@ -104,38 +104,38 @@
       }
     },
     "symbols": {
-      "actualCount": 1038,
+      "actualCount": 617,
       "fpByKind": {
-        "variable": 508,
         "method": 411,
+        "variable": 103,
         "class": 56,
-        "function": 24,
         "type": 20,
         "interface": 14,
+        "function": 8,
         "enum": 5
       },
       "fpBySource": {
-        "tree_sitter_ast": 1038
+        "tree_sitter_ast": 617
       },
       "fpTopNames": [
         "method:constructor x41",
         "method:close x11",
         "method:on x10",
         "method:unwrap x9",
-        "variable:packet x8",
-        "variable:result x7",
-        "variable:handler x6",
-        "variable:serializedPacket x6",
-        "variable:modules x5",
-        "variable:proxy x5",
         "method:listen x5",
-        "variable:options x5",
-        "variable:message x5",
         "method:registerErrorListener x5",
-        "variable:pattern x5"
+        "method:handleMessage x4",
+        "method:initializeSerializer x4",
+        "method:handleClose x4",
+        "method:error x4",
+        "method:log x4",
+        "method:warn x4",
+        "method:debug x4",
+        "method:verbose x4",
+        "method:connect x4"
       ],
       "tp": 0,
-      "fp": 973,
+      "fp": 611,
       "fn": 1,
       "emittedKinds": [
         "class",
@@ -170,16 +170,15 @@
       }
     },
     "directFiles": {
-      "matchCount": 17,
+      "matchCount": 16,
       "termCountHistogram": {
-        "1": 7,
-        "2": 5,
-        "3": 3,
+        "1": 8,
+        "2": 6,
         "4": 2
       },
       "signalsHistogram": {
-        "symbol_match+import_specifier_match": 5,
         "path_match+symbol_match": 5,
+        "symbol_match+import_specifier_match": 4,
         "path_match+symbol_match+import_specifier_match": 3,
         "symbol_match": 3,
         "import_specifier_match": 1
@@ -190,38 +189,9 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 17,
+      "fp": 16,
       "fn": 1,
       "sample": [
-        {
-          "path": "packages/core/nest-factory.ts",
-          "score": 0.45,
-          "terms": [
-            "container",
-            "load",
-            "loader",
-            "module",
-            "scanner"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "packages/testing/testing-module.builder.ts",
-          "score": 0.45,
-          "terms": [
-            "loader",
-            "module",
-            "scanner"
-          ],
-          "signals": [
-            "path_match",
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
         {
           "path": "packages/testing/testing-module.ts",
           "score": 0.313,
@@ -235,14 +205,14 @@
           ]
         },
         {
-          "path": "packages/microservices/nest-microservice.ts",
-          "score": 0.287,
+          "path": "packages/testing/testing-module.builder.ts",
+          "score": 0.275,
           "terms": [
-            "container",
-            "load",
+            "loader",
             "module"
           ],
           "signals": [
+            "path_match",
             "symbol_match",
             "import_specifier_match"
           ]
@@ -316,6 +286,33 @@
             "path_match",
             "symbol_match"
           ]
+        },
+        {
+          "path": "packages/microservices/nest-microservice.ts",
+          "score": 0.2,
+          "terms": [
+            "load",
+            "module"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "packages/core/nest-factory.ts",
+          "score": 0.188,
+          "terms": [
+            "container",
+            "load",
+            "loader",
+            "module",
+            "scanner"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
         }
       ]
     },
@@ -323,14 +320,14 @@
       "matchCount": 44,
       "truncated": false,
       "depthHistogram": {
-        "0": 17,
-        "1": 16,
+        "0": 16,
+        "1": 17,
         "2": 9,
         "3": 2
       },
       "propagationHistogram": {
-        "reverse_import_dependency": 27,
-        "direct_request_match": 17
+        "reverse_import_dependency": 28,
+        "direct_request_match": 16
       },
       "gtHitDepth": [],
       "tp": 0,

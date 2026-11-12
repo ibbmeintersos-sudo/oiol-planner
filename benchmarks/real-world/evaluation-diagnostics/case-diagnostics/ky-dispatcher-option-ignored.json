@@ -73,13 +73,13 @@
     },
     "scannerSymbols": {
       "tp": 4,
-      "fp": 301,
+      "fp": 104,
       "fn": 0,
-      "precision": 0.0131,
+      "precision": 0.037,
       "recall": 1,
-      "f1": 0.0259,
+      "f1": 0.0714,
       "expectedCount": 4,
-      "actualCount": 305
+      "actualCount": 108
     },
     "dependencyEdges": {
       "tp": 3,
@@ -103,37 +103,37 @@
       }
     },
     "symbols": {
-      "actualCount": 512,
+      "actualCount": 121,
       "fpByKind": {
-        "variable": 386,
-        "function": 44,
         "type": 40,
         "method": 32,
+        "function": 28,
+        "variable": 11,
         "interface": 3,
         "class": 3
       },
       "fpBySource": {
-        "tree_sitter_ast": 508
+        "tree_sitter_ast": 117
       },
       "fpTopNames": [
-        "variable:server x86",
-        "variable:requestCount x32",
-        "variable:headers x18",
-        "variable:response x13",
-        "variable:error x12",
-        "variable:json x11",
-        "variable:request x8",
-        "variable:body x8",
         "method:test x8",
-        "variable:result x7",
-        "function:customFetch x7",
-        "variable:data x5",
         "method:onDownloadProgress x5",
-        "variable:formData x5",
-        "variable:fixture x5"
+        "method:constructor x4",
+        "method:onUploadProgress x3",
+        "method:parseJson x2",
+        "interface:Window x1",
+        "method:fetch x1",
+        "function:createFakeResponse x1",
+        "function:isKyLeaking x1",
+        "function:isStreamLeaking x1",
+        "variable:supportsRequestStreams x1",
+        "method:duplex x1",
+        "variable:supportsAbortController x1",
+        "variable:supportsAbortSignal x1",
+        "variable:supportsResponseStreams x1"
       ],
       "tp": 4,
-      "fp": 301,
+      "fp": 104,
       "fn": 0,
       "emittedKinds": [
         "class",
@@ -169,8 +169,8 @@
       "matchCount": 11,
       "termCountHistogram": {
         "1": 5,
-        "2": 4,
-        "3": 2
+        "2": 5,
+        "3": 1
       },
       "signalsHistogram": {
         "symbol_match+import_specifier_match": 6,
@@ -216,19 +216,6 @@
           ]
         },
         {
-          "path": "source/core/Ky.ts",
-          "score": 0.287,
-          "terms": [
-            "fetch",
-            "options",
-            "request"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
           "path": "source/utils/options.ts",
           "score": 0.25,
           "terms": [
@@ -249,6 +236,18 @@
           "signals": [
             "path_match",
             "symbol_match"
+          ]
+        },
+        {
+          "path": "source/core/Ky.ts",
+          "score": 0.2,
+          "terms": [
+            "fetch",
+            "options"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
           ]
         },
         {

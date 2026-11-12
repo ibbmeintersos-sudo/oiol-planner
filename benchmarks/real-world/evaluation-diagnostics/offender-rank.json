@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T08:04:08.336Z",
+  "generatedAt": "2026-11-12T18:02:22.615Z",
   "dimensions": {
     "directFiles": {
       "topFalsePositives": [
@@ -17,7 +17,7 @@
         },
         {
           "caseId": "nestjs-node-adapter-req-route",
-          "fp": 27
+          "fp": 24
         },
         {
           "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
@@ -326,24 +326,24 @@
     "scannerSymbols": {
       "topFalsePositives": [
         {
-          "caseId": "nestjs-node-adapter-req-route",
-          "fp": 987
-        },
-        {
-          "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
-          "fp": 984
-        },
-        {
-          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
-          "fp": 973
-        },
-        {
           "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
           "fp": 939
         },
         {
           "caseId": "pydantic-decimal-json-schema-pattern",
           "fp": 930
+        },
+        {
+          "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+          "fp": 930
+        },
+        {
+          "caseId": "laravel-migration-failed-event",
+          "fp": 907
+        },
+        {
+          "caseId": "laravel-62326-add-origin-to-uri-class",
+          "fp": 907
         }
       ],
       "topFalseNegatives": [

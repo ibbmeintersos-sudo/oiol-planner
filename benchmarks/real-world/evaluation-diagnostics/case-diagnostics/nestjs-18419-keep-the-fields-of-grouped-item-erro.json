@@ -3,13 +3,13 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 19,
+      "fp": 18,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 19
+      "actualCount": 18
     },
     "affectedFiles": {
       "tp": 0,
@@ -73,13 +73,13 @@
     },
     "scannerSymbols": {
       "tp": 0,
-      "fp": 984,
+      "fp": 614,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 984
+      "actualCount": 614
     },
     "dependencyEdges": {
       "tp": 0,
@@ -104,38 +104,38 @@
       }
     },
     "symbols": {
-      "actualCount": 1051,
+      "actualCount": 620,
       "fpByKind": {
-        "variable": 518,
         "method": 413,
+        "variable": 103,
         "class": 56,
-        "function": 25,
         "type": 20,
         "interface": 14,
+        "function": 9,
         "enum": 5
       },
       "fpBySource": {
-        "tree_sitter_ast": 1051
+        "tree_sitter_ast": 620
       },
       "fpTopNames": [
         "method:constructor x41",
         "method:close x11",
         "method:on x10",
         "method:unwrap x9",
-        "variable:packet x9",
-        "variable:result x7",
-        "variable:handler x6",
-        "variable:pattern x6",
-        "variable:serializedPacket x6",
-        "variable:modules x5",
-        "variable:proxy x5",
         "method:listen x5",
-        "variable:options x5",
-        "variable:message x5",
-        "method:registerErrorListener x5"
+        "method:registerErrorListener x5",
+        "method:handleMessage x4",
+        "method:initializeSerializer x4",
+        "method:handleClose x4",
+        "method:error x4",
+        "method:log x4",
+        "method:warn x4",
+        "method:debug x4",
+        "method:verbose x4",
+        "method:connect x4"
       ],
       "tp": 0,
-      "fp": 984,
+      "fp": 614,
       "fn": 1,
       "emittedKinds": [
         "class",
@@ -170,15 +170,15 @@
       }
     },
     "directFiles": {
-      "matchCount": 19,
+      "matchCount": 18,
       "termCountHistogram": {
-        "1": 11,
-        "2": 6,
-        "3": 2
+        "1": 12,
+        "2": 5,
+        "3": 1
       },
       "signalsHistogram": {
         "symbol_match": 13,
-        "symbol_match+import_specifier_match": 5,
+        "symbol_match+import_specifier_match": 4,
         "path_match+symbol_match": 1
       },
       "gtCoverage": {
@@ -187,7 +187,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 19,
+      "fp": 18,
       "fn": 0,
       "sample": [
         {
@@ -208,19 +208,6 @@
             "error",
             "errors",
             "parse"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "packages/microservices/server/server-tcp.ts",
-          "score": 0.2,
-          "terms": [
-            "error",
-            "errors",
-            "observable"
           ],
           "signals": [
             "symbol_match",
@@ -250,30 +237,7 @@
           ]
         },
         {
-          "path": "packages/testing/services/capturing-logger.service.ts",
-          "score": 0.175,
-          "terms": [
-            "error",
-            "level"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
           "path": "packages/core/nest-factory.ts",
-          "score": 0.112,
-          "terms": [
-            "error",
-            "errors"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "packages/microservices/client/client-grpc.ts",
           "score": 0.112,
           "terms": [
             "error",
@@ -297,10 +261,42 @@
           ]
         },
         {
+          "path": "packages/microservices/server/server-tcp.ts",
+          "score": 0.112,
+          "terms": [
+            "error",
+            "errors"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
           "path": "packages/common/exceptions/http.exception.ts",
           "score": 0.087,
           "terms": [
             "error"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/common/services/log-levels.constant.ts",
+          "score": 0.087,
+          "terms": [
+            "level"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/core/application-config.ts",
+          "score": 0.087,
+          "terms": [
+            "pipe"
           ],
           "signals": [
             "symbol_match"
@@ -312,15 +308,15 @@
       "matchCount": 67,
       "truncated": false,
       "depthHistogram": {
-        "0": 19,
-        "1": 36,
+        "0": 18,
+        "1": 37,
         "2": 10,
         "3": 1,
         "4": 1
       },
       "propagationHistogram": {
-        "reverse_import_dependency": 48,
-        "direct_request_match": 19
+        "reverse_import_dependency": 49,
+        "direct_request_match": 18
       },
       "gtHitDepth": [],
       "tp": 0,

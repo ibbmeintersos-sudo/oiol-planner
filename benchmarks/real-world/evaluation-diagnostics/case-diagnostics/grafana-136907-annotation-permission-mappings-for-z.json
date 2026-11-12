@@ -73,13 +73,13 @@
     },
     "scannerSymbols": {
       "tp": 0,
-      "fp": 436,
+      "fp": 408,
       "fn": 4,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 4,
-      "actualCount": 436
+      "actualCount": 408
     },
     "dependencyEdges": {
       "tp": 0,
@@ -105,17 +105,17 @@
       }
     },
     "symbols": {
-      "actualCount": 444,
+      "actualCount": 414,
       "fpByKind": {
         "function": 156,
         "method": 153,
         "struct": 84,
-        "variable": 33,
         "type": 15,
+        "variable": 3,
         "interface": 3
       },
       "fpBySource": {
-        "tree_sitter_ast": 444
+        "tree_sitter_ast": 414
       },
       "fpTopNames": [
         "method:Run x4",
@@ -126,16 +126,16 @@
         "function:InitializeDashboardStats x3",
         "method:Validate x3",
         "struct:testCase x3",
-        "variable:baseConfig x2",
-        "variable:ext x2",
-        "variable:relativePath x2",
-        "variable:testDirRoot x2",
         "function:Initialize x2",
         "function:InitializeForTest x2",
-        "function:InitializeForCLI x2"
+        "function:InitializeForCLI x2",
+        "function:InitializeAPIServerFactory x2",
+        "function:InitializeRoutesLoader x2",
+        "method:start x2",
+        "method:running x2"
       ],
       "tp": 0,
-      "fp": 436,
+      "fp": 408,
       "fn": 4,
       "emittedKinds": [
         "function",
