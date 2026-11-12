@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 2,
+      "fp": 0,
       "fn": 0,
-      "precision": 0,
+      "precision": 1,
       "recall": 1,
-      "f1": 0,
+      "f1": 1,
       "expectedCount": 0,
-      "actualCount": 2
+      "actualCount": 0
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 2,
+      "fp": 0,
       "fn": 0,
-      "precision": 0,
+      "precision": 1,
       "recall": 1,
-      "f1": 0,
+      "f1": 1,
       "expectedCount": 0,
-      "actualCount": 2
+      "actualCount": 0
     },
     "tests": {
       "tp": 0,
@@ -160,56 +160,27 @@
       }
     },
     "directFiles": {
-      "matchCount": 2,
-      "termCountHistogram": {
-        "1": 2
-      },
-      "signalsHistogram": {
-        "symbol_match": 2
-      },
+      "matchCount": 0,
+      "termCountHistogram": {},
+      "signalsHistogram": {},
       "gtCoverage": {
         "expectedCount": 0,
         "presentInWalkedFiles": 0
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 2,
+      "fp": 0,
       "fn": 0,
-      "sample": [
-        {
-          "path": "src/Illuminate/Collections/functions.php",
-          "score": 0.087,
-          "terms": [
-            "value"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Collections/helpers.php",
-          "score": 0.087,
-          "terms": [
-            "value"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        }
-      ]
+      "sample": []
     },
     "affectedFiles": {
-      "matchCount": 2,
+      "matchCount": 0,
       "truncated": false,
-      "depthHistogram": {
-        "0": 2
-      },
-      "propagationHistogram": {
-        "direct_request_match": 2
-      },
+      "depthHistogram": {},
+      "propagationHistogram": {},
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 2,
+      "fp": 0,
       "fn": 0
     },
     "tests": {

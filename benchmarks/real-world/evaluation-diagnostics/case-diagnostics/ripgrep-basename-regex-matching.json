@@ -2,34 +2,34 @@
   "caseId": "ripgrep-basename-regex-matching",
   "dimensions": {
     "directFiles": {
-      "tp": 1,
-      "fp": 5,
-      "fn": 0,
-      "precision": 0.1667,
-      "recall": 1,
-      "f1": 0.2857,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
       "expectedCount": 1,
-      "actualCount": 6
+      "actualCount": 1
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 6,
+      "fp": 1,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 6
+      "actualCount": 1
     },
     "tests": {
-      "tp": 2,
-      "fp": 15,
-      "fn": 0,
-      "precision": 0.1176,
-      "recall": 1,
-      "f1": 0.2105,
+      "tp": 1,
+      "fp": 4,
+      "fn": 1,
+      "precision": 0.2,
+      "recall": 0.5,
+      "f1": 0.2857,
       "expectedCount": 2,
-      "actualCount": 17
+      "actualCount": 5
     },
     "packages": {
       "tp": 0,
@@ -167,24 +167,21 @@
       }
     },
     "directFiles": {
-      "matchCount": 6,
+      "matchCount": 1,
       "termCountHistogram": {
-        "1": 6
+        "1": 1
       },
       "signalsHistogram": {
-        "symbol_match": 5,
         "path_match+symbol_match+import_specifier_match": 1
       },
       "gtCoverage": {
         "expectedCount": 1,
         "presentInWalkedFiles": 1
       },
-      "gtHitMatchedTermCounts": [
-        1
-      ],
-      "tp": 1,
-      "fp": 5,
-      "fn": 0,
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
       "sample": [
         {
           "path": "crates/regex/src/non_matching.rs",
@@ -197,116 +194,45 @@
             "symbol_match",
             "import_specifier_match"
           ]
-        },
-        {
-          "path": "crates/cli/src/pattern.rs",
-          "score": 0.087,
-          "terms": [
-            "patterns"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "crates/ignore/src/overrides.rs",
-          "score": 0.087,
-          "terms": [
-            "only"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "crates/ignore/src/pathutil.rs",
-          "score": 0.087,
-          "terms": [
-            "only"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "crates/regex/src/config.rs",
-          "score": 0.087,
-          "terms": [
-            "matching"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "crates/regex/src/lib.rs",
-          "score": 0.087,
-          "terms": [
-            "matching"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 6,
+      "matchCount": 1,
       "truncated": false,
       "depthHistogram": {
-        "0": 6
+        "0": 1
       },
       "propagationHistogram": {
-        "direct_request_match": 6
+        "direct_request_match": 1
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 6,
+      "fp": 1,
       "fn": 2
     },
     "tests": {
-      "matchCount": 17,
+      "matchCount": 5,
       "byAssociation": {
-        "test_path_name_overlap": 17
+        "test_path_name_overlap": 5
       },
       "byConfidence": {
-        "low": 17
+        "low": 5
       },
       "overlapTermHistogram": {
-        "1": 10,
-        "2": 5,
-        "3": 2
+        "2": 5
       },
-      "tp": 2,
-      "fp": 15,
-      "fn": 0,
+      "tp": 1,
+      "fp": 4,
+      "fn": 1,
       "sample": [
-        {
-          "path": "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.gitignore",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "crates",
-            "ignore"
-          ]
-        },
         {
           "path": "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs",
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
             "crates",
-            "ignore",
             "rs"
-          ]
-        },
-        {
-          "path": "crates/ignore/tests/gitignore_skip_bom.gitignore",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "crates",
-            "ignore"
           ]
         },
         {
@@ -315,7 +241,6 @@
           "association": "test_path_name_overlap",
           "terms": [
             "crates",
-            "ignore",
             "rs"
           ]
         },
@@ -343,30 +268,6 @@
           "association": "test_path_name_overlap",
           "terms": [
             "crates",
-            "rs"
-          ]
-        },
-        {
-          "path": "tests/binary.rs",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "rs"
-          ]
-        },
-        {
-          "path": "tests/feature.rs",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "rs"
-          ]
-        },
-        {
-          "path": "tests/hay.rs",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
             "rs"
           ]
         }

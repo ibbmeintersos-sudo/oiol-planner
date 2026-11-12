@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 5,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 9
+      "actualCount": 5
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 5,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 9
+      "actualCount": 5
     },
     "tests": {
       "tp": 0,
@@ -168,12 +168,11 @@
       }
     },
     "directFiles": {
-      "matchCount": 9,
+      "matchCount": 5,
       "termCountHistogram": {
-        "1": 9
+        "1": 5
       },
       "signalsHistogram": {
-        "symbol_match": 4,
         "path_match+symbol_match": 3,
         "path_match+symbol_match+import_specifier_match": 2
       },
@@ -183,7 +182,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 5,
       "fn": 1,
       "sample": [
         {
@@ -242,61 +241,21 @@
             "path_match",
             "symbol_match"
           ]
-        },
-        {
-          "path": "pkg/api/alerting.go",
-          "score": 0.087,
-          "terms": [
-            "alert"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "pkg/api/common_test.go",
-          "score": 0.087,
-          "terms": [
-            "service"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "pkg/server/nats_module_test.go",
-          "score": 0.087,
-          "terms": [
-            "service"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "pkg/server/server_test.go",
-          "score": 0.087,
-          "terms": [
-            "service"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 9,
+      "matchCount": 5,
       "truncated": false,
       "depthHistogram": {
-        "0": 9
+        "0": 5
       },
       "propagationHistogram": {
-        "direct_request_match": 9
+        "direct_request_match": 5
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 5,
       "fn": 0
     },
     "tests": {

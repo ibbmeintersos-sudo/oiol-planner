@@ -3,33 +3,33 @@
   "dimensions": {
     "directFiles": {
       "tp": 1,
-      "fp": 9,
+      "fp": 7,
       "fn": 0,
-      "precision": 0.1,
+      "precision": 0.125,
       "recall": 1,
-      "f1": 0.1818,
+      "f1": 0.2222,
       "expectedCount": 1,
-      "actualCount": 10
+      "actualCount": 8
     },
     "affectedFiles": {
       "tp": 1,
-      "fp": 16,
+      "fp": 14,
       "fn": 0,
-      "precision": 0.0588,
+      "precision": 0.0667,
       "recall": 1,
-      "f1": 0.1111,
+      "f1": 0.125,
       "expectedCount": 1,
-      "actualCount": 17
+      "actualCount": 15
     },
     "tests": {
-      "tp": 1,
-      "fp": 22,
-      "fn": 0,
-      "precision": 0.0435,
-      "recall": 1,
-      "f1": 0.0833,
+      "tp": 0,
+      "fp": 11,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
       "expectedCount": 1,
-      "actualCount": 23
+      "actualCount": 11
     },
     "packages": {
       "tp": 0,
@@ -43,13 +43,13 @@
     },
     "apiConsumers": {
       "tp": 0,
-      "fp": 4,
+      "fp": 2,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 4
+      "actualCount": 2
     },
     "databaseConsumers": {
       "tp": 0,
@@ -166,16 +166,14 @@
       }
     },
     "directFiles": {
-      "matchCount": 10,
+      "matchCount": 8,
       "termCountHistogram": {
-        "1": 9,
+        "1": 7,
         "3": 1
       },
       "signalsHistogram": {
         "path_match+symbol_match+import_specifier_match": 4,
-        "path_match+symbol_match": 4,
-        "symbol_match+import_specifier_match": 1,
-        "symbol_match": 1
+        "path_match+symbol_match": 4
       },
       "gtCoverage": {
         "expectedCount": 1,
@@ -185,7 +183,7 @@
         3
       ],
       "tp": 1,
-      "fp": 9,
+      "fp": 7,
       "fn": 0,
       "sample": [
         {
@@ -281,87 +279,49 @@
             "path_match",
             "symbol_match"
           ]
-        },
-        {
-          "path": "source/utils/type-guards.ts",
-          "score": 0.112,
-          "terms": [
-            "error"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "source/types/hooks.ts",
-          "score": 0.087,
-          "terms": [
-            "error"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 17,
+      "matchCount": 15,
       "truncated": false,
       "depthHistogram": {
-        "0": 10,
+        "0": 8,
         "1": 5,
         "2": 2
       },
       "propagationHistogram": {
-        "direct_request_match": 10,
+        "direct_request_match": 8,
         "reverse_import_dependency": 7
       },
       "gtHitDepth": [
         1
       ],
       "tp": 1,
-      "fp": 16,
+      "fp": 14,
       "fn": 0
     },
     "tests": {
-      "matchCount": 23,
+      "matchCount": 11,
       "byAssociation": {
-        "test_path_name_overlap": 14,
-        "resolved_test_import_to_impacted_file": 9
+        "resolved_test_import_to_impacted_file": 9,
+        "test_path_name_overlap": 2
       },
       "byConfidence": {
-        "low": 14,
-        "high": 9
+        "high": 9,
+        "low": 2
       },
       "overlapTermHistogram": {
-        "1": 11,
-        "2": 3
+        "2": 2
       },
-      "tp": 1,
-      "fp": 22,
-      "fn": 0,
+      "tp": 0,
+      "fp": 11,
+      "fn": 1,
       "sample": [
         {
           "path": "test/base-url.ts",
           "confidence": "high",
           "association": "resolved_test_import_to_impacted_file"
-        },
-        {
-          "path": "test/body-size.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
-        },
-        {
-          "path": "test/browser.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
         },
         {
           "path": "test/bytes.ts",
@@ -389,18 +349,26 @@
           "association": "resolved_test_import_to_impacted_file"
         },
         {
-          "path": "test/helpers/create-http-test-server.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
+          "path": "test/memory-leak.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
-          "path": "test/helpers/create-large-file.ts",
+          "path": "test/methods.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/prefix.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/http-error.ts",
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
+            "error",
             "ts"
           ]
         }

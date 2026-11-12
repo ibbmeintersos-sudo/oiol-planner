@@ -3,43 +3,43 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 16,
+      "fp": 10,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 16
+      "actualCount": 10
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 44,
+      "fp": 20,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 44
+      "actualCount": 20
     },
     "tests": {
       "tp": 0,
-      "fp": 2,
+      "fp": 1,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 2
+      "actualCount": 1
     },
     "packages": {
       "tp": 1,
-      "fp": 9,
+      "fp": 8,
       "fn": 0,
-      "precision": 0.1,
+      "precision": 0.1111,
       "recall": 1,
-      "f1": 0.1818,
+      "f1": 0.2,
       "expectedCount": 1,
-      "actualCount": 10
+      "actualCount": 9
     },
     "apiConsumers": {
       "tp": 0,
@@ -170,18 +170,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 16,
+      "matchCount": 10,
       "termCountHistogram": {
-        "1": 8,
-        "2": 6,
-        "4": 2
+        "1": 4,
+        "2": 5,
+        "4": 1
       },
       "signalsHistogram": {
         "path_match+symbol_match": 5,
-        "symbol_match+import_specifier_match": 4,
         "path_match+symbol_match+import_specifier_match": 3,
-        "symbol_match": 3,
-        "import_specifier_match": 1
+        "symbol_match+import_specifier_match": 2
       },
       "gtCoverage": {
         "expectedCount": 1,
@@ -189,7 +187,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 16,
+      "fp": 10,
       "fn": 1,
       "sample": [
         {
@@ -317,37 +315,35 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 44,
+      "matchCount": 20,
       "truncated": false,
       "depthHistogram": {
-        "0": 16,
-        "1": 17,
-        "2": 9,
-        "3": 2
+        "0": 10,
+        "1": 6,
+        "2": 4
       },
       "propagationHistogram": {
-        "reverse_import_dependency": 28,
-        "direct_request_match": 16
+        "direct_request_match": 10,
+        "reverse_import_dependency": 10
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 44,
+      "fp": 20,
       "fn": 1
     },
     "tests": {
-      "matchCount": 2,
+      "matchCount": 1,
       "byAssociation": {
-        "test_path_name_overlap": 2
+        "test_path_name_overlap": 1
       },
       "byConfidence": {
-        "low": 2
+        "low": 1
       },
       "overlapTermHistogram": {
-        "3": 1,
-        "4": 1
+        "2": 1
       },
       "tp": 0,
-      "fp": 2,
+      "fp": 1,
       "fn": 1,
       "sample": [
         {
@@ -355,20 +351,8 @@
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [
-            "common",
             "packages",
-            "test",
             "ts"
-          ]
-        },
-        {
-          "path": "packages/common/test/tsconfig.json",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "common",
-            "packages",
-            "test"
           ]
         }
       ]

@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 7,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 9
+      "actualCount": 7
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 7,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 9
+      "actualCount": 7
     },
     "tests": {
       "tp": 0,
@@ -168,17 +168,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 9,
+      "matchCount": 7,
       "termCountHistogram": {
-        "1": 6,
+        "1": 4,
         "2": 3
       },
       "signalsHistogram": {
         "path_match+symbol_match": 3,
         "path_match+symbol_match+import_specifier_match": 2,
-        "symbol_match": 2,
-        "path_match": 1,
-        "symbol_match+import_specifier_match": 1
+        "symbol_match": 1,
+        "path_match": 1
       },
       "gtCoverage": {
         "expectedCount": 0,
@@ -186,7 +185,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 7,
       "fn": 0,
       "sample": [
         {
@@ -268,42 +267,21 @@
           "signals": [
             "path_match"
           ]
-        },
-        {
-          "path": "pkg/server/wire_helpers_test.go",
-          "score": 0.112,
-          "terms": [
-            "legacy"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "playwright.config.ts",
-          "score": 0.087,
-          "terms": [
-            "auth"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 9,
+      "matchCount": 7,
       "truncated": false,
       "depthHistogram": {
-        "0": 9
+        "0": 7
       },
       "propagationHistogram": {
-        "direct_request_match": 9
+        "direct_request_match": 7
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 7,
       "fn": 0
     },
     "tests": {

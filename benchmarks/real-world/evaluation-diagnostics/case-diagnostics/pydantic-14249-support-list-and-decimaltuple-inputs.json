@@ -3,33 +3,33 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 2,
+      "fp": 1,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 2
+      "actualCount": 1
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 2,
+      "fp": 1,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 2
+      "actualCount": 1
     },
     "tests": {
       "tp": 0,
-      "fp": 21,
+      "fp": 19,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 21
+      "actualCount": 19
     },
     "packages": {
       "tp": 0,
@@ -171,13 +171,12 @@
       }
     },
     "directFiles": {
-      "matchCount": 2,
+      "matchCount": 1,
       "termCountHistogram": {
-        "1": 1,
         "3": 1
       },
       "signalsHistogram": {
-        "symbol_match+import_specifier_match": 2
+        "symbol_match+import_specifier_match": 1
       },
       "gtCoverage": {
         "expectedCount": 1,
@@ -185,7 +184,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 2,
+      "fp": 1,
       "fn": 1,
       "sample": [
         {
@@ -200,49 +199,37 @@
             "symbol_match",
             "import_specifier_match"
           ]
-        },
-        {
-          "path": "pydantic-core/src/lib.rs",
-          "score": 0.112,
-          "terms": [
-            "input"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 2,
+      "matchCount": 1,
       "truncated": false,
       "depthHistogram": {
-        "0": 2
+        "0": 1
       },
       "propagationHistogram": {
-        "direct_request_match": 2
+        "direct_request_match": 1
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 2,
+      "fp": 1,
       "fn": 0
     },
     "tests": {
-      "matchCount": 21,
+      "matchCount": 19,
       "byAssociation": {
-        "test_path_name_overlap": 21
+        "test_path_name_overlap": 19
       },
       "byConfidence": {
-        "low": 21
+        "low": 19
       },
       "overlapTermHistogram": {
-        "1": 2,
         "2": 18,
         "3": 1
       },
       "tp": 0,
-      "fp": 21,
+      "fp": 19,
       "fn": 2,
       "sample": [
         {
@@ -270,6 +257,16 @@
           "terms": [
             "core",
             "pydantic"
+          ]
+        },
+        {
+          "path": "pydantic-core/tests/test.rs",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "core",
+            "pydantic",
+            "rs"
           ]
         },
         {
@@ -319,15 +316,6 @@
         },
         {
           "path": "pydantic-core/tests/test_fields_set.py",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "core",
-            "pydantic"
-          ]
-        },
-        {
-          "path": "pydantic-core/tests/test_garbage_collection.py",
           "confidence": "low",
           "association": "test_path_name_overlap",
           "terms": [

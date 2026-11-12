@@ -3,33 +3,33 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 21,
+      "fp": 12,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 21
+      "actualCount": 12
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 21,
+      "fp": 12,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 21
+      "actualCount": 12
     },
     "tests": {
       "tp": 0,
-      "fp": 88,
+      "fp": 20,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 88
+      "actualCount": 20
     },
     "packages": {
       "tp": 0,
@@ -161,17 +161,13 @@
       }
     },
     "directFiles": {
-      "matchCount": 21,
+      "matchCount": 12,
       "termCountHistogram": {
-        "1": 8,
-        "2": 13
+        "1": 1,
+        "2": 11
       },
       "signalsHistogram": {
-        "path_match+symbol_match+import_specifier_match": 12,
-        "path_match+symbol_match": 6,
-        "symbol_match+import_specifier_match": 1,
-        "path_match+import_specifier_match": 1,
-        "symbol_match": 1
+        "path_match+symbol_match+import_specifier_match": 12
       },
       "gtCoverage": {
         "expectedCount": 0,
@@ -179,7 +175,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 21,
+      "fp": 12,
       "fn": 0,
       "sample": [
         {
@@ -314,32 +310,32 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 21,
+      "matchCount": 12,
       "truncated": false,
       "depthHistogram": {
-        "0": 21
+        "0": 12
       },
       "propagationHistogram": {
-        "direct_request_match": 21
+        "direct_request_match": 12
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 21,
+      "fp": 12,
       "fn": 0
     },
     "tests": {
-      "matchCount": 88,
+      "matchCount": 20,
       "byAssociation": {
-        "test_path_name_overlap": 88
+        "test_path_name_overlap": 20
       },
       "byConfidence": {
-        "low": 88
+        "low": 20
       },
       "overlapTermHistogram": {
-        "4": 88
+        "4": 20
       },
       "tp": 0,
-      "fp": 88,
+      "fp": 20,
       "fn": 0,
       "sample": [
         {

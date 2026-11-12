@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 19,
+      "fp": 9,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 19
+      "actualCount": 9
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 19,
+      "fp": 9,
       "fn": 4,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 4,
-      "actualCount": 19
+      "actualCount": 9
     },
     "tests": {
       "tp": 0,
@@ -160,16 +160,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 19,
+      "matchCount": 9,
       "termCountHistogram": {
-        "1": 16,
+        "1": 6,
         "2": 2,
         "3": 1
       },
       "signalsHistogram": {
-        "symbol_match": 11,
         "path_match+symbol_match+import_specifier_match": 5,
-        "path_match+symbol_match": 3
+        "path_match+symbol_match": 3,
+        "symbol_match": 1
       },
       "gtCoverage": {
         "expectedCount": 2,
@@ -177,7 +177,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 19,
+      "fp": 9,
       "fn": 2,
       "sample": [
         {
@@ -286,31 +286,21 @@
           "signals": [
             "symbol_match"
           ]
-        },
-        {
-          "path": "src/Illuminate/Auth/AuthServiceProvider.php",
-          "score": 0.087,
-          "terms": [
-            "event"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 19,
+      "matchCount": 9,
       "truncated": false,
       "depthHistogram": {
-        "0": 19
+        "0": 9
       },
       "propagationHistogram": {
-        "direct_request_match": 19
+        "direct_request_match": 9
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 19,
+      "fp": 9,
       "fn": 4
     },
     "tests": {

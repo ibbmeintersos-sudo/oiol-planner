@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 8,
+      "fp": 7,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 8
+      "actualCount": 7
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 8,
+      "fp": 7,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 8
+      "actualCount": 7
     },
     "tests": {
       "tp": 0,
@@ -168,17 +168,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 8,
+      "matchCount": 7,
       "termCountHistogram": {
-        "1": 4,
+        "1": 3,
         "2": 4
       },
       "signalsHistogram": {
         "path_match+import_specifier_match": 3,
         "path_match+symbol_match": 2,
         "path_match+symbol_match+import_specifier_match": 1,
-        "path_match": 1,
-        "symbol_match": 1
+        "path_match": 1
       },
       "gtCoverage": {
         "expectedCount": 2,
@@ -186,7 +185,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 8,
+      "fp": 7,
       "fn": 2,
       "sample": [
         {
@@ -269,31 +268,21 @@
           "signals": [
             "path_match"
           ]
-        },
-        {
-          "path": "playwright.config.ts",
-          "score": 0.087,
-          "terms": [
-            "root"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 8,
+      "matchCount": 7,
       "truncated": false,
       "depthHistogram": {
-        "0": 8
+        "0": 7
       },
       "propagationHistogram": {
-        "direct_request_match": 8
+        "direct_request_match": 7
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 8,
+      "fp": 7,
       "fn": 2
     },
     "tests": {

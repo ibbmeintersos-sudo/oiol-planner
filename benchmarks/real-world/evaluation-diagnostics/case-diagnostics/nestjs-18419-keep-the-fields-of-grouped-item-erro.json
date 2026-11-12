@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 18,
+      "fp": 4,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 18
+      "actualCount": 4
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 67,
+      "fp": 12,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 67
+      "actualCount": 12
     },
     "tests": {
       "tp": 0,
@@ -170,16 +170,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 18,
+      "matchCount": 4,
       "termCountHistogram": {
-        "1": 12,
-        "2": 5,
+        "1": 1,
+        "2": 2,
         "3": 1
       },
       "signalsHistogram": {
-        "symbol_match": 13,
-        "symbol_match+import_specifier_match": 4,
-        "path_match+symbol_match": 1
+        "symbol_match": 2,
+        "path_match+symbol_match": 1,
+        "symbol_match+import_specifier_match": 1
       },
       "gtCoverage": {
         "expectedCount": 0,
@@ -187,7 +187,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 18,
+      "fp": 4,
       "fn": 0,
       "sample": [
         {
@@ -235,92 +235,24 @@
           "signals": [
             "symbol_match"
           ]
-        },
-        {
-          "path": "packages/core/nest-factory.ts",
-          "score": 0.112,
-          "terms": [
-            "error",
-            "errors"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "packages/microservices/client/client-proxy.ts",
-          "score": 0.112,
-          "terms": [
-            "error",
-            "errors"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "packages/microservices/server/server-tcp.ts",
-          "score": 0.112,
-          "terms": [
-            "error",
-            "errors"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "packages/common/exceptions/http.exception.ts",
-          "score": 0.087,
-          "terms": [
-            "error"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "packages/common/services/log-levels.constant.ts",
-          "score": 0.087,
-          "terms": [
-            "level"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "packages/core/application-config.ts",
-          "score": 0.087,
-          "terms": [
-            "pipe"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 67,
+      "matchCount": 12,
       "truncated": false,
       "depthHistogram": {
-        "0": 18,
-        "1": 37,
-        "2": 10,
-        "3": 1,
-        "4": 1
+        "0": 4,
+        "1": 4,
+        "2": 4
       },
       "propagationHistogram": {
-        "reverse_import_dependency": 49,
-        "direct_request_match": 18
+        "reverse_import_dependency": 8,
+        "direct_request_match": 4
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 67,
+      "fp": 12,
       "fn": 0
     },
     "tests": {

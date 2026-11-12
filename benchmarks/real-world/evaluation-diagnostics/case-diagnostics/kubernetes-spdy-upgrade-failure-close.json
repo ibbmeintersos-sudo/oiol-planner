@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 4,
+      "fp": 0,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 4
+      "actualCount": 0
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 5,
+      "fp": 0,
       "fn": 4,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 4,
-      "actualCount": 5
+      "actualCount": 0
     },
     "tests": {
       "tp": 0,
@@ -164,78 +164,27 @@
       }
     },
     "directFiles": {
-      "matchCount": 4,
-      "termCountHistogram": {
-        "1": 4
-      },
-      "signalsHistogram": {
-        "symbol_match": 4
-      },
+      "matchCount": 0,
+      "termCountHistogram": {},
+      "signalsHistogram": {},
       "gtCoverage": {
         "expectedCount": 1,
         "presentInWalkedFiles": 0
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 4,
+      "fp": 0,
       "fn": 1,
-      "sample": [
-        {
-          "path": "cmd/import-boss/main_test.go",
-          "score": 0.087,
-          "terms": [
-            "error"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/controller_descriptor.go",
-          "score": 0.087,
-          "terms": [
-            "handling"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/core_test.go",
-          "score": 0.087,
-          "terms": [
-            "error"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/prune-junit-xml/logparse/logparse.go",
-          "score": 0.087,
-          "terms": [
-            "error"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        }
-      ]
+      "sample": []
     },
     "affectedFiles": {
-      "matchCount": 5,
+      "matchCount": 0,
       "truncated": false,
-      "depthHistogram": {
-        "0": 4,
-        "1": 1
-      },
-      "propagationHistogram": {
-        "direct_request_match": 4,
-        "reverse_import_dependency": 1
-      },
+      "depthHistogram": {},
+      "propagationHistogram": {},
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 5,
+      "fp": 0,
       "fn": 4
     },
     "tests": {

@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 1,
-      "fp": 29,
+      "fp": 11,
       "fn": 0,
-      "precision": 0.0333,
+      "precision": 0.0833,
       "recall": 1,
-      "f1": 0.0645,
+      "f1": 0.1538,
       "expectedCount": 1,
-      "actualCount": 30
+      "actualCount": 12
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 38,
+      "fp": 20,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 38
+      "actualCount": 20
     },
     "tests": {
       "tp": 0,
@@ -164,16 +164,16 @@
       }
     },
     "directFiles": {
-      "matchCount": 30,
+      "matchCount": 12,
       "termCountHistogram": {
-        "1": 22,
+        "1": 4,
         "2": 4,
         "3": 2,
         "4": 2
       },
       "signalsHistogram": {
-        "path_match": 20,
         "path_match+symbol_match": 9,
+        "path_match": 2,
         "path_match+import_specifier_match": 1
       },
       "gtCoverage": {
@@ -184,7 +184,7 @@
         5
       ],
       "tp": 1,
-      "fp": 29,
+      "fp": 11,
       "fn": 0,
       "sample": [
         {
@@ -317,19 +317,19 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 38,
+      "matchCount": 20,
       "truncated": false,
       "depthHistogram": {
-        "0": 30,
+        "0": 12,
         "1": 8
       },
       "propagationHistogram": {
-        "direct_request_match": 30,
+        "direct_request_match": 12,
         "reverse_import_dependency": 8
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 38,
+      "fp": 20,
       "fn": 0
     },
     "tests": {

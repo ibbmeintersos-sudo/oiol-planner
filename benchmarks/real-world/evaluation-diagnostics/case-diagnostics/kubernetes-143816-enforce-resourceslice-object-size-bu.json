@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 6,
+      "fp": 1,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 6
+      "actualCount": 1
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 6,
+      "fp": 1,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 6
+      "actualCount": 1
     },
     "tests": {
       "tp": 0,
@@ -164,12 +164,11 @@
       }
     },
     "directFiles": {
-      "matchCount": 6,
+      "matchCount": 1,
       "termCountHistogram": {
-        "1": 6
+        "1": 1
       },
       "signalsHistogram": {
-        "symbol_match": 5,
         "path_match+symbol_match": 1
       },
       "gtCoverage": {
@@ -178,7 +177,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 6,
+      "fp": 1,
       "fn": 0,
       "sample": [
         {
@@ -191,71 +190,21 @@
             "path_match",
             "symbol_match"
           ]
-        },
-        {
-          "path": "cmd/dependencyverifier/dependencyverifier.go",
-          "score": 0.087,
-          "terms": [
-            "slice"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/controller_utils.go",
-          "score": 0.087,
-          "terms": [
-            "slice"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/core_test.go",
-          "score": 0.087,
-          "terms": [
-            "resource"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/discovery.go",
-          "score": 0.087,
-          "terms": [
-            "slice"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kubelet/app/init_windows.go",
-          "score": 0.087,
-          "terms": [
-            "object"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 6,
+      "matchCount": 1,
       "truncated": false,
       "depthHistogram": {
-        "0": 6
+        "0": 1
       },
       "propagationHistogram": {
-        "direct_request_match": 6
+        "direct_request_match": 1
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 6,
+      "fp": 1,
       "fn": 0
     },
     "tests": {

@@ -1,27 +1,27 @@
 {
-  "generatedAt": "2026-11-12T18:02:22.615Z",
+  "generatedAt": "2026-11-12T18:14:00.676Z",
   "dimensions": {
     "directFiles": {
       "topFalsePositives": [
         {
-          "caseId": "chi-suppress-not-found-route-context",
-          "fp": 29
-        },
-        {
-          "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
-          "fp": 29
-        },
-        {
-          "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
-          "fp": 29
-        },
-        {
           "caseId": "nestjs-node-adapter-req-route",
-          "fp": 24
+          "fp": 12
+        },
+        {
+          "caseId": "home-assistant-unifi-disabled-entities",
+          "fp": 12
+        },
+        {
+          "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+          "fp": 12
         },
         {
           "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
-          "fp": 21
+          "fp": 12
+        },
+        {
+          "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+          "fp": 12
         }
       ],
       "topFalseNegatives": [
@@ -50,24 +50,24 @@
     "affectedFiles": {
       "topFalsePositives": [
         {
-          "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
-          "fp": 67
-        },
-        {
           "caseId": "nestjs-node-adapter-req-route",
-          "fp": 55
+          "fp": 45
         },
         {
-          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
-          "fp": 44
+          "caseId": "home-assistant-unifi-disabled-entities",
+          "fp": 20
         },
         {
           "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
-          "fp": 38
+          "fp": 20
         },
         {
-          "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
-          "fp": 38
+          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+          "fp": 20
+        },
+        {
+          "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+          "fp": 18
         }
       ],
       "topFalseNegatives": [
@@ -97,23 +97,23 @@
       "topFalsePositives": [
         {
           "caseId": "pydantic-decimal-json-schema-pattern",
-          "fp": 100
+          "fp": 20
+        },
+        {
+          "caseId": "home-assistant-unifi-disabled-entities",
+          "fp": 20
         },
         {
           "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
-          "fp": 100
+          "fp": 20
         },
         {
           "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
-          "fp": 88
+          "fp": 20
         },
         {
           "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
-          "fp": 88
-        },
-        {
-          "caseId": "spring-boot-duration-micros-overflow",
-          "fp": 87
+          "fp": 20
         }
       ],
       "topFalseNegatives": [
@@ -151,7 +151,7 @@
         },
         {
           "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
-          "fp": 9
+          "fp": 8
         },
         {
           "caseId": "ky-dispatcher-option-ignored",
@@ -189,7 +189,7 @@
       "topFalsePositives": [
         {
           "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
-          "fp": 4
+          "fp": 2
         },
         {
           "caseId": "ky-dispatcher-option-ignored",

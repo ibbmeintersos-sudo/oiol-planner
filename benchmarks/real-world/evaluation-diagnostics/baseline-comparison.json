@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T18:02:22.615Z",
+  "generatedAt": "2026-11-12T18:14:00.676Z",
   "gate0": "DRIFT",
   "note": "Gate-0 passes only when every dimension stays within +-0.005 F1 of the frozen P12 baseline.",
   "dimensions": [
@@ -11,16 +11,16 @@
         "f1": 0.0312
       },
       "measured": {
-        "precision": 0.0187,
-        "recall": 0.4537,
-        "f1": 0.032
+        "precision": 0.0514,
+        "recall": 0.4259,
+        "f1": 0.0662
       },
       "delta": {
-        "precision": 0.0005,
-        "recall": 0,
-        "f1": 0.0008
+        "precision": 0.0332,
+        "recall": -0.0278,
+        "f1": 0.035
       },
-      "verdict": "neutral"
+      "verdict": "improvement"
     },
     {
       "dimension": "affectedFiles",
@@ -30,16 +30,16 @@
         "f1": 0.0656
       },
       "measured": {
-        "precision": 0.0612,
+        "precision": 0.1188,
         "recall": 0.7222,
-        "f1": 0.066
+        "f1": 0.125
       },
       "delta": {
-        "precision": -0.0002,
+        "precision": 0.0574,
         "recall": 0.0278,
-        "f1": 0.0004
+        "f1": 0.0594
       },
-      "verdict": "neutral"
+      "verdict": "improvement"
     },
     {
       "dimension": "tests",
@@ -49,14 +49,14 @@
         "f1": 0.1293
       },
       "measured": {
-        "precision": 0.121,
-        "recall": 0.4167,
-        "f1": 0.1294
+        "precision": 0.1243,
+        "recall": 0.3611,
+        "f1": 0.1328
       },
       "delta": {
-        "precision": 0.0001,
-        "recall": 0,
-        "f1": 0.0001
+        "precision": 0.0034,
+        "recall": -0.0556,
+        "f1": 0.0035
       },
       "verdict": "neutral"
     },
@@ -68,14 +68,14 @@
         "f1": 0.9217
       },
       "measured": {
-        "precision": 0.9194,
+        "precision": 0.9198,
         "recall": 1,
-        "f1": 0.9217
+        "f1": 0.9222
       },
       "delta": {
-        "precision": 0,
+        "precision": 0.0004,
         "recall": 0,
-        "f1": 0
+        "f1": 0.0005
       },
       "verdict": "neutral"
     },

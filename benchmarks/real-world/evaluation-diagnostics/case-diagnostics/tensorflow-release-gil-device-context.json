@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 2,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 9
+      "actualCount": 2
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 9,
+      "fp": 2,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 9
+      "actualCount": 2
     },
     "tests": {
       "tp": 0,
@@ -163,12 +163,11 @@
       }
     },
     "directFiles": {
-      "matchCount": 9,
+      "matchCount": 2,
       "termCountHistogram": {
-        "1": 9
+        "1": 2
       },
       "signalsHistogram": {
-        "symbol_match": 7,
         "path_match+symbol_match": 2
       },
       "gtCoverage": {
@@ -177,7 +176,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 2,
       "fn": 2,
       "sample": [
         {
@@ -201,91 +200,21 @@
             "path_match",
             "symbol_match"
           ]
-        },
-        {
-          "path": "tensorflow/go/operation_test.go",
-          "score": 0.087,
-          "terms": [
-            "device"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "tensorflow/go/operation.go",
-          "score": 0.087,
-          "terms": [
-            "device"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "tensorflow/go/session_test.go",
-          "score": 0.087,
-          "terms": [
-            "device"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "tensorflow/go/session.go",
-          "score": 0.087,
-          "terms": [
-            "device"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "tensorflow/go/tensor_handle_test.go",
-          "score": 0.087,
-          "terms": [
-            "device"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "tensorflow/go/tensor_handle.go",
-          "score": 0.087,
-          "terms": [
-            "device"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "tensorflow/go/tensor_test.go",
-          "score": 0.087,
-          "terms": [
-            "not"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 9,
+      "matchCount": 2,
       "truncated": false,
       "depthHistogram": {
-        "0": 9
+        "0": 2
       },
       "propagationHistogram": {
-        "direct_request_match": 9
+        "direct_request_match": 2
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 9,
+      "fp": 2,
       "fn": 1
     },
     "tests": {

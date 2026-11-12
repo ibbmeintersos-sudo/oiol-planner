@@ -3,33 +3,33 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 17,
+      "fp": 12,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 17
+      "actualCount": 12
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 25,
+      "fp": 20,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 25
+      "actualCount": 20
     },
     "tests": {
       "tp": 0,
-      "fp": 28,
+      "fp": 20,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 28
+      "actualCount": 20
     },
     "packages": {
       "tp": 0,
@@ -159,17 +159,17 @@
       }
     },
     "directFiles": {
-      "matchCount": 17,
+      "matchCount": 12,
       "termCountHistogram": {
-        "1": 11,
-        "2": 5,
+        "1": 7,
+        "2": 4,
         "4": 1
       },
       "signalsHistogram": {
         "path_match+symbol_match": 6,
-        "symbol_match": 5,
-        "symbol_match+import_specifier_match": 3,
-        "path_match+symbol_match+import_specifier_match": 3
+        "path_match+symbol_match+import_specifier_match": 3,
+        "symbol_match+import_specifier_match": 2,
+        "symbol_match": 1
       },
       "gtCoverage": {
         "expectedCount": 0,
@@ -177,7 +177,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 17,
+      "fp": 12,
       "fn": 0,
       "sample": [
         {
@@ -301,36 +301,36 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 25,
+      "matchCount": 20,
       "truncated": false,
       "depthHistogram": {
-        "0": 17,
+        "0": 12,
         "1": 8
       },
       "propagationHistogram": {
-        "direct_request_match": 17,
+        "direct_request_match": 12,
         "reverse_import_dependency": 8
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 25,
+      "fp": 20,
       "fn": 0
     },
     "tests": {
-      "matchCount": 28,
+      "matchCount": 20,
       "byAssociation": {
-        "test_path_name_overlap": 28
+        "test_path_name_overlap": 20
       },
       "byConfidence": {
-        "low": 28
+        "low": 20
       },
       "overlapTermHistogram": {
         "2": 1,
-        "3": 7,
-        "4": 20
+        "3": 5,
+        "4": 14
       },
       "tp": 0,
-      "fp": 28,
+      "fp": 20,
       "fn": 0,
       "sample": [
         {
@@ -413,7 +413,6 @@
             "assistant",
             "checkers",
             "config",
-            "flow",
             "home",
             "packages",
             "py",
@@ -428,7 +427,6 @@
             "assistant",
             "checkers",
             "config",
-            "flow",
             "home",
             "id",
             "packages",

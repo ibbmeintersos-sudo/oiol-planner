@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 15,
+      "fp": 3,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 15
+      "actualCount": 3
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 15,
+      "fp": 3,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 15
+      "actualCount": 3
     },
     "tests": {
       "tp": 0,
@@ -164,15 +164,14 @@
       }
     },
     "directFiles": {
-      "matchCount": 15,
+      "matchCount": 3,
       "termCountHistogram": {
-        "1": 13,
+        "1": 1,
         "2": 1,
         "3": 1
       },
       "signalsHistogram": {
-        "symbol_match": 10,
-        "symbol_match+import_specifier_match": 4,
+        "symbol_match+import_specifier_match": 2,
         "path_match+symbol_match": 1
       },
       "gtCoverage": {
@@ -181,7 +180,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 15,
+      "fp": 3,
       "fn": 0,
       "sample": [
         {
@@ -219,93 +218,21 @@
             "symbol_match",
             "import_specifier_match"
           ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/plugins_test.go",
-          "score": 0.112,
-          "terms": [
-            "volume"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "cmd/kubelet/app/plugins.go",
-          "score": 0.112,
-          "terms": [
-            "volume"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "cmd/importverifier/importverifier.go",
-          "score": 0.087,
-          "terms": [
-            "decode"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/networking.go",
-          "score": 0.087,
-          "terms": [
-            "service"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/resource.go",
-          "score": 0.087,
-          "terms": [
-            "claim"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-controller-manager/app/storageversionmigrator.go",
-          "score": 0.087,
-          "terms": [
-            "storage"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "cmd/kube-proxy/app/server_linux_test.go",
-          "score": 0.087,
-          "terms": [
-            "apply"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 15,
+      "matchCount": 3,
       "truncated": false,
       "depthHistogram": {
-        "0": 15
+        "0": 3
       },
       "propagationHistogram": {
-        "direct_request_match": 15
+        "direct_request_match": 3
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 15,
+      "fp": 3,
       "fn": 0
     },
     "tests": {

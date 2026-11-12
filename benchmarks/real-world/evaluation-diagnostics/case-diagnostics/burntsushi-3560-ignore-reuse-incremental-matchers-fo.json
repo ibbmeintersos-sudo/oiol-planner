@@ -3,33 +3,33 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 8,
+      "fp": 5,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 8
+      "actualCount": 5
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 8,
+      "fp": 5,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 8
+      "actualCount": 5
     },
     "tests": {
       "tp": 1,
-      "fp": 16,
+      "fp": 6,
       "fn": 0,
-      "precision": 0.0588,
+      "precision": 0.1429,
       "recall": 1,
-      "f1": 0.1111,
+      "f1": 0.25,
       "expectedCount": 1,
-      "actualCount": 17
+      "actualCount": 7
     },
     "packages": {
       "tp": 0,
@@ -167,13 +167,12 @@
       }
     },
     "directFiles": {
-      "matchCount": 8,
+      "matchCount": 5,
       "termCountHistogram": {
-        "1": 7,
+        "1": 4,
         "2": 1
       },
       "signalsHistogram": {
-        "symbol_match": 3,
         "path_match": 2,
         "path_match+symbol_match+import_specifier_match": 1,
         "path_match+symbol_match": 1,
@@ -185,7 +184,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 8,
+      "fp": 5,
       "fn": 1,
       "sample": [
         {
@@ -242,68 +241,37 @@
           "signals": [
             "path_match"
           ]
-        },
-        {
-          "path": "crates/core/messages.rs",
-          "score": 0.087,
-          "terms": [
-            "ignore"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "crates/regex/src/config.rs",
-          "score": 0.087,
-          "terms": [
-            "matching"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "crates/regex/src/lib.rs",
-          "score": 0.087,
-          "terms": [
-            "matching"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 8,
+      "matchCount": 5,
       "truncated": false,
       "depthHistogram": {
-        "0": 8
+        "0": 5
       },
       "propagationHistogram": {
-        "direct_request_match": 8
+        "direct_request_match": 5
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 8,
+      "fp": 5,
       "fn": 0
     },
     "tests": {
-      "matchCount": 17,
+      "matchCount": 7,
       "byAssociation": {
-        "test_path_name_overlap": 17
+        "test_path_name_overlap": 7
       },
       "byConfidence": {
-        "low": 17
+        "low": 7
       },
       "overlapTermHistogram": {
-        "1": 10,
         "2": 5,
         "3": 2
       },
       "tp": 1,
-      "fp": 16,
+      "fp": 6,
       "fn": 0,
       "sample": [
         {
@@ -368,30 +336,6 @@
           "association": "test_path_name_overlap",
           "terms": [
             "crates",
-            "rs"
-          ]
-        },
-        {
-          "path": "tests/binary.rs",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "rs"
-          ]
-        },
-        {
-          "path": "tests/feature.rs",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "rs"
-          ]
-        },
-        {
-          "path": "tests/hay.rs",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
             "rs"
           ]
         }

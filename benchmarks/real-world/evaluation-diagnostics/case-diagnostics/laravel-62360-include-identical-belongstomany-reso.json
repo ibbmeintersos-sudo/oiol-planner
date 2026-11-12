@@ -3,23 +3,23 @@
   "dimensions": {
     "directFiles": {
       "tp": 0,
-      "fp": 11,
+      "fp": 2,
       "fn": 1,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 1,
-      "actualCount": 11
+      "actualCount": 2
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 11,
+      "fp": 2,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 11
+      "actualCount": 2
     },
     "tests": {
       "tp": 0,
@@ -160,15 +160,14 @@
       }
     },
     "directFiles": {
-      "matchCount": 11,
+      "matchCount": 2,
       "termCountHistogram": {
-        "1": 9,
         "2": 1,
         "3": 1
       },
       "signalsHistogram": {
-        "symbol_match": 9,
-        "symbol_match+import_specifier_match": 2
+        "symbol_match+import_specifier_match": 1,
+        "symbol_match": 1
       },
       "gtCoverage": {
         "expectedCount": 1,
@@ -176,7 +175,7 @@
       },
       "gtHitMatchedTermCounts": [],
       "tp": 0,
-      "fp": 11,
+      "fp": 2,
       "fn": 1,
       "sample": [
         {
@@ -202,102 +201,21 @@
           "signals": [
             "symbol_match"
           ]
-        },
-        {
-          "path": "src/Illuminate/Bus/Batch.php",
-          "score": 0.112,
-          "terms": [
-            "json"
-          ],
-          "signals": [
-            "symbol_match",
-            "import_specifier_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/DatabaseStore.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/FailoverStore.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/MemcachedStore.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/MemoizedStore.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/MemoizedTaggedCache.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/RetrievesMultipleKeys.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
-        },
-        {
-          "path": "src/Illuminate/Cache/TaggedCache.php",
-          "score": 0.087,
-          "terms": [
-            "many"
-          ],
-          "signals": [
-            "symbol_match"
-          ]
         }
       ]
     },
     "affectedFiles": {
-      "matchCount": 11,
+      "matchCount": 2,
       "truncated": false,
       "depthHistogram": {
-        "0": 11
+        "0": 2
       },
       "propagationHistogram": {
-        "direct_request_match": 11
+        "direct_request_match": 2
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 11,
+      "fp": 2,
       "fn": 2
     },
     "tests": {
