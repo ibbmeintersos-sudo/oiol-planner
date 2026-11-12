@@ -1,0 +1,384 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+  "source": {
+    "repositoryUrl": "https://github.com/pallets/itsdangerous",
+    "baseCommit": "1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4",
+    "changeCommit": "09a8e058a9cca4cae9fb993d936957278cbec151",
+    "changeUrl": "https://github.com/pallets/itsdangerous/pull/404",
+    "license": "BSD-3-Clause",
+    "licenseFile": "LICENSE.txt",
+    "licenseFileUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/LICENSE.txt",
+    "sizeClass": "small",
+    "repositoryKind": "library",
+    "trackedFileCountAtBase": 58,
+    "primaryLanguages": [
+      "Python"
+    ]
+  },
+  "change": {
+    "request": "Migrate the project's dependency and development workflow to uv, keeping build, documentation, publishing, pre-commit, and CI configuration aligned.",
+    "summary": "Update project to use uv for dependency management (pallets/itsdangerous #404)",
+    "category": "cross_component"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/pallets-404-update-project-to-use-uv-for-depende",
+    "sha256": "48ae56ceeaf6251b7ee4b9cff7647eada2f68d6955f598565076a1adf8780b9b",
+    "gitTreeSha": "31278b31828f7fc223797c0e8f25fc38d4782691",
+    "artifactName": "p12-snapshot-14"
+  },
+  "groundTruth": {
+    "directFiles": [
+      ".github/workflows/lock.yaml",
+      ".github/workflows/publish.yaml",
+      ".github/workflows/tests.yaml",
+      ".pre-commit-config.yaml",
+      ".readthedocs.yaml",
+      "pyproject.toml",
+      "requirements/build.in",
+      "requirements/build.txt",
+      "requirements/dev.in",
+      "requirements/dev.txt",
+      "requirements/docs.in",
+      "requirements/docs.txt",
+      "requirements/tests.in",
+      "requirements/tests.txt",
+      "requirements/typing.in",
+      "requirements/typing.txt",
+      "tox.ini"
+    ],
+    "affectedFiles": [
+      "src/itsdangerous/__init__.py"
+    ],
+    "tests": [
+      "tests/test_itsdangerous/test_serializer.py",
+      "tests/test_itsdangerous/test_signer.py"
+    ],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "base64_decode",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "base64_encode",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "want_bytes",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/serializer.py",
+        "name": "Serializer",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/signer.py",
+        "name": "Signer",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/timed.py",
+        "name": "TimedSerializer",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/serializer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/timed.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/url_safe.py"
+      }
+    ],
+    "unknowns": [
+      "Exact uv configuration for pre-commit hooks in .pre-commit-config.yaml",
+      "Handling of optional dependency groups (dev, docs, tests, typing) in pyproject.toml",
+      "Whether .readthedocs.yaml requires changes for uv-based doc builds",
+      "Whether tox.ini will be fully replaced by uv or kept for compatibility",
+      "Whether uv's build backend replacement will preserve the sdist inclusion behavior defined in pyproject.toml sdist section."
+    ],
+    "risks": [
+      {
+        "id": "R1",
+        "severity": "medium",
+        "rationale": "Migrating the build system from flit_core to uv may alter sdist packaging, potentially including or excluding files differently, affecting published distributions."
+      },
+      {
+        "id": "ci-dep-resolution",
+        "severity": "medium",
+        "rationale": "CI workflow changes may break dependency resolution if uv version constraints differ from pip-compile output"
+      },
+      {
+        "id": "external-tooling-break",
+        "severity": "low",
+        "rationale": "Removing requirements/*.txt files breaks external tooling expecting those files"
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T00:08:37.853Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "tests",
+            "claim": "Test suite may need uv-related adjustments.",
+            "evidence": "pytest configuration in test files references requirements*.txt.",
+            "path": "tests/test_itsdangerous/test_serializer.py",
+            "symbol": "test_serializer",
+            "lineRange": "1-5",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/tests/test_itsdangerous/test_serializer.py#L1-L5"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "Version deprecation in __init__.py may affect consumers.",
+            "evidence": "deprecated __getattr__ warning about __version__.",
+            "path": "src/itsdangerous/__init__.py",
+            "symbol": "__getattr__",
+            "lineRange": "45-55",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/src/itsdangerous/__init__.py#L45-L55"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:35:27.875Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "pyproject.toml must be edited to add uv configuration and dependency groups",
+            "evidence": "Current pyproject.toml uses flit_core build backend and has no uv tool configuration",
+            "path": "pyproject.toml",
+            "symbol": "",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/pyproject.toml#L1-L50"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "tests.yaml must be updated to use uv for dependency installation and test execution",
+            "evidence": "Current workflow uses pip cache with requirements*/*.txt and runs tox",
+            "path": ".github/workflows/tests.yaml",
+            "symbol": "",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/.github/workflows/tests.yaml#L1-L50"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "publish.yaml must use uv build and uv publish instead of pip install and python -m build",
+            "evidence": "Current workflow installs requirements/build.txt and runs python -m build",
+            "path": ".github/workflows/publish.yaml",
+            "symbol": "",
+            "lineRange": "1-40",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/.github/workflows/publish.yaml#L1-L40"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "requirements/*.in and *.txt files will be removed and replaced by uv.lock and pyproject.toml dependency groups",
+            "evidence": "Tree shows 10 requirements files generated by pip-compile for build, dev, docs, tests, typing",
+            "path": "requirements/build.in",
+            "symbol": "",
+            "lineRange": "1-1",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/requirements/build.in#L1"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "pre-commit-config.yaml may need updates for uv-compatible hook execution",
+            "evidence": "Current config uses ruff-pre-commit from astral-sh which also publishes uv",
+            "path": ".pre-commit-config.yaml",
+            "symbol": "",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/.pre-commit-config.yaml#L1-L20"
+          },
+          {
+            "dimension": "risks",
+            "claim": "CI workflow changes may break dependency resolution if uv version constraints differ from pip-compile output",
+            "evidence": "tests.yaml and publish.yaml pin dependency versions via requirements/*.txt generated by pip-compile",
+            "path": ".github/workflows/tests.yaml",
+            "symbol": "",
+            "lineRange": "20-35",
+            "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/.github/workflows/tests.yaml#L20-L35"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set union of both blinded slots for every dimension",
+      "rationale": "Automated adjudication kept every item accepted by either blinded slot and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "directFiles",
+          "onlyFirst": [
+            ".github/workflows/lock.yaml"
+          ],
+          "onlySecond": [
+            ".readthedocs.yaml",
+            "requirements/build.txt",
+            "requirements/dev.in",
+            "requirements/dev.txt",
+            "requirements/docs.in",
+            "requirements/docs.txt",
+            "requirements/tests.in",
+            "requirements/tests.txt",
+            "requirements/typing.in",
+            "requirements/typing.txt",
+            "tox.ini"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [
+            "src/itsdangerous/__init__.py"
+          ],
+          "onlySecond": [],
+          "contested": false
+        },
+        {
+          "dimension": "tests",
+          "onlyFirst": [
+            "tests/test_itsdangerous/test_serializer.py",
+            "tests/test_itsdangerous/test_signer.py"
+          ],
+          "onlySecond": [],
+          "contested": false
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "src/itsdangerous/encoding.py",
+              "name": "base64_decode",
+              "kind": "function"
+            },
+            {
+              "file": "src/itsdangerous/encoding.py",
+              "name": "base64_encode",
+              "kind": "function"
+            },
+            {
+              "file": "src/itsdangerous/encoding.py",
+              "name": "want_bytes",
+              "kind": "function"
+            },
+            {
+              "file": "src/itsdangerous/serializer.py",
+              "name": "Serializer",
+              "kind": "class"
+            },
+            {
+              "file": "src/itsdangerous/signer.py",
+              "name": "Signer",
+              "kind": "class"
+            },
+            {
+              "file": "src/itsdangerous/timed.py",
+              "name": "TimedSerializer",
+              "kind": "class"
+            }
+          ],
+          "onlySecond": [],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [
+            {
+              "from": "src/itsdangerous/__init__.py",
+              "to": "src/itsdangerous/encoding.py"
+            },
+            {
+              "from": "src/itsdangerous/__init__.py",
+              "to": "src/itsdangerous/serializer.py"
+            },
+            {
+              "from": "src/itsdangerous/__init__.py",
+              "to": "src/itsdangerous/signer.py"
+            },
+            {
+              "from": "src/itsdangerous/__init__.py",
+              "to": "src/itsdangerous/timed.py"
+            },
+            {
+              "from": "src/itsdangerous/__init__.py",
+              "to": "src/itsdangerous/url_safe.py"
+            }
+          ],
+          "onlySecond": [],
+          "contested": false
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Whether uv's build backend replacement will preserve the sdist inclusion behavior defined in pyproject.toml sdist section."
+          ],
+          "onlySecond": [
+            "Exact uv configuration for pre-commit hooks in .pre-commit-config.yaml",
+            "Handling of optional dependency groups (dev, docs, tests, typing) in pyproject.toml",
+            "Whether .readthedocs.yaml requires changes for uv-based doc builds",
+            "Whether tox.ini will be fully replaced by uv or kept for compatibility"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "R1",
+              "severity": "medium",
+              "rationale": "Migrating the build system from flit_core to uv may alter sdist packaging, potentially including or excluding files differently, affecting published distributions."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "ci-dep-resolution",
+              "severity": "medium",
+              "rationale": "CI workflow changes may break dependency resolution if uv version constraints differ from pip-compile output"
+            },
+            {
+              "id": "external-tooling-break",
+              "severity": "low",
+              "rationale": "Removing requirements/*.txt files breaks external tooling expecting those files"
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

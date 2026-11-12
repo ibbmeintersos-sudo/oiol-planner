@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+  "source": {
+    "repositoryUrl": "https://github.com/go-chi/chi",
+    "baseCommit": "167e1e3bd039d060696b99c8da4e876ae04f42c1",
+    "changeCommit": "9f8adb1aabaa8a91180a821111d3f8e668d1c0bf",
+    "changeUrl": "https://github.com/go-chi/chi/pull/1213",
+    "license": "MIT",
+    "licenseFile": "LICENSE",
+    "licenseFileUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/LICENSE",
+    "sizeClass": "small",
+    "repositoryKind": "library",
+    "trackedFileCountAtBase": 105,
+    "primaryLanguages": [
+      "Go"
+    ]
+  },
+  "change": {
+    "request": "Preserve the response status when the wrapped writer receives an empty ReadFrom call, including the expected middleware writer behavior.",
+    "summary": "middleware: preserve status after empty ReadFrom (go-chi/chi #1213)",
+    "category": "source_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/go-chi-1213-middleware-preserve-status-after-emp",
+    "sha256": "f8b29ce60479d473e168669e828f5b1c9ecd2f961738142139c0db77080c0b9b",
+    "gitTreeSha": "78ea402444f50acbf2de96c413503d75ef8b6e54",
+    "artifactName": "p12-snapshot-16"
+  },
+  "groundTruth": {
+    "directFiles": [
+      "middleware/wrap_writer.go"
+    ],
+    "affectedFiles": [
+      "middleware/wrap_writer_test.go"
+    ],
+    "tests": [
+      "middleware/wrap_writer_test.go"
+    ],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "WrapResponseWriter",
+        "kind": "interface"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "ReadFrom",
+        "kind": "method"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "Status",
+        "kind": "method"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "WriteHeader",
+        "kind": "method"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "basicWriter",
+        "kind": "struct"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "http2FancyWriter",
+        "kind": "struct"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "httpFancyWriter",
+        "kind": "struct"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "basicWriter",
+        "kind": "type"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "httpFancyWriter",
+        "kind": "type"
+      },
+      {
+        "file": "middleware/wrap_writer_test.go",
+        "name": "TestWrapResponseWriterStatusWhenFlushed",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/wrap_writer_test.go",
+        "name": "readerFromRecorder",
+        "kind": "struct"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "middleware/wrap_writer_test.go",
+        "to": "middleware/wrap_writer.go"
+      }
+    ],
+    "unknowns": [
+      "Exact line numbers for ReadFrom implementations in wrap_writer.go",
+      "Whether basicWriter or other writers also implement ReadFrom",
+      "Whether httpFancyWriter.ReadFrom and http2FancyWriter.ReadFrom currently exist in the truncated source",
+      "whether preserving status during empty ReadFrom could inadvertently affect handlers that do not set WriteHeader"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Status code may be incorrectly reset when ReadFrom copies zero bytes, breaking handler expectations."
+      },
+      {
+        "id": "status-regression",
+        "severity": "medium",
+        "rationale": "Changing ReadFrom behavior may break existing handlers that rely on status being 0 before explicit WriteHeader."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T00:43:42.010Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "WrapResponseWriter must preserve status code when ReadFrom is called with empty reader",
+            "evidence": "basicWriter.WriteHeader sets code field before any ReadFrom operation; current implementation may overwrite status",
+            "path": "middleware/wrap_writer.go",
+            "symbol": "basicWriter.WriteHeader",
+            "lineRange": "20-35",
+            "immutableUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/middleware/wrap_writer.go#L20-L35"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:35:56.511Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "httpFancyWriter and http2FancyWriter implement io.ReaderFrom for fast-path copying",
+            "evidence": "NewWrapResponseWriter returns httpFancyWriter when underlying writer implements io.ReaderFrom and http.Flusher and http.Hijacker",
+            "path": "middleware/wrap_writer.go",
+            "symbol": "NewWrapResponseWriter",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/middleware/wrap_writer.go#L1-L50"
+          },
+          {
+            "dimension": "tests",
+            "claim": "TestWrapResponseWriterStatusWhenFlushed tests status preservation across writer types but not empty ReadFrom",
+            "evidence": "Test iterates flushWriter, flushHijackWriter, httpFancyWriter, http2FancyWriter with implicit/explicit status codes",
+            "path": "middleware/wrap_writer_test.go",
+            "symbol": "TestWrapResponseWriterStatusWhenFlushed",
+            "lineRange": "30-80",
+            "immutableUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/middleware/wrap_writer_test.go#L30-L80"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "WrapResponseWriter interface defines Status() method for retrieving HTTP status",
+            "evidence": "Interface includes Status() int method documented as returning HTTP status or 0 if not sent",
+            "path": "middleware/wrap_writer.go",
+            "symbol": "WrapResponseWriter",
+            "lineRange": "50-80",
+            "immutableUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/middleware/wrap_writer.go#L50-L80"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set union of both blinded slots for every dimension",
+      "rationale": "Automated adjudication kept every item accepted by either blinded slot and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [],
+          "onlySecond": [
+            "middleware/wrap_writer_test.go"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "WrapResponseWriter",
+              "kind": "interface"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "basicWriter",
+              "kind": "type"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "httpFancyWriter",
+              "kind": "type"
+            }
+          ],
+          "onlySecond": [
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "ReadFrom",
+              "kind": "method"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "Status",
+              "kind": "method"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "WriteHeader",
+              "kind": "method"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "basicWriter",
+              "kind": "struct"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "http2FancyWriter",
+              "kind": "struct"
+            },
+            {
+              "file": "middleware/wrap_writer.go",
+              "name": "httpFancyWriter",
+              "kind": "struct"
+            },
+            {
+              "file": "middleware/wrap_writer_test.go",
+              "name": "TestWrapResponseWriterStatusWhenFlushed",
+              "kind": "function"
+            },
+            {
+              "file": "middleware/wrap_writer_test.go",
+              "name": "readerFromRecorder",
+              "kind": "struct"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "from": "middleware/wrap_writer_test.go",
+              "to": "middleware/wrap_writer.go"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "whether preserving status during empty ReadFrom could inadvertently affect handlers that do not set WriteHeader"
+          ],
+          "onlySecond": [
+            "Exact line numbers for ReadFrom implementations in wrap_writer.go",
+            "Whether basicWriter or other writers also implement ReadFrom",
+            "Whether httpFancyWriter.ReadFrom and http2FancyWriter.ReadFrom currently exist in the truncated source"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-001",
+              "severity": "medium",
+              "rationale": "Status code may be incorrectly reset when ReadFrom copies zero bytes, breaking handler expectations."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "status-regression",
+              "severity": "medium",
+              "rationale": "Changing ReadFrom behavior may break existing handlers that rely on status being 0 before explicit WriteHeader."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

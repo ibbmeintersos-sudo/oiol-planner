@@ -1,0 +1,56 @@
+
+> oiol-planner@0.5.1 benchmark:real-world
+> node scripts/run-real-world-benchmark.mjs --corpus-root /home/runner/work/oiol-planner/oiol-planner/.p12-corpus-union --out benchmarks/results/real-world-benchmark-union.json
+
+{
+  "benchmark": "real_world_repository_change_impact",
+  "caseCount": 36,
+  "dimensions": {
+    "directFiles": {
+      "precision": 0.0249,
+      "recall": 0.2176,
+      "f1": 0.0386
+    },
+    "affectedFiles": {
+      "precision": 0.0451,
+      "recall": 0.2134,
+      "f1": 0.0485
+    },
+    "tests": {
+      "precision": 0.0454,
+      "recall": 0.1968,
+      "f1": 0.0585
+    },
+    "packages": {
+      "precision": 0.8667,
+      "recall": 0.9444,
+      "f1": 0.8712
+    },
+    "apiConsumers": {
+      "precision": 0.4167,
+      "recall": 0.4167,
+      "f1": 0.4167
+    },
+    "databaseConsumers": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "migrationFiles": {
+      "precision": 1,
+      "recall": 1,
+      "f1": 1
+    },
+    "scannerSymbols": {
+      "precision": 0.0073,
+      "recall": 0.2033,
+      "f1": 0.0132
+    },
+    "dependencyEdges": {
+      "precision": 0.0608,
+      "recall": 0.1061,
+      "f1": 0.0671
+    }
+  },
+  "output": "/home/runner/work/oiol-planner/oiol-planner/benchmarks/results/real-world-benchmark-union.json"
+}

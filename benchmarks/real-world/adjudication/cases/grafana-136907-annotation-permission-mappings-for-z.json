@@ -1,0 +1,343 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+  "source": {
+    "repositoryUrl": "https://github.com/grafana/grafana",
+    "baseCommit": "b9e28156159bf92fd84a9051da2bf2eb2076b749",
+    "changeCommit": "560f3cab9ae748d4087b88f8242e32e899153a59",
+    "changeUrl": "https://github.com/grafana/grafana/pull/136907",
+    "license": "AGPL-3.0-only",
+    "licenseFile": "LICENSE",
+    "licenseFileUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/LICENSE",
+    "sizeClass": "large",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 24713,
+    "primaryLanguages": [
+      "Go",
+      "TypeScript"
+    ]
+  },
+  "change": {
+    "request": "Add annotation permission mappings to the authorization model and keep tuple translation, legacy permission parity, and authorization tests consistent.",
+    "summary": "Annotation permission mappings for Zanzana (grafana/grafana #136907)",
+    "category": "cross_component"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/grafana-136907-annotation-permission-mappings-for-z",
+    "sha256": "1f0f8f1094be894b4b44c649ce2c502c396e1987bc6680cba3082fe68e3639e2",
+    "gitTreeSha": "4380f2af34c76d79622f8c47a9254961f4173f44",
+    "artifactName": "p12-snapshot-32"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [
+      "pkg/services/accesscontrol/acimpl/legacy_loader_parity_test.go",
+      "pkg/services/authz/zanzana/common/tuple_test.go",
+      "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+      "pkg/services/authz/zanzana/snapshot_tuples_test.go",
+      "pkg/services/authz/zanzana/tuple_helpers_test.go",
+      "pkg/tests/apis/provisioning/folder_authorization_test.go",
+      "pkg/tests/apis/provisioning/foldermetadata/folder_authorization_test.go"
+    ],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "pkg/services/authz/zanzana/common/tuple_test.go",
+        "name": "TestTranslateToResourceTuple",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/services/authz/zanzana/snapshot_tuples_test.go",
+        "name": "TestConvertSnapshotRolePermissionsToTuples",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/services/authz/zanzana/tuple_helpers_test.go",
+        "name": "TestResourcePermissionWriteTuples",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/services/authz/zanzana/tuple_helpers_test.go",
+        "name": "TestTupleStringWithoutCondition",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+        "to": "pkg/services/authz/zanzana/common/tuple_test.go"
+      },
+      {
+        "from": "pkg/services/authz/zanzana/tuple_helpers_test.go",
+        "to": "pkg/services/authz/zanzana/common/tuple_test.go"
+      }
+    ],
+    "unknowns": [
+      "Compatibility mapping between new annotation permissions and legacy permission tuples",
+      "Exact annotation permission mapping schema for Zanzana",
+      "Impact on provisioning authorization tests if annotations are folder-scoped resources",
+      "Non-test implementation files for tuple translation (e.g., pkg/services/authz/zanzana/common/tuple.go) not present in tree sample",
+      "Whether annotation permissions require new OpenFGA relation definitions beyond existing tuple translation logic"
+    ],
+    "risks": [
+      {
+        "id": "annotation-permission-parity-gap",
+        "severity": "medium",
+        "rationale": "New annotation permissions may diverge between RBAC and Zanzana engines if parity test cases are not extended"
+      },
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Incorrect annotation permission mappings could cause authorization decisions to diverge between Zanzana and RBAC engines, leading to unexpected access grants or denials."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:57:29.889Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "No non-test files require editing for annotation permission mappings",
+            "evidence": "Change focuses on test and model consistency",
+            "path": "pkg/services/authz/zanzana/common/tuple_test.go",
+            "symbol": "TestTranslateToResourceTuple",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/common/tuple_test.go#L1-L30"
+          },
+          {
+            "dimension": "tests",
+            "claim": "Test files must be updated to reflect new permission mappings",
+            "evidence": "Tuple translation tests cover dashboards and folders",
+            "path": "pkg/services/authz/zanzana/common/tuple_test.go",
+            "symbol": "TestTranslateToResourceTuple",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/common/tuple_test.go#L1-L30"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "Symbols identified in test files for mapping",
+            "evidence": "Functions and types defined in tuple_test.go and helpers",
+            "path": "pkg/services/authz/zanzana/common/tuple_test.go",
+            "symbol": "TestTranslateToResourceTuple",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/common/tuple_test.go#L1-L30"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "Import edges reflect tuple translation dependencies",
+            "evidence": "rbac_parity_test.go imports common tuple translation",
+            "path": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+            "symbol": "TestRbacParity",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/server/rbac_parity_test.go#L1-L20"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Risk of permission mapping inconsistency",
+            "evidence": "Medium severity risk described",
+            "path": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+            "symbol": "TestRbacParity",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/server/rbac_parity_test.go#L1-L20"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:54:33.143Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "tests",
+            "claim": "Tuple translation tests must cover annotation permission mappings",
+            "evidence": "TestTranslateToResourceTuple defines translation cases for dashboards/folders; annotations need equivalent entries",
+            "path": "pkg/services/authz/zanzana/common/tuple_test.go",
+            "symbol": "TestTranslateToResourceTuple",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/common/tuple_test.go#L1-L50"
+          },
+          {
+            "dimension": "tests",
+            "claim": "Snapshot role permission tests must include annotation actions",
+            "evidence": "TestConvertSnapshotRolePermissionsToTuples converts RolePermission actions to tuples; annotations actions missing",
+            "path": "pkg/services/authz/zanzana/snapshot_tuples_test.go",
+            "symbol": "TestConvertSnapshotRolePermissionsToTuples",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/snapshot_tuples_test.go#L1-L30"
+          },
+          {
+            "dimension": "tests",
+            "claim": "RBAC parity harness must verify annotation permission equivalence",
+            "evidence": "Parity test compares RBAC and Zanzana answers for permissions; annotation cases not present",
+            "path": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+            "symbol": "TestRBACParity",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/server/rbac_parity_test.go#L1-L100"
+          },
+          {
+            "dimension": "tests",
+            "claim": "Legacy loader parity must cover annotation permissions",
+            "evidence": "TestIntegrationLegacyLoaderParity validates legacy permission loading; annotation actions untested",
+            "path": "pkg/services/accesscontrol/acimpl/legacy_loader_parity_test.go",
+            "symbol": "TestIntegrationLegacyLoaderParity",
+            "lineRange": "1-80",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/accesscontrol/acimpl/legacy_loader_parity_test.go#L1-L80"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "TupleStringWithoutCondition used for tuple serialization in tests",
+            "evidence": "Function tested in tuple_helpers_test.go and likely used in parity comparisons",
+            "path": "pkg/services/authz/zanzana/tuple_helpers_test.go",
+            "symbol": "TupleStringWithoutCondition",
+            "lineRange": "1-40",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/tuple_helpers_test.go#L1-L40"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "tuple_helpers_test.go imports zanzana/common package",
+            "evidence": "Import statement references github.com/grafana/grafana/pkg/services/authz/zanzana/common",
+            "path": "pkg/services/authz/zanzana/tuple_helpers_test.go",
+            "symbol": "import",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/tuple_helpers_test.go#L1-L20"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "rbac_parity_test.go imports zanzana/common for TranslateToResourceTuples",
+            "evidence": "Import of github.com/grafana/grafana/pkg/services/authz/zanzana/common used in parity harness",
+            "path": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+            "symbol": "import",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/server/rbac_parity_test.go#L1-L30"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Parity gap risk if annotation permissions not added to both engines simultaneously",
+            "evidence": "RBAC parity test framework detects divergences; missing annotation cases would surface as gaps",
+            "path": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+            "symbol": "TestRBACParity",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/grafana/grafana/blob/b9e28156159bf92fd84a9051da2bf2eb2076b749/pkg/services/authz/zanzana/server/rbac_parity_test.go#L1-L100"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "packages",
+          "onlyFirst": [
+            "pkg/services/authz/zanzana"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "pkg/services/authz/zanzana/common/tuple_test.go",
+              "name": "translationTestCase",
+              "kind": "type"
+            },
+            {
+              "file": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+              "name": "TestRbacParity",
+              "kind": "function"
+            }
+          ],
+          "onlySecond": [
+            {
+              "file": "pkg/services/accesscontrol/acimpl/legacy_loader_parity_test.go",
+              "name": "TestIntegrationLegacyLoaderParity",
+              "kind": "function"
+            },
+            {
+              "file": "pkg/services/accesscontrol/acimpl/legacy_loader_parity_test.go",
+              "name": "newContractLoader",
+              "kind": "function"
+            },
+            {
+              "file": "pkg/services/authz/zanzana/common/tuple_test.go",
+              "name": "translationTestCase",
+              "kind": "struct"
+            },
+            {
+              "file": "pkg/services/authz/zanzana/server/rbac_parity_test.go",
+              "name": "TestRBACParity",
+              "kind": "function"
+            },
+            {
+              "file": "pkg/services/authz/zanzana/snapshot_tuples_test.go",
+              "name": "ConvertRolePermissionsToTuples",
+              "kind": "function"
+            },
+            {
+              "file": "pkg/services/authz/zanzana/snapshot_tuples_test.go",
+              "name": "RolePermission",
+              "kind": "struct"
+            },
+            {
+              "file": "pkg/services/authz/zanzana/tuple_helpers_test.go",
+              "name": "TupleStringWithoutCondition",
+              "kind": "function"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Compatibility mapping between new annotation permissions and legacy permission tuples",
+            "Exact annotation permission mapping schema for Zanzana"
+          ],
+          "onlySecond": [
+            "Impact on provisioning authorization tests if annotations are folder-scoped resources",
+            "Non-test implementation files for tuple translation (e.g., pkg/services/authz/zanzana/common/tuple.go) not present in tree sample",
+            "Whether annotation permissions require new OpenFGA relation definitions beyond existing tuple translation logic"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-001",
+              "severity": "medium",
+              "rationale": "Incorrect annotation permission mappings could cause authorization decisions to diverge between Zanzana and RBAC engines, leading to unexpected access grants or denials."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "annotation-permission-parity-gap",
+              "severity": "medium",
+              "rationale": "New annotation permissions may diverge between RBAC and Zanzana engines if parity test cases are not extended"
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

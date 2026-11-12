@@ -1,0 +1,436 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "nestjs-node-adapter-req-route",
+  "source": {
+    "repositoryUrl": "https://github.com/nestjs/nest",
+    "baseCommit": "9430227544b0e11b249a55123b1bea77e9e46094",
+    "changeCommit": "4d63dc2d02c2fb7f178ca71c85e1cc412e5e5711",
+    "changeUrl": "https://github.com/nestjs/nest/pull/18439",
+    "license": "MIT",
+    "licenseFile": "LICENSE",
+    "licenseFileUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/LICENSE",
+    "sizeClass": "medium",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 2748,
+    "primaryLanguages": [
+      "TypeScript"
+    ]
+  },
+  "change": {
+    "request": "Expose route-template metadata on the Node adapter request object consistently with the Express adapter, including route methods and global prefixes.",
+    "summary": "Set req.route on the node adapter like Express (nestjs/nest #18439)",
+    "category": "api_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/nestjs-node-adapter-req-route",
+    "sha256": "13913ac474e6bf868d4fb76577d83b64ed0de7ae771319c3052ffc3e8c59c5ca",
+    "gitTreeSha": "52c6e981c6f708c959f79970320e2bc428b61ad1",
+    "artifactName": "p12-snapshot-5"
+  },
+  "groundTruth": {
+    "directFiles": [
+      "packages/platform-node/adapters/configured-request.ts",
+      "packages/platform-node/adapters/node-request.ts"
+    ],
+    "affectedFiles": [
+      "packages/core/router/request/index.ts",
+      "packages/platform-node/adapters/node-adapter.ts",
+      "packages/platform-node/adapters/node-router.ts"
+    ],
+    "tests": [
+      "integration/http-adapters/e2e/node-specifics.spec.ts",
+      "integration/http-adapters/e2e/request-options.spec.ts",
+      "packages/platform-node/test/adapters/configured-request.spec.ts",
+      "packages/platform-node/test/adapters/node-request.spec.ts"
+    ],
+    "packages": [],
+    "apiConsumers": [
+      "integration/http-adapters/src/request-options/request-options.module.ts"
+    ],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "packages/core/router/request/index.ts",
+        "name": "REQUEST",
+        "kind": "constant"
+      },
+      {
+        "file": "packages/platform-node/adapters/configured-request.ts",
+        "name": "NodeRequest",
+        "kind": "class"
+      },
+      {
+        "file": "packages/platform-node/adapters/configured-request.ts",
+        "name": "createRequestClass",
+        "kind": "function"
+      },
+      {
+        "file": "packages/platform-node/adapters/node-request.ts",
+        "name": "NodeRequest",
+        "kind": "class"
+      },
+      {
+        "file": "packages/platform-node/adapters/node-request.ts",
+        "name": "path",
+        "kind": "getter"
+      },
+      {
+        "file": "packages/platform-node/adapters/node-request.ts",
+        "name": "baseUrl",
+        "kind": "property"
+      },
+      {
+        "file": "packages/platform-node/adapters/node-request.ts",
+        "name": "originalUrl",
+        "kind": "property"
+      },
+      {
+        "file": "packages/platform-node/adapters/node-request.ts",
+        "name": "route",
+        "kind": "property"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "integration/http-adapters/e2e/request-options.spec.ts",
+        "to": "packages/platform-node/adapters/node-request.ts"
+      },
+      {
+        "from": "integration/http-adapters/src/request-options/request-options.module.ts",
+        "to": "@nestjs/common"
+      },
+      {
+        "from": "packages/platform-node/adapters/configured-request.ts",
+        "to": "packages/platform-node/adapters/node-request.ts"
+      },
+      {
+        "from": "packages/platform-node/adapters/node-request.ts",
+        "to": "packages/platform-node/adapters/utils/hostname.util.js"
+      },
+      {
+        "from": "packages/platform-node/adapters/node-request.ts",
+        "to": "packages/platform-node/router/utils.js"
+      }
+    ],
+    "unknowns": [
+      "The exact shape of the route metadata object (e.g., { path, methods, stack } vs. a simpler template string) is not specified in the pinned snapshot.",
+      "Whether adding a `route` getter to `NodeRequest` breaks any existing user code that sets `req.route` manually.",
+      "Whether existing Express adapter `req.route` consumers (e.g., middleware, guards) rely on properties beyond `path`, `methods`, and `stack` that must also be mirrored.",
+      "Whether existing Express adapter route metadata population logic can be reused or must be reimplemented for the Node adapter is unknown from the provided files.",
+      "Whether global prefix metadata is available at request construction time in the Node adapter or must be resolved lazily from the router.",
+      "Whether global prefix metadata must be prepended to req.route.path for nested controllers is not established by the tree sample.",
+      "Whether the route metadata should be exposed as a `route` object (like Express) or as individual getters on `NodeRequest`."
+    ],
+    "risks": [
+      {
+        "id": "global-prefix-inconsistency",
+        "severity": "medium",
+        "rationale": "If global prefixes are not consistently prepended to route paths across adapters, route-matching middleware may behave differently between Node and Express adapters."
+      },
+      {
+        "id": "global-prefix-resolution",
+        "severity": "medium",
+        "rationale": "Resolving the global prefix per request may require router state that is not yet available when the Node request object is constructed, leading to undefined or incorrect route paths."
+      },
+      {
+        "id": "public-api-change",
+        "severity": "low",
+        "rationale": "Adding new public getters to `NodeRequest` (marked @publicApi) is additive but changes the request contract; existing code extending `NodeRequest` could conflict with new property names."
+      },
+      {
+        "id": "route-metadata-contract-divergence",
+        "severity": "medium",
+        "rationale": "Adding req.route to the Node adapter without matching Express's exact metadata shape may break middleware that expects Express-compatible route objects."
+      },
+      {
+        "id": "route-metadata-mismatch",
+        "severity": "medium",
+        "rationale": "If the Node adapter's `req.route` shape differs from Express (e.g., missing `methods` or `stack`), middleware and guards written for Express may fail at runtime when run under the Node adapter."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T05:19:22.362Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "NodeRequest class defines request properties such as originalUrl, baseUrl, params, and query that would need a route metadata property added.",
+            "evidence": "packages/platform-node/adapters/node-request.ts declares class NodeRequest extends IncomingMessage with declare originalUrl, baseUrl, params, body, and getters for path, hostname, ip.",
+            "path": "packages/platform-node/adapters/node-request.ts",
+            "symbol": "NodeRequest",
+            "lineRange": "1-200",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/adapters/node-request.ts"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "createRequestClass in configured-request.ts creates subclasses of NodeRequest and would need to preserve or extend route metadata when wrapping.",
+            "evidence": "packages/platform-node/adapters/configured-request.ts exports createRequestClass which returns NodeRequest or a subclass extending it.",
+            "path": "packages/platform-node/adapters/configured-request.ts",
+            "symbol": "createRequestClass",
+            "lineRange": "1-120",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/adapters/configured-request.ts"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "NodeAdapter creates the HTTP server and wires request handling, so it is responsible for populating req.route before dispatching to Nest handlers.",
+            "evidence": "packages/platform-node/adapters/node-adapter.ts is referenced in integration tests as the adapter used with NodeAdapter and would need to set route metadata on requests.",
+            "path": "packages/platform-node/adapters/node-adapter.ts",
+            "symbol": "NodeAdapter",
+            "lineRange": "unknown",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/adapters/node-adapter.ts"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "NodeRouter matches routes and would supply the matched route template and methods to attach to req.route.",
+            "evidence": "packages/platform-node/adapters/node-router.ts is implied by the router module structure and getRoutingPath import in node-request.ts.",
+            "path": "packages/platform-node/adapters/node-router.ts",
+            "symbol": "NodeRouter",
+            "lineRange": "unknown",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/adapters/node-router.ts"
+          },
+          {
+            "dimension": "tests",
+            "claim": "node-request.spec.ts tests NodeRequest properties and would need new cases for req.route population.",
+            "evidence": "packages/platform-node/test/adapters/node-request.spec.ts imports NodeRequest and tests query, ip, hostname, and other request properties.",
+            "path": "packages/platform-node/test/adapters/node-request.spec.ts",
+            "symbol": "NodeRequest",
+            "lineRange": "1-300",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/test/adapters/node-request.spec.ts"
+          },
+          {
+            "dimension": "tests",
+            "claim": "configured-request.spec.ts tests createRequestClass behavior and would need cases ensuring route metadata survives subclassing.",
+            "evidence": "packages/platform-node/test/adapters/configured-request.spec.ts imports createRequestClass and tests trustProxy and querystringParser options.",
+            "path": "packages/platform-node/test/adapters/configured-request.spec.ts",
+            "symbol": "createRequestClass",
+            "lineRange": "1-300",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/test/adapters/configured-request.spec.ts"
+          },
+          {
+            "dimension": "tests",
+            "claim": "node-specifics.spec.ts is an integration test for Node adapter specifics and would need route metadata parity tests.",
+            "evidence": "integration/http-adapters/e2e/node-specifics.spec.ts exists in the tree sample under integration/http-adapters/e2e/.",
+            "path": "integration/http-adapters/e2e/node-specifics.spec.ts",
+            "symbol": "node-specifics",
+            "lineRange": "unknown",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/integration/http-adapters/e2e/node-specifics.spec.ts"
+          },
+          {
+            "dimension": "apiConsumers",
+            "claim": "request-options.module.ts consumes req.protocol and req.hostname via @Req() and could consume req.route if exposed.",
+            "evidence": "integration/http-adapters/src/request-options/request-options.module.ts defines RequestOptionsController with @Get('client') using @Req() req: { protocol: string; hostname: string }.",
+            "path": "integration/http-adapters/src/request-options/request-options.module.ts",
+            "symbol": "RequestOptionsController",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/integration/http-adapters/src/request-options/request-options.module.ts"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T05:19:35.583Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "NodeRequest class defines request properties like path, ip, hostname, query.",
+            "evidence": "packages/platform-node/adapters/node-request.ts contains the NodeRequest class with getters for path, ip, hostname, query.",
+            "path": "packages/platform-node/adapters/node-request.ts",
+            "symbol": "NodeRequest",
+            "lineRange": "1-200",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/adapters/node-request.ts"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "createRequestClass creates subclasses of NodeRequest for adapter options.",
+            "evidence": "packages/platform-node/adapters/configured-request.ts exports createRequestClass which extends NodeRequest based on trustProxy and querystringParser options.",
+            "path": "packages/platform-node/adapters/configured-request.ts",
+            "symbol": "createRequestClass",
+            "lineRange": "1-120",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/adapters/configured-request.ts"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "REQUEST constant is the public injection token for the request object.",
+            "evidence": "packages/core/router/request/index.ts exports REQUEST from request-constants.js.",
+            "path": "packages/core/router/request/index.ts",
+            "symbol": "REQUEST",
+            "lineRange": "1-3",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/core/router/request/index.ts"
+          },
+          {
+            "dimension": "tests",
+            "claim": "NodeRequest unit tests exist for query, ip, and other properties.",
+            "evidence": "packages/platform-node/test/adapters/node-request.spec.ts tests NodeRequest behavior including query parsing and IP resolution.",
+            "path": "packages/platform-node/test/adapters/node-request.spec.ts",
+            "symbol": "NodeRequest",
+            "lineRange": "1-300",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/test/adapters/node-request.spec.ts"
+          },
+          {
+            "dimension": "tests",
+            "claim": "configured-request unit tests exist for trustProxy and querystringParser.",
+            "evidence": "packages/platform-node/test/adapters/configured-request.spec.ts tests createRequestClass with various options.",
+            "path": "packages/platform-node/test/adapters/configured-request.spec.ts",
+            "symbol": "createRequestClass",
+            "lineRange": "1-300",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/packages/platform-node/test/adapters/configured-request.spec.ts"
+          },
+          {
+            "dimension": "tests",
+            "claim": "Integration tests cover adapter options across express, fastify, and node.",
+            "evidence": "integration/http-adapters/e2e/request-options.spec.ts tests trust proxy and query parsing for all three adapters including node.",
+            "path": "integration/http-adapters/e2e/request-options.spec.ts",
+            "symbol": "NodeAdapter",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/integration/http-adapters/e2e/request-options.spec.ts"
+          },
+          {
+            "dimension": "apiConsumers",
+            "claim": "RequestOptionsController consumes req.protocol and req.hostname via @Req().",
+            "evidence": "integration/http-adapters/src/request-options/request-options.module.ts uses @Req() to access protocol and hostname on the request object.",
+            "path": "integration/http-adapters/src/request-options/request-options.module.ts",
+            "symbol": "RequestOptionsController",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/9430227544b0e11b249a55123b1bea77e9e46094/integration/http-adapters/src/request-options/request-options.module.ts"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set union of both blinded slots for every dimension",
+      "rationale": "Automated adjudication kept every item accepted by either blinded slot and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [
+            "packages/platform-node/adapters/node-adapter.ts",
+            "packages/platform-node/adapters/node-router.ts"
+          ],
+          "onlySecond": [
+            "packages/core/router/request/index.ts"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "tests",
+          "onlyFirst": [
+            "integration/http-adapters/e2e/node-specifics.spec.ts"
+          ],
+          "onlySecond": [
+            "integration/http-adapters/e2e/request-options.spec.ts"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "packages/platform-node/adapters/configured-request.ts",
+              "name": "NodeRequest",
+              "kind": "class"
+            },
+            {
+              "file": "packages/platform-node/adapters/node-request.ts",
+              "name": "baseUrl",
+              "kind": "property"
+            }
+          ],
+          "onlySecond": [
+            {
+              "file": "packages/core/router/request/index.ts",
+              "name": "REQUEST",
+              "kind": "constant"
+            },
+            {
+              "file": "packages/platform-node/adapters/node-request.ts",
+              "name": "path",
+              "kind": "getter"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [
+            {
+              "from": "integration/http-adapters/src/request-options/request-options.module.ts",
+              "to": "@nestjs/common"
+            }
+          ],
+          "onlySecond": [
+            {
+              "from": "integration/http-adapters/e2e/request-options.spec.ts",
+              "to": "packages/platform-node/adapters/node-request.ts"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "The exact shape of the route metadata object (e.g., { path, methods, stack } vs. a simpler template string) is not specified in the pinned snapshot.",
+            "Whether existing Express adapter route metadata population logic can be reused or must be reimplemented for the Node adapter is unknown from the provided files.",
+            "Whether global prefix metadata must be prepended to req.route.path for nested controllers is not established by the tree sample."
+          ],
+          "onlySecond": [
+            "Whether adding a `route` getter to `NodeRequest` breaks any existing user code that sets `req.route` manually.",
+            "Whether existing Express adapter `req.route` consumers (e.g., middleware, guards) rely on properties beyond `path`, `methods`, and `stack` that must also be mirrored.",
+            "Whether global prefix metadata is available at request construction time in the Node adapter or must be resolved lazily from the router.",
+            "Whether the route metadata should be exposed as a `route` object (like Express) or as individual getters on `NodeRequest`."
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "global-prefix-inconsistency",
+              "severity": "medium",
+              "rationale": "If global prefixes are not consistently prepended to route paths across adapters, route-matching middleware may behave differently between Node and Express adapters."
+            },
+            {
+              "id": "route-metadata-contract-divergence",
+              "severity": "medium",
+              "rationale": "Adding req.route to the Node adapter without matching Express's exact metadata shape may break middleware that expects Express-compatible route objects."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "global-prefix-resolution",
+              "severity": "medium",
+              "rationale": "Resolving the global prefix per request may require router state that is not yet available when the Node request object is constructed, leading to undefined or incorrect route paths."
+            },
+            {
+              "id": "public-api-change",
+              "severity": "low",
+              "rationale": "Adding new public getters to `NodeRequest` (marked @publicApi) is additive but changes the request contract; existing code extending `NodeRequest` could conflict with new property names."
+            },
+            {
+              "id": "route-metadata-mismatch",
+              "severity": "medium",
+              "rationale": "If the Node adapter's `req.route` shape differs from Express (e.g., missing `methods` or `stack`), middleware and guards written for Express may fail at runtime when run under the Node adapter."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

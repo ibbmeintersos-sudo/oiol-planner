@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "spring-boot-duration-micros-overflow",
+  "source": {
+    "repositoryUrl": "https://github.com/spring-projects/spring-boot",
+    "baseCommit": "7c1bef5e4d7d74642eca5defe24beec37f57810f",
+    "changeCommit": "9ef5b48b9a077778763fc95224136c3aec843144",
+    "changeUrl": "https://github.com/spring-projects/spring-boot/pull/52557",
+    "license": "Apache-2.0",
+    "licenseFile": "LICENSE.txt",
+    "licenseFileUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/LICENSE.txt",
+    "sizeClass": "medium",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 11383,
+    "primaryLanguages": [
+      "Java"
+    ]
+  },
+  "change": {
+    "request": "Avoid intermediate nanosecond overflow when converting large Duration values to microseconds while preserving exact conversion behavior.",
+    "summary": "Avoid premature overflow converting durations to microseconds (spring-projects/spring-boot #52557)",
+    "category": "source_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/spring-boot-duration-micros-overflow",
+    "sha256": "11ddf148dcd71599d7ecda2ebc3710f195021a5d9a0702725ce302f2dd071c95",
+    "gitTreeSha": "63cf470d37d7674b60e41821a2b6194c7d7217df",
+    "artifactName": "p12-snapshot-7"
+  },
+  "groundTruth": {
+    "directFiles": [
+      "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+    ],
+    "affectedFiles": [],
+    "tests": [
+      "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java"
+    ],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.Unit.MICROS",
+        "kind": "enum constant"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+        "to": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+      }
+    ],
+    "unknowns": [
+      "Whether callers outside the provided tree sample rely on the exact string representation produced by DurationStyle.print for microsecond values.",
+      "Whether the pinned base commit tree includes the full DurationStyle.java source beyond the truncated snippet provided."
+    ],
+    "risks": [
+      {
+        "id": "duration-micros-print-change",
+        "severity": "medium",
+        "rationale": "Changing the MICROS conversion logic may alter printed output for large durations, affecting configuration property display and logging."
+      },
+      {
+        "id": "duration-microsecond-overflow-fix",
+        "severity": "medium",
+        "rationale": "Changing Duration.toNanos() / 1000L to seconds * 1_000_000L + nanos / 1000L alters intermediate arithmetic for large durations and may affect exact microsecond conversion results."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T05:20:37.445Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "DurationStyle.java contains the MICROS unit conversion logic that divides nanoseconds by 1000, which can overflow for large Duration values.",
+            "evidence": "File core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java defines Unit.MICROS with (duration) -> duration.toNanos() / 1000L.",
+            "path": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+            "symbol": "DurationStyle.Unit.MICROS",
+            "lineRange": "130-140",
+            "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java#L130-L140"
+          },
+          {
+            "dimension": "tests",
+            "claim": "DurationStyleTests.java tests DurationStyle parsing and printing behavior including microsecond values.",
+            "evidence": "File core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java contains test methods for detectAndParse and detect behavior with various duration units.",
+            "path": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+            "symbol": "DurationStyleTests",
+            "lineRange": "1-200",
+            "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java#L1-L200"
+          },
+          {
+            "dimension": "apiConsumers",
+            "claim": "WebConversionService.java consumes DurationStyle for web formatting conversion and may be affected by changes to Duration printing behavior.",
+            "evidence": "File core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java is part of the web format auto-configuration that uses DurationStyle.",
+            "path": "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java",
+            "symbol": "WebConversionService",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java#L1-L100"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T05:20:46.184Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "DurationStyle.java contains the MICROS unit conversion using duration.toNanos() / 1000L.",
+            "evidence": "File content shows MICROS(ChronoUnit.MICROS, \"us\", (duration) -> duration.toNanos() / 1000L) in the Unit enum.",
+            "path": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+            "symbol": "DurationStyle.Unit.MICROS",
+            "lineRange": "110-120",
+            "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java#L110-L120"
+          },
+          {
+            "dimension": "tests",
+            "claim": "DurationStyleTests.java contains tests for microsecond parsing.",
+            "evidence": "File content shows detectAndParseWhenSimpleMicrosShouldReturnDuration test method asserting 10us hasNanos(10000).",
+            "path": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+            "symbol": "DurationStyleTests.detectAndParseWhenSimpleMicrosShouldReturnDuration",
+            "lineRange": "55-65",
+            "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java#L55-L65"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [
+            "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java",
+            "core/spring-boot/src/main/java/org/springframework/boot/context/properties/ConversionServiceDeducer.java"
+          ],
+          "onlySecond": [
+            "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [
+            "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+              "name": "DurationStyle.MICROS",
+              "kind": "enum constant"
+            },
+            {
+              "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+              "name": "DurationStyle.Unit.longValue",
+              "kind": "function"
+            },
+            {
+              "file": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+              "name": "DurationStyleTests",
+              "kind": "class"
+            }
+          ],
+          "onlySecond": [
+            {
+              "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+              "name": "DurationStyle.Unit.longValue",
+              "kind": "method"
+            },
+            {
+              "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+              "name": "DurationStyle.Unit.print",
+              "kind": "method"
+            },
+            {
+              "file": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+              "name": "DurationStyleTests.detectAndParseWhenSimpleMicrosShouldReturnDuration",
+              "kind": "function"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [
+            {
+              "from": "core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/format/WebConversionService.java",
+              "to": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+            }
+          ],
+          "onlySecond": [],
+          "contested": false
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Whether callers outside the provided tree sample rely on the exact string representation produced by DurationStyle.print for microsecond values."
+          ],
+          "onlySecond": [
+            "Whether the pinned base commit tree includes the full DurationStyle.java source beyond the truncated snippet provided."
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "duration-micros-print-change",
+              "severity": "medium",
+              "rationale": "Changing the MICROS conversion logic may alter printed output for large durations, affecting configuration property display and logging."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "duration-microsecond-overflow-fix",
+              "severity": "medium",
+              "rationale": "Changing Duration.toNanos() / 1000L to seconds * 1_000_000L + nanos / 1000L alters intermediate arithmetic for large durations and may affect exact microsecond conversion results."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

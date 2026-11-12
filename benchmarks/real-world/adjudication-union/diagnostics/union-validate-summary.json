@@ -1,0 +1,193 @@
+
+> oiol-planner@0.5.1 benchmark:real-world:validate
+> node scripts/validate-real-world-corpus.mjs --corpus-root /home/runner/work/oiol-planner/oiol-planner/.p12-corpus-union
+
+{
+  "ready": true,
+  "status": "ready_for_analysis",
+  "caseCount": 36,
+  "repositoryCount": 12,
+  "verified": [
+    {
+      "caseId": "ky-dispatcher-option-ignored",
+      "fileCount": 56,
+      "sha256": "f9c1958be4ac1ab0030bead25f4def788f9a38ba263c12c7dfaead5b769cff4a"
+    },
+    {
+      "caseId": "itsdangerous-drop-eol-python",
+      "fileCount": 49,
+      "sha256": "a52320e4114f27f911e26e56182bcd08a1a52d16abcde6c48263e51500c53aea"
+    },
+    {
+      "caseId": "chi-suppress-not-found-route-context",
+      "fileCount": 108,
+      "sha256": "ef226037685b52e5a04d16d9b23b5b586c513e1ee812d292fd1009acd753fc34"
+    },
+    {
+      "caseId": "ripgrep-basename-regex-matching",
+      "fileCount": 225,
+      "sha256": "c3392f009de44808875c9a479208eb7e4998ed16dba0172d7fde42700381168f"
+    },
+    {
+      "caseId": "pydantic-decimal-json-schema-pattern",
+      "fileCount": 3577,
+      "sha256": "bdbaee619b4fea87c6f6da1ff43376984eef06652846292e7d93e2127e9db9eb"
+    },
+    {
+      "caseId": "nestjs-node-adapter-req-route",
+      "fileCount": 2748,
+      "sha256": "13913ac474e6bf868d4fb76577d83b64ed0de7ae771319c3052ffc3e8c59c5ca"
+    },
+    {
+      "caseId": "laravel-migration-failed-event",
+      "fileCount": 3490,
+      "sha256": "c6de642d113eb110236183e809006478c65ff346d131315f9cfb99fbad2effb9"
+    },
+    {
+      "caseId": "spring-boot-duration-micros-overflow",
+      "fileCount": 11031,
+      "sha256": "11ddf148dcd71599d7ecda2ebc3710f195021a5d9a0702725ce302f2dd071c95"
+    },
+    {
+      "caseId": "kubernetes-spdy-upgrade-failure-close",
+      "fileCount": 26026,
+      "sha256": "62475984e90ea5d735f18db1bcf2e761c7ba10ced51eaeded670cccd129a7012"
+    },
+    {
+      "caseId": "tensorflow-release-gil-device-context",
+      "fileCount": 37708,
+      "sha256": "5913f28b285fdd6016b54fbcf784412ce48581c1904d51ff33bf775f03188057"
+    },
+    {
+      "caseId": "grafana-provisioning-job-tracing",
+      "fileCount": 24284,
+      "sha256": "0e0db1db82cd642c3bf317b58326941dce6883eb57f33386f07ba716c14c7a5f"
+    },
+    {
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "fileCount": 30400,
+      "sha256": "cc414e91103e226ff8142bbfdbdf25ca0441220414595e605a2c87cd1b3f7bb2"
+    },
+    {
+      "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "fileCount": 70,
+      "sha256": "2b6d8250e22be9f708d6d734815756c353fd964c5618a0f14c5301b0869b8497"
+    },
+    {
+      "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "fileCount": 70,
+      "sha256": "74599d58538546a72b0fd450d85b88b4b911cef9e87e5d006f72eb9844018fb2"
+    },
+    {
+      "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "fileCount": 58,
+      "sha256": "48ae56ceeaf6251b7ee4b9cff7647eada2f68d6955f598565076a1adf8780b9b"
+    },
+    {
+      "caseId": "pallets-406-remove-previously-deprecated-code",
+      "fileCount": 49,
+      "sha256": "c79b843eeb999bd196ff326071c1f5bc14c95f916c486a1596a8b99a8a276868"
+    },
+    {
+      "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "fileCount": 105,
+      "sha256": "f8b29ce60479d473e168669e828f5b1c9ecd2f961738142139c0db77080c0b9b"
+    },
+    {
+      "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "fileCount": 108,
+      "sha256": "e654837c37f1fc3c2f0e838c0fde94fc9ad520e0c1a1b2b33aad4544c50779a0"
+    },
+    {
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "fileCount": 225,
+      "sha256": "94ab7ab76d6742985a4b3d9819cfc60be8865fc0cd8efb1ee4ec60467acce042"
+    },
+    {
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+      "fileCount": 225,
+      "sha256": "94ab7ab76d6742985a4b3d9819cfc60be8865fc0cd8efb1ee4ec60467acce042"
+    },
+    {
+      "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "fileCount": 3577,
+      "sha256": "d2805120562dcf784cf5ebe3b09dcded0ba8e0170dbc5547eef4f5e89f003dcd"
+    },
+    {
+      "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+      "fileCount": 3577,
+      "sha256": "bdbaee619b4fea87c6f6da1ff43376984eef06652846292e7d93e2127e9db9eb"
+    },
+    {
+      "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "fileCount": 2729,
+      "sha256": "07117464b88b5fed419e8be2d18790a2c8438cbf182e4ba04eb3b36a26d827d3"
+    },
+    {
+      "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "fileCount": 2743,
+      "sha256": "d19c9f6366398715ef8c3e2463a1630e4e755dce4ef77f365d8c92c622a88345"
+    },
+    {
+      "caseId": "laravel-62326-add-origin-to-uri-class",
+      "fileCount": 3488,
+      "sha256": "6f86f4752944615c2eb3d549f3420e1051af161b7dc57c288ad2c702662a327c"
+    },
+    {
+      "caseId": "laravel-62360-include-identical-belongstomany-reso",
+      "fileCount": 3490,
+      "sha256": "704257275daee2e1eaf1792bd14bffd8663c32d3c960a05c85f786068e76157e"
+    },
+    {
+      "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "fileCount": 11605,
+      "sha256": "45d8357a3bcf47250b350b1514b86ea54cea05b6dc5243b6546130e4b29cca0e"
+    },
+    {
+      "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "fileCount": 11032,
+      "sha256": "df4fe6ecb1b9d9227c88df845cc45938b5597073df1a680e00aea114e1d1e538"
+    },
+    {
+      "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "fileCount": 26239,
+      "sha256": "1f4338da8dfca142f0936f683c2c4c8c35d9353464a5da3401036c23f57462d1"
+    },
+    {
+      "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "fileCount": 26073,
+      "sha256": "715bf76b6596093a26d81c4a2a7c9d472bcae8a0a90ba092b7b29746ad7633b0"
+    },
+    {
+      "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "fileCount": 37708,
+      "sha256": "772e0ee49036dde6085596c1972bec258c09e8d7e6f7b4b4f41c6574face857e"
+    },
+    {
+      "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "fileCount": 37474,
+      "sha256": "e9db7da505a620092108f38c010f709925633a4270cb0dae22fa5869b2c213be"
+    },
+    {
+      "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "fileCount": 24279,
+      "sha256": "1f0f8f1094be894b4b44c649ce2c502c396e1987bc6680cba3082fe68e3639e2"
+    },
+    {
+      "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "fileCount": 24176,
+      "sha256": "e6736f0e0bdf95eab85dbff444834c4b736a8f0e95001e33744b786732e6c3ce"
+    },
+    {
+      "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "fileCount": 30383,
+      "sha256": "b3ce267c7e2e3658b9c025fc0e327b66ec5e1c5bd4ec98449752fb08bcff3f96"
+    },
+    {
+      "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "fileCount": 30387,
+      "sha256": "016fbc76eff0926b18865b718c8ec843e46fb4b3e8eaa25a759b2a0a7ec36727"
+    }
+  ],
+  "errors": []
+}

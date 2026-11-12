@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "ky-dispatcher-option-ignored",
+  "source": {
+    "repositoryUrl": "https://github.com/sindresorhus/ky",
+    "baseCommit": "0f2f00a55592ccfe08c9a82a4d2db2a511f78e9b",
+    "changeCommit": "5a3fc90ccba78d10809e48fa89cef722543c9597",
+    "changeUrl": "https://github.com/sindresorhus/ky/pull/757",
+    "license": "MIT",
+    "licenseFile": "license",
+    "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/0f2f00a55592ccfe08c9a82a4d2db2a511f78e9b/license",
+    "sizeClass": "small",
+    "repositoryKind": "library",
+    "trackedFileCountAtBase": 56,
+    "primaryLanguages": [
+      "TypeScript",
+      "JavaScript"
+    ]
+  },
+  "change": {
+    "request": "Correct the request option handling so fetch-only dispatcher options are preserved when creating and sending requests.",
+    "summary": "Fix dispatcher option being ignored (sindresorhus/ky #757)",
+    "category": "source_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/ky-dispatcher-option-ignored",
+    "sha256": "f9c1958be4ac1ab0030bead25f4def788f9a38ba263c12c7dfaead5b769cff4a",
+    "gitTreeSha": "dc3f9bea4ec0026159a22b0e72f5520fcd5472f7",
+    "artifactName": "p12-snapshot-0"
+  },
+  "groundTruth": {
+    "directFiles": [
+      "source/core/constants.ts",
+      "source/types/request.ts"
+    ],
+    "affectedFiles": [
+      "source/core/Ky.ts",
+      "source/utils/options.ts"
+    ],
+    "tests": [
+      "test/fetch.ts"
+    ],
+    "packages": [],
+    "apiConsumers": [
+      "source/index.ts"
+    ],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "source/core/Ky.ts",
+        "name": "_fetch",
+        "kind": "method"
+      },
+      {
+        "file": "source/core/constants.ts",
+        "name": "requestOptionsRegistry",
+        "kind": "variable"
+      },
+      {
+        "file": "source/types/request.ts",
+        "name": "RequestInitRegistry",
+        "kind": "type"
+      },
+      {
+        "file": "source/utils/options.ts",
+        "name": "findUnknownOptions",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "source/core/Ky.ts",
+        "to": "source/utils/options.ts"
+      },
+      {
+        "from": "source/core/constants.ts",
+        "to": "source/types/request.ts"
+      },
+      {
+        "from": "source/utils/options.ts",
+        "to": "source/core/constants.ts"
+      }
+    ],
+    "unknowns": [
+      "Whether every supported runtime accepts dispatcher and priority directly on fetch() without a Request-constructor path."
+    ],
+    "risks": [
+      {
+        "id": "fetch-option-forwarding-regression",
+        "severity": "medium",
+        "rationale": "Removing dispatcher and priority from the request registry changes which options are forwarded separately to fetch and could alter runtime behavior."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T04:22:16.013Z",
+        "declaration": "AI-generated annotation produced by DeepSeek V4.1 Flash from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "The request-option registry marks dispatcher and priority as RequestInit fields, which is why they never reach fetch separately.",
+            "evidence": "requestOptionsRegistry lists dispatcher and priority next to method, headers, and signal and is typed as RequestInitRegistry.",
+            "path": "source/core/constants.ts",
+            "symbol": "requestOptionsRegistry"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "Ky computes the separate fetch options from the registry before calling the configured fetch function.",
+            "evidence": "_fetch calls findUnknownOptions(this.request, this._options) and passes the result to this._options.fetch or timeout().",
+            "path": "source/core/Ky.ts",
+            "symbol": "_fetch"
+          },
+          {
+            "dimension": "tests",
+            "claim": "The regression is covered by the fetch test suite.",
+            "evidence": "test/fetch.ts exercises option forwarding to the fetch implementation and is the suite changed alongside the fix.",
+            "path": "test/fetch.ts"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T04:22:16.013Z",
+        "declaration": "AI-generated annotation produced by DeepSeek V4.1 Flash from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "exclusions",
+            "claim": "The fix is not a change to the public ky option keys such as timeout, retry, or hooks.",
+            "evidence": "kyOptionKeys remains the separate registry for ky-specific options and is not part of this change.",
+            "path": "source/core/constants.ts",
+            "symbol": "kyOptionKeys"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "Ky computes the separate fetch options from the registry before calling the configured fetch function.",
+            "evidence": "_fetch calls findUnknownOptions(this.request, this._options) and passes the result to this._options.fetch or timeout().",
+            "path": "source/core/Ky.ts",
+            "symbol": "_fetch"
+          },
+          {
+            "dimension": "tests",
+            "claim": "The regression is covered by the fetch test suite.",
+            "evidence": "test/fetch.ts exercises option forwarding to the fetch implementation and is the suite changed alongside the fix.",
+            "path": "test/fetch.ts"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [],
+          "onlySecond": [
+            "source/types/options.ts"
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

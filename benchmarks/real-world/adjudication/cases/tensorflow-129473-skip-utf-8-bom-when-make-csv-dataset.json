@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+  "source": {
+    "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+    "baseCommit": "a867034f72b09350ffef56ee29cef3034a535deb",
+    "changeCommit": "d2ae0c42f788f1c66b6e453fbf3e4d4ebc6e98f5",
+    "changeUrl": "https://github.com/tensorflow/tensorflow/pull/129473",
+    "license": "Apache-2.0",
+    "licenseFile": "LICENSE",
+    "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/LICENSE",
+    "sizeClass": "large",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 37478,
+    "primaryLanguages": [
+      "C++",
+      "Python"
+    ]
+  },
+  "change": {
+    "request": "Ignore a UTF-8 byte order mark when make_csv_dataset parses CSV column names, and preserve the behavior with a focused data-loading regression test.",
+    "summary": "Skip UTF-8 BOM when make_csv_dataset reads column names (tensorflow/tensorflow #129473)",
+    "category": "source_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+    "sha256": "e9db7da505a620092108f38c010f709925633a4270cb0dae22fa5869b2c213be",
+    "gitTreeSha": "36a2dd86b5f57451622e5d9297d7efef6bed7009",
+    "artifactName": "p12-snapshot-31"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [
+      "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+    ],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+        "name": "_make_csv_dataset",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [],
+    "unknowns": [
+      "Exact location of header parsing logic in readers.py (could be in C++ kernel or Python wrapper).",
+      "Precise location of BOM parsing code in make_csv_dataset implementation not present in the provided tree sample",
+      "Whether BOM handling should also apply to CsvDataset (separate code path)."
+    ],
+    "risks": [
+      {
+        "id": "bom-stripping-regression",
+        "severity": "medium",
+        "rationale": "Stripping BOM may alter behavior for files that intentionally include BOM as data; must ensure only leading BOM on first line is removed."
+      },
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Changing column name parsing may affect existing CSV datasets that have BOM in header, potentially breaking downstream consumers if not handled correctly."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:53:17.722Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "No direct non-test files require editing in the provided tree sample.",
+            "evidence": "Tree sample contains no implementation file for make_csv_dataset column name parsing.",
+            "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+            "symbol": "make_csv_dataset",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L1-L50"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "make_csv_dataset_test.py is materially affected as it tests CSV column name parsing.",
+            "evidence": "Test file exercises make_csv_dataset which will have altered column name parsing.",
+            "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+            "symbol": "_make_csv_dataset",
+            "lineRange": "10-30",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L10-L30"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Medium risk of breaking existing pipelines with BOM in CSV headers.",
+            "evidence": "Change alters parsing behavior of CSV column names.",
+            "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+            "symbol": "make_csv_dataset",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L1-L50"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:52:34.573Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "make_csv_dataset is defined in readers.py and parses column names from the first line of CSV files.",
+            "evidence": "Test file imports readers.make_csv_dataset and uses it to create datasets with header rows.",
+            "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+            "symbol": "make_csv_dataset",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L1-L50"
+          },
+          {
+            "dimension": "tests",
+            "claim": "Regression test for BOM handling should be added to MakeCsvDatasetTest class.",
+            "evidence": "Existing test class provides _setup_files helper that writes CSV files with configurable encoding; can be extended to write UTF-8 BOM prefix.",
+            "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+            "symbol": "MakeCsvDatasetTest",
+            "lineRange": "30-80",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L30-L80"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "make_csv_dataset function is the public API affected by the change.",
+            "evidence": "Imported and used in test file; its signature includes column_names parameter inferred from header.",
+            "path": "tensorflow/python/data/experimental/ops/readers.py",
+            "symbol": "make_csv_dataset",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/ops/readers.py#L1-L100"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "Test file depends on readers module for make_csv_dataset.",
+            "evidence": "Import statement: from tensorflow.python.data.experimental.ops import readers",
+            "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+            "symbol": "readers",
+            "lineRange": "20-25",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L20-L25"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "directFiles",
+          "onlyFirst": [],
+          "onlySecond": [
+            "tensorflow/python/data/experimental/ops/readers.py"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [
+            "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [],
+          "onlySecond": [
+            "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+              "name": "make_csv_dataset",
+              "kind": "function"
+            }
+          ],
+          "onlySecond": [
+            {
+              "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+              "name": "MakeCsvDatasetTest",
+              "kind": "class"
+            },
+            {
+              "file": "tensorflow/python/data/experimental/ops/readers.py",
+              "name": "make_csv_dataset",
+              "kind": "function"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "from": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+              "to": "tensorflow/python/data/experimental/ops/readers.py"
+            }
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Precise location of BOM parsing code in make_csv_dataset implementation not present in the provided tree sample"
+          ],
+          "onlySecond": [
+            "Exact location of header parsing logic in readers.py (could be in C++ kernel or Python wrapper).",
+            "Whether BOM handling should also apply to CsvDataset (separate code path)."
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-1",
+              "severity": "medium",
+              "rationale": "Changing column name parsing may affect existing CSV datasets that have BOM in header, potentially breaking downstream consumers if not handled correctly."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "bom-stripping-regression",
+              "severity": "medium",
+              "rationale": "Stripping BOM may alter behavior for files that intentionally include BOM as data; must ensure only leading BOM on first line is removed."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}
