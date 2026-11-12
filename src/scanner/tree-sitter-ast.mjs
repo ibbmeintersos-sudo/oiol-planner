@@ -266,7 +266,15 @@ export function resolveLocalImport(file, language, specifier, fileSet, { goModul
       resolvedBase, ...extensions.map(ext => resolvedBase + ext),
       ...['index.js', 'index.ts', 'index.tsx', 'index.mjs', '__init__.py'].map(name => resolvedBase + '/' + name)
     ];
-    return candidates.find(candidate => fileSet.has(candidate)) || null;
+    const resolved = candidates.find(candidate => fileSet.has(candidate));
+    if (resolved) return resolved;
+    // TS-ESM projects write imports with a .js extension while the on-disk source is .ts/.tsx.
+    const jsStyleMatch = resolvedBase.match(/^(.*)\.(js|mjs|cjs|jsx)$/i);
+    if (jsStyleMatch) {
+      const stem = jsStyleMatch[1];
+      return [stem + '.ts', stem + '.tsx', stem + '/index.ts', stem + '/index.tsx'].find(candidate => fileSet.has(candidate)) || null;
+    }
+    return null;
   }
   return null;
 }
