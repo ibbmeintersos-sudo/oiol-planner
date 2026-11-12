@@ -146,6 +146,9 @@ function classifySymbol(language, node, sourceBytes, lineStarts) {
     }
   }
   if (['javascript', 'typescript', 'tsx'].includes(language) && kind === 'variable_declarator') {
+    // Module-local bindings dominate the inventory (hundreds per TypeScript project)
+    // but never describe a public change surface, so only exported bindings are kept.
+    if (!exportedDeclaration(language, node, sourceBytes)) return null;
     const value = node.childByFieldName('value');
     if (value) {
       try {
