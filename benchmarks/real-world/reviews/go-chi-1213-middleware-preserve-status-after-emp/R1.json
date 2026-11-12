@@ -3,38 +3,76 @@
   "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T00:43:42.010Z",
+  "scopeSummary": "Preserve HTTP status code when middleware writer's ReadFrom receives empty reader",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "middleware/wrap_writer.go"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "middleware/wrap_writer_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "basicWriter",
+        "kind": "type"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "httpFancyWriter",
+        "kind": "type"
+      },
+      {
+        "file": "middleware/wrap_writer.go",
+        "name": "WrapResponseWriter",
+        "kind": "interface"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "whether preserving status during empty ReadFrom could inadvertently affect handlers that do not set WriteHeader"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Status code may be incorrectly reset when ReadFrom copies zero bytes, breaking handler expectations."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "WrapResponseWriter must preserve status code when ReadFrom is called with empty reader",
+      "evidence": "basicWriter.WriteHeader sets code field before any ReadFrom operation; current implementation may overwrite status",
+      "path": "middleware/wrap_writer.go",
+      "symbol": "basicWriter.WriteHeader",
+      "lineRange": "20-35",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/167e1e3bd039d060696b99c8da4e876ae04f42c1/middleware/wrap_writer.go#L20-L35"
+    }
+  ]
 }

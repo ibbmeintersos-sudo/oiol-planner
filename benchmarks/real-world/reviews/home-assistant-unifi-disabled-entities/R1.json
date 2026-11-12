@@ -3,25 +3,25 @@
   "caseId": "home-assistant-unifi-disabled-entities",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T23:33:47.997Z",
+  "scopeSummary": "Impact of removing disabled UniFi entities from entity state upon registry deletion across loading and sensor handling.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "unsupported",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "unsupported",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
     "directFiles": [],
@@ -33,8 +33,53 @@
     "migrationFiles": [],
     "scannerSymbols": [],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Unable to locate UniFi integration component files in the provided tree sample."
+    ],
+    "risks": [
+      {
+        "id": "risk-unifi-001",
+        "severity": "medium",
+        "rationale": "Stale entity states may persist if registry deletion does not trigger entity state cleanup across all loading paths."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Entity registry component present in tree sample may need modification",
+      "evidence": "Entity registry manages entity IDs and partial JSON representations",
+      "path": "homeassistant/components/config/entity_registry.py",
+      "symbol": "websocket_list_entities",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L30"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Entity registry list endpoint may expose disabled entities",
+      "evidence": "Registry lists all entities including disabled ones",
+      "path": "homeassistant/components/config/entity_registry.py",
+      "symbol": "websocket_list_entities",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L30"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "No UniFi-specific symbols found in tree sample",
+      "evidence": "Tree sample does not contain any UniFi integration paths",
+      "path": "N/A",
+      "symbol": "N/A",
+      "lineRange": "N/A",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/helpers/entity_registry.py#L1-20"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Stale entity states may persist after registry deletion",
+      "evidence": "Change may affect entity state consistency across loading and sensor handling",
+      "path": "homeassistant/helpers/entity_registry.py",
+      "symbol": "async_setup",
+      "lineRange": "1-15",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/helpers/entity_registry.py#L1-15"
+    }
+  ]
 }

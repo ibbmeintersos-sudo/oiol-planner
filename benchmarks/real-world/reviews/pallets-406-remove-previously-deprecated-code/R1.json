@@ -3,38 +3,127 @@
   "caseId": "pallets-406-remove-previously-deprecated-code",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T00:26:50.258Z",
+  "scopeSummary": "Remove deprecated __version__ public API and update package exports and release notes.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "src/itsdangerous/__init__.py"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "tests/test_itsdangerous/test_signer.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "src/itsdangerous/__init__.py",
+        "name": "__getattr__",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/serializer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/timed.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/url_safe.py"
+      }
+    ],
+    "unknowns": [
+      "whether any downstream code relies on the __version__ attribute after removal"
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Removing __version__ may break code that accesses itsdangerous.__version__"
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "The __init__.py file must be edited to remove the deprecated __version__ handling.",
+      "evidence": "File contains __getattr__ that warns about __version__ deprecation and returns importlib.metadata.version.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "22-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L22-L38"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "__getattr__ is the symbol to remove to eliminate the deprecated public API.",
+      "evidence": "Defined in src/itsdangerous/__init__.py and invoked when accessing __version__.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "22-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L22-L38"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "__init__.py imports from encoding, exc, serializer, signer, timed, url_safe.",
+      "evidence": "Import statements at top of file show from .encoding, .exc, .serializer, .signer, .timed, .url_safe.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "imports",
+      "lineRange": "5-21",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L5-L21"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Downstream consumers may import __version__ from the package.",
+      "evidence": "No evidence in tree of consumers; uncertainty remains.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__version__",
+      "lineRange": "N/A",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Removing __version__ could cause AttributeError in code doing import itsdangerous; __version__.",
+      "evidence": "The __getattr__ currently provides __version__ on access; removal breaks such patterns.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "22-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L22-L38"
+    }
+  ]
 }

@@ -10,17 +10,22 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-11T23:27:47.240Z",
-  "cases": 1,
-  "offset": 12,
+  "generatedAt": "2026-11-12T00:43:42.388Z",
+  "cases": 7,
+  "offset": 11,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 2,
-  "failures": [],
-  "callsUsed": 3,
-  "callBudget": 4,
+  "written": 6,
+  "failures": [
+    "home-assistant-unifi-disabled-entities/R2: Model minimaxai/minimax-m3.1-flash request failed: The operation was aborted due to timeout",
+    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model minimaxai/minimax-m3.1-flash request failed: The operation was aborted due to timeout",
+    "pallets-404-update-project-to-use-uv-for-depende/R2: Model minimaxai/minimax-m3.1-flash request failed: The operation was aborted due to timeout",
+    "CALL_BUDGET_EXHAUSTED: 18 calls used of a 18 budget"
+  ],
+  "callsUsed": 18,
+  "callBudget": 18,
   "quotaExhausted": false,
-  "budgetExhausted": false
+  "budgetExhausted": true
 }

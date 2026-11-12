@@ -3,38 +3,122 @@
   "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T23:50:33.936Z",
+  "scopeSummary": "Ensure progress callbacks fire consistently for empty request/response bodies and stream handling",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "source/core/Ky.ts",
+      "source/utils/body.ts",
+      "source/types/options.ts"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "test/stream.ts",
+      "test/browser.ts"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "source/index.ts"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "source/types/options.ts",
+        "name": "onUploadProgress",
+        "kind": "type"
+      },
+      {
+        "file": "source/types/options.ts",
+        "name": "onDownloadProgress",
+        "kind": "type"
+      },
+      {
+        "file": "source/utils/body.ts",
+        "name": "streamRequest",
+        "kind": "function"
+      },
+      {
+        "file": "source/utils/body.ts",
+        "name": "streamResponse",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "source/core/Ky.ts",
+        "to": "source/utils/body.ts"
+      },
+      {
+        "from": "source/core/Ky.ts",
+        "to": "source/types/options.ts"
+      }
+    ],
+    "unknowns": [
+      "Progress callback behavior with empty stream bodies across different runtimes (Node.js vs browser)"
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Altering progress callback timing may break downstream consumer expectations"
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Files source/core/Ky.ts, source/utils/body.ts, source/types/options.ts must be edited to handle empty bodies",
+      "evidence": "Change request requires progress callback consistency for empty request/response bodies",
+      "path": "source/core/Ky.ts",
+      "symbol": "onUploadProgress",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/core/Ky.ts#L1-L50"
+    },
+    {
+      "dimension": "tests",
+      "claim": "test/stream.ts and test/browser.ts must be updated with empty-body progress test cases",
+      "evidence": "Existing progress tests lack coverage for empty bodies; new tests required",
+      "path": "test/stream.ts",
+      "symbol": "onUploadProgress",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/test/stream.ts#L1-L30"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Symbols onUploadProgress, onDownloadProgress, streamRequest, streamResponse identified in source files",
+      "evidence": "Symbols appear in type and utility definitions for progress handling",
+      "path": "source/types/options.ts",
+      "symbol": "onUploadProgress",
+      "lineRange": "1-20",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/types/options.ts#L1-L20"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "Import edges from Ky.ts to body.ts and options.ts exist in the codebase",
+      "evidence": "Ky.ts imports streamRequest, streamResponse from body.ts and options types",
+      "path": "source/core/Ky.ts",
+      "symbol": "streamRequest",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/core/Ky.ts#L1-L10"
+    }
+  ]
 }

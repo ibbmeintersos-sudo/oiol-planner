@@ -3,38 +3,136 @@
   "caseId": "pallets-406-remove-previously-deprecated-code",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by minimaxai/minimax-m3.1-flash from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T00:41:31.865Z",
+  "scopeSummary": "Remove the deprecated itsdangerous.__version__ attribute hook from the package initializer, adjust the public export surface, and document the removal in the release notes.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
     "tests": "partial",
-    "packages": "partial",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "src/itsdangerous/__init__.py",
+      "CHANGES.rst"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "tests/test_itsdangerous/__init__.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "src/itsdangerous/__init__.py",
+        "name": "__getattr__",
+        "kind": "function"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "The provided tree sample omits a dedicated test module for the deprecated __version__ attribute, so the exact test file to update is uncertain.",
+      "README.md and docs/ contents were not provided, so remaining references to itsdangerous.__version__ cannot be confirmed."
+    ],
+    "risks": [
+      {
+        "id": "version-attribute-removed",
+        "severity": "medium",
+        "rationale": "Callers reading itsdangerous.__version__ now get AttributeError instead of a version string with a DeprecationWarning."
+      },
+      {
+        "id": "silent-fallback-version-checks",
+        "severity": "low",
+        "rationale": "Code using getattr(itsdangerous, \"__version__\", default) silently falls back to defaults, masking version-dependent behavior."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "The deprecated public API is the __version__ attribute served by a module-level __getattr__ hook in the package initializer.",
+      "evidence": "src/itsdangerous/__init__.py lines 24-38 define __getattr__, emit DeprecationWarning for __version__, and return importlib.metadata.version(\"itsdangerous\").",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "24-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L24-L38"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Package exports are centralized in the package initializer, so removing the deprecated hook changes the public export surface.",
+      "evidence": "src/itsdangerous/__init__.py re-exports encoding, exc, serializer, signer, timed, and url_safe names and contains the only deprecated export hook.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "1-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L1-L38"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Release notes must record the removal of the deprecated public API.",
+      "evidence": "CHANGES.rst is the repository changelog and is shipped in the sdist via the [tool.flit.sdist] include list in pyproject.toml.",
+      "path": "CHANGES.rst",
+      "symbol": "",
+      "lineRange": "1-20",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/CHANGES.rst#L1-L20"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "__getattr__ is the concrete identifier implementing the deprecated attribute lookup.",
+      "evidence": "src/itsdangerous/__init__.py lines 24-38 contain the only function definition in the package initializer.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "24-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L24-L38"
+    },
+    {
+      "dimension": "tests",
+      "claim": "A test must assert that the removed attribute is no longer exposed.",
+      "evidence": "The tree sample provides tests/test_itsdangerous/__init__.py plus sibling test modules under tests/test_itsdangerous/ for package-level assertions.",
+      "path": "tests/test_itsdangerous/__init__.py",
+      "symbol": "",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/tests/test_itsdangerous/__init__.py#L1-L10"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "No in-repository consumer of the deprecated attribute is visible in the provided evidence.",
+      "evidence": "Provided source snippets contain no access to itsdangerous.__version__; only the package initializer defines it.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__version__",
+      "lineRange": "24-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L24-L38"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "No other provided source file depends on the deprecated hook, so no additional existing file changes behavior.",
+      "evidence": "The other listed modules import encoding, exc, serializer, signer, timed, and url_safe symbols only, with no reference to __getattr__ or __version__.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "1-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L1-L38"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Removing the hook changes runtime behavior for callers reading the attribute.",
+      "evidence": "The current hook returns a version string after a DeprecationWarning; after removal, attribute access raises AttributeError from normal lookup.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "24-38",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/4dffa1963f896a0a311dec3c14f003a5f382c446/src/itsdangerous/__init__.py#L24-L38"
+    }
+  ]
 }
