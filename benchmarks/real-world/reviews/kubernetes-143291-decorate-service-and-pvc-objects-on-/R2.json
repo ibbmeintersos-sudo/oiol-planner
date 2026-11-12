@@ -3,38 +3,140 @@
   "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:50:46.519Z",
+  "scopeSummary": "Apply storage decode decoration to Service and PersistentVolumeClaim objects via generic registry integration and update storage tests.",
   "dimensionCoverage": {
     "directFiles": "partial",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
-    "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
+    "apiConsumers": "unsupported",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
     "scannerSymbols": "partial",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pkg/registry/core/service/storage/storage.go",
+      "pkg/registry/core/persistentvolumeclaim/storage/storage.go"
+    ],
+    "affectedFiles": [
+      "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go"
+    ],
+    "tests": [
+      "pkg/registry/core/service/storage/storage_test.go",
+      "pkg/registry/core/persistentvolumeclaim/storage/storage_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+        "name": "newDecoratedWatcher",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+        "name": "decoratedWatcher.run",
+        "kind": "method"
+      },
+      {
+        "file": "pkg/registry/core/persistentvolumeclaim/storage/storage_test.go",
+        "name": "newStorage",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/registry/core/service/storage/storage_test.go",
+        "name": "newStorage",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pkg/registry/core/service/storage/storage.go",
+        "to": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go"
+      },
+      {
+        "from": "pkg/registry/core/persistentvolumeclaim/storage/storage.go",
+        "to": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go"
+      },
+      {
+        "from": "pkg/registry/core/service/storage/storage_test.go",
+        "to": "pkg/registry/core/service/storage/storage.go"
+      },
+      {
+        "from": "pkg/registry/core/persistentvolumeclaim/storage/storage_test.go",
+        "to": "pkg/registry/core/persistentvolumeclaim/storage/storage.go"
+      }
+    ],
+    "unknowns": [
+      "Exact decorator function signatures for Service and PVC types not visible in provided files",
+      "Whether generic registry requires new decorator registration API",
+      "Impact on existing UndecoratedStorage usage in other resource types"
+    ],
+    "risks": [
+      {
+        "id": "decoration-consistency",
+        "severity": "medium",
+        "rationale": "Inconsistent decoration across watch vs list/get paths may cause stale or missing field population for Service and PVC objects."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Service and PVC storage implementations must replace UndecoratedStorage with type-specific decorators.",
+      "evidence": "Test files show RESTOptions.Decorator set to generic.UndecoratedStorage for both resources.",
+      "path": "pkg/registry/core/persistentvolumeclaim/storage/storage_test.go",
+      "symbol": "newStorage",
+      "lineRange": "30-40",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/pkg/registry/core/persistentvolumeclaim/storage/storage_test.go#L30-L40"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Decorated watcher infrastructure exists and applies decorator on Added/Modified/Deleted/Bookmark events.",
+      "evidence": "decoratedWatcher.run calls d.decorator(recv.Object) for watch event types before sending.",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+      "symbol": "decoratedWatcher.run",
+      "lineRange": "45-60",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go#L45-L60"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Storage tests for Service and PVC must be updated to verify decoration behavior on decode.",
+      "evidence": "Current tests use UndecoratedStorage and do not assert decoration on retrieved objects.",
+      "path": "pkg/registry/core/service/storage/storage_test.go",
+      "symbol": "newStorage",
+      "lineRange": "50-70",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/pkg/registry/core/service/storage/storage_test.go#L50-L70"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "newDecoratedWatcher is the factory for decoration-enabled watchers used by generic registry.",
+      "evidence": "Function creates decoratedWatcher with decorator func and context cancellation.",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+      "symbol": "newDecoratedWatcher",
+      "lineRange": "25-35",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go#L25-L35"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Risk of inconsistent decoration between watch and non-watch read paths.",
+      "evidence": "Decorated watcher only affects watch events; list/get paths use storage decoder directly without decoration.",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+      "symbol": "decoratedWatcher.run",
+      "lineRange": "45-60",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go#L45-L60"
+    }
+  ]
 }

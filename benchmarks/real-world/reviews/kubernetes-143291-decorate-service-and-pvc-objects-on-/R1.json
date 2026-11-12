@@ -3,38 +3,96 @@
   "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:50:56.842Z",
+  "scopeSummary": "Add storage decode decoration for Service and PersistentVolumeClaim objects with generic registry integration and corresponding storage tests.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher_test.go",
+      "pkg/registry/core/persistentvolumeclaim/storage/storage_test.go",
+      "pkg/registry/core/service/storage/storage_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+        "name": "newDecoratedWatcher",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+        "name": "decoratedWatcher.run",
+        "kind": "method"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+        "name": "decorator",
+        "kind": "function"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Exact decorator implementation details for Service and PVC storage decode across generic registry versions"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Adding decoration may alter observed object state in watchers and storage operations, potentially affecting downstream consumers that rely on unchanged object metadata."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "decorated_watcher.go implements watch decoration pattern",
+      "evidence": "file contains newDecoratedWatcher function",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+      "symbol": "newDecoratedWatcher",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go#L1-L30"
+    },
+    {
+      "dimension": "tests",
+      "claim": "existing test files cover decorated watcher and PVC/service storage",
+      "evidence": "test files present in tree sample",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher_test.go",
+      "symbol": "TestDecoratedWatcher",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher_test.go#L1-L50"
+    },
+    {
+      "dimension": "risks",
+      "claim": "decoration may affect object state",
+      "evidence": "risk description based on change impact",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go",
+      "symbol": "newDecoratedWatcher",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/5ef140c09dc653e642e6e06ee9c5bea9a5383c67/staging/src/k8s.io/apiserver/pkg/registry/generic/registry/decorated_watcher.go#L1-L30"
+    }
+  ]
 }

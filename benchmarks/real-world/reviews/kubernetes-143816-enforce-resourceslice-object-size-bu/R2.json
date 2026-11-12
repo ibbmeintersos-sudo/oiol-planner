@@ -3,38 +3,159 @@
   "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:50:23.318Z",
+  "scopeSummary": "Add size budget validation for ResourceSlice API objects in DRA, including documentation, admission validation, and integration test coverage.",
   "dimensionCoverage": {
     "directFiles": "partial",
     "affectedFiles": "partial",
     "tests": "partial",
-    "packages": "partial",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
     "scannerSymbols": "partial",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "staging/src/k8s.io/api/resource/v1alpha2/types.go",
+      "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go",
+      "staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation.go"
+    ],
+    "affectedFiles": [
+      "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/admission.go",
+      "staging/src/k8s.io/apiserver/pkg/endpoints/handlers/validation.go"
+    ],
+    "tests": [
+      "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size_test.go",
+      "staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation_test.go",
+      "test/integration/resource/resourceslice_size_budget_test.go"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "pkg/kubelet/dra/plugin_manager.go",
+      "pkg/scheduler/framework/plugins/dra/dra.go"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "staging/src/k8s.io/api/resource/v1alpha2/types.go",
+        "name": "ResourceSlice",
+        "kind": "type"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go",
+        "name": "ResourceSliceSizeValidator",
+        "kind": "type"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go",
+        "name": "ValidateResourceSliceSize",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation.go",
+        "name": "ValidateResourceSlice",
+        "kind": "function"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation.go",
+        "name": "maxResourceSliceSize",
+        "kind": "variable"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go",
+        "to": "staging/src/k8s.io/api/resource/v1alpha2/types.go"
+      },
+      {
+        "from": "staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation.go",
+        "to": "staging/src/k8s.io/api/resource/v1alpha2/types.go"
+      },
+      {
+        "from": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/admission.go",
+        "to": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go"
+      }
+    ],
+    "unknowns": [
+      "Exact size budget value (bytes) not specified in change request",
+      "Whether validation applies to create/update or also to list/watch",
+      "Integration test location not confirmed in provided tree sample",
+      "Feature gate name for gradual rollout not identified",
+      "Migration strategy for existing oversized ResourceSlice objects unclear"
+    ],
+    "risks": [
+      {
+        "id": "breaking-existing-objects",
+        "severity": "high",
+        "rationale": "Enforcing size budget may reject existing ResourceSlice objects exceeding new limit, causing upgrade failures."
+      },
+      {
+        "id": "admission-performance",
+        "severity": "medium",
+        "rationale": "Additional size validation in admission path adds latency to ResourceSlice create/update requests."
+      },
+      {
+        "id": "inconsistent-validation",
+        "severity": "medium",
+        "rationale": "If validation only in admission but not in registry layer, direct etcd writes could bypass budget."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "ResourceSlice type definition likely in resource API group",
+      "evidence": "Kubernetes DRA API places ResourceSlice in staging/src/k8s.io/api/resource/v1alpha2/types.go based on API conventions",
+      "path": "staging/src/k8s.io/api/resource/v1alpha2/types.go",
+      "symbol": "ResourceSlice",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/api/resource/v1alpha2/types.go#L1-L100"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Admission plugin for resource quota likely handles size validation",
+      "evidence": "Resource quota admission plugins in staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/ enforce object budgets",
+      "path": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go",
+      "symbol": "ValidateResourceSliceSize",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go#L1-L50"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Integration test for size budget enforcement needed",
+      "evidence": "Integration tests for DRA resources typically in test/integration/resource/ directory",
+      "path": "test/integration/resource/resourceslice_size_budget_test.go",
+      "symbol": "TestResourceSliceSizeBudget",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/test/integration/resource/resourceslice_size_budget_test.go#L1-L100"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Validation function for ResourceSlice size budget",
+      "evidence": "Pattern from existing validation-gen output tests shows validation functions named Validate<Type>",
+      "path": "staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation.go",
+      "symbol": "ValidateResourceSlice",
+      "lineRange": "10-60",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/apiserver/pkg/registry/resource/resourceslice/validation.go#L10-L60"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Existing oversized ResourceSlice objects may be rejected on upgrade",
+      "evidence": "Change request enforces budget without mentioning migration path for pre-existing objects",
+      "path": "staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go",
+      "symbol": "ValidateResourceSliceSize",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/apiserver/pkg/admission/plugin/resourcequota/resourceslice_size.go#L1-L50"
+    }
+  ]
 }

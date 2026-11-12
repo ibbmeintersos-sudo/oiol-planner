@@ -3,38 +3,136 @@
   "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:46:51.062Z",
+  "scopeSummary": "Add SmartLifecycle implementation to PushGateway task scheduler for graceful shutdown on application context close",
   "dimensionCoverage": {
     "directFiles": "partial",
     "affectedFiles": "partial",
     "tests": "partial",
-    "packages": "partial",
-    "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
+    "packages": "unsupported",
+    "apiConsumers": "unsupported",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
     "scannerSymbols": "partial",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java"
+    ],
+    "affectedFiles": [
+      "module/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/metrics/export/prometheus/PrometheusPushGatewayAutoConfiguration.java"
+    ],
+    "tests": [
+      "module/spring-boot-actuator/src/test/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskSchedulerTests.java"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java",
+        "name": "PushGatewayTaskScheduler",
+        "kind": "class"
+      },
+      {
+        "file": "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java",
+        "name": "start",
+        "kind": "function"
+      },
+      {
+        "file": "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java",
+        "name": "stop",
+        "kind": "function"
+      },
+      {
+        "file": "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java",
+        "name": "getPhase",
+        "kind": "function"
+      },
+      {
+        "file": "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java",
+        "name": "isRunning",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "module/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/metrics/export/prometheus/PrometheusPushGatewayAutoConfiguration.java",
+        "to": "module/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/metrics/export/prometheus/PushGatewayTaskScheduler.java"
+      }
+    ],
+    "unknowns": [
+      "Exact PushGatewayTaskScheduler class location not visible in provided tree sample",
+      "Whether existing scheduler uses ScheduledExecutorService or TaskScheduler",
+      "Current shutdown behavior when context closes without explicit lifecycle hook"
+    ],
+    "risks": [
+      {
+        "id": "scheduler-leak-on-context-close",
+        "severity": "high",
+        "rationale": "Scheduler threads may not terminate if SmartLifecycle stop() not invoked during context close"
+      },
+      {
+        "id": "phase-ordering-conflict",
+        "severity": "medium",
+        "rationale": "Incorrect getPhase() value could cause shutdown before/after dependent beans"
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "PushGatewayTaskScheduler must implement SmartLifecycle for context-close shutdown",
+      "evidence": "WebServerGracefulShutdownLifecycle implements SmartLifecycle with stop(Runnable) for graceful shutdown",
+      "path": "module/spring-boot-web-server/src/main/java/org/springframework/boot/web/server/context/WebServerGracefulShutdownLifecycle.java",
+      "symbol": "WebServerGracefulShutdownLifecycle",
+      "lineRange": "1-60",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/module/spring-boot-web-server/src/main/java/org/springframework/boot/web/server/context/WebServerGracefulShutdownLifecycle.java"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "SmartLifecycle stop(Runnable callback) pattern used for async shutdown",
+      "evidence": "WebServerGracefulShutdownLifecycle.stop(Runnable) calls webServer.shutDownGracefully with callback",
+      "path": "module/spring-boot-web-server/src/main/java/org/springframework/boot/web/server/context/WebServerGracefulShutdownLifecycle.java",
+      "symbol": "stop",
+      "lineRange": "40-45",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/module/spring-boot-web-server/src/main/java/org/springframework/boot/web/server/context/WebServerGracefulShutdownLifecycle.java#L40-L45"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Auto-configuration registers PushGatewayTaskScheduler as bean",
+      "evidence": "ShutdownEndpointAutoConfiguration registers ShutdownEndpoint bean with destroyMethod=\"\"",
+      "path": "module/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/context/ShutdownEndpointAutoConfiguration.java",
+      "symbol": "shutdownEndpoint",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/module/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/context/ShutdownEndpointAutoConfiguration.java"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Lifecycle tests verify start/stop behavior on context refresh/close",
+      "evidence": "TestcontainersLifecycleApplicationContextInitializerTests verifies Startable.start() on refresh",
+      "path": "core/spring-boot-testcontainers/src/test/java/org/springframework/boot/testcontainers/lifecycle/TestcontainersLifecycleApplicationContextInitializerTests.java",
+      "symbol": "whenStartableBeanInvokesStartOnRefresh",
+      "lineRange": "40-55",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/core/spring-boot-testcontainers/src/test/java/org/springframework/boot/testcontainers/lifecycle/TestcontainersLifecycleApplicationContextInitializerTests.java#L40-L55"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Missing SmartLifecycle causes thread leaks on context close",
+      "evidence": "SpringApplicationShutdownHookTests verifies shutdown hook registration and context cleanup",
+      "path": "core/spring-boot/src/test/java/org/springframework/boot/SpringApplicationShutdownHookTests.java",
+      "symbol": "SpringApplicationShutdownHookTests",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/eed334dc6992755673503c742708f8e37f1ac928/core/spring-boot/src/test/java/org/springframework/boot/SpringApplicationShutdownHookTests.java"
+    }
+  ]
 }

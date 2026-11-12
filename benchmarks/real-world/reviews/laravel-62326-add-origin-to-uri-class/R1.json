@@ -3,38 +3,80 @@
   "caseId": "laravel-62326-add-origin-to-uri-class",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:46:03.223Z",
+  "scopeSummary": "Add origin() accessor to Uri class and align URI tests and package metadata.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "unsupported",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "unsupported",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
     "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "affectedFiles": [
+      "tests/Support/SupportUriTest.php"
+    ],
+    "tests": [
+      "tests/Support/SupportUriTest.php"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "tests/Support/SupportUriTest.php"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
     "scannerSymbols": [],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Exact path of Uri source file in repository"
+    ],
+    "risks": [
+      {
+        "id": "risk-uri-origin",
+        "severity": "medium",
+        "rationale": "Adding origin() accessor may change URI serialization behavior and affect downstream code that expects existing method set."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "affectedFiles",
+      "claim": "SupportUriTest.php will be affected by new origin() method.",
+      "evidence": "Test file imports and tests Uri class.",
+      "path": "tests/Support/SupportUriTest.php",
+      "symbol": "Uri",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Test file must be updated to include origin() accessor tests.",
+      "evidence": "Add test for $uri->origin().",
+      "path": "tests/Support/SupportUriTest.php",
+      "symbol": "origin",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Exact path of Uri source file in repository is unknown.",
+      "evidence": "Uri source not present in provided tree sample.",
+      "path": "tests/Support/SupportUriTest.php",
+      "symbol": "Uri",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php"
+    }
+  ]
 }
