@@ -6,12 +6,13 @@ Create a defensible expected-impact record for one historical change against its
 
 ## AI-generated annotation disclosure
 
-The current corpus annotations are **AI-generated, not human-reviewed**. Each reviewer slot (`R1`, `R2`) is an independent run of `nvidia/nemotron-3.5-super-vl:free` through OpenRouter, given the same change request and pinned base snapshot. The slots do not see OIOL output, scores, confidence, diagnostics, or each other's annotation before freezing.
+The corpus annotations are **AI-generated, not human-reviewed**, and were produced in three eras that each review's `independence.declaration` records. Case 0 was written manually by the repository operator from the pinned snapshot. Cases 1–10 are runs of `nvidia/nemotron-3.5-super-vl:free` through OpenRouter. Case 11 R2 and every slot from case 12 onward are NVIDIA NIM runs (`https://integrate.api.nvidia.com/v1/chat/completions`): slot `R1` is `nvidia/nemotron-3.5-lightning-30b-a3b` and slot `R2` is `nvidia/nemotron-3-ultra-550b-a55b`. Every slot saw only the same change request and pinned base snapshot; the slots do not see OIOL output, scores, confidence, diagnostics, or each other's annotation before freezing.
 
 - `independence.attested: true` means the repository operator attests that the generation run was isolated from OIOL output and from the other slot. It does **not** assert human independence.
 - The model declaration, model ID, and generation timestamp are stored in every review file; the run manifest is `benchmarks/real-world/reviews/.p12-run.json`.
+- The NVIDIA-era slots share one provider and one account key: the dedicated review secret is empty, so both slots fall back to the same `OIOL_API_KEY` credential. That is a **weaker independence claim** than two providers or two accounts — slot agreement is a consistency signal, not cross-vendor corroboration.
 - AI annotations can be over-inclusive and are weaker evidence than expert human review. Do not describe this corpus as human-annotated or expert-validated.
-- Disagreements between slots remain visible and adjudication stays `pending` until a reviewer records it.
+- Disagreements between slots stay visible in each case record. Adjudication was applied mechanically in both `intersection` (lower bound) and `union` (upper bound) modes; the outputs are committed under `benchmarks/real-world/adjudication/` and `benchmarks/real-world/adjudication-union/`.
 
 ## Blinding and reviewer independence
 
