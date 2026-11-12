@@ -43,6 +43,14 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
+      - name: Freeze and adjudicate the blinded review set
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$CORPUS_ROOT"
+          npm run benchmark:real-world:freeze
+          node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" | tee "$CORPUS_ROOT/adjudication-summary.json"
+
       - name: Acquire pinned source snapshots
         shell: bash
         env:
@@ -104,6 +112,11 @@ jobs:
           for f in offender-rank.json baseline-comparison.json; do
             if [ -f "benchmarks/real-world/evaluation-diagnostics/$f" ]; then
               cp "benchmarks/real-world/evaluation-diagnostics/$f" "$clone/benchmarks/real-world/evaluation-diagnostics/$f"
+            fi
+          done
+          for f in "$CORPUS_ROOT"/adjudication-summary.json "$CORPUS_ROOT"/*-summary.txt; do
+            if [ -f "$f" ]; then
+              cp "$f" "$clone/benchmarks/real-world/evaluation-diagnostics/$(basename "$f")"
             fi
           done
           git -C "$clone" config user.name "oiol-p13-bot"
