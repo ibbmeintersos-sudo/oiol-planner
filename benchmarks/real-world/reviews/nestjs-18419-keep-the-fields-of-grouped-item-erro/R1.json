@@ -3,38 +3,68 @@
   "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:42:35.181Z",
+  "scopeSummary": "Preserve item-level validation fields in ParseArrayPipe grouped errors while maintaining observable error contract.",
   "dimensionCoverage": {
     "directFiles": "partial",
     "affectedFiles": "partial",
     "tests": "partial",
     "packages": "partial",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "packages/common/interfaces/external/validation-error.interface.ts"
+    ],
     "affectedFiles": [],
-    "tests": [],
-    "packages": [],
+    "tests": [
+      "packages/core/test/errors/test/exception-handler.spec.ts"
+    ],
+    "packages": [
+      "packages/core"
+    ],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "packages/common/interfaces/external/validation-error.interface.ts",
+        "name": "ValidationError",
+        "kind": "interface"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Exact grouping logic of ParseArrayPipe error items and how they are serialized"
+    ],
+    "risks": [
+      {
+        "id": "R1",
+        "severity": "medium",
+        "rationale": "Loss of item-level validation details could degrade client-side validation user experience."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "ValidationError interface includes children field for item-level errors.",
+      "evidence": "The interface defines children?: ValidationError[].",
+      "path": "packages/common/interfaces/external/validation-error.interface.ts",
+      "symbol": "ValidationError",
+      "lineRange": "1-20",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/interfaces/external/validation-error.interface.ts#L1-L20"
+    }
+  ]
 }

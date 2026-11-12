@@ -3,38 +3,153 @@
   "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:37:09.223Z",
+  "scopeSummary": "Add support for reading and applying Git linked worktree exclude rules (.git/worktrees/<name>/info/exclude) during ignore matching without shelling out to Git.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "crates/ignore/src/gitignore.rs",
+      "crates/ignore/src/lib.rs"
+    ],
+    "affectedFiles": [
+      "crates/ignore/src/dir.rs",
+      "crates/core/search.rs"
+    ],
+    "tests": [
+      "crates/ignore/tests/worktree_exclude_tests.rs",
+      "crates/ignore/tests/worktree_exclude_tests.gitignore"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "crates/core/main.rs"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "crates/ignore/src/gitignore.rs",
+        "name": "GitignoreBuilder",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/ignore/src/gitignore.rs",
+        "name": "Gitignore",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/ignore/src/gitignore.rs",
+        "name": "add_worktree_excludes",
+        "kind": "function"
+      },
+      {
+        "file": "crates/ignore/src/lib.rs",
+        "name": "WalkBuilder",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/ignore/src/dir.rs",
+        "name": "WalkDir",
+        "kind": "struct"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "crates/ignore/src/lib.rs",
+        "to": "crates/ignore/src/gitignore.rs"
+      },
+      {
+        "from": "crates/ignore/src/dir.rs",
+        "to": "crates/ignore/src/gitignore.rs"
+      },
+      {
+        "from": "crates/core/search.rs",
+        "to": "crates/ignore/src/lib.rs"
+      },
+      {
+        "from": "crates/core/main.rs",
+        "to": "crates/ignore/src/lib.rs"
+      }
+    ],
+    "unknowns": [
+      "Whether worktree detection uses .git file vs directory heuristic",
+      "Exact precedence order between worktree excludes and repo excludes",
+      "Handling of nested worktrees or submodules"
+    ],
+    "risks": [
+      {
+        "id": "worktree-exclude-precedence",
+        "severity": "medium",
+        "rationale": "Incorrect precedence between worktree excludes and global excludes could expose or hide files unexpectedly."
+      },
+      {
+        "id": "worktree-detection-failure",
+        "severity": "medium",
+        "rationale": "Failing to detect linked worktrees on Windows or unusual Git configs would silently skip exclude rules."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "GitignoreBuilder is the entry point for building ignore matchers",
+      "evidence": "GitignoreBuilder::new and add methods construct Gitignore matchers from files",
+      "path": "crates/ignore/src/gitignore.rs",
+      "symbol": "GitignoreBuilder",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/gitignore.rs#L1-L100"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Public API exports WalkBuilder and Gitignore types",
+      "evidence": "lib.rs re-exports gitignore and dir modules for consumers",
+      "path": "crates/ignore/src/lib.rs",
+      "symbol": "WalkBuilder",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/lib.rs#L1-L50"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "WalkDir uses Gitignore for filtering during traversal",
+      "evidence": "dir.rs imports gitignore::Gitignore and applies it to candidate paths",
+      "path": "crates/ignore/src/dir.rs",
+      "symbol": "WalkDir",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/dir.rs#L1-L100"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "Core search uses ignore crate for file discovery",
+      "evidence": "search.rs imports ignore::WalkBuilder to configure file walking",
+      "path": "crates/core/search.rs",
+      "symbol": "Searcher",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/core/search.rs#L1-L100"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Existing gitignore tests use GitignoreBuilder with test fixtures",
+      "evidence": "gitignore_matched_path_or_any_parents_tests.rs loads .gitignore fixture and asserts matches",
+      "path": "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs",
+      "symbol": "get_gitignore",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs#L1-L30"
+    }
+  ]
 }

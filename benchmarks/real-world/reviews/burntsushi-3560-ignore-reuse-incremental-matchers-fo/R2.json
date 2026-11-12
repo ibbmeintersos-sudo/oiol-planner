@@ -3,38 +3,167 @@
   "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:37:51.845Z",
+  "scopeSummary": "Optimize IncrementalIgnore to reuse parent directory matchers when a directory has no local ignore rules, preserving hierarchical gitignore semantics.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "crates/ignore/src/incremental.rs",
+      "crates/ignore/src/dir.rs"
+    ],
+    "affectedFiles": [
+      "crates/ignore/src/lib.rs",
+      "crates/ignore/src/gitignore.rs"
+    ],
+    "tests": [
+      "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs",
+      "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.gitignore"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "crates/core/main.rs",
+      "crates/core/search.rs"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "crates/ignore/src/incremental.rs",
+        "name": "IncrementalIgnore",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/ignore/src/incremental.rs",
+        "name": "IncrementalMatch",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/ignore/src/dir.rs",
+        "name": "Ignore",
+        "kind": "struct"
+      },
+      {
+        "file": "crates/ignore/src/gitignore.rs",
+        "name": "matched_path_or_any_parents",
+        "kind": "method"
+      },
+      {
+        "file": "crates/ignore/src/incremental.rs",
+        "name": "get_matcher",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "crates/ignore/src/incremental.rs",
+        "to": "crates/ignore/src/dir.rs"
+      },
+      {
+        "from": "crates/ignore/src/incremental.rs",
+        "to": "crates/ignore/src/gitignore.rs"
+      },
+      {
+        "from": "crates/ignore/src/dir.rs",
+        "to": "crates/ignore/src/gitignore.rs"
+      },
+      {
+        "from": "crates/ignore/src/lib.rs",
+        "to": "crates/ignore/src/incremental.rs"
+      },
+      {
+        "from": "crates/core/search.rs",
+        "to": "crates/ignore/src/lib.rs"
+      }
+    ],
+    "unknowns": [
+      "Whether IncrementalIgnore currently creates a new matcher per directory or already shares some",
+      "Exact cache key structure used for matcher reuse in IncrementalIgnore",
+      "Thread-safety implications of sharing matchers across directory queries"
+    ],
+    "risks": [
+      {
+        "id": "matcher-reuse-semantics",
+        "severity": "medium",
+        "rationale": "Reusing parent matchers for directories without local rules must not skip parent-rule evaluation for child paths."
+      },
+      {
+        "id": "cache-invalidation",
+        "severity": "medium",
+        "rationale": "Matcher cache must not serve stale results if ignore files change between queries."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "IncrementalIgnore caches matchers per directory for hierarchical ignore matching",
+      "evidence": "IncrementalIgnore doc states matchers for directories are compiled on first use and retained for later queries",
+      "path": "crates/ignore/src/incremental.rs",
+      "symbol": "IncrementalIgnore",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/incremental.rs#L1-L50"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Ignore struct implements persistent matcher hierarchy for directory traversal",
+      "evidence": "Ignore connects directory traversal with ignore matchers, each matcher corresponds to rules from a single directory and points to parent matcher",
+      "path": "crates/ignore/src/dir.rs",
+      "symbol": "Ignore",
+      "lineRange": "1-40",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/dir.rs#L1-L40"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Test suite validates matched_path_or_any_parents semantics for gitignore rules",
+      "evidence": "Tests cover file/directory matching in root and subdirectories with various glob patterns including **/ prefixes",
+      "path": "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs",
+      "symbol": "test_files_in_deep",
+      "lineRange": "50-120",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs#L50-L120"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "matched_path_or_any_parents implements parent-rule matching semantics",
+      "evidence": "Method checks path against gitignore rules in its directory and all parent directories",
+      "path": "crates/ignore/src/gitignore.rs",
+      "symbol": "matched_path_or_any_parents",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/gitignore.rs#L1-L100"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "incremental.rs imports dir and gitignore modules for matcher construction",
+      "evidence": "use crate::{dir::Ignore, gitignore::{Gitignore, GitignoreBuilder}, ...}",
+      "path": "crates/ignore/src/incremental.rs",
+      "symbol": "use crate",
+      "lineRange": "10-20",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/incremental.rs#L10-L20"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Matcher reuse must preserve parent-rule evaluation for child paths",
+      "evidence": "IncrementalIgnore doc warns it does more work per path matched and is not for directory traversal; semantic change could break hierarchical matching",
+      "path": "crates/ignore/src/incremental.rs",
+      "symbol": "IncrementalIgnore",
+      "lineRange": "30-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/incremental.rs#L30-L50"
+    }
+  ]
 }

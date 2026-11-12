@@ -10,25 +10,17 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-12T03:31:07.472Z",
+  "generatedAt": "2026-11-12T03:42:35.182Z",
   "cases": 11,
   "offset": 13,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 4,
-  "failures": [
-    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
-    "pallets-404-update-project-to-use-uv-for-depende/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
-    "go-chi-1213-middleware-preserve-status-after-emp/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
-    "burntsushi-3578-ignore-respect-linked-worktree-exclu/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
-    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget",
-    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget",
-    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget"
-  ],
-  "callsUsed": 24,
-  "callBudget": 24,
+  "written": 13,
+  "failures": [],
+  "callsUsed": 13,
+  "callBudget": 40,
   "quotaExhausted": false,
-  "budgetExhausted": true
+  "budgetExhausted": false
 }

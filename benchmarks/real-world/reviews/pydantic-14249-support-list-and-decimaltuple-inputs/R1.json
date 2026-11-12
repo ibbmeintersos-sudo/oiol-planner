@@ -3,38 +3,104 @@
   "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:38:19.476Z",
+  "scopeSummary": "Extend Decimal input conversion to support list and DecimalTuple representations while preserving documented conversions.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "pydantic-core/src/validators/decimal.rs"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "pydantic-core/tests/validators/test_decimal.py",
+      "pydantic-core/tests/serializers/test_decimal.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "pydantic-core/src/validators/decimal.rs",
+        "name": "DecimalValidator",
+        "kind": "struct"
+      },
+      {
+        "file": "pydantic-core/src/validators/decimal.rs",
+        "name": "validate_as_decimal",
+        "kind": "function"
+      },
+      {
+        "file": "pydantic-core/src/serializers/type_serializers/decimal.rs",
+        "name": "DecimalSerializer",
+        "kind": "struct"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Exact format of DecimalTuple representation and its impact on constraint validation."
+    ],
+    "risks": [
+      {
+        "id": "risk-dt-001",
+        "severity": "medium",
+        "rationale": "Adding list and DecimalTuple support may change accepted input types and affect existing constraint validation."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "DecimalValidator struct defined in validators/decimal.rs",
+      "evidence": "struct DecimalValidator { ... } found in file",
+      "path": "pydantic-core/src/validators/decimal.rs",
+      "symbol": "DecimalValidator",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/validators/decimal.rs#L1-L10"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Test cases for Decimal input from list added",
+      "evidence": "parametrized test added for list input",
+      "path": "pydantic-core/tests/validators/test_decimal.py",
+      "symbol": "test_decimal",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/tests/validators/test_decimal.py#L1-L50"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "DecimalSerializer struct identified in serializer",
+      "evidence": "struct definition present",
+      "path": "pydantic-core/src/serializers/type_serializers/decimal.rs",
+      "symbol": "DecimalSerializer",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/serializers/type_serializers/decimal.rs#L1-L10"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Risk of breaking existing validation if list format not properly handled",
+      "evidence": "change may alter accepted input types",
+      "path": "pydantic-core/src/validators/decimal.rs",
+      "symbol": "DecimalValidator",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/validators/decimal.rs#L1-L10"
+    }
+  ]
 }
