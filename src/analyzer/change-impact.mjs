@@ -160,7 +160,8 @@ function buildFileFeatures(structure, sourceFiles, queryTokens, evidenceByPath, 
       0.35 * symbolMatches.size / denominator +
       0.10 * importMatches.size / denominator
     );
-    if (score < 0.08) continue;
+    // Import-specifier-only matches (0.10) are too weak to describe a change surface.
+    if (score < 0.12) continue;
     const evidence = evidenceByPath.get(file);
     const pkg = packageForFile(file, workspacePackages);
     const signals = [];
@@ -427,7 +428,8 @@ function impactedTests(repository, structure, impactedPaths, directMatches, maxT
     const pathTokens = tokenSet(file);
     const directlyMatchedPathTokens = new Set(directMatches.flatMap(item => item.path.split('/').flatMap(segment => [...tokenSet(segment)])));
     const overlap = tokenIntersection(pathTokens, directlyMatchedPathTokens);
-    if (overlap.size) {
+    // A single shared token is weak evidence: it links nearly every test file in a repository.
+    if (overlap.size >= 2) {
       results.push({
         path: file,
         association: 'test_path_name_overlap',
@@ -437,7 +439,12 @@ function impactedTests(repository, structure, impactedPaths, directMatches, maxT
       });
     }
   }
-  return results.slice(0, maxTests);
+  // High-confidence import links first so the cap keeps the strongest evidence.
+  const ranked = [...results].sort((a, b) => {
+    if (a.confidence !== b.confidence) return a.confidence === 'high' ? -1 : 1;
+    return a.path < b.path ? -1 : a.path > b.path ? 1 : 0;
+  });
+  return ranked.slice(0, maxTests);
 }
 
 function scopeLabel(fileCount, packageCount) {
@@ -454,11 +461,11 @@ function scopeLabel(fileCount, packageCount) {
 export function analyzeChangeImpact({
   request = '',
   repository = null,
-  maxDepth = 6,
-  maxImpactedFiles = 250,
+  maxDepth = 2,
+  maxImpactedFiles = 120,
   maxImpactedPackages = 100,
-  maxDirectMatches = 30,
-  maxTests = 100
+  maxDirectMatches = 12,
+  maxTests = 20
 } = {}) {
   if (!Number.isInteger(maxDepth) || maxDepth < 1 || maxDepth > 20) throw new Error('maxDepth must be an integer from 1 to 20');
   for (const [name, value] of Object.entries({ maxImpactedFiles, maxImpactedPackages, maxDirectMatches, maxTests })) {

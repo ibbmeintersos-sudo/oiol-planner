@@ -1,0 +1,361 @@
+{
+  "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 10,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 10
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 20,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 20
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 1
+    },
+    "packages": {
+      "tp": 1,
+      "fp": 8,
+      "fn": 0,
+      "precision": 0.1111,
+      "recall": 1,
+      "f1": 0.2,
+      "expectedCount": 1,
+      "actualCount": 9
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 611,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 611
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 218,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 218
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "javascript": 1,
+        "typescript": 87
+      }
+    },
+    "symbols": {
+      "actualCount": 617,
+      "fpByKind": {
+        "method": 411,
+        "variable": 103,
+        "class": 56,
+        "type": 20,
+        "interface": 14,
+        "function": 8,
+        "enum": 5
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 617
+      },
+      "fpTopNames": [
+        "method:constructor x41",
+        "method:close x11",
+        "method:on x10",
+        "method:unwrap x9",
+        "method:listen x5",
+        "method:registerErrorListener x5",
+        "method:handleMessage x4",
+        "method:initializeSerializer x4",
+        "method:handleClose x4",
+        "method:error x4",
+        "method:log x4",
+        "method:warn x4",
+        "method:debug x4",
+        "method:verbose x4",
+        "method:connect x4"
+      ],
+      "tp": 0,
+      "fp": 611,
+      "fn": 1,
+      "emittedKinds": [
+        "class",
+        "enum",
+        "function",
+        "interface",
+        "method",
+        "type",
+        "variable"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 218,
+      "fpByResolutionKind": {
+        "relative_path": 151,
+        "tsconfig_path_alias": 67
+      },
+      "fpByResolution": {
+        "relative-path": 218
+      },
+      "tp": 0,
+      "fp": 218,
+      "fn": 1,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 1,
+        "toMissingInWalk": 1,
+        "expectedEdgeCount": 1
+      }
+    },
+    "directFiles": {
+      "matchCount": 10,
+      "termCountHistogram": {
+        "1": 4,
+        "2": 5,
+        "4": 1
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match": 5,
+        "path_match+symbol_match+import_specifier_match": 3,
+        "symbol_match+import_specifier_match": 2
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 10,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "packages/testing/testing-module.ts",
+          "score": 0.313,
+          "terms": [
+            "lazy",
+            "module"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/testing/testing-module.builder.ts",
+          "score": 0.275,
+          "terms": [
+            "loader",
+            "module"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "packages/microservices/microservices-module.ts",
+          "score": 0.25,
+          "terms": [
+            "container",
+            "module"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "packages/websockets/socket-module.ts",
+          "score": 0.25,
+          "terms": [
+            "container",
+            "module"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "packages/core/metadata-scanner.ts",
+          "score": 0.225,
+          "terms": [
+            "scanner"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/microservices/container.ts",
+          "score": 0.225,
+          "terms": [
+            "container"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/testing/testing-instance-loader.ts",
+          "score": 0.225,
+          "terms": [
+            "loader"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/websockets/sockets-container.ts",
+          "score": 0.225,
+          "terms": [
+            "container"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "packages/microservices/nest-microservice.ts",
+          "score": 0.2,
+          "terms": [
+            "load",
+            "module"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "packages/core/nest-factory.ts",
+          "score": 0.188,
+          "terms": [
+            "container",
+            "load",
+            "loader",
+            "module",
+            "scanner"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 20,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 10,
+        "1": 6,
+        "2": 4
+      },
+      "propagationHistogram": {
+        "direct_request_match": 10,
+        "reverse_import_dependency": 10
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 20,
+      "fn": 1
+    },
+    "tests": {
+      "matchCount": 1,
+      "byAssociation": {
+        "test_path_name_overlap": 1
+      },
+      "byConfidence": {
+        "low": 1
+      },
+      "overlapTermHistogram": {
+        "2": 1
+      },
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "packages/common/test/package-exports.spec.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "packages",
+            "ts"
+          ]
+        }
+      ]
+    }
+  }
+}

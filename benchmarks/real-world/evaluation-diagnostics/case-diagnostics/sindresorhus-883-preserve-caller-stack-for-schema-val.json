@@ -1,0 +1,378 @@
+{
+  "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+  "dimensions": {
+    "directFiles": {
+      "tp": 1,
+      "fp": 7,
+      "fn": 0,
+      "precision": 0.125,
+      "recall": 1,
+      "f1": 0.2222,
+      "expectedCount": 1,
+      "actualCount": 8
+    },
+    "affectedFiles": {
+      "tp": 1,
+      "fp": 14,
+      "fn": 0,
+      "precision": 0.0667,
+      "recall": 1,
+      "f1": 0.125,
+      "expectedCount": 1,
+      "actualCount": 15
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 11,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 11
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 2
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 1,
+      "fp": 115,
+      "fn": 0,
+      "precision": 0.0086,
+      "recall": 1,
+      "f1": 0.0171,
+      "expectedCount": 1,
+      "actualCount": 116
+    },
+    "dependencyEdges": {
+      "tp": 1,
+      "fp": 70,
+      "fn": 0,
+      "precision": 0.0141,
+      "recall": 1,
+      "f1": 0.0278,
+      "expectedCount": 1,
+      "actualCount": 71
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 69,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "typescript": 46
+      }
+    },
+    "symbols": {
+      "actualCount": 116,
+      "fpByKind": {
+        "type": 43,
+        "function": 37,
+        "method": 13,
+        "variable": 13,
+        "class": 7,
+        "interface": 2
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 115
+      },
+      "fpTopNames": [
+        "method:constructor x8",
+        "method:onUploadProgress x1",
+        "function:isKyLeaking x1",
+        "function:isStreamLeaking x1",
+        "interface:Options x1",
+        "interface:NormalizedOptions x1",
+        "type:ExpectedNormalizedRetryOptions x1",
+        "type:ExpectedProgressCallbacks x1",
+        "variable:supportsRequestStreams x1",
+        "method:duplex x1",
+        "variable:supportsAbortController x1",
+        "variable:supportsAbortSignal x1",
+        "variable:supportsResponseStreams x1",
+        "variable:supportsFormData x1",
+        "variable:requestMethods x1"
+      ],
+      "tp": 1,
+      "fp": 115,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "type",
+        "variable"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 71,
+      "fpByResolutionKind": {
+        "relative_path": 70
+      },
+      "fpByResolution": {
+        "relative-path": 70
+      },
+      "tp": 1,
+      "fp": 70,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 1
+      }
+    },
+    "directFiles": {
+      "matchCount": 8,
+      "termCountHistogram": {
+        "1": 7,
+        "3": 1
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match+import_specifier_match": 4,
+        "path_match+symbol_match": 4
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [
+        3
+      ],
+      "tp": 1,
+      "fp": 7,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "source/errors/SchemaValidationError.ts",
+          "score": 0.7,
+          "terms": [
+            "error",
+            "schema",
+            "validation"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/ForceRetryError.ts",
+          "score": 0.25,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/NetworkError.ts",
+          "score": 0.25,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/TimeoutError.ts",
+          "score": 0.25,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/errors/KyError.ts",
+          "score": 0.225,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/errors/NonError.ts",
+          "score": 0.225,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/types/standard-schema.ts",
+          "score": 0.225,
+          "terms": [
+            "schema"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/utils/is-network-error.ts",
+          "score": 0.225,
+          "terms": [
+            "error"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 15,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 8,
+        "1": 5,
+        "2": 2
+      },
+      "propagationHistogram": {
+        "direct_request_match": 8,
+        "reverse_import_dependency": 7
+      },
+      "gtHitDepth": [
+        1
+      ],
+      "tp": 1,
+      "fp": 14,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 11,
+      "byAssociation": {
+        "resolved_test_import_to_impacted_file": 9,
+        "test_path_name_overlap": 2
+      },
+      "byConfidence": {
+        "high": 9,
+        "low": 2
+      },
+      "overlapTermHistogram": {
+        "2": 2
+      },
+      "tp": 0,
+      "fp": 11,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "test/base-url.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/bytes.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/context.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/fetch.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/formdata-searchparams.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/headers.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/memory-leak.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/methods.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/prefix.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/http-error.ts",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "error",
+            "ts"
+          ]
+        }
+      ]
+    }
+  }
+}

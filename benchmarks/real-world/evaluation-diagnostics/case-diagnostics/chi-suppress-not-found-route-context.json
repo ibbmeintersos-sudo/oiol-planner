@@ -1,0 +1,349 @@
+{
+  "caseId": "chi-suppress-not-found-route-context",
+  "dimensions": {
+    "directFiles": {
+      "tp": 1,
+      "fp": 11,
+      "fn": 0,
+      "precision": 0.0833,
+      "recall": 1,
+      "f1": 0.1538,
+      "expectedCount": 1,
+      "actualCount": 12
+    },
+    "affectedFiles": {
+      "tp": 1,
+      "fp": 11,
+      "fn": 0,
+      "precision": 0.0833,
+      "recall": 1,
+      "f1": 0.1538,
+      "expectedCount": 1,
+      "actualCount": 12
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 2,
+      "fp": 318,
+      "fn": 6,
+      "precision": 0.0063,
+      "recall": 0.25,
+      "f1": 0.0122,
+      "expectedCount": 8,
+      "actualCount": 320
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 55,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 55
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 106,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "go": 82
+      }
+    },
+    "symbols": {
+      "actualCount": 328,
+      "fpByKind": {
+        "function": 196,
+        "method": 80,
+        "struct": 37,
+        "interface": 8,
+        "type": 5
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 326
+      },
+      "fpTopNames": [
+        "function:main x12",
+        "function:init x6",
+        "method:Render x6",
+        "method:Flush x5",
+        "method:Hijack x5",
+        "struct:Article x5",
+        "function:NewArticleResponse x4",
+        "method:Handler x3",
+        "method:ServeHTTP x3",
+        "method:Write x3",
+        "struct:contextKey x2",
+        "method:String x2",
+        "function:TestPattern x2",
+        "method:WriteHeader x2",
+        "method:Push x2"
+      ],
+      "tp": 2,
+      "fp": 318,
+      "fn": 6,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 3,
+      "gtStructurallyUnmatchableSample": [
+        "context.go::field::Context.RouteParams",
+        "context.go::field::Context.RoutePatterns",
+        "context.go::field::Context.URLParams"
+      ]
+    },
+    "edges": {
+      "actualCount": 55,
+      "fpByResolutionKind": {
+        "parser_resolved": 55
+      },
+      "fpByResolution": {
+        "go-module-package-representative": 55
+      },
+      "tp": 0,
+      "fp": 55,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 12,
+      "termCountHistogram": {
+        "2": 6,
+        "3": 5,
+        "4": 1
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match": 8,
+        "path_match+symbol_match+import_specifier_match": 4
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [
+        3
+      ],
+      "tp": 1,
+      "fp": 11,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "middleware/route_headers.go",
+          "score": 0.45,
+          "terms": [
+            "middleware",
+            "route",
+            "router"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/middleware_test.go",
+          "score": 0.4,
+          "terms": [
+            "context",
+            "middleware",
+            "request"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/strip_test.go",
+          "score": 0.4,
+          "terms": [
+            "context",
+            "middleware",
+            "prevent",
+            "route"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/request_id.go",
+          "score": 0.388,
+          "terms": [
+            "context",
+            "middleware",
+            "request"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "middleware/page_route.go",
+          "score": 0.363,
+          "terms": [
+            "middleware",
+            "route"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/request_id_test.go",
+          "score": 0.363,
+          "terms": [
+            "middleware",
+            "request"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/request_size.go",
+          "score": 0.363,
+          "terms": [
+            "middleware",
+            "request"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "middleware/route_headers_test.go",
+          "score": 0.363,
+          "terms": [
+            "middleware",
+            "route"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "context_test.go",
+          "score": 0.338,
+          "terms": [
+            "context",
+            "route"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "context.go",
+          "score": 0.338,
+          "terms": [
+            "context",
+            "route"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 12,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 12
+      },
+      "propagationHistogram": {
+        "direct_request_match": 12
+      },
+      "gtHitDepth": [
+        0
+      ],
+      "tp": 1,
+      "fp": 11,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

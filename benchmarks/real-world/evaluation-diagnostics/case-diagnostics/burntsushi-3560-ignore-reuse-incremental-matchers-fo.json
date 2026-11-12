@@ -1,0 +1,345 @@
+{
+  "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 5,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 5
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 5,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 5
+    },
+    "tests": {
+      "tp": 1,
+      "fp": 6,
+      "fn": 0,
+      "precision": 0.1429,
+      "recall": 1,
+      "f1": 0.25,
+      "expectedCount": 1,
+      "actualCount": 7
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 527,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 527
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 225,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "rust": 64,
+        "ruby": 1
+      }
+    },
+    "symbols": {
+      "actualCount": 572,
+      "fpByKind": {
+        "function": 414,
+        "module": 66,
+        "struct": 51,
+        "enum": 24,
+        "type": 14,
+        "class": 1,
+        "method": 1,
+        "trait": 1
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 572
+      },
+      "fpTopNames": [
+        "module:tests x16",
+        "function:new x13",
+        "function:imp x11",
+        "function:serialize x9",
+        "function:default x6",
+        "function:fmt x6",
+        "function:from x6",
+        "function:build x5",
+        "function:generate x5",
+        "function:main x4",
+        "function:path x4",
+        "function:write x4",
+        "type:Err x4",
+        "function:from_str x4",
+        "function:flush x3"
+      ],
+      "tp": 0,
+      "fp": 527,
+      "fn": 1,
+      "emittedKinds": [
+        "class",
+        "enum",
+        "function",
+        "method",
+        "module",
+        "struct",
+        "trait",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 1
+      }
+    },
+    "directFiles": {
+      "matchCount": 5,
+      "termCountHistogram": {
+        "1": 4,
+        "2": 1
+      },
+      "signalsHistogram": {
+        "path_match": 2,
+        "path_match+symbol_match+import_specifier_match": 1,
+        "path_match+symbol_match": 1,
+        "path_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 5,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "crates/regex/src/non_matching.rs",
+          "score": 0.25,
+          "terms": [
+            "matching"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "crates/ignore/src/overrides.rs",
+          "score": 0.225,
+          "terms": [
+            "directories",
+            "ignore"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "crates/ignore/examples/walk.rs",
+          "score": 0.163,
+          "terms": [
+            "ignore"
+          ],
+          "signals": [
+            "path_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "crates/ignore/src/default_types.rs",
+          "score": 0.138,
+          "terms": [
+            "ignore"
+          ],
+          "signals": [
+            "path_match"
+          ]
+        },
+        {
+          "path": "crates/ignore/src/pathutil.rs",
+          "score": 0.138,
+          "terms": [
+            "ignore"
+          ],
+          "signals": [
+            "path_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 5,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 5
+      },
+      "propagationHistogram": {
+        "direct_request_match": 5
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 5,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 7,
+      "byAssociation": {
+        "test_path_name_overlap": 7
+      },
+      "byConfidence": {
+        "low": 7
+      },
+      "overlapTermHistogram": {
+        "2": 5,
+        "3": 2
+      },
+      "tp": 1,
+      "fp": 6,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.gitignore",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "ignore"
+          ]
+        },
+        {
+          "path": "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "ignore",
+            "rs"
+          ]
+        },
+        {
+          "path": "crates/ignore/tests/gitignore_skip_bom.gitignore",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "ignore"
+          ]
+        },
+        {
+          "path": "crates/ignore/tests/gitignore_skip_bom.rs",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "ignore",
+            "rs"
+          ]
+        },
+        {
+          "path": "crates/matcher/tests/test_matcher.rs",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "rs"
+          ]
+        },
+        {
+          "path": "crates/matcher/tests/tests.rs",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "rs"
+          ]
+        },
+        {
+          "path": "crates/matcher/tests/util.rs",
+          "confidence": "low",
+          "association": "test_path_name_overlap",
+          "terms": [
+            "crates",
+            "rs"
+          ]
+        }
+      ]
+    }
+  }
+}

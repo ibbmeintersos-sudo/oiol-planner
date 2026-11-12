@@ -1,0 +1,231 @@
+{
+  "caseId": "tensorflow-release-gil-device-context",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 2
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 2
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 194,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 194
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "python": 11,
+        "go": 26
+      }
+    },
+    "symbols": {
+      "actualCount": 198,
+      "fpByKind": {
+        "function": 111,
+        "method": 60,
+        "struct": 21,
+        "type": 3,
+        "class": 2,
+        "interface": 1
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 198
+      },
+      "fpTopNames": [
+        "method:c x4",
+        "method:finalizer x4",
+        "method:DataType x3",
+        "method:String x3",
+        "function:_running_from_pip_package x2",
+        "class:_LazyLoader x2",
+        "function:__init__ x2",
+        "function:_load x2",
+        "function:__getattr__ x2",
+        "function:__dir__ x2",
+        "function:__reduce__ x2",
+        "function:_forward_module x2",
+        "method:ListDevices x2",
+        "method:Shape x2",
+        "method:canBeAnInput x2"
+      ],
+      "tp": 0,
+      "fp": 194,
+      "fn": 2,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 1,
+        "toMissingInWalk": 1,
+        "expectedEdgeCount": 1
+      }
+    },
+    "directFiles": {
+      "matchCount": 2,
+      "termCountHistogram": {
+        "1": 2
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match": 2
+      },
+      "gtCoverage": {
+        "expectedCount": 2,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "sample": [
+        {
+          "path": "tensorflow/go/context_test.go",
+          "score": 0.225,
+          "terms": [
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/context.go",
+          "score": 0.225,
+          "terms": [
+            "context"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 2,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 2
+      },
+      "propagationHistogram": {
+        "direct_request_match": 2
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 2,
+      "fn": 1
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "sample": []
+    }
+  }
+}

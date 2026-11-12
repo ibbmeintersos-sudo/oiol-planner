@@ -1,0 +1,221 @@
+{
+  "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 1
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 1
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 349,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 349
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 39,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 39
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "go": 85
+      }
+    },
+    "symbols": {
+      "actualCount": 354,
+      "fpByKind": {
+        "function": 242,
+        "method": 68,
+        "struct": 35,
+        "type": 6,
+        "interface": 3
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 354
+      },
+      "fpTopNames": [
+        "function:main x23",
+        "function:initForOS x5",
+        "method:String x4",
+        "method:addOSFlags x3",
+        "method:platformApplyDefaults x3",
+        "method:platformSetup x3",
+        "method:platformCheckSupported x3",
+        "method:createProxier x3",
+        "function:platformCleanup x3",
+        "method:LogData x3",
+        "function:readFile x2",
+        "function:Run x2",
+        "method:Name x2",
+        "method:Run x2",
+        "function:GetDynamicPluginProber x2"
+      ],
+      "tp": 0,
+      "fp": 349,
+      "fn": 0,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 39,
+      "fpByResolutionKind": {
+        "parser_resolved": 39
+      },
+      "fpByResolution": {
+        "go-module-package-representative": 39
+      },
+      "tp": 0,
+      "fp": 39,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 1,
+      "termCountHistogram": {
+        "1": 1
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 0,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "cmd/kube-controller-manager/app/resource.go",
+          "score": 0.225,
+          "terms": [
+            "resource"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 1,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 1
+      },
+      "propagationHistogram": {
+        "direct_request_match": 1
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 1,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "sample": []
+    }
+  }
+}

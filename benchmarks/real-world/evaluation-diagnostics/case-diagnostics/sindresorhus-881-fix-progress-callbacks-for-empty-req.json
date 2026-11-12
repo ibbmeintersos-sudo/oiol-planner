@@ -1,0 +1,360 @@
+{
+  "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+  "dimensions": {
+    "directFiles": {
+      "tp": 1,
+      "fp": 6,
+      "fn": 2,
+      "precision": 0.1429,
+      "recall": 0.3333,
+      "f1": 0.2,
+      "expectedCount": 3,
+      "actualCount": 7
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 18,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 18
+    },
+    "tests": {
+      "tp": 1,
+      "fp": 19,
+      "fn": 1,
+      "precision": 0.05,
+      "recall": 0.5,
+      "f1": 0.0909,
+      "expectedCount": 2,
+      "actualCount": 20
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 2,
+      "fp": 114,
+      "fn": 0,
+      "precision": 0.0172,
+      "recall": 1,
+      "f1": 0.0339,
+      "expectedCount": 2,
+      "actualCount": 116
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 71,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 71
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 69,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "typescript": 46
+      }
+    },
+    "symbols": {
+      "actualCount": 116,
+      "fpByKind": {
+        "type": 43,
+        "function": 35,
+        "method": 13,
+        "variable": 13,
+        "class": 8,
+        "interface": 2
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 114
+      },
+      "fpTopNames": [
+        "method:constructor x8",
+        "method:onUploadProgress x1",
+        "function:isKyLeaking x1",
+        "function:isStreamLeaking x1",
+        "interface:Options x1",
+        "interface:NormalizedOptions x1",
+        "type:ExpectedNormalizedRetryOptions x1",
+        "type:ExpectedProgressCallbacks x1",
+        "variable:supportsRequestStreams x1",
+        "method:duplex x1",
+        "variable:supportsAbortController x1",
+        "variable:supportsAbortSignal x1",
+        "variable:supportsResponseStreams x1",
+        "variable:supportsFormData x1",
+        "variable:requestMethods x1"
+      ],
+      "tp": 2,
+      "fp": 114,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "type",
+        "variable"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 71,
+      "fpByResolutionKind": {
+        "relative_path": 71
+      },
+      "fpByResolution": {
+        "relative-path": 71
+      },
+      "tp": 0,
+      "fp": 71,
+      "fn": 2,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 2
+      }
+    },
+    "directFiles": {
+      "matchCount": 7,
+      "termCountHistogram": {
+        "1": 3,
+        "2": 3,
+        "3": 1
+      },
+      "signalsHistogram": {
+        "symbol_match": 4,
+        "path_match+symbol_match": 2,
+        "path_match+symbol_match+import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 3,
+        "presentInWalkedFiles": 3
+      },
+      "gtHitMatchedTermCounts": [
+        3
+      ],
+      "tp": 1,
+      "fp": 6,
+      "fn": 2,
+      "sample": [
+        {
+          "path": "source/utils/body.ts",
+          "score": 0.262,
+          "terms": [
+            "request",
+            "response",
+            "stream"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/types/ResponsePromise.ts",
+          "score": 0.25,
+          "terms": [
+            "response"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "source/types/request.ts",
+          "score": 0.225,
+          "terms": [
+            "request"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/types/response.ts",
+          "score": 0.225,
+          "terms": [
+            "response"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/core/constants.ts",
+          "score": 0.175,
+          "terms": [
+            "request",
+            "response"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "source/types/hooks.ts",
+          "score": 0.175,
+          "terms": [
+            "request",
+            "response"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "test-d/normalized-options.ts",
+          "score": 0.175,
+          "terms": [
+            "callbacks",
+            "progress"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 18,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 7,
+        "1": 9,
+        "2": 2
+      },
+      "propagationHistogram": {
+        "reverse_import_dependency": 11,
+        "direct_request_match": 7
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 18,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 20,
+      "byAssociation": {
+        "resolved_test_import_to_impacted_file": 10,
+        "test_path_name_overlap": 10
+      },
+      "byConfidence": {
+        "high": 10,
+        "low": 10
+      },
+      "overlapTermHistogram": {
+        "2": 8,
+        "3": 2
+      },
+      "tp": 1,
+      "fp": 19,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "test/base-url.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/body-size.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/bytes.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/context.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/fetch.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/formdata-searchparams.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/headers.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/memory-leak.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/methods.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "test/prefix.ts",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        }
+      ]
+    }
+  }
+}

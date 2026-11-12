@@ -1,0 +1,127 @@
+name: P13 scanner precision diagnostics
+
+on:
+  push:
+    branches:
+      - p13/**
+    paths:
+      - .p13/diagnose
+      - .github/workflows/p13-real-world-diagnostics.yml
+      - scripts/diagnose-real-world-precision.mjs
+      - scripts/compare-real-world-scores.mjs
+      - scripts/assemble-real-world-corpus.mjs
+      - scripts/acquire-real-world-snapshot.py
+      - scripts/run-real-world-benchmark.mjs
+      - scripts/validate-real-world-corpus.mjs
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p13-real-world-diagnostics-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CORPUS_ROOT: ${{ github.workspace }}/.p13-corpus
+
+jobs:
+  diagnose:
+    name: Diagnose scanner precision
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout P13 branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Freeze and adjudicate the blinded review set
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$CORPUS_ROOT"
+          npm run benchmark:real-world:freeze
+          node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" | tee "$CORPUS_ROOT/adjudication-summary.json"
+
+      - name: Acquire pinned source snapshots
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$CORPUS_ROOT"
+          indices=$(jq -r '.cases[] | (.snapshot.sharedAcquisitionIndex // .caseIndex)' benchmarks/real-world/annotation-worklist.json | sort -un)
+          echo "acquiring unique case indices: $indices"
+          for index in $indices; do
+            python3 scripts/acquire-real-world-snapshot.py --case-index "$index" --output acquired 2>&1 | tee -a "$CORPUS_ROOT/acquire-summary.txt"
+          done
+          du -sh acquired | tee -a "$CORPUS_ROOT/acquire-summary.txt"
+
+      - name: Assemble corpus snapshots
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/assemble-real-world-corpus.mjs --artifacts-root acquired --corpus-root "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/assemble-summary.txt"
+
+      - name: Diagnose scanner precision per case
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/diagnose-real-world-precision.mjs --corpus-root "$CORPUS_ROOT" --baseline benchmarks/real-world/adjudication/real-world-benchmark.json --out benchmarks/real-world/evaluation-diagnostics 2>&1 | tee "$CORPUS_ROOT/diagnose-summary.txt"
+
+      - name: Upload diagnostics outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p13-scanner-precision-diagnostics
+          path: |
+            benchmarks/real-world/evaluation-diagnostics/case-diagnostics
+            benchmarks/real-world/evaluation-diagnostics/offender-rank.json
+            benchmarks/real-world/evaluation-diagnostics/baseline-comparison.json
+            ${{ env.CORPUS_ROOT }}/diagnose-summary.txt
+            ${{ env.CORPUS_ROOT }}/assemble-summary.txt
+            ${{ env.CORPUS_ROOT }}/acquire-summary.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Commit diagnostics outputs
+        if: always()
+        shell: bash
+        env:
+          P13_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          clone="$RUNNER_TEMP/clone"
+          url=$(git config --get remote.origin.url)
+          git clone --quiet --depth 20 --branch "$P13_BRANCH" "$url" "$clone"
+          for key in $(git config --get-regexp "^http\\." | cut -d" " -f1); do
+            git -C "$clone" config "$key" "$(git config --get "$key")"
+          done
+          mkdir -p "$clone/benchmarks/real-world/evaluation-diagnostics/case-diagnostics"
+          if compgen -G "benchmarks/real-world/evaluation-diagnostics/case-diagnostics/*" > /dev/null; then
+            cp -r benchmarks/real-world/evaluation-diagnostics/case-diagnostics/. "$clone/benchmarks/real-world/evaluation-diagnostics/case-diagnostics/"
+          fi
+          for f in offender-rank.json baseline-comparison.json; do
+            if [ -f "benchmarks/real-world/evaluation-diagnostics/$f" ]; then
+              cp "benchmarks/real-world/evaluation-diagnostics/$f" "$clone/benchmarks/real-world/evaluation-diagnostics/$f"
+            fi
+          done
+          for f in "$CORPUS_ROOT"/adjudication-summary.json "$CORPUS_ROOT"/*-summary.txt; do
+            if [ -f "$f" ]; then
+              cp "$f" "$clone/benchmarks/real-world/evaluation-diagnostics/$(basename "$f")"
+            fi
+          done
+          git -C "$clone" config user.name "oiol-p13-bot"
+          git -C "$clone" config user.email "oiol-p13-bot@users.noreply.github.com"
+          git -C "$clone" add -A benchmarks/real-world/evaluation-diagnostics
+          if git -C "$clone" diff --cached --quiet; then echo "No diagnostics outputs to commit"; exit 0; fi
+          git -C "$clone" commit --quiet -m "chore(p13): record scanner precision diagnostics"
+          git -C "$clone" push --quiet origin "HEAD:refs/heads/$P13_BRANCH"

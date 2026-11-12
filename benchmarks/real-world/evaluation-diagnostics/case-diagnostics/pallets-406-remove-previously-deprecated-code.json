@@ -1,0 +1,197 @@
+{
+  "caseId": "pallets-406-remove-previously-deprecated-code",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 1,
+      "fp": 122,
+      "fn": 0,
+      "precision": 0.0081,
+      "recall": 1,
+      "f1": 0.0161,
+      "expectedCount": 1,
+      "actualCount": 123
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 32,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 32
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 49,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "python": 15
+      }
+    },
+    "symbols": {
+      "actualCount": 145,
+      "fpByKind": {
+        "function": 115,
+        "class": 29
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 144
+      },
+      "fpTopNames": [
+        "function:__init__ x13",
+        "function:get_signature x5",
+        "function:unsign x5",
+        "function:loads x4",
+        "function:serializer_factory x4",
+        "function:dumps x3",
+        "function:coerce_str x3",
+        "function:secret_key x2",
+        "function:load_payload x2",
+        "function:dump_payload x2",
+        "function:iter_unsigners x2",
+        "function:loads_unsafe x2",
+        "function:verify_signature x2",
+        "function:sign x2",
+        "function:validate x2"
+      ],
+      "tp": 1,
+      "fp": 122,
+      "fn": 0,
+      "emittedKinds": [
+        "class",
+        "function"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 32,
+      "fpByResolutionKind": {
+        "relative_path": 21,
+        "parser_resolved": 11
+      },
+      "fpByResolution": {
+        "relative-path": 21,
+        "python-module-root": 11
+      },
+      "tp": 0,
+      "fp": 32,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 0,
+      "termCountHistogram": {},
+      "signalsHistogram": {},
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 1
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    },
+    "affectedFiles": {
+      "matchCount": 0,
+      "truncated": false,
+      "depthHistogram": {},
+      "propagationHistogram": {},
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "sample": []
+    }
+  }
+}

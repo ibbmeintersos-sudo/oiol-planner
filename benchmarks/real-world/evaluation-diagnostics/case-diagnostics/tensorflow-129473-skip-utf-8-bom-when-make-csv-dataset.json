@@ -1,0 +1,325 @@
+{
+  "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 12,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 12
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 12,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 12
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 190,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 190
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "python": 8,
+        "go": 26
+      }
+    },
+    "symbols": {
+      "actualCount": 194,
+      "fpByKind": {
+        "function": 107,
+        "method": 60,
+        "struct": 21,
+        "type": 3,
+        "class": 2,
+        "interface": 1
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 194
+      },
+      "fpTopNames": [
+        "method:c x4",
+        "method:finalizer x4",
+        "method:DataType x3",
+        "method:String x3",
+        "function:_running_from_pip_package x2",
+        "class:_LazyLoader x2",
+        "function:__init__ x2",
+        "function:_load x2",
+        "function:__getattr__ x2",
+        "function:__dir__ x2",
+        "function:__reduce__ x2",
+        "function:_forward_module x2",
+        "method:ListDevices x2",
+        "method:Shape x2",
+        "method:canBeAnInput x2"
+      ],
+      "tp": 0,
+      "fp": 190,
+      "fn": 1,
+      "emittedKinds": [
+        "class",
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 0,
+      "fpByResolutionKind": {},
+      "fpByResolution": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 12,
+      "termCountHistogram": {
+        "1": 8,
+        "2": 4
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match": 10,
+        "path_match": 2
+      },
+      "gtCoverage": {
+        "expectedCount": 0,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 12,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "tensorflow/go/graph_test.go",
+          "score": 0.313,
+          "terms": [
+            "names",
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/operation_test.go",
+          "score": 0.313,
+          "terms": [
+            "data",
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/session_test.go",
+          "score": 0.313,
+          "terms": [
+            "order",
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/tensor_handle_test.go",
+          "score": 0.313,
+          "terms": [
+            "data",
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/attrs_test.go",
+          "score": 0.225,
+          "terms": [
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/context_test.go",
+          "score": 0.225,
+          "terms": [
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/saved_model_test.go",
+          "score": 0.225,
+          "terms": [
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/shape_test.go",
+          "score": 0.225,
+          "terms": [
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/signature_test.go",
+          "score": 0.225,
+          "terms": [
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "tensorflow/go/tensor_test.go",
+          "score": 0.225,
+          "terms": [
+            "test"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 12,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 12
+      },
+      "propagationHistogram": {
+        "direct_request_match": 12
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 12,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}

@@ -1,0 +1,419 @@
+{
+  "generatedAt": "2026-11-12T18:14:00.676Z",
+  "dimensions": {
+    "directFiles": {
+      "topFalsePositives": [
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fp": 12
+        },
+        {
+          "caseId": "home-assistant-unifi-disabled-entities",
+          "fp": 12
+        },
+        {
+          "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+          "fp": 12
+        },
+        {
+          "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+          "fp": 12
+        },
+        {
+          "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+          "fp": 12
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+          "fn": 5
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 4
+        },
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fn": 2
+        },
+        {
+          "caseId": "laravel-migration-failed-event",
+          "fn": 2
+        },
+        {
+          "caseId": "tensorflow-release-gil-device-context",
+          "fn": 2
+        }
+      ]
+    },
+    "affectedFiles": {
+      "topFalsePositives": [
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fp": 45
+        },
+        {
+          "caseId": "home-assistant-unifi-disabled-entities",
+          "fp": 20
+        },
+        {
+          "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+          "fp": 20
+        },
+        {
+          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+          "fp": 20
+        },
+        {
+          "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+          "fp": 18
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 12
+        },
+        {
+          "caseId": "laravel-migration-failed-event",
+          "fn": 4
+        },
+        {
+          "caseId": "kubernetes-spdy-upgrade-failure-close",
+          "fn": 4
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fn": 2
+        },
+        {
+          "caseId": "grafana-provisioning-job-tracing",
+          "fn": 2
+        }
+      ]
+    },
+    "tests": {
+      "topFalsePositives": [
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fp": 20
+        },
+        {
+          "caseId": "home-assistant-unifi-disabled-entities",
+          "fp": 20
+        },
+        {
+          "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+          "fp": 20
+        },
+        {
+          "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+          "fp": 20
+        },
+        {
+          "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+          "fp": 20
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+          "fn": 7
+        },
+        {
+          "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+          "fn": 4
+        },
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fn": 2
+        },
+        {
+          "caseId": "tensorflow-release-gil-device-context",
+          "fn": 2
+        },
+        {
+          "caseId": "grafana-provisioning-job-tracing",
+          "fn": 2
+        }
+      ]
+    },
+    "packages": {
+      "topFalsePositives": [
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fp": 10
+        },
+        {
+          "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+          "fp": 10
+        },
+        {
+          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+          "fp": 8
+        },
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fp": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fp": 0
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fn": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 0
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fn": 0
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fn": 0
+        },
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fn": 0
+        }
+      ]
+    },
+    "apiConsumers": {
+      "topFalsePositives": [
+        {
+          "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+          "fp": 2
+        },
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fp": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fp": 0
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fp": 0
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fp": 0
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fn": 1
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fn": 1
+        },
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fn": 1
+        },
+        {
+          "caseId": "kubernetes-spdy-upgrade-failure-close",
+          "fn": 1
+        },
+        {
+          "caseId": "tensorflow-release-gil-device-context",
+          "fn": 1
+        }
+      ]
+    },
+    "databaseConsumers": {
+      "topFalsePositives": [
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fp": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fp": 0
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fp": 0
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fp": 0
+        },
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fp": 0
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fn": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 0
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fn": 0
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fn": 0
+        },
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fn": 0
+        }
+      ]
+    },
+    "migrationFiles": {
+      "topFalsePositives": [
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fp": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fp": 0
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fp": 0
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fp": 0
+        },
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fp": 0
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fn": 0
+        },
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 0
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fn": 0
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fn": 0
+        },
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fn": 0
+        }
+      ]
+    },
+    "scannerSymbols": {
+      "topFalsePositives": [
+        {
+          "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+          "fp": 939
+        },
+        {
+          "caseId": "pydantic-decimal-json-schema-pattern",
+          "fp": 930
+        },
+        {
+          "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+          "fp": 930
+        },
+        {
+          "caseId": "laravel-migration-failed-event",
+          "fp": 907
+        },
+        {
+          "caseId": "laravel-62326-add-origin-to-uri-class",
+          "fp": 907
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 6
+        },
+        {
+          "caseId": "chi-suppress-not-found-route-context",
+          "fn": 6
+        },
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fn": 4
+        },
+        {
+          "caseId": "laravel-migration-failed-event",
+          "fn": 4
+        },
+        {
+          "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+          "fn": 4
+        }
+      ]
+    },
+    "dependencyEdges": {
+      "topFalsePositives": [
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fp": 218
+        },
+        {
+          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+          "fp": 218
+        },
+        {
+          "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+          "fp": 218
+        },
+        {
+          "caseId": "ky-dispatcher-option-ignored",
+          "fp": 87
+        },
+        {
+          "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+          "fp": 71
+        }
+      ],
+      "topFalseNegatives": [
+        {
+          "caseId": "itsdangerous-drop-eol-python",
+          "fn": 4
+        },
+        {
+          "caseId": "ripgrep-basename-regex-matching",
+          "fn": 3
+        },
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fn": 3
+        },
+        {
+          "caseId": "laravel-migration-failed-event",
+          "fn": 3
+        },
+        {
+          "caseId": "kubernetes-spdy-upgrade-failure-close",
+          "fn": 3
+        }
+      ]
+    }
+  }
+}

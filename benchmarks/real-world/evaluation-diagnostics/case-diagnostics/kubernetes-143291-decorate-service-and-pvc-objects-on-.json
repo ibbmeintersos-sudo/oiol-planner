@@ -1,0 +1,249 @@
+{
+  "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 3
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 3
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 340,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 340
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 39,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 39
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "go": 85
+      }
+    },
+    "symbols": {
+      "actualCount": 345,
+      "fpByKind": {
+        "function": 240,
+        "method": 61,
+        "struct": 35,
+        "type": 6,
+        "interface": 3
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 345
+      },
+      "fpTopNames": [
+        "function:main x23",
+        "function:initForOS x5",
+        "method:String x4",
+        "method:addOSFlags x3",
+        "method:platformApplyDefaults x3",
+        "method:platformSetup x3",
+        "method:platformCheckSupported x3",
+        "method:createProxier x3",
+        "function:platformCleanup x3",
+        "method:LogData x3",
+        "function:readFile x2",
+        "function:Run x2",
+        "method:Name x2",
+        "method:Run x2",
+        "function:GetDynamicPluginProber x2"
+      ],
+      "tp": 0,
+      "fp": 340,
+      "fn": 2,
+      "emittedKinds": [
+        "function",
+        "interface",
+        "method",
+        "struct",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 39,
+      "fpByResolutionKind": {
+        "parser_resolved": 39
+      },
+      "fpByResolution": {
+        "go-module-package-representative": 39
+      },
+      "tp": 0,
+      "fp": 39,
+      "fn": 0,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 0,
+        "expectedEdgeCount": 0
+      }
+    },
+    "directFiles": {
+      "matchCount": 3,
+      "termCountHistogram": {
+        "1": 1,
+        "2": 1,
+        "3": 1
+      },
+      "signalsHistogram": {
+        "symbol_match+import_specifier_match": 2,
+        "path_match+symbol_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 0,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "sample": [
+        {
+          "path": "cmd/kube-controller-manager/app/service_accounts.go",
+          "score": 0.225,
+          "terms": [
+            "service"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "cmd/kube-apiserver/app/server.go",
+          "score": 0.2,
+          "terms": [
+            "service",
+            "storage",
+            "tests"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "cmd/kube-controller-manager/app/plugins.go",
+          "score": 0.2,
+          "terms": [
+            "persistent",
+            "volume"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 3,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 3
+      },
+      "propagationHistogram": {
+        "direct_request_match": 3
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 3,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "sample": []
+    }
+  }
+}

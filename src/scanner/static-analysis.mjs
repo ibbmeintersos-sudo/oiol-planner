@@ -81,7 +81,15 @@ function resolveFileCandidate(base, fileSet) {
   const hasKnownExtension = FILE_SUFFIXES.some(ext => normalized.toLowerCase().endsWith(ext));
   if (!hasKnownExtension) candidates.push(...FILE_SUFFIXES.map(ext => normalized + ext));
   candidates.push(...INDEX_NAMES.map(name => path.posix.join(normalized, name)));
-  return candidates.find(candidate => fileSet.has(candidate)) || null;
+  const resolved = candidates.find(candidate => fileSet.has(candidate));
+  if (resolved) return resolved;
+  // TS-ESM projects write imports with a .js extension while the on-disk source is .ts/.tsx.
+  const jsStyleMatch = normalized.match(/^(.*)\.(js|mjs|cjs|jsx)$/i);
+  if (jsStyleMatch) {
+    const stem = jsStyleMatch[1];
+    return [stem + '.ts', stem + '.tsx', stem + '/index.ts', stem + '/index.tsx'].find(candidate => fileSet.has(candidate)) || null;
+  }
+  return null;
 }
 
 function resolveRelativeImport(file, language, specifier, fileSet) {

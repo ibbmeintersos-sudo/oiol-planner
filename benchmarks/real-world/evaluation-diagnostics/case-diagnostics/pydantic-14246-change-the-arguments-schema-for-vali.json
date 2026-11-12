@@ -1,0 +1,421 @@
+{
+  "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 12,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 12
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 13,
+      "fn": 0,
+      "precision": 0,
+      "recall": 1,
+      "f1": 0,
+      "expectedCount": 0,
+      "actualCount": 13
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 20,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 4,
+      "actualCount": 20
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 0,
+      "fp": 930,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 930
+    },
+    "dependencyEdges": {
+      "tp": 0,
+      "fp": 62,
+      "fn": 2,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 2,
+      "actualCount": 62
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 251,
+      "truncated": true,
+      "depthTruncated": false,
+      "languages": {
+        "python": 56,
+        "rust": 7
+      }
+    },
+    "symbols": {
+      "actualCount": 1220,
+      "fpByKind": {
+        "function": 805,
+        "class": 371,
+        "module": 17,
+        "struct": 12,
+        "type": 9,
+        "enum": 5,
+        "trait": 1
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 1220
+      },
+      "fpTopNames": [
+        "class:Model x110",
+        "class:MyModel x36",
+        "function:__init__ x20",
+        "class:Foo x16",
+        "function:func x15",
+        "function:py_gc_traverse x10",
+        "class:A x9",
+        "class:SelfRef x9",
+        "function:fmt x9",
+        "class:Parent x7",
+        "class:MyDataclass x7",
+        "class:Inner x6",
+        "class:Outer x6",
+        "class:Base x6",
+        "function:populate_root x6"
+      ],
+      "tp": 0,
+      "fp": 930,
+      "fn": 2,
+      "emittedKinds": [
+        "class",
+        "enum",
+        "function",
+        "module",
+        "struct",
+        "trait",
+        "type"
+      ],
+      "gtStructurallyUnmatchableCount": 0,
+      "gtStructurallyUnmatchableSample": []
+    },
+    "edges": {
+      "actualCount": 62,
+      "fpByResolutionKind": {
+        "parser_resolved": 47,
+        "relative_path": 15
+      },
+      "fpByResolution": {
+        "python-module-root": 47,
+        "relative-path": 15
+      },
+      "tp": 0,
+      "fp": 62,
+      "fn": 2,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 2,
+        "toMissingInWalk": 2,
+        "expectedEdgeCount": 2
+      }
+    },
+    "directFiles": {
+      "matchCount": 12,
+      "termCountHistogram": {
+        "1": 3,
+        "3": 3,
+        "4": 6
+      },
+      "signalsHistogram": {
+        "path_match+symbol_match+import_specifier_match": 4,
+        "path_match": 3,
+        "symbol_match": 2,
+        "symbol_match+import_specifier_match": 1,
+        "path_match+import_specifier_match": 1,
+        "import_specifier_match": 1
+      },
+      "gtCoverage": {
+        "expectedCount": 1,
+        "presentInWalkedFiles": 0
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 12,
+      "fn": 1,
+      "sample": [
+        {
+          "path": "pydantic/annotated_handlers.py",
+          "score": 0.512,
+          "terms": [
+            "call",
+            "core",
+            "json",
+            "schema",
+            "types"
+          ],
+          "signals": [
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic/validate_call_decorator.py",
+          "score": 0.475,
+          "terms": [
+            "call",
+            "types",
+            "validate"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic-core/src/lib.rs",
+          "score": 0.45,
+          "terms": [
+            "core",
+            "error",
+            "json",
+            "schema"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic-core/src/lookup_key.rs",
+          "score": 0.45,
+          "terms": [
+            "core",
+            "error",
+            "json",
+            "schema",
+            "types",
+            "validation"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic-core/src/build_tools.rs",
+          "score": 0.412,
+          "terms": [
+            "core",
+            "error",
+            "schema",
+            "types",
+            "validation"
+          ],
+          "signals": [
+            "path_match",
+            "symbol_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic/errors.py",
+          "score": 0.35,
+          "terms": [
+            "error",
+            "generation",
+            "json",
+            "schema"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "pydantic/warnings.py",
+          "score": 0.262,
+          "terms": [
+            "core",
+            "generation",
+            "schema"
+          ],
+          "signals": [
+            "symbol_match"
+          ]
+        },
+        {
+          "path": "pydantic-core/src/argument_markers.rs",
+          "score": 0.188,
+          "terms": [
+            "core",
+            "error",
+            "types"
+          ],
+          "signals": [
+            "path_match",
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic/__init__.py",
+          "score": 0.15,
+          "terms": [
+            "call",
+            "core",
+            "json",
+            "schema",
+            "types",
+            "validate"
+          ],
+          "signals": [
+            "import_specifier_match"
+          ]
+        },
+        {
+          "path": "pydantic-core/build.rs",
+          "score": 0.138,
+          "terms": [
+            "core"
+          ],
+          "signals": [
+            "path_match"
+          ]
+        }
+      ]
+    },
+    "affectedFiles": {
+      "matchCount": 13,
+      "truncated": false,
+      "depthHistogram": {
+        "0": 12,
+        "1": 1
+      },
+      "propagationHistogram": {
+        "direct_request_match": 12,
+        "reverse_import_dependency": 1
+      },
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 13,
+      "fn": 0
+    },
+    "tests": {
+      "matchCount": 20,
+      "byAssociation": {
+        "resolved_test_import_to_impacted_file": 20
+      },
+      "byConfidence": {
+        "high": 20
+      },
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 20,
+      "fn": 4,
+      "sample": [
+        {
+          "path": "tests/conftest.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_abc.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_allow_partial.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_annotation_fast_path.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_assert_in_validators.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_callable.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_construction.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_create_model.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_decorators.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        },
+        {
+          "path": "tests/test_deferred_annotations.py",
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
+        }
+      ]
+    }
+  }
+}

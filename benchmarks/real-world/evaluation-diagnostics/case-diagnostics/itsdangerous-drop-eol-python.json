@@ -1,0 +1,202 @@
+{
+  "caseId": "itsdangerous-drop-eol-python",
+  "dimensions": {
+    "directFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 4,
+      "actualCount": 0
+    },
+    "affectedFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 12,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 12,
+      "actualCount": 0
+    },
+    "tests": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "expectedCount": 1,
+      "actualCount": 0
+    },
+    "packages": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "apiConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "databaseConsumers": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "migrationFiles": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "expectedCount": 0,
+      "actualCount": 0
+    },
+    "scannerSymbols": {
+      "tp": 12,
+      "fp": 111,
+      "fn": 6,
+      "precision": 0.0976,
+      "recall": 0.6667,
+      "f1": 0.1702,
+      "expectedCount": 18,
+      "actualCount": 123
+    },
+    "dependencyEdges": {
+      "tp": 27,
+      "fp": 5,
+      "fn": 4,
+      "precision": 0.8438,
+      "recall": 0.871,
+      "f1": 0.8571,
+      "expectedCount": 31,
+      "actualCount": 32
+    }
+  },
+  "breakdown": {
+    "repository": null,
+    "scan": {
+      "fileCount": 49,
+      "truncated": false,
+      "depthTruncated": false,
+      "languages": {
+        "python": 15
+      }
+    },
+    "symbols": {
+      "actualCount": 145,
+      "fpByKind": {
+        "function": 111,
+        "class": 22
+      },
+      "fpBySource": {
+        "tree_sitter_ast": 133
+      },
+      "fpTopNames": [
+        "function:__init__ x13",
+        "function:get_signature x5",
+        "function:unsign x5",
+        "function:loads x4",
+        "function:serializer_factory x4",
+        "function:dumps x3",
+        "function:coerce_str x3",
+        "function:secret_key x2",
+        "function:load_payload x2",
+        "function:dump_payload x2",
+        "function:iter_unsigners x2",
+        "function:loads_unsafe x2",
+        "function:verify_signature x2",
+        "function:sign x2",
+        "function:validate x2"
+      ],
+      "tp": 12,
+      "fp": 111,
+      "fn": 6,
+      "emittedKinds": [
+        "class",
+        "function"
+      ],
+      "gtStructurallyUnmatchableCount": 6,
+      "gtStructurallyUnmatchableSample": [
+        "pyproject.toml::metadata::requires-python",
+        "pyproject.toml::mypy config::python_version",
+        "pyproject.toml::pyright config::pythonVersion",
+        "pyproject.toml::tox config::env_list",
+        "src/itsdangerous/_json.py::method::_CompactJSON.dumps",
+        "src/itsdangerous/_json.py::method::_CompactJSON.loads"
+      ]
+    },
+    "edges": {
+      "actualCount": 32,
+      "fpByResolutionKind": {
+        "relative_path": 5
+      },
+      "fpByResolution": {
+        "relative-path": 5
+      },
+      "tp": 27,
+      "fp": 5,
+      "fn": 4,
+      "jsSpecifierTsSiblingCount": 0,
+      "jsSpecifierTsSiblingSample": [],
+      "gtEndpointCoverage": {
+        "fromMissingInWalk": 0,
+        "toMissingInWalk": 4,
+        "expectedEdgeCount": 31
+      }
+    },
+    "directFiles": {
+      "matchCount": 0,
+      "termCountHistogram": {},
+      "signalsHistogram": {},
+      "gtCoverage": {
+        "expectedCount": 4,
+        "presentInWalkedFiles": 4
+      },
+      "gtHitMatchedTermCounts": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 4,
+      "sample": []
+    },
+    "affectedFiles": {
+      "matchCount": 0,
+      "truncated": false,
+      "depthHistogram": {},
+      "propagationHistogram": {},
+      "gtHitDepth": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 12
+    },
+    "tests": {
+      "matchCount": 0,
+      "byAssociation": {},
+      "byConfidence": {},
+      "overlapTermHistogram": {},
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "sample": []
+    }
+  }
+}
