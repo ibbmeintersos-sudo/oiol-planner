@@ -30,7 +30,7 @@ concurrency:
 jobs:
   annotate:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,13 +50,13 @@ jobs:
           P12_MODEL_R1: nvidia/nemotron-3.5-lightning-30b-a3b
           P12_MAX_TOKENS_R1: '12000'
           P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
-          P12_MODEL_R2: minimaxai/minimax-m3.1-flash
+          P12_MODEL_R2: deepseek-ai/deepseek-v4.1-flash
           P12_MAX_TOKENS_R2: '12000'
           P12_MAX_EVIDENCE_FILES: '12'
           P12_FILE_CHARS: '2500'
           P12_MAX_EVIDENCE_CHARS: '30000'
           P12_TREE_SAMPLE: '120'
-          P12_CALL_TIMEOUT: '300000'
+          P12_CALL_TIMEOUT: '600000'
           P12_SKIP_EXISTING: '1'
         run: |
           OFFSET="${{ inputs.offset || '0' }}"
