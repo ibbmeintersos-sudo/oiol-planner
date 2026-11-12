@@ -10,18 +10,19 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-12T00:43:42.388Z",
+  "generatedAt": "2026-11-12T02:09:28.618Z",
   "cases": 7,
   "offset": 11,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 6,
+  "written": 1,
   "failures": [
-    "home-assistant-unifi-disabled-entities/R2: Model minimaxai/minimax-m3.1-flash request failed: The operation was aborted due to timeout",
-    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model minimaxai/minimax-m3.1-flash request failed: The operation was aborted due to timeout",
-    "pallets-404-update-project-to-use-uv-for-depende/R2: Model minimaxai/minimax-m3.1-flash request failed: The operation was aborted due to timeout",
+    "home-assistant-unifi-disabled-entities/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
+    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
+    "pallets-404-update-project-to-use-uv-for-depende/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
+    "go-chi-1213-middleware-preserve-status-after-emp/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
     "CALL_BUDGET_EXHAUSTED: 18 calls used of a 18 budget"
   ],
   "callsUsed": 18,
