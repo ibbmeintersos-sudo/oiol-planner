@@ -3,38 +3,102 @@
   "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:58:35.482Z",
+  "scopeSummary": "Prevent temperature setpoint changes when Nest thermostat operates in Eco mode, aligning climate entity behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
     "tests": "partial",
-    "packages": "partial",
+    "packages": "complete",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "homeassistant/components/nest/climate.py"
+    ],
     "affectedFiles": [],
     "tests": [],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "PRESET_MODE_MAP",
+        "kind": "variable"
+      },
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "PRESET_INV_MODE_MAP",
+        "kind": "variable"
+      },
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "FAN_MODE_MAP",
+        "kind": "variable"
+      },
+      {
+        "file": "homeassistant/components/nest/climate.py",
+        "name": "THERMOSTAT_ECO_MODE",
+        "kind": "variable"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "homeassistant/components/nest/climate.py",
+        "to": "homeassistant/components/climate.py"
+      }
+    ],
+    "unknowns": [
+      "exact method Nest API uses to report Eco mode status for temperature setpoint blocking"
+    ],
+    "risks": [
+      {
+        "id": "RISK-001",
+        "severity": "medium",
+        "rationale": "Blocking temperature changes in Eco mode may cause user confusion if Eco mode status is not clearly communicated."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Nest climate integration requires modification to block temperature changes in Eco mode.",
+      "evidence": "File homeassistant/components/nest/climate.py defines thermostat trait mappings and climate entity logic.",
+      "path": "homeassistant/components/nest/climate.py",
+      "symbol": "PRESET_MODE_MAP",
+      "lineRange": "80-95",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/homeassistant/components/nest/climate.py#L80-L95"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Variables PRESET_MODE_MAP, PRESET_INV_MODE_MAP, FAN_MODE_MAP, THERMOSTAT_ECO_MODE are used in the Nest climate module.",
+      "evidence": "Snippet from homeassistant/components/nest/climate.py shows these identifiers.",
+      "path": "homeassistant/components/nest/climate.py",
+      "symbol": "THERMOSTAT_ECO_MODE",
+      "lineRange": "15-25",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/homeassistant/components/nest/climate.py#L15-L25"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "Nest climate module imports from homeassistant.components.climate.",
+      "evidence": "Import statement in homeassistant/components/nest/climate.py pulls climate constants.",
+      "path": "homeassistant/components/nest/climate.py",
+      "symbol": "import",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/7c5eb2b0838093fa9d1357d5e7c81c607a95aa15/homeassistant/components/nest/climate.py#L1-L30"
+    }
+  ]
 }

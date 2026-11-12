@@ -1,0 +1,278 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "laravel-62326-add-origin-to-uri-class",
+  "source": {
+    "repositoryUrl": "https://github.com/laravel/framework",
+    "baseCommit": "21719b7b765c01d4bb19fd0c4304f3292322ae3d",
+    "changeCommit": "f8080dd48e34ad9d4bdfa91a38e987db6a3b87b7",
+    "changeUrl": "https://github.com/laravel/framework/pull/62326",
+    "license": "MIT",
+    "licenseFile": "LICENSE.md",
+    "licenseFileUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/LICENSE.md",
+    "sizeClass": "medium",
+    "repositoryKind": "library",
+    "trackedFileCountAtBase": 3500,
+    "primaryLanguages": [
+      "PHP"
+    ]
+  },
+  "change": {
+    "request": "Expose an origin() accessor on the URI value object and keep package metadata and URI tests aligned with the public API.",
+    "summary": "Add origin() to Uri class (laravel/framework #62326)",
+    "category": "api_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/laravel-62326-add-origin-to-uri-class",
+    "sha256": "6f86f4752944615c2eb3d549f3420e1051af161b7dc57c288ad2c702662a327c",
+    "gitTreeSha": "8b136df410ca1f2aea3d21bdca57e414e388527e",
+    "artifactName": "p12-snapshot-24"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [
+      "tests/Support/SupportUriTest.php"
+    ],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [],
+    "dependencyEdges": [],
+    "unknowns": [
+      "Exact location of Uri.php source file not in tree sample",
+      "Exact path of Uri source file in repository",
+      "What package metadata updates are required beyond composer.json",
+      "Whether RouteUri class also needs origin() method"
+    ],
+    "risks": [
+      {
+        "id": "risk-uri-origin",
+        "severity": "medium",
+        "rationale": "Adding origin() accessor may change URI serialization behavior and affect downstream code that expects existing method set."
+      },
+      {
+        "id": "uri-origin-breaking-change",
+        "severity": "medium",
+        "rationale": "New public method on value object may conflict with existing consumer extensions or subclasses."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:46:03.223Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "affectedFiles",
+            "claim": "SupportUriTest.php will be affected by new origin() method.",
+            "evidence": "Test file imports and tests Uri class.",
+            "path": "tests/Support/SupportUriTest.php",
+            "symbol": "Uri",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php"
+          },
+          {
+            "dimension": "tests",
+            "claim": "Test file must be updated to include origin() accessor tests.",
+            "evidence": "Add test for $uri->origin().",
+            "path": "tests/Support/SupportUriTest.php",
+            "symbol": "origin",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php"
+          },
+          {
+            "dimension": "unknowns",
+            "claim": "Exact path of Uri source file in repository is unknown.",
+            "evidence": "Uri source not present in provided tree sample.",
+            "path": "tests/Support/SupportUriTest.php",
+            "symbol": "Uri",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:44:39.538Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "Uri class needs origin() accessor method added",
+            "evidence": "SupportUriTest.php tests Uri class with scheme(), host(), port() methods but no origin()",
+            "path": "src/Illuminate/Support/Uri.php",
+            "symbol": "origin",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/src/Illuminate/Support/Uri.php#L1-L50"
+          },
+          {
+            "dimension": "tests",
+            "claim": "SupportUriTest.php must be updated to test origin() method",
+            "evidence": "Test file exercises scheme(), host(), port() but lacks origin() assertions",
+            "path": "tests/Support/SupportUriTest.php",
+            "symbol": "test_basic_uri_interactions",
+            "lineRange": "20-50",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php#L20-L50"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "Uri class has scheme, host, port accessors that origin() will compose",
+            "evidence": "SupportUriTest.php calls $uri->scheme(), $uri->host(), $uri->port()",
+            "path": "src/Illuminate/Support/Uri.php",
+            "symbol": "scheme",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/src/Illuminate/Support/Uri.php#L1-L100"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "SupportUriTest imports and tests Uri class",
+            "evidence": "use Illuminate\\Support\\Uri; and Uri::of() calls in test",
+            "path": "tests/Support/SupportUriTest.php",
+            "symbol": "Uri",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/tests/Support/SupportUriTest.php#L1-L30"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Adding origin() to public API may affect consumers extending Uri",
+            "evidence": "Uri is a value object with public accessors; new method changes class contract",
+            "path": "src/Illuminate/Support/Uri.php",
+            "symbol": "origin",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/laravel/framework/blob/21719b7b765c01d4bb19fd0c4304f3292322ae3d/src/Illuminate/Support/Uri.php#L1-L100"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "directFiles",
+          "onlyFirst": [],
+          "onlySecond": [
+            "composer.json",
+            "src/Illuminate/Support/Uri.php"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [
+            "tests/Support/SupportUriTest.php"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "tests",
+          "onlyFirst": [],
+          "onlySecond": [
+            "tests/Routing/RouteUriTest.php"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [
+            "tests/Support/SupportUriTest.php"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "file": "src/Illuminate/Support/Uri.php",
+              "name": "host",
+              "kind": "function"
+            },
+            {
+              "file": "src/Illuminate/Support/Uri.php",
+              "name": "origin",
+              "kind": "function"
+            },
+            {
+              "file": "src/Illuminate/Support/Uri.php",
+              "name": "port",
+              "kind": "function"
+            },
+            {
+              "file": "src/Illuminate/Support/Uri.php",
+              "name": "scheme",
+              "kind": "function"
+            },
+            {
+              "file": "tests/Support/SupportUriTest.php",
+              "name": "test_basic_uri_interactions",
+              "kind": "function"
+            }
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "from": "tests/Routing/RouteUriTest.php",
+              "to": "src/Illuminate/Routing/RouteUri.php"
+            },
+            {
+              "from": "tests/Support/SupportUriTest.php",
+              "to": "src/Illuminate/Support/Uri.php"
+            }
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Exact path of Uri source file in repository"
+          ],
+          "onlySecond": [
+            "Exact location of Uri.php source file not in tree sample",
+            "What package metadata updates are required beyond composer.json",
+            "Whether RouteUri class also needs origin() method"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-uri-origin",
+              "severity": "medium",
+              "rationale": "Adding origin() accessor may change URI serialization behavior and affect downstream code that expects existing method set."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "uri-origin-breaking-change",
+              "severity": "medium",
+              "rationale": "New public method on value object may conflict with existing consumer extensions or subclasses."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

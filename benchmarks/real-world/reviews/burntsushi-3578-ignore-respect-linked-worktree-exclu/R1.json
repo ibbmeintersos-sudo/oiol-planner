@@ -3,38 +3,133 @@
   "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:07:23.674Z",
+  "scopeSummary": "Implement linked worktree exclude respect in ignore matching without invoking Git commands from the scanned target project.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "crates/ignore/src/gitignore.rs"
+    ],
+    "affectedFiles": [
+      "crates/cli/src/lib.rs",
+      "crates/core/search.rs"
+    ],
+    "tests": [
+      "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "crates/ignore/src/gitignore.rs",
+        "name": "GitignoreBuilder",
+        "kind": "type"
+      },
+      {
+        "file": "crates/ignore/src/gitignore.rs",
+        "name": "Gitignore",
+        "kind": "type"
+      },
+      {
+        "file": "crates/core/main.rs",
+        "name": "main",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "crates/cli/src/lib.rs",
+        "to": "crates/ignore/src/lib.rs"
+      },
+      {
+        "from": "crates/core/search.rs",
+        "to": "crates/ignore/src/lib.rs"
+      }
+    ],
+    "unknowns": [
+      "Precise method to detect linked worktree exclude rules without invoking git commands from the scanned project."
+    ],
+    "risks": [
+      {
+        "id": "risk-wt-excludes-001",
+        "severity": "medium",
+        "rationale": "Misapplication of worktree excludes could lead to incorrect file inclusion/exclusion during search."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "gitignore.rs must be edited to add worktree exclude handling",
+      "evidence": "File contains GitignoreBuilder struct used for ignore matching",
+      "path": "crates/ignore/src/gitignore.rs",
+      "symbol": "GitignoreBuilder",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/gitignore.rs#L1-L50"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "CLI and core search behavior changes when worktree excludes are respected",
+      "evidence": "crates/cli/src/lib.rs imports ignore module",
+      "path": "crates/cli/src/lib.rs",
+      "symbol": "ignore",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/cli/src/lib.rs#L1-L30"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Scanner symbols identified in direct files for impact analysis",
+      "evidence": "Symbols listed for impact analysis",
+      "path": "crates/ignore/src/gitignore.rs",
+      "symbol": "GitignoreBuilder",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/gitignore.rs#L1-L50"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "Import edges between CLI and ignore module",
+      "evidence": "cli lib imports ignore lib",
+      "path": "crates/cli/src/lib.rs",
+      "symbol": "use ignore",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/cli/src/lib.rs#L1-L10"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Uncertainty in detecting linked worktree excludes without Git",
+      "evidence": "No existing code for worktree exclude detection in base snapshot",
+      "path": "crates/ignore/src/gitignore.rs",
+      "symbol": "None",
+      "lineRange": "N/A",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/gitignore.rs"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Risk of incorrect ignore matching when worktree excludes applied",
+      "evidence": "Risk identified in change impact analysis",
+      "path": "crates/ignore/src/gitignore.rs",
+      "symbol": "risk-wt-excludes-001",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/gitignore.rs#L1-L100"
+    }
+  ]
 }

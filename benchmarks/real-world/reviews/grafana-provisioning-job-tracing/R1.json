@@ -3,38 +3,134 @@
   "caseId": "grafana-provisioning-job-tracing",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:21:48.770Z",
+  "scopeSummary": "Create a root OpenTelemetry tracing span for each provisioning job and wire the tracer into the concurrent job driver so job processing is traced end-to-end.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pkg/registry/apis/provisioning/jobs/driver.go",
+      "pkg/registry/apis/provisioning/jobs/concurrent_driver.go"
+    ],
+    "affectedFiles": [
+      "pkg/registry/apis/provisioning/jobs/driver_test.go",
+      "pkg/registry/apis/provisioning/jobs/concurrent_driver_test.go"
+    ],
+    "tests": [
+      "pkg/registry/apis/provisioning/jobs/driver_test.go",
+      "pkg/registry/apis/provisioning/jobs/concurrent_driver_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "pkg/registry/apis/provisioning/jobs/driver.go",
+        "name": "jobProcessor.processKey",
+        "kind": "method"
+      },
+      {
+        "file": "pkg/registry/apis/provisioning/jobs/driver.go",
+        "name": "tracing.Start",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/registry/apis/provisioning/jobs/concurrent_driver.go",
+        "name": "ConcurrentJobDriver",
+        "kind": "struct"
+      },
+      {
+        "file": "pkg/registry/apis/provisioning/jobs/concurrent_driver.go",
+        "name": "NewConcurrentJobDriver",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/registry/apis/provisioning/jobs/concurrent_driver.go",
+        "name": "newJobProcessor",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pkg/registry/apis/provisioning/jobs/driver.go",
+        "to": "pkg/infra/tracing"
+      },
+      {
+        "from": "pkg/registry/apis/provisioning/jobs/concurrent_driver.go",
+        "to": "pkg/registry/apis/provisioning/jobs/driver.go"
+      }
+    ],
+    "unknowns": [
+      "Whether the root span name and attributes follow the existing Grafana tracing conventions for provisioning jobs.",
+      "Whether the span context must be propagated into worker goroutines or repository operations.",
+      "Whether the change requires updates to the OpenTelemetry tracer provider configuration in pkg/infra/tracing."
+    ],
+    "risks": [
+      {
+        "id": "root-span-lifecycle",
+        "severity": "medium",
+        "rationale": "Starting a root span per job without ensuring it is ended on all error paths could leak spans and distort distributed traces."
+      },
+      {
+        "id": "span-context-propagation",
+        "severity": "medium",
+        "rationale": "If the root span context is not propagated into concurrent worker goroutines, child spans will not be associated with the job trace."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "driver.go contains processKey which already starts a claim_and_process_one_job span using tracing.Start.",
+      "evidence": "driver.go imports pkg/infra/tracing and calls tracing.Start(ctx, \"provisioning.jobs.claim_and_process_one_job\") in processKey.",
+      "path": "pkg/registry/apis/provisioning/jobs/driver.go",
+      "symbol": "processKey",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/e381a87421a65c3415e9d72c14038a1b32271296/pkg/registry/apis/provisioning/jobs/driver.go#L1-L100"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "concurrent_driver.go defines NewConcurrentJobDriver and newJobProcessor which construct jobProcessor instances used by workers.",
+      "evidence": "concurrent_driver.go contains NewConcurrentJobDriver constructor and newJobProcessor function that wires Store, RepoGetter, HistoryWriter, workers, and metrics into jobProcessor.",
+      "path": "pkg/registry/apis/provisioning/jobs/concurrent_driver.go",
+      "symbol": "NewConcurrentJobDriver",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/e381a87421a65c3415e9d72c14038a1b32271296/pkg/registry/apis/provisioning/jobs/concurrent_driver.go#L1-L200"
+    },
+    {
+      "dimension": "tests",
+      "claim": "driver_test.go and concurrent_driver_test.go contain unit tests for the driver and concurrent job driver that must be updated to cover root span creation.",
+      "evidence": "driver_test.go tests jobProcessor.processKey and concurrent_driver_test.go tests NewConcurrentJobDriver and event handler behavior.",
+      "path": "pkg/registry/apis/provisioning/jobs/driver_test.go",
+      "symbol": "TestOnProgress_IncrementsProgressUpdates",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/e381a87421a65c3415e9d72c14038a1b32271296/pkg/registry/apis/provisioning/jobs/driver_test.go#L1-L200"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "driver.go imports pkg/infra/tracing for the tracing.Start function used to create spans.",
+      "evidence": "driver.go imports \"github.com/grafana/grafana/pkg/infra/tracing\" and calls tracing.Start in processKey.",
+      "path": "pkg/registry/apis/provisioning/jobs/driver.go",
+      "symbol": "tracing.Start",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/e381a87421a65c3415e9d72c14038a1b32271296/pkg/registry/apis/provisioning/jobs/driver.go#L1-L30"
+    }
+  ]
 }

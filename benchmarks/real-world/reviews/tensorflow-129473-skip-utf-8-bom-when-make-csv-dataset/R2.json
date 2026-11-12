@@ -3,38 +3,111 @@
   "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:52:34.573Z",
+  "scopeSummary": "Add UTF-8 BOM stripping when make_csv_dataset reads header row for column names, and add a regression test in make_csv_dataset_test.py.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "tensorflow/python/data/experimental/ops/readers.py"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "tensorflow/python/data/experimental/ops/readers.py",
+        "name": "make_csv_dataset",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+        "name": "MakeCsvDatasetTest",
+        "kind": "class"
+      },
+      {
+        "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+        "name": "_make_csv_dataset",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+        "to": "tensorflow/python/data/experimental/ops/readers.py"
+      }
+    ],
+    "unknowns": [
+      "Exact location of header parsing logic in readers.py (could be in C++ kernel or Python wrapper).",
+      "Whether BOM handling should also apply to CsvDataset (separate code path)."
+    ],
+    "risks": [
+      {
+        "id": "bom-stripping-regression",
+        "severity": "medium",
+        "rationale": "Stripping BOM may alter behavior for files that intentionally include BOM as data; must ensure only leading BOM on first line is removed."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "make_csv_dataset is defined in readers.py and parses column names from the first line of CSV files.",
+      "evidence": "Test file imports readers.make_csv_dataset and uses it to create datasets with header rows.",
+      "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+      "symbol": "make_csv_dataset",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L1-L50"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Regression test for BOM handling should be added to MakeCsvDatasetTest class.",
+      "evidence": "Existing test class provides _setup_files helper that writes CSV files with configurable encoding; can be extended to write UTF-8 BOM prefix.",
+      "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+      "symbol": "MakeCsvDatasetTest",
+      "lineRange": "30-80",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L30-L80"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "make_csv_dataset function is the public API affected by the change.",
+      "evidence": "Imported and used in test file; its signature includes column_names parameter inferred from header.",
+      "path": "tensorflow/python/data/experimental/ops/readers.py",
+      "symbol": "make_csv_dataset",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/ops/readers.py#L1-L100"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "Test file depends on readers module for make_csv_dataset.",
+      "evidence": "Import statement: from tensorflow.python.data.experimental.ops import readers",
+      "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+      "symbol": "readers",
+      "lineRange": "20-25",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L20-L25"
+    }
+  ]
 }

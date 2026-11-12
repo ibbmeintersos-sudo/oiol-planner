@@ -3,38 +3,106 @@
   "caseId": "laravel-62360-include-identical-belongstomany-reso",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:46:07.535Z",
+  "scopeSummary": "Deduplicate identical BelongsToMany resources in JSON:API compound documents while preserving lazy relationship resolution and serialization behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php"
+    ],
+    "affectedFiles": [
+      "src/Illuminate/Http/Resources/JsonApi/JsonApiResource.php",
+      "src/Illuminate/Http/Resources/JsonApi/RelationResolver.php"
+    ],
+    "tests": [
+      "tests/Http/Resources/JsonApi/JsonApiResourceTest.php"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php",
+        "name": "resolveIncludedResourceObjects",
+        "kind": "method"
+      },
+      {
+        "file": "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php",
+        "name": "with",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php",
+        "to": "src/Illuminate/Http/Resources/JsonApi/JsonApiResource.php"
+      }
+    ],
+    "unknowns": [
+      "Exact unique key strategy for deduplicating BelongsToMany resources across lazy resolution boundaries"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Incorrect deduplication may cause related resources to be omitted from compound documents, breaking client expectations."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "The with method in AnonymousResourceCollection builds the included array and uses uniqueStrict on _uniqueKey for deduplication.",
+      "evidence": "AnonymousResourceCollection.php with method maps resources and calls uniqueStrict('_uniqueKey').",
+      "path": "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php",
+      "symbol": "with",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/laravel/framework/blob/3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee/src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php#L1-L100"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "resolveIncludedResourceObjects method is responsible for resolving included resource objects.",
+      "evidence": "Method defined in JsonApiResource trait; used by AnonymousResourceCollection.",
+      "path": "src/Illuminate/Http/Resources/JsonApi/JsonApiResource.php",
+      "symbol": "resolveIncludedResourceObjects",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/laravel/framework/blob/3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee/src/Illuminate/Http/Resources/JsonApi/JsonApiResource.php#L1-L100"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "AnonymousResourceCollection uses resolveIncludedResourceObjects from JsonApiResource to build included resources.",
+      "evidence": "The with method calls $resource->resolveIncludedResourceObjects($request).",
+      "path": "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php",
+      "symbol": "resolveIncludedResourceObjects",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/laravel/framework/blob/3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee/src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php#L1-L100"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Deduplication could drop resources that are needed for separate relationships.",
+      "evidence": "Risk identified based on change semantics.",
+      "path": "src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php",
+      "symbol": "with",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/laravel/framework/blob/3ee9f38b4b840acabe79dbe3212b42e00b9ee4ee/src/Illuminate/Http/Resources/JsonApi/AnonymousResourceCollection.php#L1-L100"
+    }
+  ]
 }

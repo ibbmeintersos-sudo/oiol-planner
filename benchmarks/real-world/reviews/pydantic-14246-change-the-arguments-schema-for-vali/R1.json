@@ -3,38 +3,160 @@
   "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:41:09.362Z",
+  "scopeSummary": "Update generated arguments schema for validate_call while preserving core validation, JSON Schema generation, error types, and public documentation consistency.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pydantic-core/src/validators/arguments_v3.rs",
+      "pydantic-core/src/validators/arguments.rs",
+      "pydantic-core/src/build_tools.rs"
+    ],
+    "affectedFiles": [
+      "pydantic-core/src/validators/validation_state.rs",
+      "pydantic-core/src/input/mod.rs"
+    ],
+    "tests": [
+      "pydantic-core/tests/validators/arguments_v3/test_build_errors.py",
+      "pydantic-core/tests/validators/arguments_v3/test_alias.py",
+      "pydantic-core/tests/validators/arguments_v3/test_extra.py",
+      "pydantic-core/tests/validators/arguments_v3/test_general.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "pydantic-core/src/validators/arguments_v3.rs",
+        "name": "Parameter",
+        "kind": "struct"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments_v3.rs",
+        "name": "ParameterMode",
+        "kind": "enum"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments.rs",
+        "name": "ArgumentsValidator",
+        "kind": "struct"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments.rs",
+        "name": "VarKwargsMode",
+        "kind": "enum"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pydantic-core/src/validators/arguments_v3.rs",
+        "to": "pydantic-core/src/build_tools.rs"
+      },
+      {
+        "from": "pydantic-core/src/validators/arguments_v3.rs",
+        "to": "pydantic-core/src/validators/validation_state.rs"
+      },
+      {
+        "from": "pydantic-core/src/validators/arguments.rs",
+        "to": "pydantic-core/src/build_tools.rs"
+      },
+      {
+        "from": "pydantic-core/src/validators/arguments.rs",
+        "to": "pydantic-core/src/validators/validation_state.rs"
+      }
+    ],
+    "unknowns": [
+      "Exact impact on JSON Schema output when validate_call argument modes are restructured"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Changing the arguments schema may alter validation error messages and break user code that relies on specific error types."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "arguments_v3.rs must be edited to update generated schema",
+      "evidence": "File contains Parameter struct definition",
+      "path": "pydantic-core/src/validators/arguments_v3.rs",
+      "symbol": "Parameter",
+      "lineRange": "10-30",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments_v3.rs#L10-L30"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "validation_state.rs behavior affected by schema changes",
+      "evidence": "Uses ValidationState from arguments validator",
+      "path": "pydantic-core/src/validators/validation_state.rs",
+      "symbol": "ValidationState",
+      "lineRange": "1-20",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/validation_state.rs#L1-L20"
+    },
+    {
+      "dimension": "tests",
+      "claim": "test_build_errors.py tests argument schema building",
+      "evidence": "Contains test for non-default follows default",
+      "path": "pydantic-core/tests/validators/arguments_v3/test_build_errors.py",
+      "symbol": "test_build_non_default_follows_default",
+      "lineRange": "1-15",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/tests/validators/arguments_v3/test_build_errors.py#L1-L15"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Parameter struct identified as key symbol",
+      "evidence": "Defined in arguments_v3.rs",
+      "path": "pydantic-core/src/validators/arguments_v3.rs",
+      "symbol": "Parameter",
+      "lineRange": "10-30",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments_v3.rs#L10-L30"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "arguments_v3.rs imports build_tools.rs",
+      "evidence": "Import statement present in file",
+      "path": "pydantic-core/src/validators/arguments_v3.rs",
+      "symbol": "build_tools",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments_v3.rs#L1-L5"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Exact JSON Schema impact unclear",
+      "evidence": "No evidence found for full schema output change",
+      "path": "pydantic-core/src/build_tools.rs",
+      "symbol": "unknown",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/build_tools.rs#L1-L10"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Risk of breaking changes in error messages",
+      "evidence": "Risk identified in risk section",
+      "path": "pydantic-core/src/validators/arguments_v3.rs",
+      "symbol": "Parameter",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments_v3.rs#L1-L50"
+    }
+  ]
 }

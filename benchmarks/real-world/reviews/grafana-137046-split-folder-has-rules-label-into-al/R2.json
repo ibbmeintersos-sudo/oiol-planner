@@ -3,38 +3,157 @@
   "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:53:44.800Z",
+  "scopeSummary": "Split single folder has-rules label into separate alert-rule and recording-rule labels across backend services, frontend rule editor, persistence layer, and tests.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "apps/folder/service.go",
+      "apps/alerting/rules/service.go",
+      "apps/alerting/rules/sync.go",
+      "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx",
+      "pkg/services/ngalert/store/rules/labels.go"
+    ],
+    "affectedFiles": [
+      "apps/folder/api.go",
+      "apps/alerting/rules/api.go",
+      "pkg/services/sqlstore/migrator/migrations.go"
+    ],
+    "tests": [
+      "apps/folder/service_test.go",
+      "apps/alerting/rules/service_test.go",
+      "apps/alerting/rules/sync_test.go",
+      "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.test.tsx",
+      "pkg/services/ngalert/store/rules/alert_rule_labels_test.go"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "public/app/features/alerting/unified/api/alertRuleApi.ts",
+      "apps/folder/handler.go"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "apps/folder/service.go",
+        "name": "UpdateFolderLabels",
+        "kind": "function"
+      },
+      {
+        "file": "apps/alerting/rules/service.go",
+        "name": "SyncRuleLabels",
+        "kind": "function"
+      },
+      {
+        "file": "apps/alerting/rules/sync.go",
+        "name": "RuleFolderLabels",
+        "kind": "type"
+      },
+      {
+        "file": "pkg/services/ngalert/store/rules/labels.go",
+        "name": "BuildFolderRuleLabels",
+        "kind": "function"
+      },
+      {
+        "file": "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx",
+        "name": "GrafanaFolderAndLabelsStep",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "apps/alerting/rules/service.go",
+        "to": "apps/folder/service.go"
+      },
+      {
+        "from": "apps/alerting/rules/sync.go",
+        "to": "pkg/services/ngalert/store/rules/labels.go"
+      },
+      {
+        "from": "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx",
+        "to": "public/app/features/alerting/unified/api/alertRuleApi.ts"
+      }
+    ],
+    "unknowns": [
+      "Exact database column names for folder labels in migrations",
+      "Whether recording rules share the same folder service as alert rules",
+      "Frontend label editor component prop changes for dual label types"
+    ],
+    "risks": [
+      {
+        "id": "label-migration-break",
+        "severity": "high",
+        "rationale": "Existing folders with has-rules label will lose rule association unless migration runs atomically."
+      },
+      {
+        "id": "sync-race-condition",
+        "severity": "medium",
+        "rationale": "Concurrent alert and recording rule syncs may overwrite each other's folder labels."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Folder service manages label persistence for rules",
+      "evidence": "go.mod shows apps/folder as internal workspace; folder service likely owns label mutations",
+      "path": "apps/folder/service.go",
+      "symbol": "UpdateFolderLabels",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/apps/folder/service.go#L1-L50"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Alerting rules service synchronizes folder labels",
+      "evidence": "go.mod shows apps/alerting/rules workspace; sync.go likely contains label sync logic",
+      "path": "apps/alerting/rules/sync.go",
+      "symbol": "RuleFolderLabels",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/apps/alerting/rules/sync.go#L1-L100"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Frontend rule editor handles folder and label selection",
+      "evidence": "GrafanaFolderAndLabelsStep.tsx imports FolderSelector and LabelsEditorModal for rule form",
+      "path": "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx",
+      "symbol": "GrafanaFolderAndLabelsStep",
+      "lineRange": "1-80",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx#L1-L80"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Label building logic for folder rules exists in ngalert store",
+      "evidence": "alert_rule_labels_test.go tests BuildLabelMatcherGlob and BuildLabelMatcherJSON for rule labels",
+      "path": "pkg/services/ngalert/store/rules/alert_rule_labels_test.go",
+      "symbol": "BuildFolderRuleLabels",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/pkg/services/ngalert/store/rules/alert_rule_labels_test.go#L1-L200"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Frontend label components have existing test coverage",
+      "evidence": "AlertLabel.test.tsx and AlertLabels.test.tsx test label rendering and interaction",
+      "path": "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.test.tsx",
+      "symbol": "AlertLabel",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.test.tsx#L1-L50"
+    }
+  ]
 }

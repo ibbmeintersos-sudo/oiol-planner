@@ -3,38 +3,97 @@
   "caseId": "spring-boot-duration-micros-overflow",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:20:46.184Z",
+  "scopeSummary": "Modify DurationStyle microsecond conversion to avoid intermediate nanosecond overflow for large Duration values while preserving exact conversion behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+    ],
+    "affectedFiles": [
+      "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java"
+    ],
+    "tests": [
+      "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.Unit.MICROS",
+        "kind": "enum constant"
+      },
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.Unit.longValue",
+        "kind": "method"
+      },
+      {
+        "file": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+        "name": "DurationStyle.Unit.print",
+        "kind": "method"
+      },
+      {
+        "file": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+        "name": "DurationStyleTests.detectAndParseWhenSimpleMicrosShouldReturnDuration",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+        "to": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java"
+      }
+    ],
+    "unknowns": [
+      "Whether the pinned base commit tree includes the full DurationStyle.java source beyond the truncated snippet provided."
+    ],
+    "risks": [
+      {
+        "id": "duration-microsecond-overflow-fix",
+        "severity": "medium",
+        "rationale": "Changing Duration.toNanos() / 1000L to seconds * 1_000_000L + nanos / 1000L alters intermediate arithmetic for large durations and may affect exact microsecond conversion results."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "DurationStyle.java contains the MICROS unit conversion using duration.toNanos() / 1000L.",
+      "evidence": "File content shows MICROS(ChronoUnit.MICROS, \"us\", (duration) -> duration.toNanos() / 1000L) in the Unit enum.",
+      "path": "core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java",
+      "symbol": "DurationStyle.Unit.MICROS",
+      "lineRange": "110-120",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/main/java/org/springframework/boot/convert/DurationStyle.java#L110-L120"
+    },
+    {
+      "dimension": "tests",
+      "claim": "DurationStyleTests.java contains tests for microsecond parsing.",
+      "evidence": "File content shows detectAndParseWhenSimpleMicrosShouldReturnDuration test method asserting 10us hasNanos(10000).",
+      "path": "core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java",
+      "symbol": "DurationStyleTests.detectAndParseWhenSimpleMicrosShouldReturnDuration",
+      "lineRange": "55-65",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/7c1bef5e4d7d74642eca5defe24beec37f57810f/core/spring-boot/src/test/java/org/springframework/boot/convert/DurationStyleTests.java#L55-L65"
+    }
+  ]
 }

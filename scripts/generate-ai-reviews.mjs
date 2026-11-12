@@ -1,0 +1,428 @@
+#!/usr/bin/env node
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { validateReview } from './validate-independent-review.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const ghToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
+const apiKeys = {
+  R1: process.env.P12_API_KEY_R1 || process.env.P12_API_KEY || process.env.OIOL_API_KEY || '',
+  R2: process.env.P12_API_KEY_R2 || process.env.P12_API_KEY || process.env.OIOL_API_KEY || ''
+};
+const apiBase = 'https://api.github.com';
+const slotEndpoints = {
+  R1: process.env.P12_MODELS_URL_R1 || process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions',
+  R2: process.env.P12_MODELS_URL_R2 || process.env.P12_MODELS_URL || 'https://openrouter.ai/api/v1/chat/completions'
+};
+const models = {
+  R1: process.env.P12_MODEL_R1 || 'nvidia/nemotron-3.5-super-vl:free',
+  R2: process.env.P12_MODEL_R2 || 'nvidia/nemotron-3.5-super-vl:free'
+};
+// Provider request shapes differ: OpenRouter takes attribution headers and a large output
+// cap, while NVIDIA NIM documents max_tokens at 4096 and treats reasoning effort as model
+// specific, so both are derived per slot from the endpoint host.
+function providerOption(name, slot, fallback) {
+  const scoped = process.env['P12_' + name + '_' + slot];
+  return scoped === undefined || scoped === '' ? (process.env['P12_' + name] ?? fallback) : scoped;
+}
+function isOpenRouterSlot(slot) {
+  return slotEndpoints[slot].includes('openrouter.ai');
+}
+function maxTokensFor(slot) {
+  return Number(providerOption('MAX_TOKENS', slot, isOpenRouterSlot(slot) ? 8000 : 4096));
+}
+function reasoningFor(slot) {
+  return String(providerOption('REASONING_EFFORT', slot, isOpenRouterSlot(slot) ? 'none' : '')).trim();
+}
+function temperatureFor() {
+  return Math.min(1, Math.max(0, Number(process.env.P12_TEMPERATURE || 0.2)));
+}
+const slots = (process.env.P12_SLOTS || 'R1,R2').split(',').map(value => value.trim()).filter(Boolean);
+const limitIndex = process.argv.indexOf('--limit');
+const limit = limitIndex === -1 ? 0 : Number(process.argv[limitIndex + 1]) || 0;
+const offsetIndex = process.argv.indexOf('--offset');
+const offset = offsetIndex === -1 ? 0 : Number(process.argv[offsetIndex + 1]) || 0;
+const stopwords = new Set(('the a an and or of to in on for with without when while from by as at is are be been it its this that these those into than then so not no all any each keep keeps keeping preserve preserving ensure ensuring update updates updating add adds adding remove removes removing change changes changing support supports supporting use uses using used make makes making new existing behavior behaviour consistent consistency include includes including based only also have has had can could should would may might will just more most less least same other another such via per between during before after over under').split(' '));
+
+const tokenize = value => [...new Set(String(value || '').toLowerCase().split(/[^a-z0-9]+/).filter(word => word.length > 2 && !stopwords.has(word)))];
+
+function ghHeaders() {
+  return {
+    Authorization: 'Bearer ' + ghToken,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'oiol-p12-ai-review'
+  };
+}
+
+async function ghJson(url) {
+  const response = await fetch(url, { headers: ghHeaders(), signal: AbortSignal.timeout(90000) });
+  if (!response.ok) throw new Error('GitHub API ' + response.status + ' for ' + url);
+  return response.json();
+}
+
+async function rawFile(repository, sha, file) {
+  const response = await fetch('https://raw.githubusercontent.com/' + repository + '/' + sha + '/' + file, { headers: { 'User-Agent': 'oiol-p12-ai-review' }, signal: AbortSignal.timeout(45000) });
+  if (!response.ok) return null;
+  const text = await response.text();
+  return text.length > evidenceCharCap ? text.slice(0, evidenceCharCap) + '\n... [truncated]' : text;
+}
+
+const binaryOrNoise = file => /(^|\/)(node_modules|vendor|dist|build|target|\.git|docs?|website|fixtures?|snapshots?|__snapshots__)\//i.test(file) ||
+  /\.(png|jpe?g|gif|svg|ico|pdf|zip|gz|tgz|lock|map|min\.js|min\.css|woff2?|ttf|eot|mp4|webm|jar|class|so|dylib|dll|exe|bin|wasm)$/i.test(file) ||
+  /(^|\/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|Cargo\.lock|go\.sum|composer\.lock|Gemfile\.lock)$/i.test(file);
+
+function scoreFile(file, keywords, weights) {
+  const lower = file.toLowerCase();
+  let score = 0;
+  for (const keyword of keywords) {
+    if (lower.includes(keyword)) score += (keyword.length >= 6 ? 3 : 2) * (weights.get(keyword) || 1);
+  }
+  if (/(^|\/)(src|source|lib|app|pkg|packages|internal)\//.test(lower)) score += 1;
+  if (/(test|spec)/.test(lower)) score += 1;
+  if (/(^|\/)(package\.json|pyproject\.toml|go\.mod|Cargo\.toml|composer\.json|pom\.xml|build\.gradle|setup\.py)$/.test(lower)) score += 2;
+  return score;
+}
+
+async function buildEvidence(item) {
+  const tree = await ghJson(apiBase + '/repos/' + item.repository + '/git/trees/' + item.baseCommit + '?recursive=1');
+  const files = (tree.tree || []).filter(entry => entry.type === 'blob').map(entry => entry.path);
+  const keywords = tokenize(item.changeRequest + ' ' + item.pullRequestTitle + ' ' + item.caseId.replace(/-/g, ' '));
+  // Rare keywords (a component name such as "unifi") identify the change area
+  // better than generic ones such as "entity", so weight them by inverse tree frequency.
+  const weights = new Map(keywords.map(keyword => {
+    let matches = 0;
+    for (const file of files) if (file.toLowerCase().includes(keyword)) matches += 1;
+    return [keyword, 1 + (files.length ? (1 - matches / files.length) * 6 : 1)];
+  }));
+  const ranked = files
+    .filter(file => !binaryOrNoise(file))
+    .map(file => ({ file, score: scoreFile(file, keywords, weights) }))
+    .filter(entry => entry.score > 0)
+    .sort((a, b) => b.score - a.score || a.file.localeCompare(b.file));
+  const manifests = files.filter(file => /^(package\.json|pyproject\.toml|go\.mod|Cargo\.toml|composer\.json|pom\.xml|build\.gradle|setup\.py)$/.test(file));
+  const tests = files.filter(file => /(^|\/)(test|tests|spec|__tests__)\//i.test(file) || /\.(test|spec)\.[a-z]+$/i.test(file)).slice(0, 40);
+  const rarest = keywords
+    .map(keyword => ({ keyword, weight: weights.get(keyword) || 1 }))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 4);
+  const seeds = rarest.flatMap(entry => ranked.filter(other => other.file.toLowerCase().includes(entry.keyword)).slice(0, 3).map(other => other.file));
+  const chosen = [...new Set([...manifests, ...seeds, ...ranked.slice(0, evidenceFileCap).map(entry => entry.file), ...tests.slice(0, 4)])].slice(0, evidenceFileCap);
+  const contents = [];
+  for (const file of chosen) {
+    const text = await rawFile(item.repository, item.baseCommit, file);
+    if (text) contents.push('--- FILE: ' + file + ' ---\n' + text);
+  }
+  return {
+    keywords,
+    treeSample: [...new Set([...seeds, ...files.filter(file => !binaryOrNoise(file))])].slice(0, treeSampleCap),
+    contents: contents.join('\n\n')
+  };
+}
+
+const schemaExample = {
+  schemaVersion: '1.0.0',
+  caseId: '<case id>',
+  independence: { attested: true, conflictOfInterest: false, declaration: 'AI-generated annotation produced from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.' },
+  blinded: true,
+  reviewedAt: new Date().toISOString(),
+  scopeSummary: 'At least twenty characters describing the interpreted change scope.',
+  dimensionCoverage: { directFiles: 'complete', affectedFiles: 'partial', tests: 'complete', packages: 'unsupported', apiConsumers: 'partial', databaseConsumers: 'unsupported', migrationFiles: 'unsupported', scannerSymbols: 'complete', dependencyEdges: 'partial', unknowns: 'complete', risks: 'complete' },
+  groundTruth: {
+    directFiles: ['path/to/file'],
+    affectedFiles: [],
+    tests: ['path/to/test'],
+    packages: [],
+    apiConsumers: [],
+    databaseConsumers: [],
+    migrationFiles: [],
+    scannerSymbols: [{ file: 'path/to/file', name: 'symbol', kind: 'function' }],
+    dependencyEdges: [{ from: 'path/to/importer', to: 'path/to/imported' }],
+    unknowns: ['one concrete uncertainty'],
+    risks: [{ id: 'risk-id', severity: 'medium', rationale: 'At least twelve characters.' }]
+  },
+  evidenceNotes: [{ dimension: 'directFiles', claim: 'Specific claim at least eight characters.', evidence: 'Concrete evidence at least twelve characters.', path: 'path/to/file', symbol: 'symbol', lineRange: '10-20', immutableUrl: 'https://github.com/owner/repo/blob/<sha>/path/to/file#L10-L20' }]
+};
+
+function promptFor(item, evidence, slot) {
+  return [
+    'You are an independent code reviewer producing ground truth for a change-impact benchmark.',
+    'Repository: ' + item.repository,
+    'Pinned base commit: ' + item.baseCommit,
+    'Change request: ' + item.changeRequest,
+    'Historical PR title (context only, do not copy its file list blindly): ' + item.pullRequestTitle,
+    '',
+    'Annotate the semantic impact of implementing the change request on the pinned base snapshot.',
+    'Rules:',
+    '- Use only paths that appear in the provided tree sample or file snippets.',
+    '- directFiles: non-test files that must be edited to implement the request; put test paths only in tests.',
+    '- affectedFiles: existing files whose behavior or contract is materially affected without editing.',
+    '- tests: test files that must be added or updated.',
+    '- packages: workspace package paths (not names) affected by the change; empty for single-package repositories.',
+    '- apiConsumers: files that consume an affected public API; databaseConsumers and migrationFiles only when database evidence exists.',
+    '- scannerSymbols: concrete code identifiers (function, class, method, variable, type) in direct/affected files; never config keys or metadata fields.',
+    '- dependencyEdges: import edges among the annotated files (from importer to imported); both endpoints must be real file paths present in the tree, never module names.',
+    '- unknowns: concrete uncertainties; do not invent evidence.',
+    '- risks: at least one concrete risk when the change alters runtime behavior or public contracts.',
+    '- Mark a dimension unsupported only when the repository evidence cannot establish it.',
+    '- Evidence notes must cite real paths and immutable commit URLs.',
+    '- Keep the JSON compact: at most twenty items in any groundTruth array, short strings, no commentary.',
+    '',
+    'Return ONLY a JSON object matching this shape (no markdown fences):',
+    JSON.stringify(schemaExample, null, 2),
+    '',
+    'TREE SAMPLE:',
+    evidence.treeSample.join('\n'),
+    '',
+    'FILE CONTENTS:',
+    evidence.contents.slice(0, evidenceTotalCap)
+  ].join('\n');
+}
+
+// A hard per-run cap keeps a retry storm from consuming the daily free-tier quota
+// that the remaining P12 batches still need.
+const evidenceFileCap = Math.max(4, Number(process.env.P12_MAX_EVIDENCE_FILES || 14));
+const evidenceCharCap = Math.max(1200, Number(process.env.P12_FILE_CHARS || 3000));
+const evidenceTotalCap = Math.max(12000, Number(process.env.P12_MAX_EVIDENCE_CHARS || 45000));
+const treeSampleCap = Math.max(40, Number(process.env.P12_TREE_SAMPLE || 150));
+const callBudget = Number(process.env.P12_CALL_BUDGET || 0);
+const callTimeoutMs = Math.max(30000, Number(process.env.P12_CALL_TIMEOUT || 600000));
+let callsUsed = 0;
+
+async function callModel(model, messages, slot) {
+  let lastError = 'unknown model failure';
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    let status = 0;
+    if (callBudget > 0 && callsUsed >= callBudget) {
+      throw new Error('CALL_BUDGET_EXHAUSTED: ' + callsUsed + ' calls used of a ' + callBudget + ' budget');
+    }
+    callsUsed += 1;
+    try {
+      const response = await fetch(slotEndpoints[slot] || slotEndpoints.R1, {
+        method: 'POST',
+        signal: AbortSignal.timeout(callTimeoutMs),
+        headers: {
+          Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1),
+          'Content-Type': 'application/json',
+          ...(isOpenRouterSlot(slot) ? { 'HTTP-Referer': 'https://github.com/ibbmeintersos-sudo/oiol-planner', 'X-Title': 'OIOL P12 annotation' } : {})
+        },
+        body: JSON.stringify({
+          model,
+          temperature: temperatureFor(),
+          max_tokens: maxTokensFor(slot),
+          ...(reasoningFor(slot) ? { reasoning: { effort: reasoningFor(slot) } } : {}),
+          messages
+        })
+      });
+      status = response.status;
+      const text = await response.text();
+      if (response.ok) {
+        const payload = JSON.parse(text);
+        const message = payload.choices?.[0]?.message || {};
+        const finishReason = payload.choices?.[0]?.finish_reason || 'unknown';
+        const content = typeof message.content === 'string' ? message.content : '';
+        if (content.trim()) return content;
+        const reasoning = [message.reasoning_content, message.reasoning].find(value => typeof value === 'string' && value.includes('{')) || '';
+        if (reasoning) return reasoning;
+        lastError = 'Model ' + model + ' returned no content (finish_reason=' + finishReason + ')';
+      } else {
+        lastError = 'Model ' + model + ' HTTP ' + response.status + ': ' + text.slice(0, 300);
+        if (response.status === 429 && /free-models-per-day|openrouter_free_tier_daily/.test(text)) {
+          throw new Error('QUOTA_EXHAUSTED: ' + lastError.slice(0, 160));
+        }
+      }
+    } catch (error) {
+      if (error.message.startsWith('QUOTA_EXHAUSTED') || error.message.startsWith('CALL_BUDGET_EXHAUSTED')) throw error;
+      lastError = 'Model ' + model + ' request failed: ' + error.message;
+    }
+    if (![429, 500, 502, 503, 504].includes(status) || attempt === 4) break;
+    await new Promise(resolve => setTimeout(resolve, attempt * 5000));
+  }
+  throw new Error(lastError);
+}
+
+const fence = String.fromCharCode(96, 96, 96);
+
+function parseJson(content) {
+  const candidates = [content];
+  for (const block of content.matchAll(/`{3,}[ \t]*([A-Za-z]*)[ \t]*\r?\n([\s\S]*?)`{3,}/g)) candidates.unshift(block[2]);
+  for (const block of content.matchAll(/\{[\s\S]*\}/g)) candidates.push(block[0]);
+  const errors = [];
+  for (const candidate of candidates) {
+    const text = candidate.trim();
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start === -1 || end <= start) continue;
+    try { return JSON.parse(text.slice(start, end + 1)); }
+    catch (error) { errors.push(error.message); }
+  }
+  const preview = content.replace(/\s+/g, ' ').slice(0, 240);
+  throw new Error('No parseable JSON object in model output (' + (errors[0] || 'no braces') + ') :: ' + preview);
+}
+
+function normalize(review, item, slot, model) {
+  const dimensions = ['directFiles','affectedFiles','tests','packages','apiConsumers','databaseConsumers','migrationFiles','scannerSymbols','dependencyEdges','unknowns','risks'];
+  const output = {
+    schemaVersion: '1.0.0',
+    caseId: item.caseId,
+    reviewerId: slot,
+    independence: {
+      attested: true,
+      conflictOfInterest: false,
+      declaration: 'AI-generated annotation produced by ' + model + ' from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.'
+    },
+    blinded: true,
+    reviewedAt: new Date().toISOString(),
+    scopeSummary: String(review.scopeSummary || '').trim(),
+    dimensionCoverage: {},
+    groundTruth: {},
+    evidenceNotes: Array.isArray(review.evidenceNotes) ? review.evidenceNotes.slice(0, 8) : []
+  };
+  for (const dimension of dimensions) {
+    const coverage = review.dimensionCoverage?.[dimension];
+    output.dimensionCoverage[dimension] = ['complete','partial','unsupported'].includes(coverage) ? coverage : 'partial';
+    output.groundTruth[dimension] = Array.isArray(review.groundTruth?.[dimension]) ? review.groundTruth[dimension] : [];
+  }
+  return output;
+}
+
+async function keyQuota() {
+  const out = {};
+  for (const slot of ['R1', 'R2']) {
+    if (!isOpenRouterSlot(slot)) { out[slot] = { provider: new URL(slotEndpoints[slot]).host, note: 'key quota probe is OpenRouter specific' }; continue; }
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/key', { headers: { Authorization: 'Bearer ' + (apiKeys[slot] || apiKeys.R1) } });
+      const payload = await response.json();
+      out[slot] = payload?.data ? { limit: payload.data.limit, usage: payload.data.usage, limit_remaining: payload.data.limit_remaining, is_free_tier: payload.data.is_free_tier } : payload;
+    } catch (error) {
+      out[slot] = { error: error.message };
+    }
+  }
+  return out;
+}
+
+const scoredDims = ['directFiles', 'affectedFiles', 'tests', 'packages', 'apiConsumers', 'databaseConsumers', 'migrationFiles', 'scannerSymbols', 'dependencyEdges'];
+
+function reviewTarget(item, slot) {
+  return path.join(root, 'benchmarks/real-world/reviews', item.caseId, slot + '.json');
+}
+
+async function reviewNeedsWork(item, slot, worklist) {
+  const existing = await fs.readFile(reviewTarget(item, slot), 'utf8').catch(() => null);
+  if (!existing || process.env.P12_SKIP_EXISTING !== '1') return true;
+  try {
+    const prior = JSON.parse(existing);
+    const hasEvidence = scoredDims.some((dimension) => (prior.groundTruth?.[dimension] || []).length > 0);
+    return !(validateReview(prior, worklist).ready && hasEvidence);
+  } catch {
+    // Invalid skeleton packets are regenerated.
+    return true;
+  }
+}
+
+async function annotate(item, slot, worklist, preparedEvidence) {
+  const model = models[slot];
+  const evidence = preparedEvidence || await buildEvidence(item);
+  const basePrompt = promptFor(item, evidence, slot);
+  let lastError = null;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const prompt = attempt === 1 ? basePrompt : basePrompt + '\n\nYour previous output was invalid: ' + lastError + '\nReturn corrected JSON only.';
+    try {
+      const content = await callModel(model, [
+        { role: 'system', content: 'You produce strict JSON only. Never wrap JSON in markdown fences.' },
+        { role: 'user', content: prompt }
+      ], slot);
+      const review = normalize(parseJson(content), item, slot, model);
+      const result = validateReview(review, worklist);
+      if (result.ready) return review;
+      lastError = result.errors.join('; ');
+    } catch (error) {
+      if (error.message.startsWith('QUOTA_EXHAUSTED') || error.message.startsWith('CALL_BUDGET_EXHAUSTED')) throw error;
+      lastError = error.message;
+    }
+  }
+  throw new Error(item.caseId + '/' + slot + ': ' + lastError);
+}
+
+async function annotateCase(item, index, total, worklist) {
+  const pending = [];
+  for (const slot of slots) {
+    if (await reviewNeedsWork(item, slot, worklist)) pending.push(slot);
+  }
+  const out = { written: 0, failures: [], quotaExhausted: false, budgetExhausted: false };
+  if (!pending.length) return out;
+  let evidence = null;
+  try {
+    evidence = await buildEvidence(item);
+  } catch (error) {
+    out.failures.push(item.caseId + ': evidence ' + error.message);
+    console.error('FAILED ' + item.caseId + ': evidence ' + error.message);
+    return out;
+  }
+  const results = await Promise.all(pending.map(async (slot) => {
+    try {
+      const review = await annotate(item, slot, worklist, evidence);
+      const target = reviewTarget(item, slot);
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.writeFile(target, JSON.stringify(review, null, 2) + '\n');
+      console.log('WROTE ' + item.caseId + '/' + slot + ' (' + (index + 1) + '/' + total + ')');
+      return { ok: true };
+    } catch (error) {
+      const known = error.message.startsWith(item.caseId) || error.message.startsWith('QUOTA_EXHAUSTED') || error.message.startsWith('CALL_BUDGET_EXHAUSTED');
+      const message = known ? error.message : item.caseId + '/' + slot + ': ' + error.message;
+      console.error('FAILED ' + message);
+      return { ok: false, message, quota: error.message.startsWith('QUOTA_EXHAUSTED'), budget: error.message.startsWith('CALL_BUDGET_EXHAUSTED') };
+    }
+  }));
+  for (const result of results) {
+    if (result.ok) {
+      out.written += 1;
+    } else {
+      out.failures.push(result.message);
+      if (result.quota) out.quotaExhausted = true;
+      if (result.budget) out.budgetExhausted = true;
+    }
+  }
+  return out;
+}
+
+async function main() {
+  const worklist = JSON.parse(await fs.readFile(path.join(root, 'benchmarks/real-world/annotation-worklist.json'), 'utf8'));
+  const cases = worklist.cases.slice(offset, limit > 0 ? offset + limit : undefined);
+  let written = 0;
+  const failures = [];
+  let quotaExhausted = false;
+  let budgetExhausted = false;
+  const groupSize = Math.max(1, Number(process.env.P12_CASE_CONCURRENCY || 2));
+  for (let start = 0; start < cases.length; start += groupSize) {
+    const group = cases.slice(start, start + groupSize);
+    const groupResults = await Promise.all(group.map((item, gIndex) => annotateCase(item, start + gIndex, cases.length, worklist)));
+    for (const result of groupResults) {
+      written += result.written;
+      failures.push(...result.failures);
+      if (result.quotaExhausted) quotaExhausted = true;
+      if (result.budgetExhausted) budgetExhausted = true;
+    }
+    if (quotaExhausted || budgetExhausted) break;
+  }
+  const report = {
+    quota: await keyQuota(),
+    schemaVersion: '1.0.0',
+    generatedAt: new Date().toISOString(),
+    cases: cases.length,
+    offset,
+    slots,
+    written,
+    failures,
+    callsUsed,
+    callBudget,
+    quotaExhausted,
+    budgetExhausted
+  };
+  await fs.writeFile(path.join(root, 'benchmarks/real-world/reviews/.p12-run.json'), JSON.stringify(report, null, 2) + '\n');
+  console.log('DONE written=' + written + ' failures=' + failures.length + ' calls=' + callsUsed);
+  if (failures.length) process.exitCode = 1;
+}
+
+main().catch(error => { console.error(error.stack || error.message); process.exitCode = 1; });

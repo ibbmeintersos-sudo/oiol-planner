@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0.0",
+  "corpusVersion": "1.0.0-2026-11-12T04:02:12.958Z",
+  "annotationProvenance": "AI-generated blinded slots with automated union adjudication; not human review",
+  "cases": [
+    {
+      "caseId": "ky-dispatcher-option-ignored",
+      "caseFile": "cases/ky-dispatcher-option-ignored.json"
+    },
+    {
+      "caseId": "itsdangerous-drop-eol-python",
+      "caseFile": "cases/itsdangerous-drop-eol-python.json"
+    },
+    {
+      "caseId": "chi-suppress-not-found-route-context",
+      "caseFile": "cases/chi-suppress-not-found-route-context.json"
+    },
+    {
+      "caseId": "ripgrep-basename-regex-matching",
+      "caseFile": "cases/ripgrep-basename-regex-matching.json"
+    },
+    {
+      "caseId": "pydantic-decimal-json-schema-pattern",
+      "caseFile": "cases/pydantic-decimal-json-schema-pattern.json"
+    },
+    {
+      "caseId": "nestjs-node-adapter-req-route",
+      "caseFile": "cases/nestjs-node-adapter-req-route.json"
+    },
+    {
+      "caseId": "laravel-migration-failed-event",
+      "caseFile": "cases/laravel-migration-failed-event.json"
+    },
+    {
+      "caseId": "spring-boot-duration-micros-overflow",
+      "caseFile": "cases/spring-boot-duration-micros-overflow.json"
+    },
+    {
+      "caseId": "kubernetes-spdy-upgrade-failure-close",
+      "caseFile": "cases/kubernetes-spdy-upgrade-failure-close.json"
+    },
+    {
+      "caseId": "tensorflow-release-gil-device-context",
+      "caseFile": "cases/tensorflow-release-gil-device-context.json"
+    },
+    {
+      "caseId": "grafana-provisioning-job-tracing",
+      "caseFile": "cases/grafana-provisioning-job-tracing.json"
+    },
+    {
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "caseFile": "cases/home-assistant-unifi-disabled-entities.json"
+    },
+    {
+      "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "caseFile": "cases/sindresorhus-883-preserve-caller-stack-for-schema-val.json"
+    },
+    {
+      "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "caseFile": "cases/sindresorhus-881-fix-progress-callbacks-for-empty-req.json"
+    },
+    {
+      "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "caseFile": "cases/pallets-404-update-project-to-use-uv-for-depende.json"
+    },
+    {
+      "caseId": "pallets-406-remove-previously-deprecated-code",
+      "caseFile": "cases/pallets-406-remove-previously-deprecated-code.json"
+    },
+    {
+      "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "caseFile": "cases/go-chi-1213-middleware-preserve-status-after-emp.json"
+    },
+    {
+      "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "caseFile": "cases/go-chi-1218-middleware-parse-quoted-contentchars.json"
+    },
+    {
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "caseFile": "cases/burntsushi-3578-ignore-respect-linked-worktree-exclu.json"
+    },
+    {
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+      "caseFile": "cases/burntsushi-3560-ignore-reuse-incremental-matchers-fo.json"
+    },
+    {
+      "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "caseFile": "cases/pydantic-14249-support-list-and-decimaltuple-inputs.json"
+    },
+    {
+      "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+      "caseFile": "cases/pydantic-14246-change-the-arguments-schema-for-vali.json"
+    },
+    {
+      "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "caseFile": "cases/nestjs-18385-roll-back-modules-on-failed-lazy-loa.json"
+    },
+    {
+      "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "caseFile": "cases/nestjs-18419-keep-the-fields-of-grouped-item-erro.json"
+    },
+    {
+      "caseId": "laravel-62326-add-origin-to-uri-class",
+      "caseFile": "cases/laravel-62326-add-origin-to-uri-class.json"
+    },
+    {
+      "caseId": "laravel-62360-include-identical-belongstomany-reso",
+      "caseFile": "cases/laravel-62360-include-identical-belongstomany-reso.json"
+    },
+    {
+      "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "caseFile": "cases/spring-projects-52619-opentelemetry-semantic-conventions-s.json"
+    },
+    {
+      "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "caseFile": "cases/spring-projects-52585-pushgatewaytaskscheduler-shutdown-on.json"
+    },
+    {
+      "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "caseFile": "cases/kubernetes-143816-enforce-resourceslice-object-size-bu.json"
+    },
+    {
+      "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "caseFile": "cases/kubernetes-143291-decorate-service-and-pvc-objects-on-.json"
+    },
+    {
+      "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "caseFile": "cases/tensorflow-129795-optimize-checkpointreader-hastensor-.json"
+    },
+    {
+      "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "caseFile": "cases/tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset.json"
+    },
+    {
+      "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "caseFile": "cases/grafana-136907-annotation-permission-mappings-for-z.json"
+    },
+    {
+      "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "caseFile": "cases/grafana-137046-split-folder-has-rules-label-into-al.json"
+    },
+    {
+      "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "caseFile": "cases/home-assistant-189946-prohibit-nest-thermostat-temperature.json"
+    },
+    {
+      "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "caseFile": "cases/home-assistant-189189-add-unifi-ips-engine-update-entity.json"
+    }
+  ]
+}

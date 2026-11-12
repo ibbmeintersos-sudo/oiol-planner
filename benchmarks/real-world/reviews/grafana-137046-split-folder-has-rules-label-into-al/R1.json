@@ -3,38 +3,122 @@
   "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:55:28.812Z",
+  "scopeSummary": "Separate folder labels for alert and recording rules impacting rule editing UI, synchronization, service behavior, and persistence.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx",
+      "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.tsx"
+    ],
+    "affectedFiles": [
+      "pkg/services/ngalert/store/rules/alert_rule_labels_test.go",
+      "packages/grafana-alerting/src/grafana/rules/utils/labels.test.ts"
+    ],
+    "tests": [
+      "packages/grafana-alerting/src/grafana/rules/utils/labels.test.ts",
+      "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.test.tsx",
+      "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabels.test.tsx",
+      "pkg/services/ngalert/store/rules/alert_rule_labels_test.go"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.tsx",
+        "name": "AlertLabel",
+        "kind": "function"
+      },
+      {
+        "file": "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.tsx",
+        "name": "LabelSize",
+        "kind": "type"
+      },
+      {
+        "file": "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.tsx",
+        "name": "BaseProps",
+        "kind": "type"
+      },
+      {
+        "file": "pkg/services/ngalert/store/rules/alert_rule_labels_test.go",
+        "name": "TestBuildLabelMatcherGlob",
+        "kind": "function"
+      },
+      {
+        "file": "pkg/services/ngalert/store/rules/alert_rule_labels_test.go",
+        "name": "TestBuildLabelMatcherJSON",
+        "kind": "function"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Exact mapping of folder label separation to recording rule persistence layer configuration"
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Potential mismatch between alert and recording rule folder assignments during migration."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "GrafanaFolderAndLabelsStep.tsx must be edited to support separate folder labels for alert and recording rules",
+      "evidence": "File imports alertRuleApi and defines folder/label step",
+      "path": "public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx",
+      "symbol": "alertRuleApi",
+      "lineRange": "1-20",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/public/app/features/alerting/unified/components/rule-editor/GrafanaFolderAndLabelsStep.tsx#L1-L20"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "alert_rule_labels_test.go test logic may need updating due to label separation",
+      "evidence": "Test builds label matcher SQL for rule labels",
+      "path": "pkg/services/ngalert/store/rules/alert_rule_labels_test.go",
+      "symbol": "TestBuildLabelMatcherGlob",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/pkg/services/ngalert/store/rules/alert_rule_labels_test.go#L1-L30"
+    },
+    {
+      "dimension": "tests",
+      "claim": "labels.test.ts tests rule instance label generation",
+      "evidence": "Contains getGrafanaRuleInstanceLabels function",
+      "path": "packages/grafana-alerting/src/grafana/rules/utils/labels.test.ts",
+      "symbol": "getGrafanaRuleInstanceLabels",
+      "lineRange": "1-15",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/packages/grafana-alerting/src/grafana/rules/utils/labels.test.ts#L1-L15"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "AlertLabel component defines LabelSize type",
+      "evidence": "Type definition in AlertLabel.tsx",
+      "path": "packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.tsx",
+      "symbol": "LabelSize",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/grafana/grafana/blob/af0a912af5e4af0def56ecb4c1ed2a1ddb1b2e28/packages/grafana-alerting/src/grafana/rules/components/labels/AlertLabel.tsx#L1-L5"
+    }
+  ]
 }

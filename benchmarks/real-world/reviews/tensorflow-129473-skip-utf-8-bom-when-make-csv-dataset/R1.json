@@ -3,38 +3,89 @@
   "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:53:17.722Z",
+  "scopeSummary": "Ignore UTF-8 BOM when make_csv_dataset reads CSV column names and add regression test",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
     "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "affectedFiles": [
+      "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+    ],
+    "tests": [
+      "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+        "name": "make_csv_dataset",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+        "name": "_make_csv_dataset",
+        "kind": "method"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Precise location of BOM parsing code in make_csv_dataset implementation not present in the provided tree sample"
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Changing column name parsing may affect existing CSV datasets that have BOM in header, potentially breaking downstream consumers if not handled correctly."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "No direct non-test files require editing in the provided tree sample.",
+      "evidence": "Tree sample contains no implementation file for make_csv_dataset column name parsing.",
+      "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+      "symbol": "make_csv_dataset",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L1-L50"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "make_csv_dataset_test.py is materially affected as it tests CSV column name parsing.",
+      "evidence": "Test file exercises make_csv_dataset which will have altered column name parsing.",
+      "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+      "symbol": "_make_csv_dataset",
+      "lineRange": "10-30",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L10-L30"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Medium risk of breaking existing pipelines with BOM in CSV headers.",
+      "evidence": "Change alters parsing behavior of CSV column names.",
+      "path": "tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py",
+      "symbol": "make_csv_dataset",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/a867034f72b09350ffef56ee29cef3034a535deb/tensorflow/python/data/experimental/kernel_tests/make_csv_dataset_test.py#L1-L50"
+    }
+  ]
 }

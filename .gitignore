@@ -8,5 +8,10 @@ coverage/
 *.tmp
 .plan-cache/
 
+# Ephemeral P12 evaluation workspace
+.p12-corpus*/
+acquired/
+
+
 # Benchmark outputs may contain private repository context or provider metadata
 benchmarks/results/

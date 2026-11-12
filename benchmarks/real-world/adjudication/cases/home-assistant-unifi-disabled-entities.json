@@ -1,0 +1,288 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "home-assistant-unifi-disabled-entities",
+  "source": {
+    "repositoryUrl": "https://github.com/home-assistant/core",
+    "baseCommit": "cbf2c02c9bff331537c19bff69da8dc11c3fbfbf",
+    "changeCommit": "f4e3a420d981b8a523fad8614923ffbc18494741",
+    "changeUrl": "https://github.com/home-assistant/core/pull/190773",
+    "license": "Apache-2.0",
+    "licenseFile": "LICENSE.md",
+    "licenseFileUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/LICENSE.md",
+    "sizeClass": "large",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 30403,
+    "primaryLanguages": [
+      "Python"
+    ]
+  },
+  "change": {
+    "request": "Ensure disabled UniFi entities are removed from the integration's entity state when their registry entry is deleted, consistently across entity loading and sensor handling.",
+    "summary": "Forget disabled UniFi entities when their registry entry is removed (home-assistant/core #190773)",
+    "category": "cross_component"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/home-assistant-unifi-disabled-entities",
+    "sha256": "cc414e91103e226ff8142bbfdbdf25ca0441220414595e605a2c87cd1b3f7bb2",
+    "gitTreeSha": "c3c2d955f1d68cc67f4c95a233ae6d1b4b5df2b9",
+    "artifactName": "p12-snapshot-11"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [],
+    "dependencyEdges": [],
+    "unknowns": [
+      "Exact mechanism for removing disabled UniFi entities across entity loading pipelines.",
+      "No UniFi test modules appear in the supplied evidence, so required test file paths and assertions cannot be determined.",
+      "The supplied excerpts do not show how disabled UniFi entities are currently loaded or how their states are tracked, so the precise behavioral gap cannot be localized.",
+      "The supplied tree sample and file excerpts contain no homeassistant/components/unifi paths, so the exact modules that must be edited cannot be established.",
+      "Whether the intended fix reacts to entity registry update events, entity platform removal callbacks, or both is not visible in the supplied evidence."
+    ],
+    "risks": [
+      {
+        "id": "consumer-reference-break",
+        "severity": "medium",
+        "rationale": "Removing entity states on registry deletion can break automations or templates that still reference the deleted entity's entity_id."
+      },
+      {
+        "id": "inconsistent-removal-path",
+        "severity": "low",
+        "rationale": "Applying removal only in entity loading but not in sensor handling can leave stale states for entities deleted while the integration is running."
+      },
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Removing entities during loading may break existing entity state if not handled idempotently."
+      },
+      {
+        "id": "stale-disabled-entity-state",
+        "severity": "medium",
+        "rationale": "If disabled UniFi entities are not removed from the integration's entity state on registry deletion, stale states can persist and misrepresent removed entities."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T00:52:17.155Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "Edit required in entity registry to support UniFi entity removal.",
+            "evidence": "Config entity registry file must be modified.",
+            "path": "homeassistant/components/config/entity_registry.py",
+            "symbol": "async_setup",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L30"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "Sensor entity state contract changed by UniFi entity removal.",
+            "evidence": "Sensor entity state code path affected.",
+            "path": "homeassistant/components/sensor/entity.py",
+            "symbol": "state",
+            "lineRange": "100-120",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/sensor/entity.py#L100-L120"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "Function and property symbols identified for change impact.",
+            "evidence": "Symbols located in direct files.",
+            "path": "homeassistant/components/config/entity_registry.py",
+            "symbol": "async_setup",
+            "lineRange": "1-5",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L5"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "Import edge from config entity registry to helpers entity registry.",
+            "evidence": "Config entity registry imports helpers entity registry.",
+            "path": "homeassistant/components/config/entity_registry.py",
+            "symbol": "er",
+            "lineRange": "1-10",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L10"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Medium severity risk identified.",
+            "evidence": "Risk rationale documented.",
+            "path": "homeassistant/components/config/entity_registry.py",
+            "symbol": "async_setup",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L30"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T23:10:04.587Z",
+        "declaration": "AI-generated annotation produced by minimaxai/minimax-m3.1-flash from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "No UniFi integration module is present in the supplied excerpts, so direct edit targets cannot be established.",
+            "evidence": "The provided file contents cover binary_sensor, config, growatt_server, integration, lacrosse, lacrosse_view, mysensors, powersensor_au, and recorder modules only; no homeassistant/components/unifi path appears in the tree sample or snippets.",
+            "path": "homeassistant/components/config/entity_registry.py",
+            "symbol": "async_setup",
+            "lineRange": "1-26",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L26"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "The supplied registry listener only handles entity_id updates and is not materially changed by UniFi-specific state removal.",
+            "evidence": "entity_registry_changed_filter returns true only for action == \"update\" with an old_entity_id, and the listener updates recorder statistics and states metadata rather than removing UniFi entity states.",
+            "path": "homeassistant/components/recorder/entity_registry.py",
+            "symbol": "entity_registry_changed_filter",
+            "lineRange": "39-44",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/recorder/entity_registry.py#L39-L44"
+          },
+          {
+            "dimension": "tests",
+            "claim": "No UniFi test module is supplied, so test paths to add or update cannot be established.",
+            "evidence": "The tree sample lists repository metadata and CI workflow paths, and the file excerpts contain only production modules; no UniFi test file is included.",
+            "path": "pyproject.toml",
+            "symbol": "project",
+            "lineRange": "1-10",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/pyproject.toml#L1-L10"
+          },
+          {
+            "dimension": "packages",
+            "claim": "The repository is a single Python project, so no workspace package paths are affected.",
+            "evidence": "pyproject.toml declares one project named homeassistant with a setuptools build backend and no workspace package configuration.",
+            "path": "pyproject.toml",
+            "symbol": "project",
+            "lineRange": "1-10",
+            "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/pyproject.toml#L1-L10"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "directFiles",
+          "onlyFirst": [
+            "homeassistant/components/config/entity_registry.py",
+            "homeassistant/helpers/entity_registry.py"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [
+            "homeassistant/components/sensor/entity.py"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "tests",
+          "onlyFirst": [
+            "benchmarks/test_core_states.py"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [
+            "homeassistant/components/sensor/entity.py"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "homeassistant/components/config/entity_registry.py",
+              "name": "async_setup",
+              "kind": "function"
+            },
+            {
+              "file": "homeassistant/components/config/entity_registry.py",
+              "name": "websocket_list_entities",
+              "kind": "function"
+            }
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [
+            {
+              "from": "homeassistant/components/config/entity_registry.py",
+              "to": "homeassistant/helpers/entity_registry.py"
+            }
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Exact mechanism for removing disabled UniFi entities across entity loading pipelines."
+          ],
+          "onlySecond": [
+            "No UniFi test modules appear in the supplied evidence, so required test file paths and assertions cannot be determined.",
+            "The supplied excerpts do not show how disabled UniFi entities are currently loaded or how their states are tracked, so the precise behavioral gap cannot be localized.",
+            "The supplied tree sample and file excerpts contain no homeassistant/components/unifi paths, so the exact modules that must be edited cannot be established.",
+            "Whether the intended fix reacts to entity registry update events, entity platform removal callbacks, or both is not visible in the supplied evidence."
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-001",
+              "severity": "medium",
+              "rationale": "Removing entities during loading may break existing entity state if not handled idempotently."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "consumer-reference-break",
+              "severity": "medium",
+              "rationale": "Removing entity states on registry deletion can break automations or templates that still reference the deleted entity's entity_id."
+            },
+            {
+              "id": "inconsistent-removal-path",
+              "severity": "low",
+              "rationale": "Applying removal only in entity loading but not in sensor handling can leave stale states for entities deleted while the integration is running."
+            },
+            {
+              "id": "stale-disabled-entity-state",
+              "severity": "medium",
+              "rationale": "If disabled UniFi entities are not removed from the integration's entity state on registry deletion, stale states can persist and misrepresent removed entities."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

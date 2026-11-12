@@ -3,38 +3,189 @@
   "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:40:16.151Z",
+  "scopeSummary": "Implement rollback of module discovery and container state when lazy module loading fails, covering scanner, loader, and container interactions.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "complete",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
-    "packages": [],
-    "apiConsumers": [],
+    "directFiles": [
+      "packages/core/injector/lazy-module-loader/lazy-module-loader.ts"
+    ],
+    "affectedFiles": [
+      "packages/core/injector/modules-container.ts"
+    ],
+    "tests": [
+      "packages/core/test/injector/lazy-module-loader/lazy-module-loader.spec.ts",
+      "integration/lazy-modules/e2e/lazy-import-global-modules.spec.ts",
+      "integration/lazy-modules/e2e/lazy-import-request-providers.spec.ts",
+      "integration/lazy-modules/e2e/lazy-import-transient-providers.spec.ts"
+    ],
+    "packages": [
+      "packages/core"
+    ],
+    "apiConsumers": [
+      "integration/lazy-modules/src/lazy.controller.ts"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+        "name": "LazyModuleLoader",
+        "kind": "class"
+      },
+      {
+        "file": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+        "name": "load",
+        "kind": "method"
+      },
+      {
+        "file": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+        "name": "modulesInFlight",
+        "kind": "property"
+      },
+      {
+        "file": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+        "name": "getTargetModuleRef",
+        "kind": "method"
+      },
+      {
+        "file": "packages/core/injector/modules-container.ts",
+        "name": "ModulesContainer",
+        "kind": "class"
+      },
+      {
+        "file": "packages/core/injector/modules-container.ts",
+        "name": "getById",
+        "kind": "method"
+      },
+      {
+        "file": "packages/core/injector/modules-container.ts",
+        "name": "getRpcTargetRegistry",
+        "kind": "method"
+      },
+      {
+        "file": "packages/core/injector/modules-container.ts",
+        "name": "addRpcTarget",
+        "kind": "method"
+      },
+      {
+        "file": "packages/core/injector/modules-container.ts",
+        "name": "applicationId",
+        "kind": "getter"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+        "to": "packages/core/injector/modules-container.ts"
+      },
+      {
+        "from": "integration/lazy-modules/e2e/lazy-import-global-modules.spec.ts",
+        "to": "integration/lazy-modules/src/lazy.controller.ts"
+      },
+      {
+        "from": "integration/lazy-modules/e2e/lazy-import-request-providers.spec.ts",
+        "to": "integration/lazy-modules/src/lazy.controller.ts"
+      },
+      {
+        "from": "integration/lazy-modules/e2e/lazy-import-transient-providers.spec.ts",
+        "to": "integration/lazy-modules/src/lazy.controller.ts"
+      }
+    ],
+    "unknowns": [
+      "How DependenciesScanner adds modules to container during scanForModules and whether partial additions occur on failure",
+      "Whether Module class has cleanup method for provider instances and subscriptions",
+      "How instanceLoader modifies container state and if it requires separate rollback",
+      "Concurrency behavior of modulesInFlight WeakMap when multiple loads target same module"
+    ],
+    "risks": [
+      {
+        "id": "incomplete-rollback",
+        "severity": "high",
+        "rationale": "Partial rollback may leave container with orphaned modules causing memory leaks and inconsistent state on retries"
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "LazyModuleLoader.load orchestrates module scanning and loading",
+      "evidence": "Method load calls dependenciesScanner.scanForModules and processes moduleInstances",
+      "path": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+      "symbol": "load",
+      "lineRange": "25-45",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/packages/core/injector/lazy-module-loader/lazy-module-loader.ts#L25-L45"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "ModulesContainer holds module instances in a Map keyed by token",
+      "evidence": "Class extends Map<string, Module> and provides getById lookup",
+      "path": "packages/core/injector/modules-container.ts",
+      "symbol": "ModulesContainer",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/packages/core/injector/modules-container.ts#L1-L30"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Unit tests for LazyModuleLoader exist and cover load behavior",
+      "evidence": "Test file imports LazyModuleLoader, DependenciesScanner, InstanceLoader, ModulesContainer",
+      "path": "packages/core/test/injector/lazy-module-loader/lazy-module-loader.spec.ts",
+      "symbol": "describe",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/packages/core/test/injector/lazy-module-loader/lazy-module-loader.spec.ts#L1-L50"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "LazyController uses LazyModuleLoader.load for lazy module loading",
+      "evidence": "Controller injects LazyModuleLoader and calls load with dynamic imports",
+      "path": "integration/lazy-modules/src/lazy.controller.ts",
+      "symbol": "LazyController",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/integration/lazy-modules/src/lazy.controller.ts#L1-L30"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "LazyModuleLoader imports ModulesContainer",
+      "evidence": "Import statement: import { ModulesContainer } from '../modules-container.js'",
+      "path": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+      "symbol": "import",
+      "lineRange": "1-15",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/packages/core/injector/lazy-module-loader/lazy-module-loader.ts#L1-L15"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Scanner behavior on failure is not visible in provided files",
+      "evidence": "DependenciesScanner imported from '../../scanner.js' but scanner.ts not in tree sample",
+      "path": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts",
+      "symbol": "dependenciesScanner",
+      "lineRange": "10-15",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/packages/core/injector/lazy-module-loader/lazy-module-loader.ts#L10-L15"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Incomplete rollback could leave container in inconsistent state",
+      "evidence": "Container is a Map; partial deletions may orphan modules and providers",
+      "path": "packages/core/injector/modules-container.ts",
+      "symbol": "ModulesContainer",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/nestjs/nest/blob/206a5ccd302739a552ce000c1193c606c1ca58ad/packages/core/injector/modules-container.ts#L1-L30"
+    }
+  ]
 }

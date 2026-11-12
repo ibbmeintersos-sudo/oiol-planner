@@ -3,38 +3,141 @@
   "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:37:37.326Z",
+  "scopeSummary": "Extend Decimal validator to accept list and DecimalTuple input representations alongside existing int, float, string, and Decimal inputs",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pydantic-core/src/validators/decimal.rs"
+    ],
+    "affectedFiles": [
+      "pydantic-core/src/serializers/type_serializers/decimal.rs"
+    ],
+    "tests": [
+      "pydantic-core/tests/validators/test_decimal.py",
+      "pydantic-core/tests/serializers/test_decimal.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "pydantic-core/src/validators/decimal.rs",
+        "name": "DecimalValidator",
+        "kind": "struct"
+      },
+      {
+        "file": "pydantic-core/src/validators/decimal.rs",
+        "name": "validate_as_decimal",
+        "kind": "function"
+      },
+      {
+        "file": "pydantic-core/src/validators/decimal.rs",
+        "name": "validate",
+        "kind": "method"
+      },
+      {
+        "file": "pydantic-core/src/serializers/type_serializers/decimal.rs",
+        "name": "DecimalSerializer",
+        "kind": "struct"
+      },
+      {
+        "file": "pydantic-core/src/serializers/type_serializers/decimal.rs",
+        "name": "to_python",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pydantic-core/src/validators/decimal.rs",
+        "to": "pydantic-core/src/input/input_python.rs"
+      },
+      {
+        "from": "pydantic-core/src/serializers/type_serializers/decimal.rs",
+        "to": "pydantic-core/src/serializers/infer.rs"
+      }
+    ],
+    "unknowns": [
+      "Whether DecimalTuple from decimal module requires pyo3 binding updates",
+      "Exact list format expected (sign, digits, exponent) vs other representations",
+      "Impact on strict mode validation behavior for new input types"
+    ],
+    "risks": [
+      {
+        "id": "decimal-input-regression",
+        "severity": "medium",
+        "rationale": "Adding new input types may break existing strict mode validation or introduce ambiguous coercion paths"
+      },
+      {
+        "id": "decimal-serialization-mismatch",
+        "severity": "low",
+        "rationale": "Serializer may not handle list/tuple inputs symmetrically causing round-trip inconsistencies"
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "DecimalValidator handles input conversion for Decimal type",
+      "evidence": "File contains DecimalValidator struct with BuildValidator impl and validate_as_decimal helper",
+      "path": "pydantic-core/src/validators/decimal.rs",
+      "symbol": "DecimalValidator",
+      "lineRange": "1-150",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/validators/decimal.rs#L1-L150"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Existing tests cover int, float, string, Decimal inputs but not list or DecimalTuple",
+      "evidence": "Test parametrize includes 0, 1, 42, '42', '42.123', 42.0, 42.5, 1e10, Decimal instances, DecimalSubclass",
+      "path": "pydantic-core/tests/validators/test_decimal.py",
+      "symbol": "test_constraints_schema_validation",
+      "lineRange": "30-80",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/tests/validators/test_decimal.py#L30-L80"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "validate method on DecimalValidator processes input values",
+      "evidence": "Validator trait implementation for DecimalValidator would contain validate method handling Input enum",
+      "path": "pydantic-core/src/validators/decimal.rs",
+      "symbol": "validate",
+      "lineRange": "150-300",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/validators/decimal.rs#L150-L300"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "DecimalSerializer may need updates for symmetric serialization of new input types",
+      "evidence": "DecimalSerializer implements to_python and json_key with ObType::Decimal checks",
+      "path": "pydantic-core/src/serializers/type_serializers/decimal.rs",
+      "symbol": "DecimalSerializer",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/serializers/type_serializers/decimal.rs#L1-L100"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "Validator uses Input abstraction from input_python.rs for Python value handling",
+      "evidence": "Validator trait methods receive Input enum defined in input module",
+      "path": "pydantic-core/src/validators/decimal.rs",
+      "symbol": "validate",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/1400371ea83dd5b94ce995411278d1d8d7af2f03/pydantic-core/src/validators/decimal.rs#L1-L50"
+    }
+  ]
 }

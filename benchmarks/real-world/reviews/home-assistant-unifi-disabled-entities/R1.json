@@ -3,38 +3,117 @@
   "caseId": "home-assistant-unifi-disabled-entities",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T00:52:17.155Z",
+  "scopeSummary": "Ensure disabled UniFi entities are removed from the integration's entity state when their registry entry is deleted, consistently across entity loading and sensor handling.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "homeassistant/components/config/entity_registry.py",
+      "homeassistant/helpers/entity_registry.py"
+    ],
+    "affectedFiles": [
+      "homeassistant/components/sensor/entity.py"
+    ],
+    "tests": [
+      "benchmarks/test_core_states.py"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "homeassistant/components/sensor/entity.py"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "homeassistant/components/config/entity_registry.py",
+        "name": "async_setup",
+        "kind": "function"
+      },
+      {
+        "file": "homeassistant/components/config/entity_registry.py",
+        "name": "websocket_list_entities",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "homeassistant/components/config/entity_registry.py",
+        "to": "homeassistant/helpers/entity_registry.py"
+      }
+    ],
+    "unknowns": [
+      "Exact mechanism for removing disabled UniFi entities across entity loading pipelines."
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Removing entities during loading may break existing entity state if not handled idempotently."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Edit required in entity registry to support UniFi entity removal.",
+      "evidence": "Config entity registry file must be modified.",
+      "path": "homeassistant/components/config/entity_registry.py",
+      "symbol": "async_setup",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L30"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Sensor entity state contract changed by UniFi entity removal.",
+      "evidence": "Sensor entity state code path affected.",
+      "path": "homeassistant/components/sensor/entity.py",
+      "symbol": "state",
+      "lineRange": "100-120",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/sensor/entity.py#L100-L120"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Function and property symbols identified for change impact.",
+      "evidence": "Symbols located in direct files.",
+      "path": "homeassistant/components/config/entity_registry.py",
+      "symbol": "async_setup",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L5"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "Import edge from config entity registry to helpers entity registry.",
+      "evidence": "Config entity registry imports helpers entity registry.",
+      "path": "homeassistant/components/config/entity_registry.py",
+      "symbol": "er",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L10"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Medium severity risk identified.",
+      "evidence": "Risk rationale documented.",
+      "path": "homeassistant/components/config/entity_registry.py",
+      "symbol": "async_setup",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/cbf2c02c9bff331537c19bff69da8dc11c3fbfbf/homeassistant/components/config/entity_registry.py#L1-L30"
+    }
+  ]
 }

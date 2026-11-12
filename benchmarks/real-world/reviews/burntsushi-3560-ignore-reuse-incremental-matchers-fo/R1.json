@@ -3,38 +3,103 @@
   "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:22:58.122Z",
+  "scopeSummary": "Reuse incremental ignore matchers for directories lacking local ignore rules while preserving parent-rule matching semantics.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
-    "packages": [],
+    "directFiles": [
+      "crates/ignore/src/incremental.rs"
+    ],
+    "affectedFiles": [
+      "crates/ignore/src/dir.rs"
+    ],
+    "tests": [
+      "crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs"
+    ],
+    "packages": [
+      "crates/ignore"
+    ],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "crates/ignore/src/incremental.rs",
+        "name": "IncrementalIgnore",
+        "kind": "struct"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "crates/ignore/src/incremental.rs",
+        "to": "crates/ignore/src/dir.rs"
+      }
+    ],
+    "unknowns": [
+      "exact semantics of parent-rule matching when reusing incremental matchers for directories without local rules"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Potential change in ignore matching behavior for directories without local rules could affect search results."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "IncrementalIgnore struct must be modified to reuse matchers for directories without local rules.",
+      "evidence": "The incremental.rs file defines IncrementalIgnore and its matcher caching logic.",
+      "path": "crates/ignore/src/incremental.rs",
+      "symbol": "IncrementalIgnore",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/incremental.rs#L1-L50"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "dir.rs Ignore struct behavior changes due to incremental matcher reuse.",
+      "evidence": "dir.rs uses IncrementalIgnore to match paths respecting parent ignore rules.",
+      "path": "crates/ignore/src/dir.rs",
+      "symbol": "Ignore",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/dir.rs#L1-L30"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "IncrementalIgnore struct is the key symbol for incremental matching.",
+      "evidence": "Defined in incremental.rs as the core type for cached matchers.",
+      "path": "crates/ignore/src/incremental.rs",
+      "symbol": "IncrementalIgnore",
+      "kind": "struct",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/incremental.rs#L1-L10"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Risk of altered ignore matching semantics.",
+      "evidence": "Change could cause files previously matched to become unmatched or vice versa.",
+      "path": "crates/ignore/src/incremental.rs",
+      "symbol": "IncrementalIgnore",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/BurntSushi/ripgrep/blob/6892bc2b7efe5909cbbeec8f757ed2c4c76b1d30/crates/ignore/src/incremental.rs#L1-L5"
+    }
+  ]
 }

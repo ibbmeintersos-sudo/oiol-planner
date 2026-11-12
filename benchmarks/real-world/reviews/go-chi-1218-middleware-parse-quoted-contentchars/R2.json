@@ -3,38 +3,153 @@
   "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by minimaxai/minimax-m3.1-flash from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:19:34.867Z",
+  "scopeSummary": "Parse quoted charset values in Content-Type media parameters for the ContentCharset middleware while preserving existing middleware behavior for valid unquoted charset values.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "middleware/content_charset.go"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "middleware/content_charset_test.go"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "middleware/content_charset_test.go"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "middleware/content_charset.go",
+        "name": "ContentCharset",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/content_charset.go",
+        "name": "contentEncoding",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/content_charset.go",
+        "name": "split",
+        "kind": "function"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "Whether the implementation will use mime.ParseMediaType or a custom quoted-string parser for the charset parameter.",
+      "How malformed or unterminated quoted charset values should be handled: rejected with 415 or treated as an absent charset.",
+      "Whether the split helper remains in middleware/content_charset.go after the parsing change."
+    ],
+    "risks": [
+      {
+        "id": "risk-malformed-header-outcome-change",
+        "severity": "medium",
+        "rationale": "Replacing split-based extraction with a standards-based media type parser can change 415 outcomes for malformed or unusual Content-Type headers that the current code accepts."
+      },
+      {
+        "id": "risk-unquoted-regression",
+        "severity": "medium",
+        "rationale": "A parser change could alter case folding, whitespace trimming, or parameter ordering for previously accepted unquoted charset values."
+      },
+      {
+        "id": "risk-empty-charset-semantics",
+        "severity": "low",
+        "rationale": "The empty charset option allows requests without a Content-Type or charset parameter, so quoted parsing must not turn a missing charset into a mismatch."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "ContentCharset extracts the charset parameter with split-based string cuts, so a quoted value keeps its quote characters.",
+      "evidence": "contentEncoding lowercases the header, cuts on ';' and 'charset=', trims whitespace, and compares the raw token against the allowed charsets.",
+      "path": "middleware/content_charset.go",
+      "symbol": "contentEncoding",
+      "lineRange": "35-40",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L35-L40"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "The exported ContentCharset middleware is the runtime entry point whose 415 behavior must be preserved for unquoted values.",
+      "evidence": "ContentCharset lowercases configured charsets and calls contentEncoding with the request Content-Type header before writing StatusUnsupportedMediaType.",
+      "path": "middleware/content_charset.go",
+      "symbol": "ContentCharset",
+      "lineRange": "12-32",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L12-L32"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Existing ContentCharset tests cover only unquoted charset parameter values.",
+      "evidence": "TestContentCharset table cases use charset=UTF-8, charset=utf-8, and charset=Latin-1 without any quoted parameter variant.",
+      "path": "middleware/content_charset_test.go",
+      "symbol": "TestContentCharset",
+      "lineRange": "13-92",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset_test.go#L13-L92"
+    },
+    {
+      "dimension": "apiConsumers",
+      "claim": "The middleware test file is the in-repository consumer of the exported ContentCharset API.",
+      "evidence": "TestContentCharset installs the middleware with r.Use(ContentCharset(tt.inputContentCharset...)) and asserts the resulting HTTP status.",
+      "path": "middleware/content_charset_test.go",
+      "symbol": "TestContentCharset",
+      "lineRange": "102-104",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset_test.go#L102-L104"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "The split helper is the concrete parsing primitive used for charset extraction in the pinned snapshot.",
+      "evidence": "split uses strings.Cut and strings.TrimSpace to return two trimmed parts and is called twice by contentEncoding.",
+      "path": "middleware/content_charset.go",
+      "symbol": "split",
+      "lineRange": "43-51",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L43-L51"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "AllowContentType is not materially affected because it ignores media parameters entirely.",
+      "evidence": "AllowContentType cuts the Content-Type header at the first ';' and compares only the media type, so quoted charset values cannot alter its result.",
+      "path": "middleware/content_type.go",
+      "symbol": "AllowContentType",
+      "lineRange": "34-35",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_type.go#L34-L35"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Switching to a standards-based media type parser can change outcomes for malformed headers.",
+      "evidence": "The current split-based code accepts arbitrary text after 'charset=', whereas a strict parser would report an error for malformed parameters.",
+      "path": "middleware/content_charset.go",
+      "symbol": "contentEncoding",
+      "lineRange": "35-40",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L35-L40"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "The exact parser and fallback semantics for malformed quoted parameters are not established by the base snapshot.",
+      "evidence": "The pinned file contains only split-based extraction and no quoted-string handling, error fallback, or additional helper.",
+      "path": "middleware/content_charset.go",
+      "symbol": "contentEncoding",
+      "lineRange": "35-51",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L35-L51"
+    }
+  ]
 }

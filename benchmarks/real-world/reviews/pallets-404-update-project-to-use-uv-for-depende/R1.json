@@ -3,38 +3,129 @@
   "caseId": "pallets-404-update-project-to-use-uv-for-depende",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T00:08:37.853Z",
+  "scopeSummary": "Migrate dependency management and CI to uv, aligning build, docs, pre-commit, and workflow configurations.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pyproject.toml",
+      ".pre-commit-config.yaml",
+      ".github/workflows/tests.yaml",
+      ".github/workflows/publish.yaml",
+      ".github/workflows/lock.yaml",
+      "requirements/build.in"
+    ],
+    "affectedFiles": [
+      "src/itsdangerous/__init__.py"
+    ],
+    "tests": [
+      "tests/test_itsdangerous/test_serializer.py",
+      "tests/test_itsdangerous/test_signer.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "base64_encode",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "base64_decode",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "want_bytes",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/signer.py",
+        "name": "Signer",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/timed.py",
+        "name": "TimedSerializer",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/serializer.py",
+        "name": "Serializer",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/serializer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/timed.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/url_safe.py"
+      }
+    ],
+    "unknowns": [
+      "Whether uv's build backend replacement will preserve the sdist inclusion behavior defined in pyproject.toml sdist section."
+    ],
+    "risks": [
+      {
+        "id": "R1",
+        "severity": "medium",
+        "rationale": "Migrating the build system from flit_core to uv may alter sdist packaging, potentially including or excluding files differently, affecting published distributions."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "tests",
+      "claim": "Test suite may need uv-related adjustments.",
+      "evidence": "pytest configuration in test files references requirements*.txt.",
+      "path": "tests/test_itsdangerous/test_serializer.py",
+      "symbol": "test_serializer",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/tests/test_itsdangerous/test_serializer.py#L1-L5"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Version deprecation in __init__.py may affect consumers.",
+      "evidence": "deprecated __getattr__ warning about __version__.",
+      "path": "src/itsdangerous/__init__.py",
+      "symbol": "__getattr__",
+      "lineRange": "45-55",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/1ad903dddad0e38b6ab25be5e4e7a9189cc5a9a4/src/itsdangerous/__init__.py#L45-L55"
+    }
+  ]
 }

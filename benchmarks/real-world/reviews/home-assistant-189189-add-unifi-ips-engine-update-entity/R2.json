@@ -3,38 +3,176 @@
   "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:58:14.369Z",
+  "scopeSummary": "Add UniFi IPS engine update entity to UniFi Network integration with strings, update behavior, snapshots, and tests.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "homeassistant/components/unifi/update.py",
+      "homeassistant/components/unifi/strings.json",
+      "homeassistant/components/unifi/__init__.py",
+      "homeassistant/components/unifi/coordinator.py"
+    ],
+    "affectedFiles": [
+      "homeassistant/components/unifi/entity.py",
+      "homeassistant/components/unifi/hub/entity_helper.py"
+    ],
+    "tests": [
+      "tests/components/unifi/test_update.py",
+      "tests/components/unifi/test_init.py",
+      "tests/components/unifi/snapshots/test_update_snapshot.json"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "homeassistant/components/unifi/update.py",
+        "name": "UnifiIpsEngineUpdateEntity",
+        "kind": "class"
+      },
+      {
+        "file": "homeassistant/components/unifi/update.py",
+        "name": "async_setup_entry",
+        "kind": "function"
+      },
+      {
+        "file": "homeassistant/components/unifi/coordinator.py",
+        "name": "UnifiDataUpdateCoordinator",
+        "kind": "class"
+      },
+      {
+        "file": "homeassistant/components/unifi/entity.py",
+        "name": "UnifiEntity",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "homeassistant/components/unifi/update.py",
+        "to": "homeassistant/components/unifi/entity.py"
+      },
+      {
+        "from": "homeassistant/components/unifi/update.py",
+        "to": "homeassistant/components/unifi/coordinator.py"
+      },
+      {
+        "from": "homeassistant/components/unifi/__init__.py",
+        "to": "homeassistant/components/unifi/update.py"
+      },
+      {
+        "from": "tests/components/unifi/test_update.py",
+        "to": "homeassistant/components/unifi/update.py"
+      }
+    ],
+    "unknowns": [
+      "Exact IPS engine firmware attribute name in aiounifi controller response",
+      "Whether update entity requires new coordinator method or uses existing firmware data",
+      "Snapshot format for update entity state attributes"
+    ],
+    "risks": [
+      {
+        "id": "update-entity-firmware-mismatch",
+        "severity": "medium",
+        "rationale": "IPS engine firmware version may not be exposed by aiounifi API, causing update entity to show unavailable."
+      },
+      {
+        "id": "string-key-conflict",
+        "severity": "low",
+        "rationale": "New strings.json keys must not collide with existing UniFi update entity translations."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "New update.py platform file needed for IPS engine update entity",
+      "evidence": "UniFi Network integration lacks update platform; pattern from other integrations shows update.py with async_setup_entry",
+      "path": "homeassistant/components/unifi/update.py",
+      "symbol": "async_setup_entry",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/update.py#L1-L50"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Strings.json must contain config and entity translation keys for update entity",
+      "evidence": "Philips IR strings.json shows config flow and entity string structure; UniFi will need similar for update entity",
+      "path": "homeassistant/components/unifi/strings.json",
+      "symbol": "update",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/strings.json#L1-L100"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "UnifiEntity base class may need update-specific helpers",
+      "evidence": "entity.py defines UnifiEntity with coordinator and device_info; update entity will inherit",
+      "path": "homeassistant/components/unifi/entity.py",
+      "symbol": "UnifiEntity",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/entity.py#L1-L100"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Test file for update entity must cover setup, state, and update installation",
+      "evidence": "Home Assistant update platform tests typically snapshot entity state and test install flow",
+      "path": "tests/components/unifi/test_update.py",
+      "symbol": "test_ips_engine_update_entity",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/tests/components/unifi/test_update.py#L1-L100"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "UnifiIpsEngineUpdateEntity class implements UpdateEntity interface",
+      "evidence": "Home Assistant update entities inherit from UpdateEntity and implement installed_version, latest_version, async_install",
+      "path": "homeassistant/components/unifi/update.py",
+      "symbol": "UnifiIpsEngineUpdateEntity",
+      "lineRange": "10-80",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/update.py#L10-L80"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "update.py imports UnifiEntity from entity.py",
+      "evidence": "Update entity will extend UnifiEntity base class for coordinator and device registry integration",
+      "path": "homeassistant/components/unifi/update.py",
+      "symbol": "from .entity import UnifiEntity",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/update.py#L1-L10"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "IPS engine firmware attribute name in aiounifi unknown",
+      "evidence": "aiounifi models not in tree sample; must inspect controller response for IPS engine version field",
+      "path": "homeassistant/components/unifi/coordinator.py",
+      "symbol": "UnifiDataUpdateCoordinator",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/coordinator.py#L1-L50"
+    },
+    {
+      "dimension": "risks",
+      "claim": "IPS engine firmware may not be exposed by aiounifi API",
+      "evidence": "UniFi Network controller may not surface IPS engine version separately from main firmware",
+      "path": "homeassistant/components/unifi/coordinator.py",
+      "symbol": "UnifiDataUpdateCoordinator",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/home-assistant/core/blob/185ff6043357ee966afd764391dda5476df41278/homeassistant/components/unifi/coordinator.py#L1-L100"
+    }
+  ]
 }

@@ -1,0 +1,276 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+  "source": {
+    "repositoryUrl": "https://github.com/nestjs/nest",
+    "baseCommit": "6e83cc83c99cbac0108384392902e7230ed94843",
+    "changeCommit": "ca790a95825ddf4f4fc99ef63ec42a919d836051",
+    "changeUrl": "https://github.com/nestjs/nest/pull/18419",
+    "license": "MIT",
+    "licenseFile": "LICENSE",
+    "licenseFileUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/LICENSE",
+    "sizeClass": "medium",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 2743,
+    "primaryLanguages": [
+      "TypeScript"
+    ]
+  },
+  "change": {
+    "request": "Preserve item-level validation fields in grouped errors emitted by ParseArrayPipe, maintaining the observable error contract and associated tests.",
+    "summary": "keep the fields of grouped item errors in parse array pipe (nestjs/nest #18419)",
+    "category": "api_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/nestjs-18419-keep-the-fields-of-grouped-item-erro",
+    "sha256": "d19c9f6366398715ef8c3e2463a1630e4e755dce4ef77f365d8c92c622a88345",
+    "gitTreeSha": "5dc9e396ca16ea5d261dc7fc9ff4bcc5c5493f1c",
+    "artifactName": "p12-snapshot-23"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "packages/common/interfaces/external/validation-error.interface.ts",
+        "name": "ValidationError",
+        "kind": "interface"
+      }
+    ],
+    "dependencyEdges": [],
+    "unknowns": [
+      "Exact current grouping logic in ParseArrayPipe.transform that discards item-level fields",
+      "Exact grouping logic of ParseArrayPipe error items and how they are serialized",
+      "Whether ValidationError interface needs new optional fields to carry grouped item metadata"
+    ],
+    "risks": [
+      {
+        "id": "R1",
+        "severity": "medium",
+        "rationale": "Loss of item-level validation details could degrade client-side validation user experience."
+      },
+      {
+        "id": "validation-contract-break",
+        "severity": "medium",
+        "rationale": "Changing grouped error shape may break existing consumers expecting current flattened structure"
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:42:35.181Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "ValidationError interface includes children field for item-level errors.",
+            "evidence": "The interface defines children?: ValidationError[].",
+            "path": "packages/common/interfaces/external/validation-error.interface.ts",
+            "symbol": "ValidationError",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/interfaces/external/validation-error.interface.ts#L1-L20"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:41:43.023Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "ParseArrayPipe is the pipe responsible for array validation and error grouping",
+            "evidence": "Historical PR title references 'parse array pipe' and change request mentions 'ParseArrayPipe' explicitly",
+            "path": "packages/common/pipes/parse-array.pipe.ts",
+            "symbol": "ParseArrayPipe",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/pipes/parse-array.pipe.ts#L1-L50"
+          },
+          {
+            "dimension": "affectedFiles",
+            "claim": "ValidationError interface defines the shape of validation errors including item-level fields",
+            "evidence": "File defines property, value, constraints, children, contexts fields that need preservation",
+            "path": "packages/common/interfaces/external/validation-error.interface.ts",
+            "symbol": "ValidationError",
+            "lineRange": "1-35",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/interfaces/external/validation-error.interface.ts#L1-L35"
+          },
+          {
+            "dimension": "tests",
+            "claim": "ParseArrayPipe tests must be updated to assert preserved item-level fields in grouped errors",
+            "evidence": "Change request explicitly requires maintaining associated tests",
+            "path": "packages/common/pipes/test/parse-array.pipe.spec.ts",
+            "symbol": "describe",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/pipes/test/parse-array.pipe.spec.ts#L1-L100"
+          },
+          {
+            "dimension": "apiConsumers",
+            "claim": "GraphQL code-first integration tests exercise pipes and may observe error shape changes",
+            "evidence": "Integration test file exists for pipes in graphql-code-first suite",
+            "path": "integration/graphql-code-first/e2e/pipes.spec.ts",
+            "symbol": "describe",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/integration/graphql-code-first/e2e/pipes.spec.ts#L1-L50"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "ParseArrayPipe.transform and validate methods handle array element validation and error aggregation",
+            "evidence": "Standard NestJS pipe pattern uses transform for validation logic",
+            "path": "packages/common/pipes/parse-array.pipe.ts",
+            "symbol": "transform",
+            "lineRange": "50-150",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/pipes/parse-array.pipe.ts#L50-L150"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Existing consumers may depend on current grouped error format without item-level fields",
+            "evidence": "Change alters public error contract observable to API clients",
+            "path": "packages/common/pipes/parse-array.pipe.ts",
+            "symbol": "ParseArrayPipe",
+            "lineRange": "1-200",
+            "immutableUrl": "https://github.com/nestjs/nest/blob/6e83cc83c99cbac0108384392902e7230ed94843/packages/common/pipes/parse-array.pipe.ts#L1-L200"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "directFiles",
+          "onlyFirst": [
+            "packages/common/interfaces/external/validation-error.interface.ts"
+          ],
+          "onlySecond": [
+            "packages/common/pipes/parse-array.pipe.ts"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [],
+          "onlySecond": [
+            "packages/common/interfaces/external/validation-error.interface.ts"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "tests",
+          "onlyFirst": [
+            "packages/core/test/errors/test/exception-handler.spec.ts"
+          ],
+          "onlySecond": [
+            "packages/common/pipes/test/parse-array.pipe.spec.ts"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "packages",
+          "onlyFirst": [
+            "packages/core"
+          ],
+          "onlySecond": [],
+          "contested": true
+        },
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [],
+          "onlySecond": [
+            "integration/graphql-code-first/e2e/pipes.spec.ts"
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "file": "packages/common/pipes/parse-array.pipe.ts",
+              "name": "ParseArrayPipe",
+              "kind": "class"
+            },
+            {
+              "file": "packages/common/pipes/parse-array.pipe.ts",
+              "name": "transform",
+              "kind": "method"
+            },
+            {
+              "file": "packages/common/pipes/parse-array.pipe.ts",
+              "name": "validate",
+              "kind": "method"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "from": "integration/graphql-code-first/e2e/pipes.spec.ts",
+              "to": "packages/common/pipes/parse-array.pipe.ts"
+            },
+            {
+              "from": "packages/common/pipes/parse-array.pipe.ts",
+              "to": "packages/common/interfaces/external/validation-error.interface.ts"
+            },
+            {
+              "from": "packages/common/pipes/test/parse-array.pipe.spec.ts",
+              "to": "packages/common/pipes/parse-array.pipe.ts"
+            }
+          ],
+          "contested": true
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Exact grouping logic of ParseArrayPipe error items and how they are serialized"
+          ],
+          "onlySecond": [
+            "Exact current grouping logic in ParseArrayPipe.transform that discards item-level fields",
+            "Whether ValidationError interface needs new optional fields to carry grouped item metadata"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "R1",
+              "severity": "medium",
+              "rationale": "Loss of item-level validation details could degrade client-side validation user experience."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "validation-contract-break",
+              "severity": "medium",
+              "rationale": "Changing grouped error shape may break existing consumers expecting current flattened structure"
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

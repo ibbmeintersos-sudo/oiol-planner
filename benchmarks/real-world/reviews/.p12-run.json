@@ -1,0 +1,26 @@
+{
+  "quota": {
+    "R1": {
+      "provider": "integrate.api.nvidia.com",
+      "note": "key quota probe is OpenRouter specific"
+    },
+    "R2": {
+      "provider": "integrate.api.nvidia.com",
+      "note": "key quota probe is OpenRouter specific"
+    }
+  },
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-11-12T04:01:08.592Z",
+  "cases": 1,
+  "offset": 34,
+  "slots": [
+    "R1",
+    "R2"
+  ],
+  "written": 1,
+  "failures": [],
+  "callsUsed": 1,
+  "callBudget": 4,
+  "quotaExhausted": false,
+  "budgetExhausted": false
+}

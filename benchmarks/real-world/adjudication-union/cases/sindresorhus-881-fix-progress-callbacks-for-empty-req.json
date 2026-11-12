@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+  "source": {
+    "repositoryUrl": "https://github.com/sindresorhus/ky",
+    "baseCommit": "0bda554d448c1b57c17a5c18114432c02465d467",
+    "changeCommit": "99644d0169138eb0c42718f06862061288f05a96",
+    "changeUrl": "https://github.com/sindresorhus/ky/pull/881",
+    "license": "MIT",
+    "licenseFile": "license",
+    "licenseFileUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/license",
+    "sizeClass": "small",
+    "repositoryKind": "library",
+    "trackedFileCountAtBase": 70,
+    "primaryLanguages": [
+      "TypeScript",
+      "JavaScript"
+    ]
+  },
+  "change": {
+    "request": "Ensure progress callbacks behave consistently for empty request and response bodies, including stream handling and browser tests.",
+    "summary": "Fix progress callbacks for empty request and response bodies (sindresorhus/ky #881)",
+    "category": "source_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/sindresorhus-881-fix-progress-callbacks-for-empty-req",
+    "sha256": "74599d58538546a72b0fd450d85b88b4b911cef9e87e5d006f72eb9844018fb2",
+    "gitTreeSha": "0337759ea08d2cc69804f97af92d66ff7ef0e95e",
+    "artifactName": "p12-snapshot-13"
+  },
+  "groundTruth": {
+    "directFiles": [
+      "source/core/Ky.ts",
+      "source/types/options.ts",
+      "source/utils/body.ts"
+    ],
+    "affectedFiles": [
+      "source/index.ts",
+      "source/types/ky.ts"
+    ],
+    "tests": [
+      "test/browser.ts",
+      "test/stream.ts"
+    ],
+    "packages": [],
+    "apiConsumers": [
+      "source/index.ts"
+    ],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [
+      {
+        "file": "source/core/Ky.ts",
+        "name": "ky",
+        "kind": "function"
+      },
+      {
+        "file": "source/types/options.ts",
+        "name": "onDownloadProgress",
+        "kind": "property"
+      },
+      {
+        "file": "source/types/options.ts",
+        "name": "onUploadProgress",
+        "kind": "property"
+      },
+      {
+        "file": "source/types/options.ts",
+        "name": "Progress",
+        "kind": "type"
+      },
+      {
+        "file": "source/types/options.ts",
+        "name": "onDownloadProgress",
+        "kind": "type"
+      },
+      {
+        "file": "source/types/options.ts",
+        "name": "onUploadProgress",
+        "kind": "type"
+      },
+      {
+        "file": "source/utils/body.ts",
+        "name": "streamRequest",
+        "kind": "function"
+      },
+      {
+        "file": "source/utils/body.ts",
+        "name": "streamResponse",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "source/core/Ky.ts",
+        "to": "source/types/options.ts"
+      },
+      {
+        "from": "source/core/Ky.ts",
+        "to": "source/utils/body.ts"
+      },
+      {
+        "from": "test/browser.ts",
+        "to": "source/index.ts"
+      },
+      {
+        "from": "test/stream.ts",
+        "to": "source/index.ts"
+      }
+    ],
+    "unknowns": [
+      "Exact browser test scenarios needed for empty body progress",
+      "If streamRequest/streamResponse handle zero-length ReadableStreams",
+      "Progress callback behavior with empty stream bodies across different runtimes (Node.js vs browser)",
+      "Whether Progress type includes totalBytes=0 for empty bodies"
+    ],
+    "risks": [
+      {
+        "id": "progress-empty-body-break",
+        "severity": "medium",
+        "rationale": "Changing progress callback behavior for empty bodies may break existing consumers relying on current callback timing or absence"
+      },
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Altering progress callback timing may break downstream consumer expectations"
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-11T23:50:33.936Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "Files source/core/Ky.ts, source/utils/body.ts, source/types/options.ts must be edited to handle empty bodies",
+            "evidence": "Change request requires progress callback consistency for empty request/response bodies",
+            "path": "source/core/Ky.ts",
+            "symbol": "onUploadProgress",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/core/Ky.ts#L1-L50"
+          },
+          {
+            "dimension": "tests",
+            "claim": "test/stream.ts and test/browser.ts must be updated with empty-body progress test cases",
+            "evidence": "Existing progress tests lack coverage for empty bodies; new tests required",
+            "path": "test/stream.ts",
+            "symbol": "onUploadProgress",
+            "lineRange": "1-30",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/test/stream.ts#L1-L30"
+          },
+          {
+            "dimension": "scannerSymbols",
+            "claim": "Symbols onUploadProgress, onDownloadProgress, streamRequest, streamResponse identified in source files",
+            "evidence": "Symbols appear in type and utility definitions for progress handling",
+            "path": "source/types/options.ts",
+            "symbol": "onUploadProgress",
+            "lineRange": "1-20",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/types/options.ts#L1-L20"
+          },
+          {
+            "dimension": "dependencyEdges",
+            "claim": "Import edges from Ky.ts to body.ts and options.ts exist in the codebase",
+            "evidence": "Ky.ts imports streamRequest, streamResponse from body.ts and options types",
+            "path": "source/core/Ky.ts",
+            "symbol": "streamRequest",
+            "lineRange": "1-10",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/core/Ky.ts#L1-L10"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:33:44.645Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "streamRequest and streamResponse handle progress callbacks for request/response bodies",
+            "evidence": "Ky.ts imports streamRequest and streamResponse from utils/body.ts for body streaming",
+            "path": "source/core/Ky.ts",
+            "symbol": "streamRequest",
+            "lineRange": "1-50",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/core/Ky.ts#L1-L50"
+          },
+          {
+            "dimension": "directFiles",
+            "claim": "Progress type and callback options defined in options.ts",
+            "evidence": "Types for onUploadProgress and onDownloadProgress callbacks likely in options.ts",
+            "path": "source/types/options.ts",
+            "symbol": "Progress",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/source/types/options.ts#L1-L100"
+          },
+          {
+            "dimension": "tests",
+            "claim": "stream.ts tests upload progress with onUploadProgress callback",
+            "evidence": "Test POST JSON with upload progress verifies progress updates including percent and transferredBytes",
+            "path": "test/stream.ts",
+            "symbol": "onUploadProgress",
+            "lineRange": "1-80",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/test/stream.ts#L1-L80"
+          },
+          {
+            "dimension": "tests",
+            "claim": "browser.ts runs browser tests with ky distribution build",
+            "evidence": "Browser tests use playwright to test ky in real browsers with distribution build",
+            "path": "test/browser.ts",
+            "symbol": "defaultBrowsersTest",
+            "lineRange": "1-100",
+            "immutableUrl": "https://github.com/sindresorhus/ky/blob/0bda554d448c1b57c17a5c18114432c02465d467/test/browser.ts#L1-L100"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set union of both blinded slots for every dimension",
+      "rationale": "Automated adjudication kept every item accepted by either blinded slot and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "affectedFiles",
+          "onlyFirst": [],
+          "onlySecond": [
+            "source/index.ts",
+            "source/types/ky.ts"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "apiConsumers",
+          "onlyFirst": [
+            "source/index.ts"
+          ],
+          "onlySecond": [],
+          "contested": false
+        },
+        {
+          "dimension": "scannerSymbols",
+          "onlyFirst": [
+            {
+              "file": "source/types/options.ts",
+              "name": "onDownloadProgress",
+              "kind": "type"
+            },
+            {
+              "file": "source/types/options.ts",
+              "name": "onUploadProgress",
+              "kind": "type"
+            }
+          ],
+          "onlySecond": [
+            {
+              "file": "source/core/Ky.ts",
+              "name": "ky",
+              "kind": "function"
+            },
+            {
+              "file": "source/types/options.ts",
+              "name": "onDownloadProgress",
+              "kind": "property"
+            },
+            {
+              "file": "source/types/options.ts",
+              "name": "onUploadProgress",
+              "kind": "property"
+            },
+            {
+              "file": "source/types/options.ts",
+              "name": "Progress",
+              "kind": "type"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "dependencyEdges",
+          "onlyFirst": [],
+          "onlySecond": [
+            {
+              "from": "test/browser.ts",
+              "to": "source/index.ts"
+            },
+            {
+              "from": "test/stream.ts",
+              "to": "source/index.ts"
+            }
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Progress callback behavior with empty stream bodies across different runtimes (Node.js vs browser)"
+          ],
+          "onlySecond": [
+            "Exact browser test scenarios needed for empty body progress",
+            "If streamRequest/streamResponse handle zero-length ReadableStreams",
+            "Whether Progress type includes totalBytes=0 for empty bodies"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-1",
+              "severity": "medium",
+              "rationale": "Altering progress callback timing may break downstream consumer expectations"
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "progress-empty-body-break",
+              "severity": "medium",
+              "rationale": "Changing progress callback behavior for empty bodies may break existing consumers relying on current callback timing or absence"
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

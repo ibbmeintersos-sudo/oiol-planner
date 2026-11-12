@@ -3,38 +3,163 @@
   "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:39:27.922Z",
+  "scopeSummary": "Migrate validate_call to generate arguments_v3 schema replacing legacy arguments schema, ensuring core validation, JSON Schema generation, error types, and docs remain consistent.",
   "dimensionCoverage": {
     "directFiles": "partial",
     "affectedFiles": "partial",
     "tests": "partial",
-    "packages": "partial",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pydantic-core/src/validators/arguments_v3.rs"
+    ],
+    "affectedFiles": [
+      "pydantic-core/src/validators/arguments.rs",
+      "pydantic-core/src/errors/validation_exception.rs"
+    ],
+    "tests": [
+      "pydantic-core/tests/validators/arguments_v3/test_build_errors.py",
+      "pydantic-core/tests/validators/arguments_v3/test_alias.py",
+      "pydantic-core/tests/validators/arguments_v3/test_extra.py",
+      "pydantic-core/tests/validators/arguments_v3/test_general.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "pydantic-core/src/validators/arguments_v3.rs",
+        "name": "ArgumentsValidator",
+        "kind": "class"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments_v3.rs",
+        "name": "Parameter",
+        "kind": "class"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments_v3.rs",
+        "name": "ParameterMode",
+        "kind": "enum"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments.rs",
+        "name": "ArgumentsValidator",
+        "kind": "class"
+      },
+      {
+        "file": "pydantic-core/src/validators/arguments.rs",
+        "name": "VarKwargsMode",
+        "kind": "enum"
+      },
+      {
+        "file": "pydantic-core/src/errors/validation_exception.rs",
+        "name": "ValidationError",
+        "kind": "class"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "pydantic-core/src/validators/arguments_v3.rs",
+        "to": "pydantic-core/src/validators/validation_state.rs"
+      },
+      {
+        "from": "pydantic-core/src/validators/arguments_v3.rs",
+        "to": "pydantic-core/src/errors/validation_exception.rs"
+      },
+      {
+        "from": "pydantic-core/src/validators/arguments.rs",
+        "to": "pydantic-core/src/validators/validation_state.rs"
+      },
+      {
+        "from": "pydantic-core/tests/validators/arguments_v3/test_build_errors.py",
+        "to": "pydantic-core/src/validators/arguments_v3.rs"
+      }
+    ],
+    "unknowns": [
+      "Main pydantic package validate_call implementation path not in tree sample",
+      "JSON Schema generation for arguments_v3 location unknown",
+      "Public documentation files for validate_call not in tree sample",
+      "Error type mappings for new schema in main package unknown"
+    ],
+    "risks": [
+      {
+        "id": "validate-call-schema-mismatch",
+        "severity": "high",
+        "rationale": "Switching validate_call to arguments_v3 schema may break existing user code relying on legacy argument validation behavior or error message formats."
+      },
+      {
+        "id": "json-schema-generation-inconsistency",
+        "severity": "medium",
+        "rationale": "JSON Schema generation must be updated to emit arguments_v3 compatible schemas or downstream tooling will produce invalid schemas."
+      },
+      {
+        "id": "error-type-regression",
+        "severity": "medium",
+        "rationale": "ValidationError construction in validation_exception.rs may need updates to correctly represent arguments_v3 error locations and types."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "arguments_v3.rs implements new ArgumentsValidator with ParameterMode enum supporting positional_only, positional_or_keyword, var_args, keyword_only, var_kwargs_uniform, var_kwargs_unpacked_typed_dict",
+      "evidence": "ParameterMode enum and Parameter struct definition in arguments_v3.rs lines 30-80",
+      "path": "pydantic-core/src/validators/arguments_v3.rs",
+      "symbol": "ParameterMode",
+      "lineRange": "30-80",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments_v3.rs#L30-L80"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Legacy arguments.rs uses different VarKwargsMode enum with only uniform and unpacked-typed-dict variants, indicating schema incompatibility",
+      "evidence": "VarKwargsMode enum in arguments.rs lines 30-50 shows only two variants vs six in v3",
+      "path": "pydantic-core/src/validators/arguments.rs",
+      "symbol": "VarKwargsMode",
+      "lineRange": "30-50",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments.rs#L30-L50"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Test suite for arguments_v3 covers alias handling, extra behavior, default factories, and build-time validation errors",
+      "evidence": "Four test files in arguments_v3 directory test alias, extra, general behavior, and build errors",
+      "path": "pydantic-core/tests/validators/arguments_v3/test_alias.py",
+      "symbol": "test_alias",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/tests/validators/arguments_v3/test_alias.py#L1-L50"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "ValidationError in validation_exception.rs constructs errors from ValError with line_errors and location tracking",
+      "evidence": "ValidationError::from_val_error method processes ValError::LineErrors into PyLineError with outer_location",
+      "path": "pydantic-core/src/errors/validation_exception.rs",
+      "symbol": "ValidationError",
+      "lineRange": "50-120",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/errors/validation_exception.rs#L50-L120"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "arguments_v3.rs imports ValidationState from validation_state.rs for validation context",
+      "evidence": "use super::validation_state::ValidationState; at line 20 of arguments_v3.rs",
+      "path": "pydantic-core/src/validators/arguments_v3.rs",
+      "symbol": "ValidationState",
+      "lineRange": "20-20",
+      "immutableUrl": "https://github.com/pydantic/pydantic/blob/9895381aa55eb2a1e74079f0b4fb745d1ea12d12/pydantic-core/src/validators/arguments_v3.rs#L20-L20"
+    }
+  ]
 }

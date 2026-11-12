@@ -2,12 +2,22 @@
 
 ## Purpose
 
-Create a defensible expected-impact record for one historical change against its exact pinned **base** snapshot. The current 36-case queue is in [annotation-worklist.json](./annotation-worklist.json); it is a reviewer worklist, not a validated corpus or source of ground-truth labels. The annotation is a human ground-truth artifact; it is not a transcription of the pull request's changed-file list and must never be seeded from OIOL output.
+Create a defensible expected-impact record for one historical change against its exact pinned **base** snapshot. The current 36-case queue is in [annotation-worklist.json](./annotation-worklist.json); it is a reviewer worklist, not a validated corpus or source of ground-truth labels. The annotation is a declared ground-truth artifact; it is not a transcription of the pull request's changed-file list and must never be seeded from OIOL output.
+
+## AI-generated annotation disclosure
+
+The corpus annotations are **AI-generated, not human-reviewed**, and were produced in three eras that each review's `independence.declaration` records. Case 0 was written manually by the repository operator from the pinned snapshot. Cases 1–10 are runs of `nvidia/nemotron-3.5-super-vl:free` through OpenRouter. Case 11 R2 and every slot from case 12 onward are NVIDIA NIM runs (`https://integrate.api.nvidia.com/v1/chat/completions`): slot `R1` is `nvidia/nemotron-3.5-lightning-30b-a3b` and slot `R2` is `nvidia/nemotron-3-ultra-550b-a55b`. Every slot saw only the same change request and pinned base snapshot; the slots do not see OIOL output, scores, confidence, diagnostics, or each other's annotation before freezing.
+
+- `independence.attested: true` means the repository operator attests that the generation run was isolated from OIOL output and from the other slot. It does **not** assert human independence.
+- The model declaration, model ID, and generation timestamp are stored in every review file; the run manifest is `benchmarks/real-world/reviews/.p12-run.json`.
+- The NVIDIA-era slots share one provider and one account key: the dedicated review secret is empty, so both slots fall back to the same `OIOL_API_KEY` credential. That is a **weaker independence claim** than two providers or two accounts — slot agreement is a consistency signal, not cross-vendor corroboration.
+- AI annotations can be over-inclusive and are weaker evidence than expert human review. Do not describe this corpus as human-annotated or expert-validated.
+- Disagreements between slots stay visible in each case record. Adjudication was applied mechanically in both `intersection` (lower bound) and `union` (upper bound) modes; the outputs are committed under `benchmarks/real-world/adjudication/` and `benchmarks/real-world/adjudication-union/`.
 
 ## Blinding and reviewer independence
 
 - Assign two distinct stable reviewer IDs before annotation. Do not put names, email addresses, employer identifiers, or other personal data in the corpus.
-- Reviewers work independently and must not see OIOL plans, Scanner output, confidence values, diagnostics, or each other's annotation.
+- Reviewer slots work independently and must not see OIOL plans, Scanner output, confidence values, diagnostics, or each other's annotation.
 - Reviewers may inspect the natural-language request, the pinned base snapshot, the historical change commit/PR and its discussion, and public documentation needed to understand contracts.
 - A reviewer must disclose a conflict if they authored, implemented, or directly reviewed the historical change. A conflicted reviewer cannot serve as one of the two independent reviewers.
 - Record evidence notes as paths plus symbol/section names and, where practical, line ranges or immutable commit URLs. Avoid unsupported assertions.
@@ -57,6 +67,22 @@ Compare the two frozen records dimension by dimension.
 
 The adjudication record must say whether adjudication was required, its final status, who adjudicated (stable ID only), and a rationale. A pending adjudication blocks the case from the accepted corpus.
 
+### Automated adjudication modes
+
+`scripts/adjudicate-independent-reviews.mjs` compares the two frozen records mechanically and can emit either corpus:
+
+- `--mode intersection` (default) keeps only items both slots accepted, while `unknowns` and `risks` always take the union. It is a strict lower bound: if one slot leaves a dimension empty, the intersection is empty no matter how confident the other slot was.
+- `--mode union` keeps every item either slot accepted. It is the coverage upper bound.
+
+Score both and report the pair as a range. While the slots disagree, neither mode alone is a definitive accuracy number, and automated adjudication is a bookkeeping step, not a substitute for a reviewer recording a judgement.
+
+Scoring conventions used by `scripts/run-real-world-benchmark.mjs`:
+
+- Path dimensions compare repo-relative path strings.
+- `scannerSymbols` compares `file::kind::name` and `dependencyEdges` compares `from -> to`. Ground truth may store objects (`{file,name,kind}`, `{from,to}`) or pre-joined strings; both sides are normalized before comparison.
+- Empty expected set with empty predicted set scores `1`; empty expected set with a non-empty predicted set scores precision `0`. Those are conventions, not evidence of correctness.
+- `dependencyEdges` covers resolved local import edges only, so unresolved specifiers and alias-only imports appear as misses.
+
 ## Prohibited shortcuts
 
 - Do not copy historical PR changed paths into `directFiles` or `affectedFiles` without independent reasoning.
@@ -72,7 +98,7 @@ A case is annotation-ready only when:
 - [ ] the exact base snapshot is acquired and fingerprinted;
 - [ ] Git tree path-set parity and license hash are verified;
 - [ ] the change request is written independently of OIOL output;
-- [ ] two non-conflicted reviewers are assigned;
+- [ ] two distinct, non-conflicted reviewer slots are assigned (human reviewers or declared AI runs);
 - [ ] both reviewers can access the same immutable evidence set;
 - [ ] OIOL output remains hidden until both records are frozen.
 

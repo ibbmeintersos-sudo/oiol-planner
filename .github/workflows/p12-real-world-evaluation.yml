@@ -1,0 +1,177 @@
+name: P12 real-world evaluation
+
+on:
+  push:
+    branches:
+      - p12/**
+    paths:
+      - .p12/evaluate
+      - .github/workflows/p12-real-world-evaluation.yml
+      - scripts/adjudicate-independent-reviews.mjs
+      - scripts/assemble-real-world-corpus.mjs
+      - scripts/acquire-real-world-snapshot.py
+      - scripts/freeze-independent-reviews.mjs
+      - scripts/validate-real-world-corpus.mjs
+      - scripts/run-real-world-benchmark.mjs
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p12-real-world-evaluation-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CORPUS_ROOT: ${{ github.workspace }}/.p12-corpus
+  UNION_ROOT: ${{ github.workspace }}/.p12-corpus-union
+
+jobs:
+  evaluate:
+    name: Freeze, adjudicate and score
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout P12 branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Freeze the blinded review set
+        run: npm run benchmark:real-world:freeze
+
+      - name: Adjudicate frozen reviews into corpora
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p "$CORPUS_ROOT" "$UNION_ROOT"
+          node scripts/adjudicate-independent-reviews.mjs --out "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/adjudication-summary.json"
+          node scripts/adjudicate-independent-reviews.mjs --mode union --out "$UNION_ROOT" 2>&1 | tee "$UNION_ROOT/adjudication-summary.json"
+
+      - name: Acquire pinned source snapshots
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          indices=$(jq -r '.cases[] | (.snapshot.sharedAcquisitionIndex // .caseIndex)' benchmarks/real-world/annotation-worklist.json | sort -un)
+          echo "acquiring unique case indices: $indices"
+          for index in $indices; do
+            python3 scripts/acquire-real-world-snapshot.py --case-index "$index" --output acquired 2>&1 | tee -a "$CORPUS_ROOT/acquire-summary.txt"
+          done
+          du -sh acquired | tee -a "$CORPUS_ROOT/acquire-summary.txt"
+
+      - name: Assemble corpus snapshots
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/assemble-real-world-corpus.mjs --artifacts-root acquired --corpus-root "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/assemble-summary.json"
+
+      - name: Share snapshots with the union corpus
+        shell: bash
+        run: |
+          set -uo pipefail
+          rm -rf "$UNION_ROOT/snapshots"
+          cp -al "$CORPUS_ROOT/snapshots" "$UNION_ROOT/snapshots" || cp -r "$CORPUS_ROOT/snapshots" "$UNION_ROOT/snapshots"
+          du -sh "$CORPUS_ROOT/snapshots" "$UNION_ROOT/snapshots" | tee "$UNION_ROOT/share-summary.txt"
+
+      - name: Validate corpus before scoring
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run benchmark:real-world:validate -- --corpus-root "$CORPUS_ROOT" 2>&1 | tee "$CORPUS_ROOT/validate-summary.json"
+
+      - name: Validate the union corpus before scoring
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run benchmark:real-world:validate -- --corpus-root "$UNION_ROOT" 2>&1 | tee "$UNION_ROOT/validate-summary.json"
+
+      - name: Score OIOL against the adjudicated ground truth
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run benchmark:real-world -- --corpus-root "$CORPUS_ROOT" --out benchmarks/results/real-world-benchmark.json 2>&1 | tee "$CORPUS_ROOT/score-summary.json"
+
+      - name: Score OIOL against the union ground truth
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run benchmark:real-world -- --corpus-root "$UNION_ROOT" --out benchmarks/results/real-world-benchmark-union.json 2>&1 | tee "$UNION_ROOT/score-summary.json"
+
+      - name: Upload evaluation outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p12-real-world-evaluation
+          path: |
+            benchmarks/results/real-world-benchmark.json
+            benchmarks/results/real-world-benchmark-union.json
+            benchmarks/real-world/review-freeze.json
+            ${{ env.CORPUS_ROOT }}/manifest.json
+            ${{ env.CORPUS_ROOT }}/cases
+            ${{ env.CORPUS_ROOT }}/adjudication-summary.json
+            ${{ env.CORPUS_ROOT }}/acquire-summary.txt
+            ${{ env.CORPUS_ROOT }}/validate-summary.json
+            ${{ env.UNION_ROOT }}/adjudication-summary.json
+            ${{ env.UNION_ROOT }}/assemble-summary.json
+            ${{ env.UNION_ROOT }}/validate-summary.json
+            ${{ env.UNION_ROOT }}/cases
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Commit evaluation outputs
+        if: always()
+        shell: bash
+        env:
+          P12_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          stage="$RUNNER_TEMP/evidence"
+          clone="$RUNNER_TEMP/clone"
+          mkdir -p "$stage/cases" "$stage/diagnostics"
+          for f in manifest.json adjudication-summary.json assemble-summary.json acquire-summary.txt validate-summary.json score-summary.json commit-attempt.txt; do
+            if [ -f "$CORPUS_ROOT/$f" ]; then
+              if [ "$f" = "manifest.json" ]; then cp "$CORPUS_ROOT/$f" "$stage/corpus-manifest.json"; else cp "$CORPUS_ROOT/$f" "$stage/diagnostics/"; fi
+            fi
+          done
+          if [ -d "$CORPUS_ROOT/cases" ]; then cp -r "$CORPUS_ROOT/cases/." "$stage/cases/"; fi
+          if [ -f benchmarks/results/real-world-benchmark.json ]; then cp benchmarks/results/real-world-benchmark.json "$stage/real-world-benchmark.json"; fi
+          if [ -f benchmarks/real-world/review-freeze.json ]; then cp benchmarks/real-world/review-freeze.json "$stage/review-freeze.json"; fi
+          mkdir -p "$stage/union-cases" "$stage/union-diagnostics"
+          for f in adjudication-summary.json assemble-summary.json share-summary.txt validate-summary.json score-summary.json; do
+            if [ -f "$UNION_ROOT/$f" ]; then cp "$UNION_ROOT/$f" "$stage/union-diagnostics/union-$f"; fi
+          done
+          if [ -f "$UNION_ROOT/manifest.json" ]; then cp "$UNION_ROOT/manifest.json" "$stage/union-corpus-manifest.json"; fi
+          if [ -d "$UNION_ROOT/cases" ]; then cp -r "$UNION_ROOT/cases/." "$stage/union-cases/"; fi
+          if [ -f benchmarks/results/real-world-benchmark-union.json ]; then cp benchmarks/results/real-world-benchmark-union.json "$stage/union-benchmark.json"; fi
+          git config --get-regexp "^http\." | sed "s/\([a-z]*\) .*http/extra|http/" > /dev/null 2>&1 || true
+          url=$(git config --get remote.origin.url)
+          git clone --quiet --depth 20 --branch "$P12_BRANCH" "$url" "$clone"
+          for key in $(git config --get-regexp "^http\." | cut -d" " -f1); do
+            git -C "$clone" config "$key" "$(git config --get "$key")"
+          done
+          mkdir -p "$clone/benchmarks/real-world/adjudication/cases" "$clone/benchmarks/real-world/evaluation-diagnostics"
+          if [ -f "$stage/review-freeze.json" ]; then cp "$stage/review-freeze.json" "$clone/benchmarks/real-world/review-freeze.json"; fi
+          if [ -f "$stage/corpus-manifest.json" ]; then cp "$stage/corpus-manifest.json" "$clone/benchmarks/real-world/adjudication/corpus-manifest.json"; fi
+          if [ -f "$stage/real-world-benchmark.json" ]; then cp "$stage/real-world-benchmark.json" "$clone/benchmarks/real-world/adjudication/real-world-benchmark.json"; fi
+          if compgen -G "$stage/cases/*" > /dev/null; then cp -r "$stage/cases/." "$clone/benchmarks/real-world/adjudication/cases/"; fi
+          if compgen -G "$stage/diagnostics/*" > /dev/null; then cp -r "$stage/diagnostics/." "$clone/benchmarks/real-world/evaluation-diagnostics/"; fi
+          mkdir -p "$clone/benchmarks/real-world/adjudication-union/cases" "$clone/benchmarks/real-world/adjudication-union/diagnostics"
+          if [ -f "$stage/union-corpus-manifest.json" ]; then cp "$stage/union-corpus-manifest.json" "$clone/benchmarks/real-world/adjudication-union/corpus-manifest.json"; fi
+          if [ -f "$stage/union-benchmark.json" ]; then cp "$stage/union-benchmark.json" "$clone/benchmarks/real-world/adjudication-union/real-world-benchmark.json"; fi
+          if compgen -G "$stage/union-cases/*" > /dev/null; then cp -r "$stage/union-cases/." "$clone/benchmarks/real-world/adjudication-union/cases/"; fi
+          if compgen -G "$stage/union-diagnostics/*" > /dev/null; then cp -r "$stage/union-diagnostics/." "$clone/benchmarks/real-world/adjudication-union/diagnostics/"; fi
+          git -C "$clone" config user.name "oiol-p12-bot"
+          git -C "$clone" config user.email "oiol-p12-bot@users.noreply.github.com"
+          git -C "$clone" add -A benchmarks/real-world
+          if git -C "$clone" diff --cached --quiet; then echo "No evaluation outputs to commit"; exit 0; fi
+          git -C "$clone" commit --quiet -m "chore(p12): record freeze, adjudication and scoring outputs"
+          git -C "$clone" push --quiet origin "HEAD:refs/heads/$P12_BRANCH"

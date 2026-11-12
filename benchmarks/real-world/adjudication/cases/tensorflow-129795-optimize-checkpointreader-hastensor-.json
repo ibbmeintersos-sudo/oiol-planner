@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1.0.0",
+  "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+  "source": {
+    "repositoryUrl": "https://github.com/tensorflow/tensorflow",
+    "baseCommit": "dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36",
+    "changeCommit": "c1f4588972ea4091cea94aee83e12222394394e4",
+    "changeUrl": "https://github.com/tensorflow/tensorflow/pull/129795",
+    "license": "Apache-2.0",
+    "licenseFile": "LICENSE",
+    "licenseFileUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/LICENSE",
+    "sizeClass": "large",
+    "repositoryKind": "workspace",
+    "trackedFileCountAtBase": 37712,
+    "primaryLanguages": [
+      "C++",
+      "Python"
+    ]
+  },
+  "change": {
+    "request": "Use the initialized in-memory shape map for HasTensor lookups and align Python binding lock behavior with the optimized reader path.",
+    "summary": "Optimize CheckpointReader HasTensor lookup (tensorflow/tensorflow #129795)",
+    "category": "source_change"
+  },
+  "snapshot": {
+    "relativePath": "snapshots/tensorflow-129795-optimize-checkpointreader-hastensor-",
+    "sha256": "772e0ee49036dde6085596c1972bec258c09e8d7e6f7b4b4f41c6574face857e",
+    "gitTreeSha": "2f8615f13176169f055b8e8377f118c97a48d853",
+    "artifactName": "p12-snapshot-30"
+  },
+  "groundTruth": {
+    "directFiles": [],
+    "affectedFiles": [],
+    "tests": [],
+    "packages": [],
+    "apiConsumers": [],
+    "databaseConsumers": [],
+    "migrationFiles": [],
+    "scannerSymbols": [],
+    "dependencyEdges": [],
+    "unknowns": [
+      "Cannot locate CheckpointReader HasTensor lookup implementation in the provided tree sample.",
+      "CheckpointReader implementation files not present in provided tree sample or file snippets",
+      "HasTensor method definition and call sites not locatable in provided files",
+      "In-memory shape map initialization code not found in provided evidence",
+      "Lock behavior alignment details for Python bindings not verifiable from provided files",
+      "Python binding layer for checkpoint reading not present in provided evidence"
+    ],
+    "risks": [
+      {
+        "id": "missing-evidence-risk",
+        "severity": "high",
+        "rationale": "Cannot verify implementation files or test coverage from provided repository sample; change may affect checkpoint loading correctness and Python thread safety."
+      },
+      {
+        "id": "risk-1",
+        "severity": "medium",
+        "rationale": "Misaligned Python binding lock may cause deadlocks during checkpoint restoration."
+      }
+    ]
+  },
+  "annotation": {
+    "reviewers": [
+      {
+        "reviewerId": "R1",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:52:50.823Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "No direct files identified for CheckpointReader change.",
+            "evidence": "Tree sample lacks checkpoint reader source files.",
+            "path": "tensorflow/python/grappler/memory_optimizer_test.py",
+            "symbol": "N/A",
+            "lineRange": "1-1",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/tensorflow/python/grappler/memory_optimizer_test.py#L1-L1"
+          },
+          {
+            "dimension": "unknowns",
+            "claim": "Inability to determine which Python binding lock needs alignment.",
+            "evidence": "Change description references Python binding lock but no such code in sample.",
+            "path": "tensorflow/python/grappler/memory_optimizer_test.py",
+            "symbol": "N/A",
+            "lineRange": "1-1",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/tensorflow/python/grappler/memory_optimizer_test.py#L1-L1"
+          },
+          {
+            "dimension": "risks",
+            "claim": "Potential deadlock from misaligned lock.",
+            "evidence": "Change may alter lock behavior in checkpoint restoration.",
+            "path": "tensorflow/python/grappler/memory_optimizer_test.py",
+            "symbol": "N/A",
+            "lineRange": "1-1",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/tensorflow/python/grappler/memory_optimizer_test.py#L1-L1"
+          }
+        ]
+      },
+      {
+        "reviewerId": "R2",
+        "independent": true,
+        "conflictOfInterest": false,
+        "blinded": true,
+        "reviewedAt": "2026-11-12T03:51:54.418Z",
+        "declaration": "AI-generated annotation produced by nvidia/nemotron-3-ultra-550b-a55b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator.",
+        "generatedBy": "declared-ai-run",
+        "evidenceNotes": [
+          {
+            "dimension": "directFiles",
+            "claim": "No CheckpointReader or HasTensor related files found in provided tree sample or file snippets.",
+            "evidence": "Tree sample shows only build configs, CI scripts, and unrelated test files (grappler, TensorRT, TFLite kernels, MLIR). No core checkpoint reader paths present.",
+            "path": "tensorflow/core/api_def/python_api/api_def_TensorMapLookup.pbtxt",
+            "symbol": "TensorMapLookup",
+            "lineRange": "1-5",
+            "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dc52bcefc1dd70d5c530c47c8bbd7036e9fa8d36/tensorflow/core/api_def/python_api/api_def_TensorMapLookup.pbtxt#L1-L5"
+          }
+        ]
+      }
+    ],
+    "adjudication": {
+      "required": true,
+      "status": "completed",
+      "reviewerId": "automated-adjudicator",
+      "method": "set intersection for scored dimensions; union for unknowns and risks",
+      "rationale": "Automated adjudication kept only items present in both blinded slots and recorded every slot-only item as a disagreement; no silent averaging.",
+      "disagreements": [
+        {
+          "dimension": "unknowns",
+          "onlyFirst": [
+            "Cannot locate CheckpointReader HasTensor lookup implementation in the provided tree sample."
+          ],
+          "onlySecond": [
+            "CheckpointReader implementation files not present in provided tree sample or file snippets",
+            "HasTensor method definition and call sites not locatable in provided files",
+            "In-memory shape map initialization code not found in provided evidence",
+            "Lock behavior alignment details for Python bindings not verifiable from provided files",
+            "Python binding layer for checkpoint reading not present in provided evidence"
+          ],
+          "contested": false
+        },
+        {
+          "dimension": "risks",
+          "onlyFirst": [
+            {
+              "id": "risk-1",
+              "severity": "medium",
+              "rationale": "Misaligned Python binding lock may cause deadlocks during checkpoint restoration."
+            }
+          ],
+          "onlySecond": [
+            {
+              "id": "missing-evidence-risk",
+              "severity": "high",
+              "rationale": "Cannot verify implementation files or test coverage from provided repository sample; change may affect checkpoint loading correctness and Python thread safety."
+            }
+          ],
+          "contested": false
+        }
+      ]
+    }
+  }
+}

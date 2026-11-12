@@ -3,38 +3,140 @@
   "caseId": "laravel-migration-failed-event",
   "reviewerId": "R2",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:20:25.295Z",
+  "scopeSummary": "Introduce a MigrationFailed event class and dispatch it when a database migration throws, preserving existing migration lifecycle behavior.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "src/Illuminate/Database/Events/MigrationFailed.php",
+      "src/Illuminate/Database/Migrations/Migrator.php"
+    ],
+    "affectedFiles": [
+      "src/Illuminate/Contracts/Database/Events/MigrationEvent.php",
+      "src/Illuminate/Database/Events/MigrationEvent.php",
+      "src/Illuminate/Database/Events/MigrationStarted.php",
+      "src/Illuminate/Database/Events/MigrationEnded.php"
+    ],
+    "tests": [
+      "tests/Database/DatabaseMigrationEventTest.php"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "src/Illuminate/Database/Events/MigrationFailed.php",
+        "name": "MigrationFailed",
+        "kind": "class"
+      },
+      {
+        "file": "src/Illuminate/Database/Migrations/Migrator.php",
+        "name": "runMigration",
+        "kind": "method"
+      },
+      {
+        "file": "src/Illuminate/Database/Migrations/Migrator.php",
+        "name": "dispatchSchemaEvent",
+        "kind": "method"
+      },
+      {
+        "file": "src/Illuminate/Database/Events/MigrationEvent.php",
+        "name": "MigrationEvent",
+        "kind": "class"
+      },
+      {
+        "file": "src/Illuminate/Contracts/Database/Events/MigrationEvent.php",
+        "name": "MigrationEvent",
+        "kind": "interface"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "src/Illuminate/Database/Events/MigrationFailed.php",
+        "to": "src/Illuminate/Database/Events/MigrationEvent.php"
+      },
+      {
+        "from": "src/Illuminate/Database/Events/MigrationEvent.php",
+        "to": "src/Illuminate/Contracts/Database/Events/MigrationEvent.php"
+      },
+      {
+        "from": "src/Illuminate/Database/Migrations/Migrator.php",
+        "to": "src/Illuminate/Database/Events/MigrationFailed.php"
+      }
+    ],
+    "unknowns": [
+      "Whether the Migrator class catches Throwable or Exception around migration execution to dispatch MigrationFailed.",
+      "Whether MigrationFailed should carry the thrown exception as a public property.",
+      "Whether existing tests assert on MigrationStarted/MigrationEnded ordering and may need updates for the new event.",
+      "Whether the event should be dispatched for both up and down migration operations."
+    ],
+    "risks": [
+      {
+        "id": "migration-failed-event-swallowing-exception",
+        "severity": "high",
+        "rationale": "Dispatching MigrationFailed inside a catch block could swallow the original exception and alter migration failure behavior if not re-thrown."
+      },
+      {
+        "id": "migration-failed-event-listener-side-effects",
+        "severity": "medium",
+        "rationale": "Adding a new event may affect existing event listeners or tests that assert on the exact set of dispatched migration events."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "Create MigrationFailed event class extending MigrationEvent.",
+      "evidence": "New file src/Illuminate/Database/Events/MigrationFailed.php following MigrationStarted pattern.",
+      "path": "src/Illuminate/Database/Events/MigrationFailed.php",
+      "symbol": "MigrationFailed",
+      "lineRange": "1-30",
+      "immutableUrl": "https://github.com/laravel/framework/blob/288b3b4b85b1d28802dd439d2cec5516c513c31e/src/Illuminate/Database/Events/MigrationStarted.php"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "Edit Migrator to dispatch MigrationFailed when migration throws.",
+      "evidence": "src/Illuminate/Database/Migrations/Migrator.php contains runMigration method that dispatches MigrationStarted and MigrationEnded.",
+      "path": "src/Illuminate/Database/Migrations/Migrator.php",
+      "symbol": "runMigration",
+      "lineRange": "1-200",
+      "immutableUrl": "https://github.com/laravel/framework/blob/288b3b4b85b1d28802dd439d2cec5516c513c31e/src/Illuminate/Database/Migrations/Migrator.php"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "MigrationEvent base class and contract define shared event structure.",
+      "evidence": "src/Illuminate/Database/Events/MigrationEvent.php extends MigrationEventContract with migration, method, name properties.",
+      "path": "src/Illuminate/Database/Events/MigrationEvent.php",
+      "symbol": "MigrationEvent",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/laravel/framework/blob/288b3b4b85b1d28802dd439d2cec5516c513c31e/src/Illuminate/Database/Events/MigrationEvent.php"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Add test for MigrationFailed event dispatch on migration exception.",
+      "evidence": "tests/Database/DatabaseMigrationEventTest.php would be created or updated to cover the new event.",
+      "path": "tests/Database/DatabaseMigrationEventTest.php",
+      "symbol": "DatabaseMigrationEventTest",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/laravel/framework/blob/288b3b4b85b1d28802dd439d2cec5516c513c31e/tests/Database/DatabaseMigrationEventTest.php"
+    }
+  ]
 }

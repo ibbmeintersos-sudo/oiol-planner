@@ -1,0 +1,89 @@
+name: P12 AI review generation
+
+on:
+  push:
+    branches: ['p12/**']
+    paths: ['.p12/trigger']
+  workflow_dispatch:
+    inputs:
+      slots:
+        description: 'Comma-separated reviewer slots'
+        default: 'R1,R2'
+      limit:
+        description: 'Number of cases to annotate (0 = all)'
+        default: '0'
+      offset:
+        description: 'Zero-based case offset'
+        default: '0'
+      budget:
+        description: 'Maximum model calls for this run (0 = uncapped)'
+        default: '0'
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: p12-ai-review-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  annotate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate AI reviews
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          P12_API_KEY_R1: ${{ secrets.OIOL_API_KEY }}
+          P12_API_KEY_R2: ${{ secrets.OIOL_REVIEW_API_KEY }}
+          P12_SLOTS: ${{ inputs.slots || 'R1,R2' }}
+          P12_MODELS_URL_R1: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODEL_R1: nvidia/nemotron-3.5-lightning-30b-a3b
+          P12_MAX_TOKENS_R1: '12000'
+          P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODEL_R2: nvidia/nemotron-3-ultra-550b-a55b
+          P12_MAX_TOKENS_R2: '12000'
+          P12_MAX_EVIDENCE_FILES: '10'
+          P12_FILE_CHARS: '2000'
+          P12_MAX_EVIDENCE_CHARS: '24000'
+          P12_TREE_SAMPLE: '120'
+          P12_CALL_TIMEOUT: '600000'
+          P12_SKIP_EXISTING: '1'
+          P12_CASE_CONCURRENCY: '2'
+        run: |
+          OFFSET="${{ inputs.offset || '0' }}"
+          LIMIT="${{ inputs.limit || '0' }}"
+          BUDGET="${{ inputs.budget || '0' }}"
+          if [ "${{ github.event_name }}" = "push" ] && [ -f .p12/trigger ]; then
+            TRIGGER=$(head -n1 .p12/trigger)
+            OFFSET="${TRIGGER%%:*}"
+            LIMIT="${TRIGGER##*:}"
+            SECOND=$(sed -n '2p' .p12/trigger | tr -d '[:space:]')
+            if printf '%s' "$SECOND" | grep -Eq '^[0-9]+$'; then BUDGET="$SECOND"; fi
+          fi
+          echo "annotating offset=$OFFSET limit=$LIMIT call_budget=$BUDGET"
+          P12_CALL_BUDGET="$BUDGET" node scripts/generate-ai-reviews.mjs --offset "$OFFSET" --limit "$LIMIT"
+
+      - name: Commit generated reviews
+        if: always()
+        run: |
+          git config user.name "oiol-p12-bot"
+          git config user.email "oiol-p12-bot@users.noreply.github.com"
+          git add benchmarks/real-world/reviews
+          if git diff --cached --quiet; then
+            echo "No review changes to commit"
+            exit 0
+          fi
+          git commit -m "review(p12): generate AI annotations"
+          git fetch origin "${{ github.ref_name }}"
+          git rebase --autostash "origin/${{ github.ref_name }}"
+          git push origin HEAD:${{ github.ref_name }}

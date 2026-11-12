@@ -1,0 +1,512 @@
+{
+  "schemaVersion": "1.0.0",
+  "frozenAt": "2026-11-12T04:02:12.958Z",
+  "caseCount": 36,
+  "reviewCount": 72,
+  "cases": [
+    {
+      "caseId": "ky-dispatcher-option-ignored",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "73a6c9684900933fba51cceb8536099c80054a86f6286cb7d1a38e5a4a3c13e6"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "ddcb5d2ec2f2b0133dfb824aaa1625553d7784e0e8e34a9d9a2077cafc59b74d"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "itsdangerous-drop-eol-python",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "d7eb40df64f4cafa768b9011d71829fda7ea6e911e93b8595dc48082a3440fff"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "1c8d8e333c308b6f1c51e249fd361612eae30316f7b75b3f7fb4985cb2b08157"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "chi-suppress-not-found-route-context",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "420687e0991910eda02ab06702ee78728a1b00d1eb5dcdf939cce0fbd50181e9"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "36d82939f7718ea81c804b8c1c364485ac01c77e9f9e5f3bd7aceb5fab93d0f6"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "ripgrep-basename-regex-matching",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "f270a878bc17ff4a6c4465456465ae49e014cb1beb8cb254f4531dfda84372a2"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "33ecb7d1a3ba370f954a5d376683cdeaae98084a2c791f4c0544efc90e501296"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "pydantic-decimal-json-schema-pattern",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "1805b64fe2c0bc362dbc59adbbf81b8a54b3926cd4c8d1ecd5fc03eed77d86cf"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "d21ff63a6b81a320c06642051b3c10923af33d7caa4161ddc8cfead859c761dd"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "nestjs-node-adapter-req-route",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "4985ceec4444686f2cde017cf4a4cdf7720ec0138b67b3408833b5e95a098112"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "ed8cbbb3c82fbfdc10cd31dd6e5e8dafa6224b38cdbea735cf6c5e64471d89c9"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "laravel-migration-failed-event",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "5b1b69eaeb149dba76dd9e85560816ad11dd7cd80542279e63d8be4905cbfbe1"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "e3b0571cf1a4812c6cf97afd9378e7447fa583b5c33c0bf103a9adecf9234b10"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "spring-boot-duration-micros-overflow",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "0e5d53eafb23dfe98a2367428eda0e0d366ff30b5a161473c6884e6d17676763"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "454a0e54ee8d27632140f822dd74703370cd98cca4c649b66ec9b8a8b9693c7d"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "kubernetes-spdy-upgrade-failure-close",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "4d4a75535b2465fd62f53600551b1faa480fe6609743ce75567ef802bf8d0c86"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "58ecc69f03c1b00f0aaaa7860a3e8c1ad4d4c8d1ad9b3102ce22888eeee4dbd6"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "tensorflow-release-gil-device-context",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "1b6dac78f525b6482f9ddf5324a436c91691acd48b1681706d7415aa2d732eda"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "a0d252be7f32f260b8962f02807a8da10905989afe37c1a9ef7eb17265dd4c5a"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "grafana-provisioning-job-tracing",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "41efb14321384d7b6f981ba63695354cf94cc9a68de8eec9145d5b6cf088fe4c"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "aac68b5d14ea1b8145b993600664cee71d83a8302b299ae871d4fa7c79ee47e5"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "home-assistant-unifi-disabled-entities",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "87fad6b676460c9f5f9088d6567fd7c91cc457ed98c382f6573fdfb50b6d54d5"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "6256a1bffe8e4acab3b0056eac5e90a8594f88c0fa62711debfbd81f5d20bc3d"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "46b26d6712ba530b2a35d4ad3a5535f4a3fd27ed230a7853138d9d69e9d63f5c"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "dfb8b7c02cc1fcf958c4a02bea4a3e15f4d6e4b6138734e89ddd4d42f3d11d28"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "fb44a875a6c9b815511e5454c49c8c84f2174072a0c03a6e16b8c8475e93f06b"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "b02b385006adaab1a7e63c6d551ceaeda08d6b6f7e260303cb4b2c67395dcc72"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "pallets-404-update-project-to-use-uv-for-depende",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "02fb11e1713637819364323af29f80a76fe0e918c2b00998d3723a29cac0c66f"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "f593e6907bc93c069dc343f13443869b62f8596425af5b1e6df73d0744291a2c"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "pallets-406-remove-previously-deprecated-code",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "c7816796ebb38600b91220cd1f2c393333bb20e1fa24ba7dea7ef8c56ec62dfa"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "1a4113b4b80de32abb1184c6f5e953b99ebf6f7e21759d4f2ed879c07a6dabc6"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "fffd1808b178d96ca54e1420295560e3cce6798b53c5c1a8b785f344e13c0c54"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "e6a9e5e86d2b3b7205596a4c1f7f0d64ffd824f7c4f3f9140019c50c8a38c543"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "5050f9e8028ec760e2dbe515d129fcf38dfe2fd4b87ac0929f31063b0cb7dce6"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "e07cb92bae70f2baad60ebd55d112b89a02637f0a93ae2405c4441a3e57fca2e"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "burntsushi-3578-ignore-respect-linked-worktree-exclu",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "973e6fae79f961cef5f88c910fce6d48fd0d9cc3dee2448f560a06f6a8251a74"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "be3faaa17c5e3315d3945e340c8763120359fc359f22de15d68e8fc52a147da8"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "burntsushi-3560-ignore-reuse-incremental-matchers-fo",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "8dbfb93042cc89c3887d2bb679038bd98179ab57042c10a6b0df0fbac4ef1933"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "7035b35fca0940f7b0a66a18b7e8d07463b368d1b38c023a6d6802c1b8039bf8"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "7b2076ca90a6e2ef59c1a444ec120c2e9e298533e33e1b90c463bdef6b0856cc"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "3eace72d7b6d18682eac4f26d807ac964f9e06a7e51817855bab1de022186bae"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "pydantic-14246-change-the-arguments-schema-for-vali",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "07c103ee70ce5f59706cffa79ae9cc9d54e03703e2915ab2ab8864c7063da648"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "03371a7ddbe1540ee1174aff6f6e3282cd8bb3e1a5120517043001f99b0bac75"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "e2648ced242dfd5719a9e05ddf0e48a943fc43d96ed7662eaeb6c9b5207ca96e"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "ec4c5ea54a5e20f6cee69f84101117e4cbd6bc8e935f8321f37d97936b171c35"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "8600c23f5cf779bb392ab9547e7be020820727556db1f96714392cc9af1662ce"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "bdc0ae1fc618471d18f2874bd7ef35bfc18c2e6a07f05a9efd15b74050c4d828"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "laravel-62326-add-origin-to-uri-class",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "10d2c4c118687a874d6ff155c147e4d6d2ea1a6dfb9f4f2564ed3f4cc0025c5c"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "37665fae75611d05fa3735f2927a0655e43f24a3ffc709e98a6c582e36d5b449"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "laravel-62360-include-identical-belongstomany-reso",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "9a803349852d24644210c2a45942dd3b7172cb4680ce6cee00df078223422863"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "0001d7ed60949b1cf558ed3517cc55021dee0c0edd83879f89c2a8ab17c7387c"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "854b1a8981d1b0824ad7b89645662881414de173f15c640f048fbf56a46852ed"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "9bdabe93f25aab79948968ff7ff69a864238dfc056ae9456371e9af8afbf8930"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "spring-projects-52585-pushgatewaytaskscheduler-shutdown-on",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "5f578b0e615d9d63bcb466469c4db238fce11289a30749f77fb447a246b0cb31"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "6a2faa80206e9e1d815031ce61bcb65a5d9fa920e708f244b536c53bd11bcd30"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "be2153e6ac2ee90829f60ef501cd8105aecf78ab28c3ae27e23d165b60cc58fa"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "3a21c7ecf3305b5d2961bf2a595f1b93aec175dd1f89fd3bf0c15500396aeacc"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "kubernetes-143291-decorate-service-and-pvc-objects-on-",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "9897b6edd926a14f5b5d7d35c15e9c290d54e4bbefbe0e9661c20dcec0d0e25a"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "2a5c9aacd4849bda8d7dfc56715174bc73c7e15554de5cb2aabaf45086781124"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "tensorflow-129795-optimize-checkpointreader-hastensor-",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "050da9937b1add6ba851ff0662a31205281b34799a9248382aa528111916b669"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "2cabcecb10d261853dd659806f86f9b0d82a86ae4aee5fb7ab564395eba0904d"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "tensorflow-129473-skip-utf-8-bom-when-make-csv-dataset",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "9a50c136ab7b858bdc4110c13299682051af55986bdf454f57eaf90ddd2ade86"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "c0df3212dddab06f2b9b301e7b2d16566dc6f7a178536e7ef038ddd3782ebf2b"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "grafana-136907-annotation-permission-mappings-for-z",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "bfdedd2731305fd5cd2ca07523cf66cef465e49ef052fc5efeeacffbe00afd9f"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "768a8fa861c357063de111982502dd0f19923134ba25e233351a99d75606867a"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "grafana-137046-split-folder-has-rules-label-into-al",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "5df6ef7425a52329f0ee93b4667c04d8c057c75babe2414f4a4630cdefc6cf55"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "baada16b020b7a839d728193d10c8ac32f9e4d3e92eb31bf59481e2732f4cfb7"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "home-assistant-189946-prohibit-nest-thermostat-temperature",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "32f17ed616e3930336f8ee7e67be8028dd86b00b568efaa51bb625791f159a14"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "a66f8b30c5c036e0a5aa2fc8969371ab4e7d885b78c3ff9451e921b885fe0b48"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    },
+    {
+      "caseId": "home-assistant-189189-add-unifi-ips-engine-update-entity",
+      "reviews": [
+        {
+          "reviewerId": "R1",
+          "sha256": "63ea5fca1fd086600f9b51e34de6eb5e6929e376464093a30ee770bbbe7006ed"
+        },
+        {
+          "reviewerId": "R2",
+          "sha256": "d01238b18dc3f5c6c204152b14ee85f30066bc0ada8e7131cf6e03ffcdf01770"
+        }
+      ],
+      "adjudicationStatus": "pending"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+name: P12 provider probe
+
+on:
+  push:
+    branches: ['p12/**']
+    paths: ['.p12/probe']
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p12-provider-probe-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Probe configured providers
+        env:
+          P12_API_KEY_R1: ${{ secrets.OIOL_API_KEY }}
+          P12_API_KEY_R2: ${{ secrets.OIOL_REVIEW_API_KEY }}
+          P12_MODELS_BASE_R1: https://integrate.api.nvidia.com/v1
+          P12_MODELS_BASE_R2: https://openrouter.ai/api/v1
+          P12_MODELS_URL_R1: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODELS_URL_R2: https://integrate.api.nvidia.com/v1/chat/completions
+          P12_MODEL_R1: deepseek-ai/deepseek-v4.1-flash
+          P12_MODEL_R2: mistralai/mistral-large-4-1t-a52b
+          P12_SWEEP_SLOT: R1
+          P12_SWEEP_TOKENS: '4000,8000'
+          P12_MODEL_CANDIDATES: nvidia/nemotron-3-ultra-550b-a55b,nvidia/nemotron-3.5-lightning-30b-a3b,deepseek-ai/deepseek-v4.1-flash,mistralai/mistral-large-4-1t-a52b,minimaxai/minimax-m3.1-flash
+        run: node scripts/probe-model-providers.mjs
+
+      - name: Commit probe report
+        if: always()
+        shell: bash
+        env:
+          P12_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          report="benchmarks/real-world/reviews/.p12-provider-probe.json"
+          clone="$RUNNER_TEMP/probe-clone"
+          if [ ! -f "$report" ]; then echo "No probe report produced"; exit 0; fi
+          cp "$report" "$RUNNER_TEMP/probe-report.json"
+          url=$(git config --get remote.origin.url)
+          git clone --quiet --depth 5 --branch "$P12_BRANCH" "$url" "$clone"
+          for key in $(git config --get-regexp "^http\." | cut -d" " -f1); do
+            git -C "$clone" config "$key" "$(git config --get "$key")"
+          done
+          mkdir -p "$clone/benchmarks/real-world/reviews"
+          cp "$RUNNER_TEMP/probe-report.json" "$clone/benchmarks/real-world/reviews/.p12-provider-probe.json"
+          git -C "$clone" config user.name "oiol-p12-bot"
+          git -C "$clone" config user.email "oiol-p12-bot@users.noreply.github.com"
+          git -C "$clone" add -A benchmarks/real-world/reviews/.p12-provider-probe.json
+          if git -C "$clone" diff --cached --quiet; then echo "Probe report unchanged"; exit 0; fi
+          git -C "$clone" commit --quiet -m "chore(p12): record provider probe report"
+          git -C "$clone" push --quiet origin "HEAD:refs/heads/$P12_BRANCH"

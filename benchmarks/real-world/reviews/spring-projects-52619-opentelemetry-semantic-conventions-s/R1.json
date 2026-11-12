@@ -3,38 +3,132 @@
   "caseId": "spring-projects-52619-opentelemetry-semantic-conventions-s",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:49:18.693Z",
+  "scopeSummary": "Fix management observation convention selection to activate OpenTelemetry conventions and associated tests.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
+    "directFiles": [
+      "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java"
+    ],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "module/spring-boot-micrometer-observation/src/test/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/ConditionalOnSemanticConventionsTests.java",
+      "module/spring-boot-micrometer-observation/src/test/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventionsTests.java"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+        "name": "MICROMETER",
+        "kind": "enum constant"
+      },
+      {
+        "file": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+        "name": "OPEN_TELEMETRY",
+        "kind": "enum constant"
+      },
+      {
+        "file": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+        "name": "isActive",
+        "kind": "method"
+      },
+      {
+        "file": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+        "name": "getCanonicalName",
+        "kind": "method"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/OnSemanticConventionsCondition.java",
+        "to": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java"
+      }
+    ],
+    "unknowns": [
+      "Canonical name generation may not cover all property value formats."
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Changing convention selection could alter which auto-configuration beans are activated, affecting application behavior."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "SemanticConventions.java must be edited to fix convention selection.",
+      "evidence": "File contains enum and isActive method governing convention activation.",
+      "path": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+      "symbol": "isActive",
+      "lineRange": "45-55",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java#L45-L55"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Test files must verify OpenTelemetry convention activation.",
+      "evidence": "ConditionalOnSemanticConventionsTests and SemanticConventionsTests cover convention matching.",
+      "path": "module/spring-boot-micrometer-observation/src/test/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/ConditionalOnSemanticConventionsTests.java",
+      "symbol": "whenPropertyIsSetToOpenTelemetryOnlyOpenTelementryIsActive",
+      "lineRange": "15-25",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/module/spring-boot-micrometer-observation/src/test/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/ConditionalOnSemanticConventionsTests.java#L15-L25"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "Symbol isActive is key method for convention matching.",
+      "evidence": "Method determines if semantic convention is active based on property.",
+      "path": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+      "symbol": "isActive",
+      "lineRange": "45-55",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java#L45-L55"
+    },
+    {
+      "dimension": "dependencyEdges",
+      "claim": "OnSemanticConventionsCondition depends on SemanticConventions enum.",
+      "evidence": "Import edge for convention checking.",
+      "path": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/OnSemanticConventionsCondition.java",
+      "symbol": "semanticConvention",
+      "lineRange": "20-30",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/OnSemanticConventionsCondition.java#L20-L30"
+    },
+    {
+      "dimension": "unknowns",
+      "claim": "Uncertainty about canonical name handling for mixed case property values.",
+      "evidence": "Current logic may not cover all edge cases.",
+      "path": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+      "symbol": "getCanonicalName",
+      "lineRange": "57-65",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java#L57-L65"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Changing convention selection may affect which auto-configuration beans are activated.",
+      "evidence": "Risk identified in change impact analysis.",
+      "path": "module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java",
+      "symbol": "isActive",
+      "lineRange": "45-55",
+      "immutableUrl": "https://github.com/spring-projects/spring-boot/blob/39b546e7425ecd5e4fc4325bf33974d43a62d1a2/module/spring-boot-micrometer-observation/src/main/java/org/springframework/boot/micrometer/observation/autoconfigure/condition/SemanticConventions.java#L45-L55"
+    }
+  ]
 }

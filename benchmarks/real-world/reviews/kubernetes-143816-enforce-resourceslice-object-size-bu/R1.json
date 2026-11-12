@@ -3,38 +3,87 @@
   "caseId": "kubernetes-143816-enforce-resourceslice-object-size-bu",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:51:31.538Z",
+  "scopeSummary": "Enforce ResourceSlice object size budget with validation and API integration.",
   "dimensionCoverage": {
-    "directFiles": "partial",
-    "affectedFiles": "partial",
+    "directFiles": "unsupported",
+    "affectedFiles": "unsupported",
     "tests": "partial",
-    "packages": "partial",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
     "scannerSymbols": "partial",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
     "directFiles": [],
     "affectedFiles": [],
-    "tests": [],
+    "tests": [
+      "staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
+    "scannerSymbols": [
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer.go",
+        "name": "PluginName",
+        "kind": "variable"
+      },
+      {
+        "file": "staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer.go",
+        "name": "Register",
+        "kind": "function"
+      }
+    ],
     "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "unknowns": [
+      "ResourceSlice type definition and size budget parameters not present in tree sample"
+    ],
+    "risks": [
+      {
+        "id": "rsb-001",
+        "severity": "medium",
+        "rationale": "Incorrect size budget thresholds may cause admission to reject valid ResourceSlice objects."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "No ResourceSlice-related direct files in tree sample.",
+      "evidence": "Tree sample contains conditionsenforcer admission plugin files, not ResourceSlice types.",
+      "path": "staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer.go",
+      "symbol": "PluginName",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer.go#L1-L5"
+    },
+    {
+      "dimension": "tests",
+      "claim": "Existing conditions enforcer test file can be adapted for ResourceSlice validation coverage.",
+      "evidence": "conditionsenforcer_test.go present in tree with admission test structure.",
+      "path": "staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer_test.go",
+      "symbol": "TestConditionsEnforcer",
+      "lineRange": "1-10",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer_test.go#L1-L10"
+    },
+    {
+      "dimension": "risks",
+      "claim": "Misconfigured size budget may lead to admission failures for valid workloads.",
+      "evidence": "Admission plugins enforce constraints that impact workload scheduling.",
+      "path": "staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer.go",
+      "symbol": "Register",
+      "lineRange": "1-5",
+      "immutableUrl": "https://github.com/kubernetes/kubernetes/blob/59332646f342a3e2c485e4f9e4b776eb2f79042f/staging/src/k8s.io/apiserver/pkg/admission/plugin/authorizer/conditionsenforcer/conditionsenforcer.go#L1-L5"
+    }
+  ]
 }

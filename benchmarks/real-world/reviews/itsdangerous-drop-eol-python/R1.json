@@ -3,38 +3,352 @@
   "caseId": "itsdangerous-drop-eol-python",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:08:47.108Z",
+  "scopeSummary": "Raise minimum supported Python version from 3.8 to 3.9 and update package metadata, CI, type-checker configuration, and tests to align with the new support policy.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "pyproject.toml",
+      ".github/workflows/tests.yaml",
+      ".pre-commit-config.yaml",
+      "tests/test_itsdangerous/test_encoding.py"
+    ],
+    "affectedFiles": [
+      "src/itsdangerous/__init__.py",
+      "src/itsdangerous/_json.py",
+      "src/itsdangerous/encoding.py",
+      "src/itsdangerous/exc.py",
+      "src/itsdangerous/serializer.py",
+      "src/itsdangerous/signer.py",
+      "src/itsdangerous/timed.py",
+      "src/itsdangerous/url_safe.py",
+      "tests/test_itsdangerous/test_serializer.py",
+      "tests/test_itsdangerous/test_signer.py",
+      "tests/test_itsdangerous/test_timed.py",
+      "tests/test_itsdangerous/test_url_safe.py"
+    ],
+    "tests": [
+      "tests/test_itsdangerous/test_encoding.py"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "pyproject.toml",
+        "name": "requires-python",
+        "kind": "metadata"
+      },
+      {
+        "file": "pyproject.toml",
+        "name": "python_version",
+        "kind": "mypy config"
+      },
+      {
+        "file": "pyproject.toml",
+        "name": "pythonVersion",
+        "kind": "pyright config"
+      },
+      {
+        "file": "pyproject.toml",
+        "name": "env_list",
+        "kind": "tox config"
+      },
+      {
+        "file": "src/itsdangerous/_json.py",
+        "name": "_CompactJSON.loads",
+        "kind": "method"
+      },
+      {
+        "file": "src/itsdangerous/_json.py",
+        "name": "_CompactJSON.dumps",
+        "kind": "method"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "want_bytes",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "base64_encode",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "base64_decode",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "int_to_bytes",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/encoding.py",
+        "name": "bytes_to_int",
+        "kind": "function"
+      },
+      {
+        "file": "src/itsdangerous/signer.py",
+        "name": "Signer",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/signer.py",
+        "name": "SigningAlgorithm",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/signer.py",
+        "name": "HMACAlgorithm",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/signer.py",
+        "name": "NoneAlgorithm",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/timed.py",
+        "name": "TimestampSigner",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/timed.py",
+        "name": "TimedSerializer",
+        "kind": "class"
+      },
+      {
+        "file": "src/itsdangerous/serializer.py",
+        "name": "Serializer",
+        "kind": "class"
+      },
+      {
+        "file": "tests/test_itsdangerous/test_encoding.py",
+        "name": "test_want_bytes",
+        "kind": "test"
+      },
+      {
+        "file": "tests/test_itsdangerous/test_encoding.py",
+        "name": "test_base64",
+        "kind": "test"
+      },
+      {
+        "file": "tests/test_itsdangerous/test_encoding.py",
+        "name": "test_base64_bad",
+        "kind": "test"
+      },
+      {
+        "file": "tests/test_itsdangerous/test_encoding.py",
+        "name": "test_int_bytes",
+        "kind": "test"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/serializer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/timed.py"
+      },
+      {
+        "from": "src/itsdangerous/__init__.py",
+        "to": "src/itsdangerous/url_safe.py"
+      },
+      {
+        "from": "src/itsdangerous/_json.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/encoding.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "src/itsdangerous/serializer.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/serializer.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "src/itsdangerous/serializer.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "src/itsdangerous/signer.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/signer.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "src/itsdangerous/timed.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "src/itsdangerous/timed.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "src/itsdangerous/timed.py",
+        "to": "src/itsdangerous/serializer.py"
+      },
+      {
+        "from": "src/itsdangerous/timed.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_encoding.py",
+        "to": "src/itsdangerous/encoding.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_encoding.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_serializer.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_serializer.py",
+        "to": "src/itsdangerous/serializer.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_serializer.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_signer.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_signer.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_timed.py",
+        "to": "src/itsdangerous/exc.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_timed.py",
+        "to": "src/itsdangerous/signer.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_timed.py",
+        "to": "src/itsdangerous/timed.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_timed.py",
+        "to": "test_itsdangerous.test_serializer"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_timed.py",
+        "to": "test_itsdangerous.test_signer"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_url_safe.py",
+        "to": "src/itsdangerous/url_safe.py"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_url_safe.py",
+        "to": "test_itsdangerous.test_serializer"
+      },
+      {
+        "from": "tests/test_itsdangerous/test_url_safe.py",
+        "to": "test_itsdangerous.test_timed"
+      }
+    ],
+    "unknowns": [
+      "Whether the target minimum Python version is 3.9 or 3.10, as the pinned snapshot only shows requires-python >=3.8 and no explicit target is provided in the change request."
+    ],
+    "risks": [
+      {
+        "id": "runtime-python-version",
+        "severity": "medium",
+        "rationale": "Raising requires-python may break installations on Python 3.8 environments that currently rely on this package."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "pyproject.toml declares requires-python >=3.8 and must be updated to the new minimum Python version.",
+      "evidence": "pyproject.toml contains requires-python = \">=3.8\" in the [project] table.",
+      "path": "pyproject.toml",
+      "symbol": "requires-python",
+      "lineRange": "13-13",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/pyproject.toml#L13-L13"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "pyproject.toml configures mypy python_version = 3.8 and pyright pythonVersion = 3.8, which must be aligned with the new support policy.",
+      "evidence": "pyproject.toml contains [tool.mypy] python_version = \"3.8\" and [tool.pyright] pythonVersion = \"3.8\".",
+      "path": "pyproject.toml",
+      "symbol": "python_version",
+      "lineRange": "104-111",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/pyproject.toml#L104-L111"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "pyproject.toml tox env_list includes py3.8 and pypy311 environments that may need adjustment for the new support policy.",
+      "evidence": "pyproject.toml contains [tool.tox] env_list with py3.13, py3.12, py3.11, py3.10, py3.9, py3.8, pypy311.",
+      "path": "pyproject.toml",
+      "symbol": "env_list",
+      "lineRange": "126-132",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/pyproject.toml#L126-L132"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "tests/test_itsdangerous/test_encoding.py uses str | bytes union syntax in parametrize values, which is valid on Python 3.10+ but may require from __future__ import annotations on 3.9.",
+      "evidence": "tests/test_itsdangerous/test_encoding.py contains @pytest.mark.parametrize(\"value\", (\"mañana\", b\"tomorrow\")) and similar annotations.",
+      "path": "tests/test_itsdangerous/test_encoding.py",
+      "symbol": "test_want_bytes",
+      "lineRange": "13-18",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/tests/test_itsdangerous/test_encoding.py#L13-L18"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "Source files use PEP 604 union syntax (str | bytes) and X | None annotations that require Python 3.10+ or from __future__ import annotations on 3.9.",
+      "evidence": "src/itsdangerous/_json.py, src/itsdangerous/encoding.py, src/itsdangerous/exc.py, src/itsdangerous/serializer.py, src/itsdangerous/signer.py, src/itsdangerous/timed.py all use str | bytes and t.Any | None syntax.",
+      "path": "src/itsdangerous/_json.py",
+      "symbol": "_CompactJSON.loads",
+      "lineRange": "13-16",
+      "immutableUrl": "https://github.com/pallets/itsdangerous/blob/117218e006641644a038772e557a3ae6cb1448a1/src/itsdangerous/_json.py#L13-L16"
+    }
+  ]
 }

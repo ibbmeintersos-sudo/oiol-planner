@@ -3,38 +3,206 @@
   "caseId": "tensorflow-release-gil-device-context",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-super-vl:free from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-11T05:21:26.844Z",
+  "scopeSummary": "Release the Python GIL around synchronous C++ device discovery and context creation so unrelated Python threads are not blocked.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "tensorflow/python/client/device_lib.py",
+      "tensorflow/python/eager/context.py",
+      "tensorflow/python/eager/pywrap_tfe.cc"
+    ],
+    "affectedFiles": [
+      "tensorflow/python/client/session.py",
+      "tensorflow/python/eager/pywrap_tfe_internal.h",
+      "tensorflow/c/eager/c_api.cc",
+      "tensorflow/c/eager/c_api.h"
+    ],
+    "tests": [
+      "tensorflow/python/client/device_lib_test.py",
+      "tensorflow/python/client/session_list_devices_test.py",
+      "tensorflow/python/eager/context_test.py"
+    ],
     "packages": [],
-    "apiConsumers": [],
+    "apiConsumers": [
+      "tensorflow/python/client/session.py",
+      "tensorflow/python/eager/context.py"
+    ],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "tensorflow/python/client/device_lib.py",
+        "name": "list_local_devices",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/python/eager/context.py",
+        "name": "EagerContext",
+        "kind": "class"
+      },
+      {
+        "file": "tensorflow/python/eager/context.py",
+        "name": "device_name",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/python/eager/pywrap_tfe.cc",
+        "name": "TFE_ContextCreate",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/python/eager/pywrap_tfe.cc",
+        "name": "TFE_ContextListDevices",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/c/eager/c_api.cc",
+        "name": "TFE_ContextCreate",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/c/eager/c_api.cc",
+        "name": "TFE_ContextListDevices",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/c/eager/c_api.h",
+        "name": "TFE_ContextCreate",
+        "kind": "function"
+      },
+      {
+        "file": "tensorflow/c/eager/c_api.h",
+        "name": "TFE_ContextListDevices",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "tensorflow/python/client/device_lib.py",
+        "to": "tensorflow/python/client/pywrap_tf_session.py"
+      },
+      {
+        "from": "tensorflow/python/eager/context.py",
+        "to": "tensorflow/python/eager/pywrap_tfe.py"
+      },
+      {
+        "from": "tensorflow/python/eager/context.py",
+        "to": "tensorflow/python/client/device_lib.py"
+      },
+      {
+        "from": "tensorflow/python/client/session.py",
+        "to": "tensorflow/python/client/device_lib.py"
+      }
+    ],
+    "unknowns": [
+      "Whether the pinned base snapshot contains the exact GIL-release macros (e.g., Py_BEGIN_ALLOW_THREADS / Py_END_ALLOW_THREADS) in pywrap_tfe.cc or requires adding them.",
+      "Whether device discovery is invoked through pywrap_tf_session or pywrap_tfe in this snapshot, and which path must be edited.",
+      "Whether releasing the GIL around context creation could break Python callers that assume the GIL is held when the C++ call returns.",
+      "Whether existing tests in device_lib_test.py and context_test.py need concurrency assertions added to validate GIL release behavior."
+    ],
+    "risks": [
+      {
+        "id": "risk-gil-reentrancy",
+        "severity": "medium",
+        "rationale": "Releasing the GIL during synchronous C++ device discovery or context creation allows other Python threads to run and potentially mutate TensorFlow state, causing reentrancy or race conditions if the C++ code or callbacks touch Python objects."
+      },
+      {
+        "id": "risk-api-contract-change",
+        "severity": "medium",
+        "rationale": "If TFE_ContextCreate or TFE_ContextListDevices semantics change (e.g., returning before Python state is fully synchronized), API consumers such as session.py and context.py may observe inconsistent device lists or partially initialized contexts."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "device_lib.py exposes list_local_devices for synchronous device discovery.",
+      "evidence": "tensorflow/python/client/device_lib.py defines list_local_devices and is tested by device_lib_test.py.",
+      "path": "tensorflow/python/client/device_lib.py",
+      "symbol": "list_local_devices",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/client/device_lib.py"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "context.py manages EagerContext creation and device name resolution.",
+      "evidence": "tensorflow/python/eager/context.py defines EagerContext class and device_name function, used by session.py and other consumers.",
+      "path": "tensorflow/python/eager/context.py",
+      "symbol": "EagerContext",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/eager/context.py"
+    },
+    {
+      "dimension": "directFiles",
+      "claim": "pywrap_tfe.cc implements the C++ eager context and device listing entry points.",
+      "evidence": "tensorflow/python/eager/pywrap_tfe.cc contains TFE_ContextCreate and TFE_ContextListDevices bindings.",
+      "path": "tensorflow/python/eager/pywrap_tfe.cc",
+      "symbol": "TFE_ContextCreate",
+      "lineRange": "1-100",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/eager/pywrap_tfe.cc"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "session.py consumes device_lib.list_local_devices and context APIs.",
+      "evidence": "tensorflow/python/client/session.py imports device_lib and uses list_devices, making it an API consumer affected by GIL-release behavior.",
+      "path": "tensorflow/python/client/session.py",
+      "symbol": "list_devices",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/client/session.py"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "c_api.cc and c_api.h declare the public C eager API functions.",
+      "evidence": "tensorflow/c/eager/c_api.cc and c_api.h define TFE_ContextCreate and TFE_ContextListDevices, which pywrap_tfe.cc wraps.",
+      "path": "tensorflow/c/eager/c_api.cc",
+      "symbol": "TFE_ContextCreate",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/c/eager/c_api.cc"
+    },
+    {
+      "dimension": "tests",
+      "claim": "device_lib_test.py tests list_local_devices and should be updated for GIL-release behavior.",
+      "evidence": "tensorflow/python/client/device_lib_test.py contains DeviceLibTest with testListLocalDevices.",
+      "path": "tensorflow/python/client/device_lib_test.py",
+      "symbol": "testListLocalDevices",
+      "lineRange": "1-40",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/client/device_lib_test.py"
+    },
+    {
+      "dimension": "tests",
+      "claim": "session_list_devices_test.py tests session list_devices and may be affected.",
+      "evidence": "tensorflow/python/client/session_list_devices_test.py contains SessionListDevicesTest with testListDevices.",
+      "path": "tensorflow/python/client/session_list_devices_test.py",
+      "symbol": "testListDevices",
+      "lineRange": "1-40",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/client/session_list_devices_test.py"
+    },
+    {
+      "dimension": "tests",
+      "claim": "context_test.py tests eager context creation and device APIs.",
+      "evidence": "tensorflow/python/eager/context_test.py exists in the tree and tests EagerContext behavior.",
+      "path": "tensorflow/python/eager/context_test.py",
+      "symbol": "EagerContext",
+      "lineRange": "1-50",
+      "immutableUrl": "https://github.com/tensorflow/tensorflow/blob/dcbc81ffd6fdcc6ae33880fc3807bba4ef8626af/tensorflow/python/eager/context_test.py"
+    }
+  ]
 }
