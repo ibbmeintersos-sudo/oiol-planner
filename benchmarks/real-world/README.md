@@ -10,21 +10,23 @@ The full pipeline — freeze, automated adjudication, snapshot re-acquisition, a
 
 ### Measured change-impact scores (36 cases)
 
-Scores are a range: `intersection` adjudication is the lower bound, `union` adjudication the upper bound.
+Scores are a range: `intersection` adjudication is the lower bound, `union` adjudication the upper bound. The left value of each pair below is the frozen P12 baseline; the right value is the P13 result on the same frozen corpus, measured after the scanner precision work recorded in [P13_SCANNER_PRECISION.md](../P13_SCANNER_PRECISION.md). Both columns use the intersection corpus.
 
-| dimension | precision | recall | F1 |
-| --- | --- | --- | --- |
-| `directFiles` | 0.0182 / 0.0249 | 0.4537 / 0.2176 | 0.0312 / 0.0386 |
-| `affectedFiles` | 0.0614 / 0.0451 | 0.6944 / 0.2134 | 0.0656 / 0.0485 |
-| `tests` | 0.1209 / 0.0454 | 0.4167 / 0.1968 | 0.1293 / 0.0585 |
-| `packages` | 0.9194 / 0.8667 | 1 / 0.9444 | 0.9217 / 0.8712 |
-| `apiConsumers` | 0.8333 / 0.4167 | 0.8333 / 0.4167 | 0.8333 / 0.4167 |
-| `databaseConsumers` | 1 / 1 | 1 / 1 | 1 / 1 |
-| `migrationFiles` | 1 / 1 | 1 / 1 | 1 / 1 |
-| `scannerSymbols` | 0.004 / 0.0073 | 0.5069 / 0.2033 | 0.0074 / 0.0132 |
-| `dependencyEdges` | 0.1346 / 0.0608 | 0.5242 / 0.1061 | 0.1349 / 0.0671 |
+| dimension | precision | recall | F1 | P13 verdict |
+| --- | --- | --- | --- | --- |
+| `directFiles` | 0.0182 → 0.0514 | 0.4537 → 0.4259 | 0.0312 → 0.0662 | improvement (F1 ×2.1) |
+| `affectedFiles` | 0.0614 → 0.1188 | 0.6944 → 0.7222 | 0.0656 → 0.1250 | improvement (F1 ×1.9) |
+| `tests` | 0.1209 → 0.1243 | 0.4167 → 0.3611 | 0.1293 → 0.1328 | neutral |
+| `packages` | 0.9194 → 0.9198 | 1 → 1 | 0.9217 → 0.9222 | neutral |
+| `apiConsumers` | 0.8333 → 0.8056 | 0.8333 → 0.8333 | 0.8333 → 0.8056 | regression (vacuous-case artifact) |
+| `databaseConsumers` | 1 → 1 | 1 → 1 | 1 → 1 | neutral (no positive examples) |
+| `migrationFiles` | 1 → 1 | 1 → 1 | 1 → 1 | neutral (no positive examples) |
+| `scannerSymbols` | 0.0040 → 0.0052 | 0.5069 → 0.5069 | 0.0074 → 0.0095 | neutral |
+| `dependencyEdges` | 0.1346 → 0.1359 | 0.5242 → 0.5798 | 0.1349 → 0.1375 | neutral (recall +0.0556) |
 
-`databaseConsumers` and `migrationFiles` have no positive examples and `packages` / `apiConsumers` are sparse, so their high scores are vacuous rather than a strength. File-level recall is moderate while precision is very low because the scanner reports far more files than the few the annotations accept; symbol and edge precision are near zero for the same structural reason.
+`databaseConsumers` and `migrationFiles` have no positive examples and `packages` / `apiConsumers` are sparse, so their high scores are vacuous rather than a strength. File-level recall is moderate while precision is very low because the scanner reports far more files than the few the annotations accept; symbol and edge precision stay near zero for the same structural reason.
+
+Why do the caps fix the file dimensions but not the symbol and edge ones? Precision is computed per case as `tp / (tp + fp)`, and a case with no true positive scores zero however many false positives are removed; the reported value is the macro-average over the 36 cases. Pruning inventory therefore only helps cases that already contain a true positive. Removing 520 variable symbols per TypeScript case is real hygiene but cannot lift a dimension whose expected set is one to three change-scoped symbols. The `apiConsumers` drop is the same artifact in reverse: 30 of 36 cases have no expected consumers and score a vacuous precision of 1, and one case (`sindresorhus-883`) now resolves consumers where the annotations expect none.
 
 ## Evaluation unit
 
