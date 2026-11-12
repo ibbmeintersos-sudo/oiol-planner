@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "mode": "intersection",
-  "createdAt": "2026-11-12T07:37:42.274Z",
+  "createdAt": "2026-11-12T07:57:33.946Z",
   "caseCount": 36,
   "contested": [
     "itsdangerous-drop-eol-python",

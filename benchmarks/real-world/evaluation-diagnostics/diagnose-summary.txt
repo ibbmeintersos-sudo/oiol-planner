@@ -34,4 +34,4 @@ DIAGNOSED grafana-136907-annotation-permission-mappings-for-z
 DIAGNOSED grafana-137046-split-folder-has-rules-label-into-al
 DIAGNOSED home-assistant-189946-prohibit-nest-thermostat-temperature
 DIAGNOSED home-assistant-189189-add-unifi-ips-engine-update-entity
-DONE cases=36 gate0=PASS out=/home/runner/work/oiol-planner/oiol-planner/benchmarks/real-world/evaluation-diagnostics
+DONE cases=36 gate0=DRIFT out=/home/runner/work/oiol-planner/oiol-planner/benchmarks/real-world/evaluation-diagnostics

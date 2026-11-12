@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T07:44:06.402Z",
+  "generatedAt": "2026-11-12T08:04:08.336Z",
   "dimensions": {
     "directFiles": {
       "topFalsePositives": [
@@ -50,24 +50,24 @@
     "affectedFiles": {
       "topFalsePositives": [
         {
+          "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
+          "fp": 67
+        },
+        {
+          "caseId": "nestjs-node-adapter-req-route",
+          "fp": 55
+        },
+        {
+          "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
+          "fp": 44
+        },
+        {
           "caseId": "go-chi-1213-middleware-preserve-status-after-emp",
           "fp": 38
         },
         {
           "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
           "fp": 38
-        },
-        {
-          "caseId": "chi-suppress-not-found-route-context",
-          "fp": 35
-        },
-        {
-          "caseId": "nestjs-node-adapter-req-route",
-          "fp": 31
-        },
-        {
-          "caseId": "home-assistant-unifi-disabled-entities",
-          "fp": 25
         }
       ],
       "topFalseNegatives": [
@@ -188,6 +188,10 @@
     "apiConsumers": {
       "topFalsePositives": [
         {
+          "caseId": "sindresorhus-883-preserve-caller-stack-for-schema-val",
+          "fp": 4
+        },
+        {
           "caseId": "ky-dispatcher-option-ignored",
           "fp": 0
         },
@@ -201,10 +205,6 @@
         },
         {
           "caseId": "ripgrep-basename-regex-matching",
-          "fp": 0
-        },
-        {
-          "caseId": "pydantic-decimal-json-schema-pattern",
           "fp": 0
         }
       ],
@@ -373,33 +373,29 @@
       "topFalsePositives": [
         {
           "caseId": "nestjs-node-adapter-req-route",
-          "fp": 66
+          "fp": 218
         },
         {
           "caseId": "nestjs-18385-roll-back-modules-on-failed-lazy-loa",
-          "fp": 66
+          "fp": 218
         },
         {
           "caseId": "nestjs-18419-keep-the-fields-of-grouped-item-erro",
-          "fp": 66
+          "fp": 218
         },
         {
-          "caseId": "pydantic-decimal-json-schema-pattern",
-          "fp": 62
+          "caseId": "ky-dispatcher-option-ignored",
+          "fp": 87
         },
         {
-          "caseId": "pydantic-14249-support-list-and-decimaltuple-inputs",
-          "fp": 62
+          "caseId": "sindresorhus-881-fix-progress-callbacks-for-empty-req",
+          "fp": 71
         }
       ],
       "topFalseNegatives": [
         {
           "caseId": "itsdangerous-drop-eol-python",
           "fn": 4
-        },
-        {
-          "caseId": "ky-dispatcher-option-ignored",
-          "fn": 3
         },
         {
           "caseId": "ripgrep-basename-regex-matching",
@@ -411,6 +407,10 @@
         },
         {
           "caseId": "laravel-migration-failed-event",
+          "fn": 3
+        },
+        {
+          "caseId": "kubernetes-spdy-upgrade-failure-close",
           "fn": 3
         }
       ]

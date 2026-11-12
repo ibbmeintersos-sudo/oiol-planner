@@ -13,13 +13,13 @@
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 19,
+      "fp": 67,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 19
+      "actualCount": 67
     },
     "tests": {
       "tp": 0,
@@ -83,13 +83,13 @@
     },
     "dependencyEdges": {
       "tp": 0,
-      "fp": 66,
+      "fp": 218,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 66
+      "actualCount": 218
     }
   },
   "breakdown": {
@@ -150,15 +150,16 @@
       "gtStructurallyUnmatchableSample": []
     },
     "edges": {
-      "actualCount": 66,
+      "actualCount": 218,
       "fpByResolutionKind": {
-        "tsconfig_path_alias": 66
+        "relative_path": 151,
+        "tsconfig_path_alias": 67
       },
       "fpByResolution": {
-        "relative-path": 66
+        "relative-path": 218
       },
       "tp": 0,
-      "fp": 66,
+      "fp": 218,
       "fn": 0,
       "jsSpecifierTsSiblingCount": 0,
       "jsSpecifierTsSiblingSample": [],
@@ -308,17 +309,22 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 19,
+      "matchCount": 67,
       "truncated": false,
       "depthHistogram": {
-        "0": 19
+        "0": 19,
+        "1": 36,
+        "2": 10,
+        "3": 1,
+        "4": 1
       },
       "propagationHistogram": {
+        "reverse_import_dependency": 48,
         "direct_request_match": 19
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 19,
+      "fp": 67,
       "fn": 0
     },
     "tests": {

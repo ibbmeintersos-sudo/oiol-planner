@@ -13,13 +13,13 @@
     },
     "affectedFiles": {
       "tp": 0,
-      "fp": 8,
+      "fp": 18,
       "fn": 0,
       "precision": 0,
       "recall": 1,
       "f1": 0,
       "expectedCount": 0,
-      "actualCount": 8
+      "actualCount": 18
     },
     "tests": {
       "tp": 2,
@@ -83,13 +83,13 @@
     },
     "dependencyEdges": {
       "tp": 0,
-      "fp": 0,
+      "fp": 71,
       "fn": 2,
       "precision": 0,
       "recall": 0,
       "f1": 0,
       "expectedCount": 2,
-      "actualCount": 0
+      "actualCount": 71
     }
   },
   "breakdown": {
@@ -147,11 +147,15 @@
       "gtStructurallyUnmatchableSample": []
     },
     "edges": {
-      "actualCount": 0,
-      "fpByResolutionKind": {},
-      "fpByResolution": {},
+      "actualCount": 71,
+      "fpByResolutionKind": {
+        "relative_path": 71
+      },
+      "fpByResolution": {
+        "relative-path": 71
+      },
       "tp": 0,
-      "fp": 0,
+      "fp": 71,
       "fn": 2,
       "jsSpecifierTsSiblingCount": 0,
       "jsSpecifierTsSiblingSample": [],
@@ -280,31 +284,36 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 8,
+      "matchCount": 18,
       "truncated": false,
       "depthHistogram": {
-        "0": 8
+        "0": 8,
+        "1": 8,
+        "2": 2
       },
       "propagationHistogram": {
+        "reverse_import_dependency": 10,
         "direct_request_match": 8
       },
       "gtHitDepth": [],
       "tp": 0,
-      "fp": 8,
+      "fp": 18,
       "fn": 0
     },
     "tests": {
       "matchCount": 24,
       "byAssociation": {
-        "test_path_name_overlap": 24
+        "test_path_name_overlap": 14,
+        "resolved_test_import_to_impacted_file": 10
       },
       "byConfidence": {
-        "low": 24
+        "low": 14,
+        "high": 10
       },
       "overlapTermHistogram": {
         "1": 1,
-        "2": 20,
-        "3": 3
+        "2": 11,
+        "3": 2
       },
       "tp": 2,
       "fp": 22,
@@ -312,22 +321,13 @@
       "sample": [
         {
           "path": "test/base-url.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/body-size.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "body",
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/browser.ts",
@@ -340,48 +340,28 @@
         },
         {
           "path": "test/bytes.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/context.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/fetch.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/formdata-searchparams.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/headers.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "test",
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/helpers/create-http-test-server.ts",

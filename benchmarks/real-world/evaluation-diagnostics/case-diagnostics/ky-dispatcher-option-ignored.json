@@ -13,13 +13,13 @@
     },
     "affectedFiles": {
       "tp": 2,
-      "fp": 9,
+      "fp": 15,
       "fn": 0,
-      "precision": 0.1818,
+      "precision": 0.1176,
       "recall": 1,
-      "f1": 0.3077,
+      "f1": 0.2105,
       "expectedCount": 2,
-      "actualCount": 11
+      "actualCount": 17
     },
     "tests": {
       "tp": 1,
@@ -82,14 +82,14 @@
       "actualCount": 305
     },
     "dependencyEdges": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 3,
-      "precision": 0,
-      "recall": 0,
-      "f1": 0,
+      "tp": 3,
+      "fp": 87,
+      "fn": 0,
+      "precision": 0.0333,
+      "recall": 1,
+      "f1": 0.0645,
       "expectedCount": 3,
-      "actualCount": 0
+      "actualCount": 90
     }
   },
   "breakdown": {
@@ -147,12 +147,16 @@
       "gtStructurallyUnmatchableSample": []
     },
     "edges": {
-      "actualCount": 0,
-      "fpByResolutionKind": {},
-      "fpByResolution": {},
-      "tp": 0,
-      "fp": 0,
-      "fn": 3,
+      "actualCount": 90,
+      "fpByResolutionKind": {
+        "relative_path": 87
+      },
+      "fpByResolution": {
+        "relative-path": 87
+      },
+      "tp": 3,
+      "fp": 87,
+      "fn": 0,
       "jsSpecifierTsSiblingCount": 0,
       "jsSpecifierTsSiblingSample": [],
       "gtEndpointCoverage": {
@@ -307,33 +311,38 @@
       ]
     },
     "affectedFiles": {
-      "matchCount": 11,
+      "matchCount": 17,
       "truncated": false,
       "depthHistogram": {
-        "0": 11
+        "0": 11,
+        "1": 5,
+        "2": 1
       },
       "propagationHistogram": {
-        "direct_request_match": 11
+        "direct_request_match": 11,
+        "reverse_import_dependency": 6
       },
       "gtHitDepth": [
         0,
         0
       ],
       "tp": 2,
-      "fp": 9,
+      "fp": 15,
       "fn": 0
     },
     "tests": {
       "matchCount": 19,
       "byAssociation": {
-        "test_path_name_overlap": 19
+        "resolved_test_import_to_impacted_file": 12,
+        "test_path_name_overlap": 7
       },
       "byConfidence": {
-        "low": 19
+        "high": 12,
+        "low": 7
       },
       "overlapTermHistogram": {
-        "1": 16,
-        "2": 3
+        "1": 6,
+        "2": 1
       },
       "tp": 1,
       "fp": 18,
@@ -341,43 +350,28 @@
       "sample": [
         {
           "path": "test/browser.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/bytes.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/fetch.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/formdata-searchparams.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/headers.ts",
-          "confidence": "low",
-          "association": "test_path_name_overlap",
-          "terms": [
-            "ts"
-          ]
+          "confidence": "high",
+          "association": "resolved_test_import_to_impacted_file"
         },
         {
           "path": "test/helpers/create-http-test-server.ts",
