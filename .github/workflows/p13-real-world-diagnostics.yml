@@ -49,6 +49,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          mkdir -p "$CORPUS_ROOT"
           indices=$(jq -r '.cases[] | (.snapshot.sharedAcquisitionIndex // .caseIndex)' benchmarks/real-world/annotation-worklist.json | sort -un)
           echo "acquiring unique case indices: $indices"
           for index in $indices; do
