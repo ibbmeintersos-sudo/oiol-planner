@@ -302,9 +302,28 @@ async function keyQuota() {
   return out;
 }
 
-async function annotate(item, slot, worklist) {
+const scoredDims = ['directFiles', 'affectedFiles', 'tests', 'packages', 'apiConsumers', 'databaseConsumers', 'migrationFiles', 'scannerSymbols', 'dependencyEdges'];
+
+function reviewTarget(item, slot) {
+  return path.join(root, 'benchmarks/real-world/reviews', item.caseId, slot + '.json');
+}
+
+async function reviewNeedsWork(item, slot, worklist) {
+  const existing = await fs.readFile(reviewTarget(item, slot), 'utf8').catch(() => null);
+  if (!existing || process.env.P12_SKIP_EXISTING !== '1') return true;
+  try {
+    const prior = JSON.parse(existing);
+    const hasEvidence = scoredDims.some((dimension) => (prior.groundTruth?.[dimension] || []).length > 0);
+    return !(validateReview(prior, worklist).ready && hasEvidence);
+  } catch {
+    // Invalid skeleton packets are regenerated.
+    return true;
+  }
+}
+
+async function annotate(item, slot, worklist, preparedEvidence) {
   const model = models[slot];
-  const evidence = await buildEvidence(item);
+  const evidence = preparedEvidence || await buildEvidence(item);
   const basePrompt = promptFor(item, evidence, slot);
   let lastError = null;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -326,6 +345,48 @@ async function annotate(item, slot, worklist) {
   throw new Error(item.caseId + '/' + slot + ': ' + lastError);
 }
 
+async function annotateCase(item, index, total, worklist) {
+  const pending = [];
+  for (const slot of slots) {
+    if (await reviewNeedsWork(item, slot, worklist)) pending.push(slot);
+  }
+  const out = { written: 0, failures: [], quotaExhausted: false, budgetExhausted: false };
+  if (!pending.length) return out;
+  let evidence = null;
+  try {
+    evidence = await buildEvidence(item);
+  } catch (error) {
+    out.failures.push(item.caseId + ': evidence ' + error.message);
+    console.error('FAILED ' + item.caseId + ': evidence ' + error.message);
+    return out;
+  }
+  const results = await Promise.all(pending.map(async (slot) => {
+    try {
+      const review = await annotate(item, slot, worklist, evidence);
+      const target = reviewTarget(item, slot);
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.writeFile(target, JSON.stringify(review, null, 2) + '\n');
+      console.log('WROTE ' + item.caseId + '/' + slot + ' (' + (index + 1) + '/' + total + ')');
+      return { ok: true };
+    } catch (error) {
+      const known = error.message.startsWith(item.caseId) || error.message.startsWith('QUOTA_EXHAUSTED') || error.message.startsWith('CALL_BUDGET_EXHAUSTED');
+      const message = known ? error.message : item.caseId + '/' + slot + ': ' + error.message;
+      console.error('FAILED ' + message);
+      return { ok: false, message, quota: error.message.startsWith('QUOTA_EXHAUSTED'), budget: error.message.startsWith('CALL_BUDGET_EXHAUSTED') };
+    }
+  }));
+  for (const result of results) {
+    if (result.ok) {
+      out.written += 1;
+    } else {
+      out.failures.push(result.message);
+      if (result.quota) out.quotaExhausted = true;
+      if (result.budget) out.budgetExhausted = true;
+    }
+  }
+  return out;
+}
+
 async function main() {
   const worklist = JSON.parse(await fs.readFile(path.join(root, 'benchmarks/real-world/annotation-worklist.json'), 'utf8'));
   const cases = worklist.cases.slice(offset, limit > 0 ? offset + limit : undefined);
@@ -333,40 +394,17 @@ async function main() {
   const failures = [];
   let quotaExhausted = false;
   let budgetExhausted = false;
-  outer:
-  for (const [index, item] of cases.entries()) {
-    for (const slot of slots) {
-      const target = path.join(root, 'benchmarks/real-world/reviews', item.caseId, slot + '.json');
-      const existing = await fs.readFile(target, 'utf8').catch(() => null);
-      if (existing && process.env.P12_SKIP_EXISTING === '1') {
-        try {
-          const prior = JSON.parse(existing);
-          const scoredDims = ['directFiles', 'affectedFiles', 'tests', 'packages', 'apiConsumers', 'databaseConsumers', 'migrationFiles', 'scannerSymbols', 'dependencyEdges'];
-          const hasEvidence = scoredDims.some((dimension) => (prior.groundTruth?.[dimension] || []).length > 0);
-          if (validateReview(prior, worklist).ready && hasEvidence) continue;
-        } catch {
-          // Invalid skeleton packets are regenerated.
-        }
-      }
-      try {
-        const review = await annotate(item, slot, worklist);
-        await fs.mkdir(path.dirname(target), { recursive: true });
-        await fs.writeFile(target, JSON.stringify(review, null, 2) + '\n');
-        written += 1;
-        console.log('WROTE ' + item.caseId + '/' + slot + ' (' + (index + 1) + '/' + cases.length + ')');
-      } catch (error) {
-        failures.push(error.message);
-        console.error('FAILED ' + error.message);
-        if (error.message.startsWith('QUOTA_EXHAUSTED')) {
-          quotaExhausted = true;
-          break outer;
-        }
-        if (error.message.startsWith('CALL_BUDGET_EXHAUSTED')) {
-          budgetExhausted = true;
-          break outer;
-        }
-      }
+  const groupSize = Math.max(1, Number(process.env.P12_CASE_CONCURRENCY || 2));
+  for (let start = 0; start < cases.length; start += groupSize) {
+    const group = cases.slice(start, start + groupSize);
+    const groupResults = await Promise.all(group.map((item, gIndex) => annotateCase(item, start + gIndex, cases.length, worklist)));
+    for (const result of groupResults) {
+      written += result.written;
+      failures.push(...result.failures);
+      if (result.quotaExhausted) quotaExhausted = true;
+      if (result.budgetExhausted) budgetExhausted = true;
     }
+    if (quotaExhausted || budgetExhausted) break;
   }
   const report = {
     quota: await keyQuota(),
