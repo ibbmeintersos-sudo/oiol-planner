@@ -3,38 +3,101 @@
   "caseId": "go-chi-1218-middleware-parse-quoted-contentchars",
   "reviewerId": "R1",
   "independence": {
-    "attested": false,
+    "attested": true,
     "conflictOfInterest": false,
-    "declaration": ""
+    "declaration": "AI-generated annotation produced by nvidia/nemotron-3.5-lightning-30b-a3b from the pinned base snapshot and public change evidence, without access to OIOL outputs or the other review; attested by the repository operator."
   },
-  "blinded": false,
-  "reviewedAt": "",
-  "scopeSummary": "",
+  "blinded": true,
+  "reviewedAt": "2026-11-12T03:10:06.431Z",
+  "scopeSummary": "Implement quoted charset parsing in Content-Type media type parameter handling for chi middleware.",
   "dimensionCoverage": {
-    "directFiles": "partial",
+    "directFiles": "complete",
     "affectedFiles": "partial",
-    "tests": "partial",
-    "packages": "partial",
+    "tests": "complete",
+    "packages": "unsupported",
     "apiConsumers": "partial",
-    "databaseConsumers": "partial",
-    "migrationFiles": "partial",
-    "scannerSymbols": "partial",
+    "databaseConsumers": "unsupported",
+    "migrationFiles": "unsupported",
+    "scannerSymbols": "complete",
     "dependencyEdges": "partial",
-    "unknowns": "partial",
-    "risks": "partial"
+    "unknowns": "complete",
+    "risks": "complete"
   },
   "groundTruth": {
-    "directFiles": [],
-    "affectedFiles": [],
-    "tests": [],
+    "directFiles": [
+      "middleware/content_charset.go"
+    ],
+    "affectedFiles": [
+      "middleware/content_type.go"
+    ],
+    "tests": [
+      "middleware/content_charset_test.go"
+    ],
     "packages": [],
     "apiConsumers": [],
     "databaseConsumers": [],
     "migrationFiles": [],
-    "scannerSymbols": [],
-    "dependencyEdges": [],
-    "unknowns": [],
-    "risks": []
+    "scannerSymbols": [
+      {
+        "file": "middleware/content_charset.go",
+        "name": "ContentCharset",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/content_charset.go",
+        "name": "contentEncoding",
+        "kind": "function"
+      },
+      {
+        "file": "middleware/content_charset.go",
+        "name": "split",
+        "kind": "function"
+      }
+    ],
+    "dependencyEdges": [
+      {
+        "from": "middleware/content_charset.go",
+        "to": "middleware/content_type.go"
+      }
+    ],
+    "unknowns": [
+      "Handling of escaped quotes and non‑standard charset parameter order in real-world Content-Type headers"
+    ],
+    "risks": [
+      {
+        "id": "risk-001",
+        "severity": "medium",
+        "rationale": "Changing charset parsing may cause previously valid unquoted charset values to be rejected or accepted differently, affecting existing deployments."
+      }
+    ]
   },
-  "evidenceNotes": []
+  "evidenceNotes": [
+    {
+      "dimension": "directFiles",
+      "claim": "The content_charset.go file must be modified to parse quoted charset values such as charset=\"UTF-8\".",
+      "evidence": "The current contentEncoding function splits on 'charset=' without quote awareness, as seen in the split logic.",
+      "path": "middleware/content_charset.go",
+      "symbol": "contentEncoding",
+      "lineRange": "23-30",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L23-L30"
+    },
+    {
+      "dimension": "scannerSymbols",
+      "claim": "The symbols ContentCharset, contentEncoding, and split are identified in content_charset.go for parsing logic.",
+      "evidence": "These functions are defined in the file and form the charset parsing pipeline.",
+      "path": "middleware/content_charset.go",
+      "symbol": "ContentCharset",
+      "lineRange": "6-20",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_charset.go#L6-L20"
+    },
+    {
+      "dimension": "affectedFiles",
+      "claim": "AllowContentType in content_type.go may be indirectly affected because it also parses Content-Type parameters.",
+      "evidence": "Although not directly modified, changes to charset parsing could influence downstream middleware composition.",
+      "path": "middleware/content_type.go",
+      "symbol": "AllowContentType",
+      "lineRange": "13-25",
+      "immutableUrl": "https://github.com/go-chi/chi/blob/46295d0582d9fe19194db1ab13ff74d01a02d7bb/middleware/content_type.go#L13-L25"
+    }
+  ]
 }

@@ -10,23 +10,25 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-12T02:09:28.618Z",
-  "cases": 7,
-  "offset": 11,
+  "generatedAt": "2026-11-12T03:31:07.472Z",
+  "cases": 11,
+  "offset": 13,
   "slots": [
     "R1",
     "R2"
   ],
-  "written": 1,
+  "written": 4,
   "failures": [
-    "home-assistant-unifi-disabled-entities/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
-    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
-    "pallets-404-update-project-to-use-uv-for-depende/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
-    "go-chi-1213-middleware-preserve-status-after-emp/R2: Model deepseek-ai/deepseek-v4.1-flash request failed: fetch failed",
-    "CALL_BUDGET_EXHAUSTED: 18 calls used of a 18 budget"
+    "sindresorhus-881-fix-progress-callbacks-for-empty-req/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
+    "pallets-404-update-project-to-use-uv-for-depende/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
+    "go-chi-1213-middleware-preserve-status-after-emp/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
+    "burntsushi-3578-ignore-respect-linked-worktree-exclu/R2: Model minimaxai/minimax-m3.1-flash request failed: fetch failed",
+    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget",
+    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget",
+    "CALL_BUDGET_EXHAUSTED: 24 calls used of a 24 budget"
   ],
-  "callsUsed": 18,
-  "callBudget": 18,
+  "callsUsed": 24,
+  "callBudget": 24,
   "quotaExhausted": false,
   "budgetExhausted": true
 }
